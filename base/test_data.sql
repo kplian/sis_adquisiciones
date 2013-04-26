@@ -278,7 +278,7 @@ INSERT INTO param.tdepto ("id_usuario_reg", "id_usuario_mod", "fecha_reg", "fech
 VALUES (1, NULL, E'2013-04-22 00:00:00', E'2013-04-22 19:41:33.152', E'activo', 15, 11, E'tesor', E'tesoreria', E'tesorer');
 
 INSERT INTO param.tdepto_usuario ("id_usuario_reg", "id_usuario_mod", "fecha_reg", "fecha_mod", "estado_reg", "id_depto_usuario", "id_depto", "id_usuario", "funcion", "cargo")
-VALUES (1, NULL, E'2013-04-22 12:26:11.378', NULL, E'activo', 1, 13, 2, NULL, E'Gerencia de Mantenimiento');
+VALUES (1, NULL, E'2013-04-22 12:26:11.378', NULL, E'activo', 1, 13, 5, NULL, E'Gerencia de Mantenimiento');
 
 INSERT INTO orga.testructura_uo ("id_usuario_reg", "id_usuario_mod", "fecha_reg", "fecha_mod", "estado_reg", "id_estructura_uo", "id_uo_padre", "id_uo_hijo")
 VALUES (1, NULL, E'2012-05-17 00:00:00', NULL, E'activo', 36, 2, 39);
@@ -314,7 +314,7 @@ INSERT INTO segu.tusuario ("id_usuario", "id_clasificador", "cuenta", "contrasen
 VALUES (3, 1, E'caro', E'437612e345ed8c59db6e905a8dc0d1c6', E'2013-04-30', E'2013-04-22', E'xtheme-blue.css', NULL, 8560, E'activo', E'local');
 
 INSERT INTO segu.tusuario ("id_usuario", "id_clasificador", "cuenta", "contrasena", "fecha_caducidad", "fecha_reg", "estilo", "contrasena_anterior", "id_persona", "estado_reg", "autentificacion")
-VALUES (2, 1, E'jaime', E'fde2fdb1dbf604aede0ffee76d26e4ce', E'2013-04-30', E'2013-04-22', E'xtheme-blue.css', NULL, 8786, E'activo', E'local');
+VALUES (5, 1, E'jaime', E'fde2fdb1dbf604aede0ffee76d26e4ce', E'2013-04-30', E'2013-04-22', E'xtheme-blue.css', NULL, 8786, E'activo', E'local');
 
 --INSERT INTO segu.tusuario ("id_usuario", "id_clasificador", "cuenta", "contrasena", "fecha_caducidad", "fecha_reg", "estilo", "contrasena_anterior", "id_persona", "estado_reg", "autentificacion")
 --VALUES (9, 1, E'victor', E'ffc150a160d37e92012c196b6af4160d', E'2013-04-30', E'2013-04-22', E'xtheme-blue.css', NULL, 8465, E'activo', E'local');
@@ -401,7 +401,7 @@ VALUES (5, 3, 6, NULL, E'activo');
 --VALUES (2, 2, 2, NULL, E'inactivo');
 
 INSERT INTO segu.tusuario_rol ("id_usuario_rol", "id_rol", "id_usuario", "fecha_reg", "estado_reg")
-VALUES (8, 4, 2, NULL, E'activo');
+VALUES (8, 4, 5, NULL, E'activo');
 
 INSERT INTO segu.tusuario_rol ("id_usuario_rol", "id_rol", "id_usuario", "fecha_reg", "estado_reg")
 VALUES (9, 5, 75, NULL, E'activo');
