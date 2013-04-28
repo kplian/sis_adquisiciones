@@ -90,7 +90,7 @@ Phx.vista.TipoDocumento=Ext.extend(Phx.gridInterfaz,{
         {
             config:{
                 name: 'nombre_tipo_doc',
-                fieldLabel: 'Nombre tipo documento',
+                fieldLabel: 'Extensiones Permitidas',
                 allowBlank: true,
                 anchor: '80%',
                 gwidth: 160,

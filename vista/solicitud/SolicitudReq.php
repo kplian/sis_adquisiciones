@@ -159,7 +159,7 @@ Phx.vista.SolicitudReq = {
          
     onButtonNew:function(){
        Phx.vista.SolicitudReq.superclass.onButtonNew.call(this); 
-       this.cmpFechaSoli.enable();
+       
        this.cmpIdDepto.enable(); 
          
        this.Cmp.id_categoria_compra.enable();

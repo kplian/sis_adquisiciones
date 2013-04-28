@@ -44,8 +44,7 @@ Phx.vista.ChequeoDocumentoSol=Ext.extend(Phx.gridInterfaz,{
         
         this.iniciarEventos();
         this.Atributos[1].valorInicial = this.id_solicitud;
-        this.Atributos[2].valorInicial = this.id_categoria_compra;
-        this.Atributos[4].valorInicial = '';        
+        this.Atributos[4].valorInicial = this.id_categoria_compra;        
         this.Atributos[8].valorInicial = '';
     },
             
@@ -69,6 +68,36 @@ Phx.vista.ChequeoDocumentoSol=Ext.extend(Phx.gridInterfaz,{
             },
             type:'Field',
             form:true 
+        },
+        {
+            //configuracion del componente
+            config:{
+                    labelSeparator:'',
+                    inputType:'hidden',
+                    name: 'nombre_arch_doc'
+            },
+            type:'Field',
+            form:true 
+        },
+        {
+            config:{
+                name: 'chequeado',
+                fieldLabel: 'Chequeado',
+                allowBlank: true,
+                anchor: '80%',
+                gwidth: 100,
+                renderer:function (value, p, record){  
+                            if(record.data['chequeado'] == 'true')
+                            	return  String.format('{0}',"<div style='text-align:center'><img src = '../../../lib/imagenes/icono_dibu/dibu_ok.png' align='center' width='45' height='45'/></div>");
+                            else
+                            	return  String.format('{0}',"<div style='text-align:center'><img src = '../../../lib/imagenes/icono_dibu/dibu_eli.png' align='center' width='45' height='45'/></div>");
+                        },
+            },
+            type:'Checkbox',
+            filters:{pfiltro:'docsol.chequeado',type:'string'},
+            id_grupo:1,
+            grid:true,
+            form:true
         },
         {
             config: {
@@ -119,7 +148,7 @@ Phx.vista.ChequeoDocumentoSol=Ext.extend(Phx.gridInterfaz,{
         {
             config:{
                 name: 'nombre_doc',
-                fieldLabel: 'Descripción Documento',
+                fieldLabel: 'Nombre Documento',
                 allowBlank: true,
                 anchor: '80%',
                 gwidth: 150,
@@ -131,21 +160,7 @@ Phx.vista.ChequeoDocumentoSol=Ext.extend(Phx.gridInterfaz,{
             grid:true,
             form:true
         },
-        {
-            config:{
-                name: 'nombre_arch_doc',
-                fieldLabel: 'Nombre archivo',
-                allowBlank: true,
-                anchor: '80%',
-                gwidth: 150,
-                maxLength:300
-            },
-            type:'Field',
-            filters:{pfiltro:'docsol.nombre_arch_doc',type:'string'},
-            id_grupo:1,
-            grid:true,
-            form:true
-        },
+        
         {
             config:{
                 fieldLabel: "Enlace",
@@ -172,7 +187,7 @@ Phx.vista.ChequeoDocumentoSol=Ext.extend(Phx.gridInterfaz,{
         {
             config:{
                 name: 'nombre_tipo_doc',
-                fieldLabel: 'Nombre tipo documento',
+                fieldLabel: 'Extensiones Permitidas',
                 allowBlank: true,
                 anchor: '80%',
                 gwidth: 100,
@@ -199,20 +214,7 @@ Phx.vista.ChequeoDocumentoSol=Ext.extend(Phx.gridInterfaz,{
             grid:true,
             form:false
         },
-        {
-            config:{
-                name: 'chequeado',
-                fieldLabel: 'Chequeado',
-                allowBlank: true,
-                anchor: '80%',
-                gwidth: 100
-            },
-            type:'Checkbox',
-            filters:{pfiltro:'docsol.chequeado',type:'string'},
-            id_grupo:1,
-            grid:true,
-            form:true
-        },
+        
         {
             config:{
                 name: 'estado_reg',
@@ -321,8 +323,10 @@ Phx.vista.ChequeoDocumentoSol=Ext.extend(Phx.gridInterfaz,{
         field: 'id_documento_sol',
         direction: 'ASC'
     },
-    bdel:true,
-    bsave:true,
+    bdel:false,
+    bnew:true,
+    bedit:false,
+    bsave:false,
     fwidht: 450,
     fheight: 300,
     preparaMenu:function(tb){
@@ -338,7 +342,6 @@ Phx.vista.ChequeoDocumentoSol=Ext.extend(Phx.gridInterfaz,{
     iniciarEventos:function()
     {       
         this.ocultarComponente(this.getComponente('id_categoria_compra'));
-        this.ocultarComponente(this.getComponente('nombre_arch_doc'));
         this.ocultarComponente(this.getComponente('chequeado'));
     },
     }
