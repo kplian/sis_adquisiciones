@@ -261,7 +261,7 @@ VALUES (5, 4, 5, NULL, E'activo');
 -- DATOS PARA BOA
 -- Autor Gonzalo Sarmiento Sejas
 --------------------------------------
-
+/*
 INSERT INTO segu.tpersona ("id_usuario_reg", "id_usuario_mod", "fecha_reg", "fecha_mod", "estado_reg", "id_persona", "nombre", "apellido_paterno", "apellido_materno", "ci", "correo", "celular1", "num_documento", "telefono1", "telefono2", "celular2", "foto", "extension", "genero", "fecha_nacimiento", "direccion")
 VALUES (1, NULL, E'2012-05-20 00:00:00', NULL, E'activo', 8466, E'MARCO ANTONIO', E'MENDOZA', E'SALAZAR', E'4417656', E'marco_mendoza77@hotmail.com', E'72242710', NULL, E'4490612', E'4140873', E'72242710', NULL, NULL, E'', E'1977-08-10', E'ZENOBIO GALLARDO 3403');
 
@@ -376,9 +376,9 @@ VALUES (1, NULL, E'2008-10-01 00:00:00', NULL, E'activo', 32, NULL, E'ACCESS NET
 INSERT INTO param.tproveedor ("id_usuario_reg", "id_usuario_mod", "fecha_reg", "fecha_mod", "estado_reg", "id_proveedor", "id_institucion", "id_persona", "tipo", "numero_sigma", "codigo", "nit", "id_lugar")
 VALUES (1, NULL, E'2008-10-01 00:00:00', NULL, E'activo', 21, 32, NULL, NULL, NULL, E'PROV0021', NULL, NULL);
 
-
+*/
 /* Data for the 'segu.tusuario_rol' table  (Records 1 - 9) */
-
+/*
 --INSERT INTO segu.tusuario_rol ("id_usuario_rol", "id_rol", "id_usuario", "fecha_reg", "estado_reg")
 --VALUES (1, 1, 1, E'2011-05-17', E'activo');
 
@@ -404,4 +404,4 @@ INSERT INTO segu.tusuario_rol ("id_usuario_rol", "id_rol", "id_usuario", "fecha_
 VALUES (8, 4, 5, NULL, E'activo');
 
 INSERT INTO segu.tusuario_rol ("id_usuario_rol", "id_rol", "id_usuario", "fecha_reg", "estado_reg")
-VALUES (9, 5, 75, NULL, E'activo');
+VALUES (9, 5, 75, NULL, E'activo');*/

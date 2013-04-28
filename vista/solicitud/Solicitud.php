@@ -209,6 +209,21 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
    		     grid:true,
    			form:true
    	      },
+        {
+            config:{
+                name: 'obs',
+                fieldLabel: 'Instrucciones/Obs',
+                allowBlank: true,
+                anchor: '80%',
+                gwidth: 150,
+                maxLength:4
+            },
+            type:'Field',
+            filters:{pfiltro:'ew.obs',type:'string'},
+            id_grupo:1,
+            grid:true,
+            form:false
+        },
    	      
          {
             config:{
@@ -522,7 +537,8 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
 		'desc_depto',
 		'desc_proceso_macro',
 		'desc_categoria_compra',
-		'id_proceso_macro'
+		'id_proceso_macro',
+		'obs'
 		
 	],
 	
