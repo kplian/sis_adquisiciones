@@ -1,3 +1,5 @@
+--------------- SQL ---------------
+
 CREATE OR REPLACE FUNCTION adq.f_solicitud_sel (
   p_administrador integer,
   p_id_usuario integer,
@@ -46,7 +48,7 @@ BEGIN
 	if(p_transaccion='ADQ_SOL_SEL')then
      				
     	begin
-            --si es administrador
+          --si es administrador
             
             v_filtro='';
             if (v_parametros.id_funcionario_usu is null) then
@@ -74,8 +76,7 @@ BEGIN
                 
                 
             END IF;
-            
-       
+           
         
         
         
@@ -121,7 +122,8 @@ BEGIN
                         cat.nombre as desc_categoria_compra,
                         sol.id_proceso_macro,
                         sol.numero,
-                        funrpc.desc_funcionario1 as desc_funcionario_rpc
+                        funrpc.desc_funcionario1 as desc_funcionario_rpc,
+                        ew.obs
                         	
 						from adq.tsolicitud sol
 						inner join segu.tusuario usu1 on usu1.id_usuario = sol.id_usuario_reg
@@ -147,6 +149,7 @@ BEGIN
 			v_consulta:=v_consulta||v_parametros.filtro;
 			v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
 
+             raise notice '%',v_consulta;
 			--Devuelve la respuesta
 			return v_consulta;
 						
@@ -246,6 +249,10 @@ BEGIN
 
 		begin
             v_filtro='';
+            
+         
+            
+           v_filtro='';
             
          	if (v_parametros.id_funcionario_usu is null) then
             	v_parametros.id_funcionario_usu = -1;
