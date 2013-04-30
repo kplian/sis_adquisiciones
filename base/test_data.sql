@@ -4,38 +4,30 @@
 
 
 
-/* Data for the 'param.taprobador' table  (Records 1 - 3) */
-/*
-INSERT INTO param.taprobador ("id_usuario_reg", "id_usuario_mod", "fecha_reg", "fecha_mod", "estado_reg", "id_funcionario", "id_subsistema", "id_centro_costo", "monto_min", "monto_max", "fecha_ini", "fecha_fin", "id_uo", "obs", "id_ep")
-VALUES (1, NULL, E'2013-03-20 13:40:10.761', NULL, E'activo', 2, 6, NULL, '0', NULL, E'2013-01-01', NULL, 2, E'', NULL);
+/* Data for the 'param.taprobador' table  (Records 1 - 1) */
 
-INSERT INTO param.taprobador ("id_usuario_reg", "id_usuario_mod", "fecha_reg", "fecha_mod", "estado_reg", "id_funcionario", "id_subsistema", "id_centro_costo", "monto_min", "monto_max", "fecha_ini", "fecha_fin", "id_uo", "obs", "id_ep")
-VALUES (1, NULL, E'2013-03-20 13:41:13.113', NULL, E'activo', 3, 6, NULL, '0', NULL, E'2012-11-01', NULL, 7, E'', NULL);
-
-INSERT INTO param.taprobador ("id_usuario_reg", "id_usuario_mod", "fecha_reg", "fecha_mod", "estado_reg", "id_funcionario", "id_subsistema", "id_centro_costo", "monto_min", "monto_max", "fecha_ini", "fecha_fin", "id_uo", "obs", "id_ep")
-VALUES (1, NULL, E'2013-03-20 13:41:21.555', NULL, E'activo', 3, 6, NULL, '0', NULL, E'2012-11-01', NULL, 9, E'', NULL);
-*/
+INSERT INTO param.taprobador ("id_usuario_reg", "id_usuario_mod", "fecha_reg", "fecha_mod", "estado_reg", "id_aprobador", "id_funcionario", "id_subsistema", "id_centro_costo", "monto_min", "monto_max", "fecha_ini", "fecha_fin", "id_uo", "obs", "id_ep")
+VALUES (1, NULL, E'2013-04-30 16:03:43.643', NULL, E'activo', 1, 300, 7, NULL, '0', NULL, E'2013-02-01', NULL, 39, E'', NULL);
 
 ---------------------------------------------------
 -- DEPTOS (EN PARAMETROS)
 ------------------------------------------------
 
-/* Data for the 'param.tdepto' table  (Records 1 - 2) */
-/*
-INSERT INTO param.tdepto ("id_usuario_reg", "id_usuario_mod", "fecha_reg", "fecha_mod", "estado_reg", "id_subsistema", "codigo", "nombre", "nombre_corto")
-VALUES (1, NULL, E'2013-03-20 00:00:00', E'2013-03-20 14:17:22.287', E'activo', 6, E'ADQ', E'Adquisiciones  Central', E'');
+/* Data for the 'param.tdepto' table  (Records 1 - 1) */
 
-INSERT INTO param.tdepto ("id_usuario_reg", "id_usuario_mod", "fecha_reg", "fecha_mod", "estado_reg", "id_subsistema", "codigo", "nombre", "nombre_corto")
-VALUES (1, NULL, E'2013-03-20 00:00:00', E'2013-03-20 14:17:45.392', E'activo', 6, E'ADQLP', E'Departamento de Adquisiciones La Paz', E'ADQLP');
-*/
-/* Data for the 'param.tdepto_usuario' table  (Records 1 - 2) */
-/*
-INSERT INTO param.tdepto_usuario ("id_usuario_reg", "id_usuario_mod", "fecha_reg", "fecha_mod", "estado_reg", "id_depto", "id_usuario", "funcion", "cargo")
-VALUES (1, NULL, E'2013-03-20 14:17:55.046', NULL, E'activo', 2, 1, NULL, E'');
+INSERT INTO param.tdepto ("id_usuario_reg", "id_usuario_mod", "fecha_reg", "fecha_mod", "estado_reg", "id_depto", "id_subsistema", "codigo", "nombre", "nombre_corto")
+VALUES (1, NULL, E'2013-04-30 00:00:00', E'2013-04-30 15:46:26.154', E'activo', 5, 7, E'ADQ-CEN', E'Adquisiciones Central', E'');
 
-INSERT INTO param.tdepto_usuario ("id_usuario_reg", "id_usuario_mod", "fecha_reg", "fecha_mod", "estado_reg", "id_depto", "id_usuario", "funcion", "cargo")
-VALUES (1, NULL, E'2013-03-20 14:18:01.481', NULL, E'activo', 1, 1, NULL, E'');
-*/
+/* Data for the 'param.tdepto_usuario' table  (Records 1 - 3) */
+
+INSERT INTO param.tdepto_usuario ("id_usuario_reg", "id_usuario_mod", "fecha_reg", "fecha_mod", "estado_reg", "id_depto_usuario", "id_depto", "id_usuario", "funcion", "cargo")
+VALUES (1, NULL, E'2013-04-30 15:46:58.360', NULL, E'activo', 1, 5, 51, NULL, E'Solicitante');
+
+INSERT INTO param.tdepto_usuario ("id_usuario_reg", "id_usuario_mod", "fecha_reg", "fecha_mod", "estado_reg", "id_depto_usuario", "id_depto", "id_usuario", "funcion", "cargo")
+VALUES (1, NULL, E'2013-04-30 16:52:12.692', NULL, E'activo', 2, 5, 55, NULL, E'responsable proceso compra');
+
+INSERT INTO param.tdepto_usuario ("id_usuario_reg", "id_usuario_mod", "fecha_reg", "fecha_mod", "estado_reg", "id_depto_usuario", "id_depto", "id_usuario", "funcion", "cargo")
+VALUES (1, NULL, E'2013-04-30 18:49:37.675', NULL, E'activo', 3, 5, 52, NULL, E'visto bueno');
 
 -------------------------------------------
 -- INICIO ROLES 
@@ -210,123 +202,26 @@ select pxp.f_insert_trol_procedimiento_gui ('Proceso de compra encargado', 'ADQ_
 select pxp.f_insert_trol_procedimiento_gui ('Proceso de compra encargado', 'PM_DEPPTO_SEL', 'PROC');
 select pxp.f_insert_trol_procedimiento_gui ('Proceso de compra encargado', 'ADQ_SOLD_SEL', 'PROC');
 select pxp.f_insert_trol_procedimiento_gui ('Proceso de compra encargado', 'ADQ_FINREGC_IME', 'PROC');
---select pxp.f_insert_trol_procedimiento_gui ('Proceso de compra encargado', 'ADQ_ANTEST_IME', 'PROC');
---select pxp.f_insert_trol_procedimiento_gui ('Proceso de compra encargado', 'ADQ_GENOC_IME', 'PROC');
---select pxp.f_insert_trol_procedimiento_gui ('Proceso de compra encargado', 'ADQ_TOTALADJ_IME', 'PROC');
---select pxp.f_insert_trol_procedimiento_gui ('Proceso de compra encargado', 'ADQ_ADJDET_IME', 'PROC');
 select pxp.f_insert_trol_procedimiento_gui ('Proceso de compra encargado', 'ADQ_COTOC_REP', 'PROC.1');
 select pxp.f_insert_trol_procedimiento_gui ('Proceso de compra encargado', 'ADQ_HABPAG_IME', 'PROC.1');
+select pxp.f_insert_trol_procedimiento_gui ('Proceso de compra encargado', 'ADQ_ANTEST_IME', 'PROC.1');
+select pxp.f_insert_trol_procedimiento_gui ('Proceso de compra encargado', 'ADQ_ADJTODO_IME', 'PROC.1');
+select pxp.f_insert_trol_procedimiento_gui ('Proceso de compra encargado', 'ADQ_TOTALADJ_IME', 'PROC.1.1');
+select pxp.f_insert_trol_procedimiento_gui ('Proceso de compra encargado', 'ADQ_ADJDET_IME', 'PROC.1.1');
+select pxp.f_insert_trol_procedimiento_gui ('Proceso de compra encargado', 'ADQ_GENOC_IME', 'PROC.1');
 -------------------------------------------
 -- FIN ROLES 
 -- Autor Gonzalo Sarmiento Sejas
 ------------------------------------------
 
 
--------------------------------------------
--- INICIO USUARIOS DE PRUEBA 
--- Autor Gonzalo Sarmiento Sejas
-------------------------------------------
-/*
-INSERT INTO segu.tusuario ("id_usuario", "id_clasificador", "cuenta", "contrasena", "fecha_caducidad", "fecha_reg", "estilo", "contrasena_anterior", "id_persona", "estado_reg", "autentificacion")
-VALUES (2, 1, E'juan', E'a94652aa97c7211ba8954dd15a3cf838', E'2014-04-29', E'2013-03-28', E'xtheme-blue.css', NULL, 2, E'activo', E'local');
-
-INSERT INTO segu.tusuario ("id_usuario", "id_clasificador", "cuenta", "contrasena", "fecha_caducidad", "fecha_reg", "estilo", "contrasena_anterior", "id_persona", "estado_reg", "autentificacion")
-VALUES (3, 1, E'ga', E'32d7508fe69220cb40af28441ef746d9', E'2014-04-29', E'2013-03-28', E'xtheme-blue.css', NULL, 4, E'activo', E'local');
-
-INSERT INTO segu.tusuario ("id_usuario", "id_clasificador", "cuenta", "contrasena", "fecha_caducidad", "fecha_reg", "estilo", "contrasena_anterior", "id_persona", "estado_reg", "autentificacion")
-VALUES (4, 1, E'jo', E'674f33841e2309ffdd24c85dc3b999de', E'2014-04-29', E'2013-03-28', E'xtheme-blue.css', NULL, 5, E'activo', E'local');
-
-INSERT INTO segu.tusuario ("id_usuario", "id_clasificador", "cuenta", "contrasena", "fecha_caducidad", "fecha_reg", "estilo", "contrasena_anterior", "id_persona", "estado_reg", "autentificacion")
-VALUES (5, 1, E'edu', E'379ef4bd50c30e261ccfb18dfc626d9f', E'2014-04-29', E'2013-03-28', E'xtheme-blue.css', NULL, 6, E'activo', E'local');
-*/
-/*
-INSERT INTO segu.tusuario_rol ("id_usuario_rol", "id_rol", "id_usuario", "fecha_reg", "estado_reg")
-VALUES (2, 2, 2, NULL, E'activo');
-
-INSERT INTO segu.tusuario_rol ("id_usuario_rol", "id_rol", "id_usuario", "fecha_reg", "estado_reg")
-VALUES (3, 3, 3, NULL, E'activo');
-
-INSERT INTO segu.tusuario_rol ("id_usuario_rol", "id_rol", "id_usuario", "fecha_reg", "estado_reg")
-VALUES (4, 3, 4, NULL, E'activo');
-
-INSERT INTO segu.tusuario_rol ("id_usuario_rol", "id_rol", "id_usuario", "fecha_reg", "estado_reg")
-VALUES (5, 4, 5, NULL, E'activo');
-*/
--------------------------------------------
--- FIN USUARIOS DE PRUEBA 
--- Autor Gonzalo Sarmiento Sejas
-------------------------------------------
-
 -------------------------------------
 -- DATOS PARA BOA
 -- Autor Gonzalo Sarmiento Sejas
 --------------------------------------
 
-INSERT INTO segu.tpersona ("id_usuario_reg", "id_usuario_mod", "fecha_reg", "fecha_mod", "estado_reg", "id_persona", "nombre", "apellido_paterno", "apellido_materno", "ci", "correo", "celular1", "num_documento", "telefono1", "telefono2", "celular2", "foto", "extension", "genero", "fecha_nacimiento", "direccion")
-VALUES (1, NULL, E'2012-05-20 00:00:00', NULL, E'activo', 8466, E'MARCO ANTONIO', E'MENDOZA', E'SALAZAR', E'4417656', E'marco_mendoza77@hotmail.com', E'72242710', NULL, E'4490612', E'4140873', E'72242710', NULL, NULL, E'', E'1977-08-10', E'ZENOBIO GALLARDO 3403');
-
-INSERT INTO orga.tfuncionario ("id_usuario_reg", "id_usuario_mod", "fecha_reg", "fecha_mod", "estado_reg", "id_funcionario", "id_persona", "codigo", "email_empresa", "interno", "fecha_ingreso", "telefono_ofi")
-VALUES (1, NULL, E'2012-06-04 00:00:00', NULL, E'activo', 69, 8466, E'77-0810-MSM', NULL, NULL, E'2013-04-22', NULL);
-
-INSERT INTO param.taprobador ("id_usuario_reg", "id_usuario_mod", "fecha_reg", "fecha_mod", "estado_reg", "id_aprobador", "id_funcionario", "id_subsistema", "id_centro_costo", "monto_min", "monto_max", "fecha_ini", "fecha_fin", "id_uo", "obs", "id_ep")
-VALUES (1, 1, E'2013-04-22 16:33:51.600', E'2013-04-22 16:42:06.048', E'activo', 3, 69, 6, NULL, '0', NULL, E'2013-04-22', NULL, 9, E'', NULL);
-
-INSERT INTO param.tdepto ("id_usuario_reg", "id_usuario_mod", "fecha_reg", "fecha_mod", "estado_reg", "id_depto", "id_subsistema", "codigo", "nombre", "nombre_corto")
-VALUES (1, NULL, E'2013-04-22 00:00:00', E'2013-04-22 12:25:30.633', E'activo', 13, 6, E'DAQ-CENTRAL', E'Departamento de Adquisiciones', E'Adquisiciones');
-
-INSERT INTO param.tdepto ("id_usuario_reg", "id_usuario_mod", "fecha_reg", "fecha_mod", "estado_reg", "id_depto", "id_subsistema", "codigo", "nombre", "nombre_corto")
-VALUES (1, NULL, E'2013-04-22 00:00:00', E'2013-04-22 19:41:33.152', E'activo', 15, 11, E'tesor', E'tesoreria', E'tesorer');
-
-INSERT INTO param.tdepto_usuario ("id_usuario_reg", "id_usuario_mod", "fecha_reg", "fecha_mod", "estado_reg", "id_depto_usuario", "id_depto", "id_usuario", "funcion", "cargo")
-VALUES (1, NULL, E'2013-04-22 12:26:11.378', NULL, E'activo', 1, 13, 5, NULL, E'Gerencia de Mantenimiento');
-
-INSERT INTO orga.testructura_uo ("id_usuario_reg", "id_usuario_mod", "fecha_reg", "fecha_mod", "estado_reg", "id_estructura_uo", "id_uo_padre", "id_uo_hijo")
-VALUES (1, NULL, E'2012-05-17 00:00:00', NULL, E'activo', 36, 2, 39);
-
-INSERT INTO orga.tuo ("id_usuario_reg", "id_usuario_mod", "fecha_reg", "fecha_mod", "estado_reg", "id_uo", "nombre_unidad", "nombre_cargo", "cargo_individual", "descripcion", "presupuesta", "codigo", "nodo_base", "gerencia", "correspondencia")
-VALUES (1, NULL, E'2012-05-17 00:00:00', NULL, E'activo', 39, E'Departamento de Mantenimiento', E'Jefe Departamento de Mantenimiento', E'si', E'Jefe Departamento de Mantenimiento', E'si', E'MD', E'no', E'no', E'no');
-
-INSERT INTO orga.tuo_funcionario ("id_usuario_reg", "id_usuario_mod", "fecha_reg", "fecha_mod", "estado_reg", "id_uo_funcionario", "id_uo", "id_funcionario", "fecha_asignacion", "fecha_finalizacion")
-VALUES (NULL, NULL, E'2013-04-23 12:19:22.685', E'2013-04-23 12:19:22.685', E'activo', 4, 39, 69, E'2013-04-23', NULL);
-
-INSERT INTO param.tdepto_uo ("id_usuario_reg", "id_usuario_mod", "fecha_reg", "fecha_mod", "estado_reg", "id_depto_uo", "id_depto", "id_uo")
-VALUES (1, NULL, E'2013-04-22 12:26:50.907', NULL, E'activo', 1, 13, 39);
-
-INSERT INTO segu.tpersona ("id_usuario_reg", "id_usuario_mod", "fecha_reg", "fecha_mod", "estado_reg", "id_persona", "nombre", "apellido_paterno", "apellido_materno", "ci", "correo", "celular1", "num_documento", "telefono1", "telefono2", "celular2", "foto", "extension", "genero", "fecha_nacimiento", "direccion")
-VALUES (1, NULL, E'2012-05-22 00:00:00', NULL, E'activo', 8716, E'ROGER WILMER', E'BALDERRAMA', E'ANGULO', E'3006828', E'wilmer.balderrama@gmail.com', E'71727872', NULL, E'4450210', E'4141968', E'72242020', NULL, NULL, E'', E'1963-05-26', E'CALLE SCHILLER NO. 0394');
-
-INSERT INTO segu.tpersona ("id_usuario_reg", "id_usuario_mod", "fecha_reg", "fecha_mod", "estado_reg", "id_persona", "nombre", "apellido_paterno", "apellido_materno", "ci", "correo", "celular1", "num_documento", "telefono1", "telefono2", "celular2", "foto", "extension", "genero", "fecha_nacimiento", "direccion")
-VALUES (1, NULL, E'2012-05-21 00:00:00', NULL, E'activo', 8560, E'CAROLINA VANESSA', E'JORDAN', E'CARDONA', E'5308868', E'cjordan@boa.bo', E'70303805', NULL, E'4242157', NULL, NULL, NULL, NULL, E'', E'1983-01-09', E'pasaje luis calvo');
-
-INSERT INTO segu.tpersona ("id_usuario_reg", "id_usuario_mod", "fecha_reg", "fecha_mod", "estado_reg", "id_persona", "nombre", "apellido_paterno", "apellido_materno", "ci", "correo", "celular1", "num_documento", "telefono1", "telefono2", "celular2", "foto", "extension", "genero", "fecha_nacimiento", "direccion")
-VALUES (1, NULL, E'2012-05-22 00:00:00', NULL, E'activo', 8786, E'PASTOR JAIME', E'LAZARTE', E'VILLAGRA', E'3136291', E'pjlazarte@hotmail.com', E'72249882', NULL, E'4712718', E'4159321', E'72249882', NULL, NULL, E'', E'1966-06-05', E'URB.LOS OLIVOS');
-
---INSERT INTO segu.tpersona ("id_usuario_reg", "id_usuario_mod", "fecha_reg", "fecha_mod", "estado_reg", "id_persona", "nombre", "apellido_paterno", "apellido_materno", "ci", "correo", "celular1", "num_documento", "telefono1", "telefono2", "celular2", "foto", "extension", "genero", "fecha_nacimiento", "direccion")
---VALUES (1, NULL, E'2012-05-20 00:00:00', NULL, E'activo', 8465, E'VICTOR', E'MAMANI', E'VARGAS', E'2228187', E'vmamani@boa.bo', E'72201285', NULL, E'4122438', NULL, NULL, NULL, NULL, E'', E'1954-11-08', E'GabrielReneMoreno106');
-
-INSERT INTO segu.tpersona ("id_usuario_reg", "id_usuario_mod", "fecha_reg", "fecha_mod", "estado_reg", "id_persona", "nombre", "apellido_paterno", "apellido_materno", "ci", "correo", "celular1", "num_documento", "telefono1", "telefono2", "celular2", "foto", "extension", "genero", "fecha_nacimiento", "direccion")
-VALUES (1, NULL, E'2012-05-17 00:00:00', E'2012-05-17 00:00:00', E'activo', 8415, E'ROCIO ESDENKA', E'CLAURE', E'CASTELLON', NULL, E'rclaure@boa.bo', NULL, NULL, NULL, NULL, NULL, NULL, NULL, E'', E'2012-05-07', NULL);
-
-INSERT INTO segu.tusuario ("id_usuario", "id_clasificador", "cuenta", "contrasena", "fecha_caducidad", "fecha_reg", "estilo", "contrasena_anterior", "id_persona", "estado_reg", "autentificacion")
-VALUES (6, 1, E'roger', E'b911af807c2df88d671bd7004c54c1c2', E'2013-04-30', E'2013-04-22', E'xtheme-gray.css', NULL, 8716, E'activo', E'local');
-
-INSERT INTO segu.tusuario ("id_usuario", "id_clasificador", "cuenta", "contrasena", "fecha_caducidad", "fecha_reg", "estilo", "contrasena_anterior", "id_persona", "estado_reg", "autentificacion")
-VALUES (3, 1, E'caro', E'437612e345ed8c59db6e905a8dc0d1c6', E'2013-04-30', E'2013-04-22', E'xtheme-blue.css', NULL, 8560, E'activo', E'local');
-
-INSERT INTO segu.tusuario ("id_usuario", "id_clasificador", "cuenta", "contrasena", "fecha_caducidad", "fecha_reg", "estilo", "contrasena_anterior", "id_persona", "estado_reg", "autentificacion")
-VALUES (5, 1, E'jaime', E'fde2fdb1dbf604aede0ffee76d26e4ce', E'2013-04-30', E'2013-04-22', E'xtheme-blue.css', NULL, 8786, E'activo', E'local');
-
---INSERT INTO segu.tusuario ("id_usuario", "id_clasificador", "cuenta", "contrasena", "fecha_caducidad", "fecha_reg", "estilo", "contrasena_anterior", "id_persona", "estado_reg", "autentificacion")
---VALUES (9, 1, E'victor', E'ffc150a160d37e92012c196b6af4160d', E'2013-04-30', E'2013-04-22', E'xtheme-blue.css', NULL, 8465, E'activo', E'local');
-
-INSERT INTO segu.tusuario ("id_usuario", "id_clasificador", "cuenta", "contrasena", "fecha_caducidad", "fecha_reg", "estilo", "contrasena_anterior", "id_persona", "estado_reg", "autentificacion")
-VALUES (4, 1, E'marco', E'f5888d0bb58d611107e11f7cbc41c97a', E'2013-04-30', E'2013-04-22', E'xtheme-gray.css', NULL, 8466, E'activo', E'local');
-
-INSERT INTO segu.tusuario ("id_usuario", "id_clasificador", "cuenta", "contrasena", "fecha_caducidad", "fecha_reg", "estilo", "contrasena_anterior", "id_persona", "estado_reg", "autentificacion")
-VALUES (75, 2, E'rocio', E'325daa03a34823cef2fc367c779561ba', E'2013-04-30', E'2013-04-22', E'xtheme-gray.css', E'85741b002a62a335b970190271b9cadf', 8415, E'activo', E'local');
-
-INSERT INTO orga.tfuncionario ("id_usuario_reg", "id_usuario_mod", "fecha_reg", "fecha_mod", "estado_reg", "id_funcionario", "id_persona", "codigo", "email_empresa", "interno", "fecha_ingreso", "telefono_ofi")
-VALUES (1, NULL, E'2012-06-04 00:00:00', NULL, E'activo', 300, 8716, E'63-0526-BAR', NULL, NULL, E'2013-04-22', NULL);
+INSERT INTO wf.tfuncionario_tipo_estado ("id_usuario_reg", "id_usuario_mod", "fecha_reg", "fecha_mod", "estado_reg", "id_funcionario_tipo_estado", "id_tipo_estado", "id_funcionario", "id_depto", "id_labores_tipo_proceso")
+VALUES (1, NULL, E'2013-04-30 16:28:35.283', NULL, E'activo', 1, 6, 64, 5, NULL);
 
 INSERT INTO param.tgestion ("id_usuario_reg", "id_usuario_mod", "fecha_reg", "fecha_mod", "estado_reg", "id_gestion", "gestion", "estado", "id_moneda_base", "id_empresa")
 VALUES (1, NULL, E'2013-04-22 11:23:43.102', NULL, E'activo', 11, 2013, E'abierto', 1, 1);
@@ -376,32 +271,3 @@ VALUES (1, NULL, E'2008-10-01 00:00:00', NULL, E'activo', 32, NULL, E'ACCESS NET
 INSERT INTO param.tproveedor ("id_usuario_reg", "id_usuario_mod", "fecha_reg", "fecha_mod", "estado_reg", "id_proveedor", "id_institucion", "id_persona", "tipo", "numero_sigma", "codigo", "nit", "id_lugar")
 VALUES (1, NULL, E'2008-10-01 00:00:00', NULL, E'activo', 21, 32, NULL, NULL, NULL, E'PROV0021', NULL, NULL);
 
-
-/* Data for the 'segu.tusuario_rol' table  (Records 1 - 9) */
-
---INSERT INTO segu.tusuario_rol ("id_usuario_rol", "id_rol", "id_usuario", "fecha_reg", "estado_reg")
---VALUES (1, 1, 1, E'2011-05-17', E'activo');
-
-INSERT INTO segu.tusuario_rol ("id_usuario_rol", "id_rol", "id_usuario", "fecha_reg", "estado_reg")
-VALUES (3, 2, 3, NULL, E'activo');
-
-INSERT INTO segu.tusuario_rol ("id_usuario_rol", "id_rol", "id_usuario", "fecha_reg", "estado_reg")
-VALUES (4, 3, 4, NULL, E'activo');
-
-INSERT INTO segu.tusuario_rol ("id_usuario_rol", "id_rol", "id_usuario", "fecha_reg", "estado_reg")
-VALUES (5, 3, 6, NULL, E'activo');
-
---INSERT INTO segu.tusuario_rol ("id_usuario_rol", "id_rol", "id_usuario", "fecha_reg", "estado_reg")
---VALUES (6, 3, 7, NULL, E'activo');
-
---INSERT INTO segu.tusuario_rol ("id_usuario_rol", "id_rol", "id_usuario", "fecha_reg", "estado_reg")
---VALUES (7, 4, 9, NULL, E'activo');
-
---INSERT INTO segu.tusuario_rol ("id_usuario_rol", "id_rol", "id_usuario", "fecha_reg", "estado_reg")
---VALUES (2, 2, 2, NULL, E'inactivo');
-
-INSERT INTO segu.tusuario_rol ("id_usuario_rol", "id_rol", "id_usuario", "fecha_reg", "estado_reg")
-VALUES (8, 4, 5, NULL, E'activo');
-
-INSERT INTO segu.tusuario_rol ("id_usuario_rol", "id_rol", "id_usuario", "fecha_reg", "estado_reg")
-VALUES (9, 5, 75, NULL, E'activo');
