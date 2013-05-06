@@ -324,8 +324,8 @@ BEGIN
     begin 
       	select sol.id_estado_wf as solicitud, pc.id_estado_wf as proceso, cot.id_estado_wf as cotizacion into v_ids_estados
         from adq.tsolicitud sol
-        inner join adq.tproceso_compra pc on pc.id_solicitud=sol.id_solicitud
-        inner join adq.tcotizacion cot on cot.id_proceso_compra=pc.id_proceso_compra
+        left join adq.tproceso_compra pc on pc.id_solicitud=sol.id_solicitud
+        left join adq.tcotizacion cot on cot.id_proceso_compra=pc.id_proceso_compra
         where sol.id_solicitud=v_parametros.id_solicitud;
 
         create temporary table estados(
