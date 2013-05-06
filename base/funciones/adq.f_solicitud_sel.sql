@@ -28,6 +28,8 @@ DECLARE
 	v_nombre_funcion   	text;
 	v_resp				varchar;
     v_filtro varchar;
+    v_ids_estados		record;
+    v_resultado 		record;
 			    
 BEGIN
 
@@ -296,14 +298,62 @@ BEGIN
                         
 				        where  '||v_filtro;
 			
-			--Definicion de la respuesta		    
+			--Definicion de la respuesta		   
 			v_consulta:=v_consulta||v_parametros.filtro;
 
 			--Devuelve la respuesta
 			return v_consulta;
 
 		end;
-					
+        
+   	/*********************************    
+ 	#TRANSACCION:  'ADQ_ESTSOL_SEL'
+ 	#DESCRIPCION:	Consulta estado de solicitud
+ 	#AUTOR:		Gonzalo Sarmiento Sejas	
+ 	#FECHA:		02-05-2013
+	***********************************/
+
+	elsif(p_transaccion='ADQ_ESTSOL_SEL')then
+    begin 
+      	select sol.id_estado_wf as solicitud, pc.id_estado_wf as proceso, cot.id_estado_wf as cotizacion into v_ids_estados
+        from adq.tsolicitud sol
+        inner join adq.tproceso_compra pc on pc.id_solicitud=sol.id_solicitud
+        inner join adq.tcotizacion cot on cot.id_proceso_compra=pc.id_proceso_compra
+        where sol.id_solicitud=v_parametros.id_solicitud;
+
+        create temporary table estados(
+            nombre varchar,
+            nombre_estado varchar,
+            fecha_reg date,
+            id_tipo_estado int4,
+            id_estado_wf int4,
+            id_estado_anterior int4
+        ) on commit drop;	
+        
+		INSERT INTO estados(
+        WITH RECURSIVE estados_solicitud(id_tipo_proceso, id_tipo_estado,id_estado_wf, id_estado_anterior, fecha_reg)AS(
+           SELECT et.id_proceso_wf, et.id_tipo_estado, et.id_estado_wf, et.id_estado_anterior, et.fecha_reg
+           FROM wf.testado_wf et
+           WHERE et.id_estado_wf IN (v_ids_estados.solicitud,v_ids_estados.proceso,v_ids_estados.cotizacion)      
+        UNION ALL        
+           SELECT et.id_proceso_wf, et.id_tipo_estado, et.id_estado_wf, et.id_estado_anterior, et.fecha_reg
+           FROM wf.testado_wf et, estados_solicitud
+           WHERE et.id_estado_wf=estados_solicitud.id_estado_anterior         
+        )         
+         SELECT tp.nombre, te.nombre_estado, es.fecha_reg, es.id_tipo_estado, es.id_estado_wf, COALESCE(es.id_estado_anterior,NULL)
+         FROM estados_solicitud es
+         INNER JOIN wf.ttipo_estado te on te.id_tipo_estado= es.id_tipo_estado
+         INNER JOIN wf.ttipo_proceso tp on tp.id_tipo_proceso=es.id_tipo_proceso
+         ORDER BY es.id_estado_wf ASC);
+         
+        --Definicion de la respuesta         	
+        v_consulta:='select * from estados';
+
+        --Devuelve la respuesta
+        return v_consulta;
+
+	end;
+    					
 	else
 					     
 		raise exception 'Transaccion inexistente';

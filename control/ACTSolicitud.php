@@ -9,6 +9,7 @@
 
 require_once(dirname(__FILE__).'/../../pxp/pxpReport/ReportWriter.php');
 require_once(dirname(__FILE__).'/../reportes/RSolicitudCompra.php');
+require_once(dirname(__FILE__).'/../reportes/DiagramadorGantt.php');
 require_once(dirname(__FILE__).'/../../pxp/pxpReport/DataSource.php');
 
 class ACTSolicitud extends ACTbase{    
@@ -127,7 +128,33 @@ class ACTSolicitud extends ACTbase{
 
     }
 
-    
+    function diagramaGantt(){
+						$dataSource = new DataSource();
+			    $idSolicitud = $this->objParam->getParametro('id_solicitud');
+			    //$this->objParam->addParametroConsulta('id_plan_mant',$idPlanMant);
+			    $this->objParam->addParametroConsulta('ordenacion','id_solicitud');
+			    $this->objParam->addParametroConsulta('dir_ordenacion','ASC');
+			    $this->objParam->addParametroConsulta('cantidad',1000);
+			    $this->objParam->addParametroConsulta('puntero',0);
+			    $this->objFunc = $this->create('MODSolicitud');
+			    $resultSolicitud = $this->objFunc->estadosSolicitud();
+			    $datosSolicitud = $resultSolicitud->getDatos();
+							$dataSource->setDataset($datosSolicitud);
+			  			          
+			    //build the diagram
+			    $nombreArchivo='diagramaGantt.png';
+			    $diagramador = new DiagramadorGantt();
+							$diagramador->setDataSource($dataSource);
+							$diagramador->graficar($nombreArchivo);
+							
+			    $mensajeExito = new Mensaje();
+			    $mensajeExito->setMensaje('EXITO','DiagramaGantt.php','Diagrama Gantt generado',
+			                                    'Se generó con éxito el diagrama Gantt: '.$nombreArchivo,'control');
+			    $mensajeExito->setArchivoGenerado($nombreArchivo);
+			    $this->res = $mensajeExito;
+			    $this->res->imprimirRespuesta($this->res->generarJson());
+				}
+				
     function siguienteEstadoSolicitud(){
         $this->objFunc=$this->create('MODSolicitud');  
         $this->objParam->addParametro('id_funcionario_usu',$_SESSION["ss_id_funcionario"]); 

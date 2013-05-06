@@ -311,6 +311,28 @@ class MODSolicitud extends MODbase{
 		//Devuelve la respuesta
 		return $this->respuesta;
 	}
+
+	function estadosSolicitud(){
+		$this->procedimiento = 'adq.f_solicitud_sel';
+		$this->transaccion = 'ADQ_ESTSOL_SEL';
+		$this->tipo_procedimiento = 'SEL';
+		$this->setCount(false);
+		
+		$this->setParametro('id_solicitud','id_solicitud','int4');
+		
+		$this->captura('nombre','varchar');
+		$this->captura('nombre_estado','varchar');
+		$this->captura('fecha_reg','date');
+		$this->captura('id_tipo_estado','int');
+		$this->captura('id_estado_wf','int');
+		$this->captura('id_estado_anterior','int');		
+				
+		//Ejecuta la instruccion
+		$this->armarConsulta();
+		$this->ejecutarConsulta();
+		//Devuelve la respuesta
+		return $this->respuesta;
+	}
 			
 }
 ?>
