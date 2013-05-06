@@ -72,6 +72,7 @@ DECLARE
       v_id_funcionario_estado integer;
       
       v_id_depto_estado integer;
+      v_registros		record;
 			    
 BEGIN
 
@@ -215,6 +216,39 @@ BEGIN
             v_id_proceso_macro
 							
 			)RETURNING id_solicitud into v_id_solicitud;
+            
+            /*Insertar los documentos necesarios para la solicitud*/
+            
+            for v_registros in (select * 
+            					from adq.tdocumento_sol d
+                                where d.id_categoria_compra = v_parametros.id_categoria_compra)loop
+        		insert into adq.tdocumento_sol(
+                          id_solicitud,
+                          id_categoria_compra,
+                          nombre_doc,
+                          nombre_arch_doc,
+                          nombre_tipo_doc,
+                          chequeado,
+                          estado_reg,
+                          id_usuario_reg,
+                          fecha_reg,
+                          id_usuario_mod,
+                          fecha_mod
+                                ) values(
+                          v_id_solicitud,
+                          v_parametros.id_categoria_compra,
+                          v_registros.nombre_doc,
+                          v_registros.nombre_arch_doc,
+                          v_registros.nombre_tipo_doc,
+                          'false',
+                          'activo',
+                          p_id_usuario,
+                          now(),
+                          null,
+                          null                                  
+                          );
+            end loop;
+            
 			
 			--Definicion de la respuesta
 			v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Solicitud de Compras almacenado(a) con exito (id_solicitud'||v_id_solicitud||')'); 

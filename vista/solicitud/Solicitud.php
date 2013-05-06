@@ -125,6 +125,7 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
                 name: 'fecha_soli',
                 fieldLabel: 'Fecha Sol.',
                 allowBlank: false,
+                disabled: true,
                 gwidth: 100,
                         format: 'd/m/Y', 
                         renderer:function (value,p,record){return value?value.dateFormat('d/m/Y'):''}
@@ -533,8 +534,8 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
             Phx.CP.loadWindows('../../../sis_adquisiciones/vista/documento_sol/ChequeoDocumentoSol.php',
                     'Chequeo de documentos de la solicitud',
                     {
-                        width:900,
-                        height:600
+                        width:700,
+                        height:450
                     },
                     rec.data,
                     this.idContenedor,

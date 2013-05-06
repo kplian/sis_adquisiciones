@@ -46,6 +46,12 @@ BEGIN
   if(p_transaccion='ADQ_DOCSOL_INS')then
           
         begin
+        	if (v_parametros.id_solicitud is not null)then
+            	select id_categoria_compra
+                into v_parametros.id_categoria_compra
+                from adq.tsolicitud s
+                where s.id_solicitud = v_parametros.id_solicitud;
+            end if;
           --Sentencia de la insercion
           insert into adq.tdocumento_sol(
       id_solicitud,
@@ -92,7 +98,7 @@ BEGIN
 
   elsif(p_transaccion='ADQ_DOCSOL_MOD')then
 
-    begin
+    begin    	
       --Sentencia de la modificacion
       update adq.tdocumento_sol set
       id_solicitud = v_parametros.id_solicitud,

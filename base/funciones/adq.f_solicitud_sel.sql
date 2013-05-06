@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION adq.f_solicitud_sel (
   p_administrador integer,
   p_id_usuario integer,
@@ -51,10 +49,11 @@ BEGIN
             --si es administrador
             
             v_filtro='';
-            
+            if (v_parametros.id_funcionario_usu is null) then
+              	v_parametros.id_funcionario_usu = -1;
+            end if;
             IF p_administrador !=1  and lower(v_parametros.tipo_interfaz) = 'solicitudrq' THEN
-            
-                          
+                                        
               v_filtro = '(ew.id_funcionario='||v_parametros.id_funcionario_usu::varchar||'  or sol.id_usuario_reg='||p_id_usuario||' ) and ';
             
                
@@ -248,13 +247,31 @@ BEGIN
 		begin
             v_filtro='';
             
-         
+         	if (v_parametros.id_funcionario_usu is null) then
+            	v_parametros.id_funcionario_usu = -1;
+            end if;
             
-            IF p_administrador !=1 THEN
+            IF p_administrador !=1  and lower(v_parametros.tipo_interfaz) = 'solicitudrq' THEN
+                                        
+              v_filtro = '(ew.id_funcionario='||v_parametros.id_funcionario_usu::varchar||'  or sol.id_usuario_reg='||p_id_usuario||' ) and ';
             
-              v_filtro = '(ew.id_funcionario='||v_parametros.id_funcionario_usu::varchar||' or sol.id_usuario_reg='||p_id_usuario||') and';
+               
+            END IF;
             
+            IF  lower(v_parametros.tipo_interfaz) = 'solicitudvb' THEN
             
+                       
+                IF p_administrador !=1 THEN
+                
+                              
+                      v_filtro = '(ew.id_funcionario='||v_parametros.id_funcionario_usu::varchar||' ) and  (lower(sol.estado)!=''borrador'') and ';
+                  
+                 ELSE
+                    v_filtro = ' (lower(sol.estado)!=''borrador''  and lower(sol.estado)!=''proceso'' and lower(sol.estado)!=''finalizado'') and ';
+                  
+                END IF;
+                
+                
             END IF;
         
         

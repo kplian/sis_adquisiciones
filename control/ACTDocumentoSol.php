@@ -14,8 +14,9 @@ class ACTDocumentoSol extends ACTbase{
         $this->objParam->defecto('dir_ordenacion','asc');
         
         if($this->objParam->getParametro('id_categoria_compra')!=''){
-            $this->objParam->addFiltro("docsol.id_categoria_compra = ".$this->objParam->getParametro('id_categoria_compra'));    
+            $this->objParam->addFiltro("docsol.id_solicitud is null and docsol.id_categoria_compra = ".$this->objParam->getParametro('id_categoria_compra'));    
         }
+		
        
         if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
             $this->objReporte = new Reporte($this->objParam,$this);
@@ -33,7 +34,7 @@ class ACTDocumentoSol extends ACTbase{
         $this->objParam->defecto('dir_ordenacion','asc');
         
         if($this->objParam->getParametro('id_solicitud')!=''){
-            //$this->objParam->addFiltro("docsol.id_solicitud = ".$this->objParam->getParametro('id_solicitud'));    
+            $this->objParam->addFiltro("docsol.id_solicitud = ".$this->objParam->getParametro('id_solicitud'));    
         }
        
         if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
