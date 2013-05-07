@@ -341,32 +341,24 @@ INSERT INTO param.tproveedor ("id_usuario_reg", "id_usuario_mod", "fecha_reg", "
 VALUES (1, NULL, E'2008-10-01 00:00:00', NULL, E'activo', 21, 32, NULL, NULL, NULL, E'PROV0021', NULL, NULL);
 
 */
-/* Data for the 'segu.tusuario_rol' table  (Records 1 - 9) */
-/*
---INSERT INTO segu.tusuario_rol ("id_usuario_rol", "id_rol", "id_usuario", "fecha_reg", "estado_reg")
---VALUES (1, 1, 1, E'2011-05-17', E'activo');
+/* Data for the 'segu.tusuario_rol' table  (Records 1 - 6) */
+
+--usuario-rol
 
 INSERT INTO segu.tusuario_rol ("id_usuario_rol", "id_rol", "id_usuario", "fecha_reg", "estado_reg")
-VALUES (3, 2, 3, NULL, E'activo');
+VALUES (3, 4, 51, NULL, E'activo');
 
 INSERT INTO segu.tusuario_rol ("id_usuario_rol", "id_rol", "id_usuario", "fecha_reg", "estado_reg")
-VALUES (4, 3, 4, NULL, E'activo');
+VALUES (4, 5, 52, NULL, E'activo');
 
 INSERT INTO segu.tusuario_rol ("id_usuario_rol", "id_rol", "id_usuario", "fecha_reg", "estado_reg")
-VALUES (5, 3, 6, NULL, E'activo');
-
---INSERT INTO segu.tusuario_rol ("id_usuario_rol", "id_rol", "id_usuario", "fecha_reg", "estado_reg")
---VALUES (6, 3, 7, NULL, E'activo');
-
---INSERT INTO segu.tusuario_rol ("id_usuario_rol", "id_rol", "id_usuario", "fecha_reg", "estado_reg")
---VALUES (7, 4, 9, NULL, E'activo');
-
---INSERT INTO segu.tusuario_rol ("id_usuario_rol", "id_rol", "id_usuario", "fecha_reg", "estado_reg")
---VALUES (2, 2, 2, NULL, E'inactivo');
+VALUES (5, 5, 53, NULL, E'activo');
 
 INSERT INTO segu.tusuario_rol ("id_usuario_rol", "id_rol", "id_usuario", "fecha_reg", "estado_reg")
-VALUES (8, 4, 5, NULL, E'activo');
+VALUES (6, 5, 54, NULL, E'activo');
 
 INSERT INTO segu.tusuario_rol ("id_usuario_rol", "id_rol", "id_usuario", "fecha_reg", "estado_reg")
-VALUES (9, 5, 75, NULL, E'activo');*/
+VALUES (7, 6, 55, NULL, E'activo');
 
+INSERT INTO segu.tusuario_rol ("id_usuario_rol", "id_rol", "id_usuario", "fecha_reg", "estado_reg")
+VALUES (8, 7, 56, NULL, E'activo');
