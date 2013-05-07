@@ -623,7 +623,9 @@ BEGIN
                id_estado_wf =  v_id_estado_actual,
                estado = v_codigo_estado,
                id_usuario_mod=p_id_usuario,
-               fecha_mod=now()
+               fecha_mod=now(),
+               instruc_rpc=v_parametros.instruc_rpc
+               
              where id_solicitud = v_parametros.id_solicitud;
              
              

@@ -135,7 +135,21 @@ Phx.vista.SolicitudVb = {
                         allowBlank: false,
                         anchor: '80%',
                         maxLength:500
-                    }]
+                    },
+                  {
+                    xtype: 'combo',
+                    name:'instruc_rpc',
+                    fieldLabel:'Proceder',
+                    allowBlank:false,
+                    emptyText:'Tipo...',
+                    typeAhead: true,
+                    triggerAction: 'all',
+                    lazyRender:true,
+                    mode: 'local',
+                    valueField: 'estilo',
+                    gwidth: 100,
+                    store:['Iniciar Contrato','Orden de Bien/Servicio','Cotizar','Solicitar Pago']
+                }]
         });
         
         
@@ -144,8 +158,8 @@ Phx.vista.SolicitudVb = {
             collapsible: true,
             maximizable: true,
              autoDestroy: true,
-            width: 350,
-            height: 200,
+            width: 380,
+            height: 290,
             layout: 'fit',
             plain: true,
             bodyStyle: 'padding:5px;',
@@ -184,6 +198,8 @@ Phx.vista.SolicitudVb = {
       
         this.cmpObs=this.formEstado.getForm().findField('obs');
         
+        this.cmbIntrucRPC =this.formEstado.getForm().findField('instruc_rpc');
+       
         
         this.cmbTipoEstado.on('select',function(){
             
@@ -208,7 +224,8 @@ Phx.vista.SolicitudVb = {
                             operacion:'cambiar',
                             id_tipo_estado:this.cmbTipoEstado.getValue(),
                             id_funcionario:this.cmbFuncionarioWf.getValue(),
-                            obs:this.cmpObs.getValue()
+                            obs:this.cmpObs.getValue(),
+                            instruc_rpc:this.cmbIntrucRPC.getValue()
                             },
                         success:this.successSinc,
                         failure: this.conexionFailure,
@@ -235,9 +252,11 @@ Phx.vista.SolicitudVb = {
             Ext.Ajax.request({
                 // form:this.form.getForm().getEl(),
                 url:'../../sis_adquisiciones/control/Solicitud/siguienteEstadoSolicitud',
-                params:{id_solicitud:d.id_solicitud,operacion:'verificar',
-                            obs:this.cmpObs.getValue()},
+                params:{id_solicitud:d.id_solicitud,
+                        operacion:'verificar',
+                        obs:this.cmpObs.getValue()},
                 success:this.successSinc,
+                argument:{data:d},
                 failure: this.conexionFailure,
                 timeout:this.timeout,
                 scope:this
@@ -253,6 +272,9 @@ Phx.vista.SolicitudVb = {
             this.cmbFuncionarioWf.hide();
             this.cmbTipoEstado.disable();
             this.cmbFuncionarioWf.disable();
+            this.cmbIntrucRPC.hide();
+            this.cmbIntrucRPC.disable(); 
+            this.cmpObs.setValue('');
             
             this.sw_estado =res.argument.estado;
            
@@ -303,8 +325,8 @@ Phx.vista.SolicitudVb = {
                             id_funcionario:reg.ROOT.datos.id_funcionario_estado,
                             id_depto:reg.ROOT.datos.id_depto_estado,
                             id_solicitud:d.id_solicitud,
-                            obs:this.cmpObs.getValue()
-                            
+                            obs:this.cmpObs.getValue(),
+                            instruc_rpc:this.cmbIntrucRPC.getValue()
                             },
                         success:this.successSinc,
                         failure: this.conexionFailure,
@@ -315,9 +337,19 @@ Phx.vista.SolicitudVb = {
                    else{
                      this.cmbTipoEstado.store.baseParams.estados= reg.ROOT.datos.estados;
                      this.cmbTipoEstado.modificado=true;
+                 
+                     console.log(resp)
+                      if(resp.argument.data.estado=='vbrpc'){
+                        this.cmbIntrucRPC.show();
+                        this.cmbIntrucRPC.enable();
+                     }
+                     else{
+                         this.cmbIntrucRPC.hide();
+                         this.cmbIntrucRPC.disable(); 
+                         
+                     }
                      
-                     
-                     
+                     this.cmpObs.setValue('');
                      this.cmbFuncionarioWf.disable();
                      this.wEstado.buttons[1].hide();
                      this.wEstado.buttons[0].show();

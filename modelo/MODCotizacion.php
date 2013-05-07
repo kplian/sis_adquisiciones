@@ -61,6 +61,55 @@ class MODCotizacion extends MODbase{
 		//Devuelve la respuesta
 		return $this->respuesta;
 	}
+	
+	function listarCotizacionRPC(){
+        //Definicion de variables para ejecucion del procedimientp
+        $this->procedimiento='adq.f_cotizacion_sel';
+        $this->transaccion='ADQ_COTRPC_SEL';
+        $this->tipo_procedimiento='SEL';//tipo de transaccion
+                
+        $this->setParametro('id_funcionario_rpc','id_funcionario_rpc','int4');
+        //Definicion de la lista del resultado del query
+        $this->captura('id_cotizacion','int4');
+        $this->captura('estado_reg','varchar');
+        $this->captura('estado','varchar');
+        $this->captura('lugar_entrega','varchar');
+        $this->captura('tipo_entrega','varchar');
+        $this->captura('fecha_coti','date');
+        $this->captura('numero_oc','varchar');
+        $this->captura('id_proveedor','int4');
+        $this->captura('desc_proveedor','varchar');
+        
+        $this->captura('fecha_entrega','date');
+        $this->captura('id_moneda','int4');
+        $this->captura('moneda','varchar');
+        $this->captura('id_proceso_compra','int4');
+        $this->captura('fecha_venc','date');
+        $this->captura('obs','text');
+        $this->captura('fecha_adju','date');
+        $this->captura('nro_contrato','varchar');
+        
+        $this->captura('fecha_reg','timestamp');
+        $this->captura('id_usuario_reg','int4');
+        $this->captura('fecha_mod','timestamp');
+        $this->captura('id_usuario_mod','int4');
+        $this->captura('usr_reg','varchar');
+        $this->captura('usr_mod','varchar');
+        $this->captura('id_estado_wf','integer');
+        $this->captura('id_proceso_wf','integer');
+        $this->captura('desc_moneda','varchar');
+        
+        $this->captura('tipo_cambio_conv','numeric');
+        
+        
+        
+        //Ejecuta la instruccion
+        $this->armarConsulta();
+        $this->ejecutarConsulta();
+        
+        //Devuelve la respuesta
+        return $this->respuesta;
+    }
 			
 	function insertarCotizacion(){
 		//Definicion de variables para ejecucion del procedimiento
@@ -231,6 +280,26 @@ class MODCotizacion extends MODbase{
                 
         //Define los parametros para la funcion
         $this->setParametro('id_cotizacion','id_cotizacion','int4');
+
+        //Ejecuta la instruccion
+        $this->armarConsulta();
+        $this->ejecutarConsulta();
+
+        //Devuelve la respuesta
+        return $this->respuesta;
+    }
+    
+    
+    
+   function solicitarAprobacion(){
+        //Definicion de variables para ejecucion del procedimiento
+        $this->procedimiento='adq.f_cotizacion_ime';
+        $this->transaccion='ADQ_SOLAPRO_IME';
+        $this->tipo_procedimiento='IME';
+                
+        //Define los parametros para la funcion
+        $this->setParametro('id_cotizacion','id_cotizacion','int4');
+       
 
         //Ejecuta la instruccion
         $this->armarConsulta();

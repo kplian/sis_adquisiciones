@@ -49,6 +49,7 @@ CREATE TABLE adq.tdocumento_sol(
 	  presu_revertido VARCHAR(2), 
 	  num_tramite VARCHAR(200), 
 	  presu_comprometido VARCHAR(2) NOT NULL  DEFAULT 'no'::varchar,
+	  instruc_rpc VARCHAR(100), 
 	  PRIMARY KEY (id_solicitud)
 	  
 	) INHERITS (pxp.tbase)

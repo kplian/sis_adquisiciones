@@ -16,8 +16,8 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
 		this.maestro=config.maestro;
 		//llama al constructor de la clase padre
     	Phx.vista.Cotizacion.superclass.constructor.call(this,config);
-								
-									 this.addButton('btnReporte',{
+    	
+    	 this.addButton('btnReporte',{
                     text :'Reporte',
                     iconCls : 'bpdf32',
                     disabled: true,
@@ -30,8 +30,8 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
             iconCls : 'bpdf32',
             disabled: true,
             handler : this.onButtonRepOC,
-            tooltip : '<b>Orden de Compra</b><br/><b>Orden de Compra</b>'
-	 							 });
+            tooltip : '<b>Reporte de OC</b><br/><b>Orden de Compra</b>'
+                                 });
        
          this.addButton('ant_estado',{
               argument: {estado: 'anterior'},
@@ -41,162 +41,8 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
               handler:this.antEstado,
               tooltip: '<b>Pasar al Anterior Estado</b>'
           });
-         
-		
-		 this.addButton('fin_registro',{text:'Fin Reg.',iconCls: 'badelante',disabled:true,handler:this.fin_registro,tooltip: '<b>Finalizar</b><p>Finalizar registro de cotización</p>'});
-         
-         this.addButton('btnAdjudicar',{
-                    text :'Adjudicar',
-                    iconCls : 'bchecklist',
-                    disabled: true,
-                    handler : this.onAdjudicarTodo,
-                    tooltip : '<b>Adjudicar Todo</b><br/><b>Adjudica todo lo disponible</b>'
-          });   
-		
-		this.addButton('btnGenOC',{
-                    text :'Generar OC',
-                    iconCls : 'bchecklist',
-                    disabled: true,
-                    handler : this.onGenOC,
-                    tooltip : '<b>Genrar OC</b><br/><b>Genera el Número de Orden de Compra</b>'
-          });
-		
-		this.addButton('btnHabPago',{
-                    text :'Habilitar Pago',
-                    iconCls : 'bcharge',
-                    disabled: true,
-                    handler : this.onHabPag,
-                    tooltip : '<b>Habilitar Pago</b><br/><b> Permite solicitar pagos en el modulo de cuentar por pagar</b>'
-          });
-		
-		this.init();
-		this.iniciarEventos();
-		this.store.baseParams={id_proceso_compra:this.id_proceso_compra}; 
-		this.load({params:{start:0, limit:this.tam_pag}});
-		
-		//formulario de adjudicacion parcil
-        
-        this.formOC = new Ext.form.FormPanel({
-            baseCls: 'x-plain',
-            autoDestroy: true,
-            layout: 'form',
-            items: [
-                   { 
-                    xtype: 'datefield',   
-                    name: 'fecha_oc',
-                    fieldLabel: 'Fecha OC',
-                    disabled:true,
-                    allowBlank: false
-                    
-                   }
-                  ]
-        });
-        
-        
-         this.cmpFechaOC =this.formOC.getForm().findField('fecha_oc');
-         
-         
-         
-         this.wOC= new Ext.Window({
-            title: 'Generar OC',
-            collapsible: true,
-            maximizable: true,
-             autoDestroy: true,
-            width: 350,
-            height: 170,
-            layout: 'fit',
-            plain: true,
-            bodyStyle: 'padding:5px;',
-            buttonAlign: 'center',
-            items: this.formOC,
-            modal:true,
-             closeAction: 'hide',
-            buttons: [{
-                text: 'Guardar',
-                 handler:this.onSubmitGenOC,
-                scope:this
-                
-            },{
-                text: 'Cancelar',
-                handler:function(){this.wOC.hide()},
-                scope:this
-            }]
-        });
-        
-        //formulario de departamentos
-        
-        this.formDEPTO = new Ext.form.FormPanel({
-            baseCls: 'x-plain',
-            autoDestroy: true,
-            layout: 'form',
-            items: [
-                   {
-                    xtype: 'combo',
-                    name: 'id_depto_tes',
-                     hiddenName: 'id_depto_tes',
-                    fieldLabel: 'DEP TESORERIA',
-                    allowBlank: false,
-                    emptyText:'Elija un Depto',
-                    store:new Ext.data.JsonStore(
-                    {
-                        url: '../../sis_parametros/control/Depto/listarDepto',
-                        id: 'id_depto',
-                        root: 'datos',
-                        sortInfo:{
-                            field: 'deppto.nombre',
-                            direction: 'ASC'
-                        },
-                        totalProperty: 'total',
-                        fields: ['id_depto','nombre'],
-                        // turn on remote sorting
-                        remoteSort: true,
-                        baseParams:{par_filtro:'deppto.nombre#deppto.codigo',estado:'activo',codigo_subsistema:'TES',tipo_filtro:'DEP_EP-DEP_EP'}
-                    }),
-                    valueField: 'id_depto',
-                    displayField: 'nombre',
-                    tpl:'<tpl for="."><div class="x-combo-list-item"><p>{nombre}</p></div></tpl>',
-                    hiddenName: 'id_depto_tes',
-                    forceSelection:true,
-                    typeAhead: true,
-                    triggerAction: 'all',
-                    lazyRender:true,
-                    mode:'remote',
-                    pageSize:10,
-                    queryDelay:1000,
-                    width:250,
-                    listWidth:'280',
-                    minChars:2
-                }
-                  ]
-        });
-        
-        this.cmpDeptoTes =this.formDEPTO.getForm().findField('id_depto_tes');
-        
-        this.wDEPTO= new Ext.Window({
-            title: 'Depto Tesoreria',
-            collapsible: true,
-            maximizable: true,
-             autoDestroy: true,
-            width: 400,
-            height: 200,
-            layout: 'fit',
-            plain: true,
-            bodyStyle: 'padding:5px;',
-            buttonAlign: 'center',
-            items: this.formDEPTO,
-            modal:true,
-             closeAction: 'hide',
-            buttons: [{
-                text: 'Guardar',
-                 handler:this.onSubmitHabPag,
-                scope:this
-                
-            },{
-                text: 'Cancelar',
-                handler:function(){this.wDEPTO.hide()},
-                scope:this
-            }]
-        });
+								
+		 
     },
 	tam_pag:50,
 			
@@ -595,156 +441,14 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
 		{name:'usr_mod', type: 'string'},'desc_moneda','tipo_cambio_conv','id_estado_wf','id_proceso_wf'
 		
 	],
-	
-	onButtonReporte:function(){
-	    var rec=this.sm.getSelected();
-                Ext.Ajax.request({
-                    url:'../../sis_adquisiciones/control/Cotizacion/reporteCotizacion',
-                    params:{'id_cotizacion':rec.data.id_cotizacion,'tipo':rec.data.estado},
-                    success: this.successExport,
-                    failure: function() {
-                        console.log("fail");
-                    },
-                    timeout: function() {
-                        console.log("timeout");
-                    },
-                    scope:this
-                });  
-	},
 
 	sortInfo:{
 		field: 'id_cotizacion',
 		direction: 'ASC'
 	},
 	
-	EnableSelect:function(n){
-	     Phx.vista.Cotizacion.superclass.EnableSelect.call(this,n,{desc_moneda_sol:this.desc_moneda});
-	},
-	
-	onButtonNew:function(){			
-			Phx.vista.Cotizacion.superclass.onButtonNew.call(this);
-			
-			this.cmbMoneda.disable();
-            this.cmpTipoCambioConv.disable();
-         
-			this.getComponente('id_proceso_compra').setValue(this.id_proceso_compra);			
-	},
-	
-
-	
-	iniciarEventos:function(){
-    	  this.cmbMoneda= this.getComponente('id_moneda');
-    	  this.cmpFechaCoti =  this.getComponente('fecha_coti');
-    	  this.cmpTipoCambioConv =  this.getComponente('tipo_cambio_conv');
-    	  this.cmbMoneda.disable();
-    	  this.cmpTipoCambioConv.disable();
-    	  
-    	  this.cmpFechaCoti.on('blur',function(){
-    	       this.cmbMoneda.enable();
-    	       this.cmbMoneda.reset();
-    	       this.cmpTipoCambioConv.reset();
-    	       
-    	  },this);
-    	 
-    	  this.cmbMoneda.on('select',function(com,dat){
-    	      
-    	      if(dat.data.tipo_moneda=='base'){
-    	         this.cmpTipoCambioConv.disable();
-    	         this.cmpTipoCambioConv.setValue(1); 
-    	          
-    	      }
-    	      else{
-    	           this.cmpTipoCambioConv.enable()
-    	         this.obtenerTipoCambio();  
-    	      }
-    	     
-    	      
-    	  },this);
-	   
-	},
-	obtenerTipoCambio:function(){
-         
-         var fecha = this.cmpFechaCoti.getValue().dateFormat(this.cmpFechaCoti.format);
-         var id_moneda = this.cmbMoneda.getValue();
-            Phx.CP.loadingShow();
-            Ext.Ajax.request({
-                    // form:this.form.getForm().getEl(),
-                    url:'../../sis_parametros/control/TipoCambio/obtenerTipoCambio',
-                    params:{fecha:fecha,id_moneda:id_moneda},
-                    success:this.successTC,
-                    failure: this.conexionFailure,
-                    timeout:this.timeout,
-                    scope:this
-             });
-        }, 
-    successTC:function(resp){
-       Phx.CP.loadingHide();
-            var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
-            if(!reg.ROOT.error){
-                
-                this.cmpTipoCambioConv.setValue(reg.ROOT.datos.tipo_cambio);
-            }else{
-                
-                alert('ocurrio al obtener el tipo de Cambio')
-            } 
-    },
-	fin_registro:function()
-        {                   
-            var d= this.sm.getSelected().data;
-           
-            Phx.CP.loadingShow();
-            
-            Ext.Ajax.request({
-                // form:this.form.getForm().getEl(),
-                url:'../../sis_adquisiciones/control/Cotizacion/finalizarRegistro',
-                params:{id_cotizacion:d.id_cotizacion,operacion:'fin_registro'},
-                success:this.successSinc,
-                failure: this.conexionFailure,
-                timeout:this.timeout,
-                scope:this
-            });     
-        },
-     
-        
-         onAdjudicarTodo:function(){
-            var data = this.getSelectedData();
-            Phx.CP.loadingShow();
-            Ext.Ajax.request({
-                // form:this.form.getForm().getEl(),
-                url:'../../sis_adquisiciones/control/Cotizacion/adjudicarTodo',
-                params:{id_cotizacion:data.id_cotizacion},
-                success:this.successSinc,
-                failure: this.conexionFailure,
-                timeout:this.timeout,
-                scope:this
-            });
-        },
-        
-       
-        successSinc:function(resp){
-            Phx.CP.loadingHide();
-           
-            var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
-            if(!reg.ROOT.error){
-                 this.wOC.hide(); 
-                 this.wDEPTO.hide();
-                this.reload();
-             }else{
-                alert('ocurrio un error durante el proceso')
-            }
-        },
-        
-        onGenOC:function(){
-            
-          this.cmpFechaOC.setValue(new Date());
-          this.cmpFechaOC.disable();
-          this.wOC.show(); 
-            
-        },
-        
-
-        onButtonRepOC: function(){
-		   							var rec=this.sm.getSelected();
+	onButtonRepOC: function(){
+                                    var rec=this.sm.getSelected();
                 console.debug(rec);
                 Ext.Ajax.request({
                     url:'../../sis_adquisiciones/control/Cotizacion/reporteOC',
@@ -758,47 +462,24 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
                     },
                     scope:this
                 });
-								},
-								
-
-        onHabPag:function(){
-            console.log(this.id_depto);
-            this.cmpDeptoTes.reset();
-            this.cmpDeptoTes.store.baseParams.id_depto = this.id_depto;
-            this.cmpDeptoTes.modificado = true;
-            this.wDEPTO.show();
-            
         },
-        
-        onSubmitHabPag:function(){
-            var data = this.getSelectedData();
-            Phx.CP.loadingShow();
-            Ext.Ajax.request({
-                url:'../../sis_adquisiciones/control/Cotizacion/habilitarPago',
-                params:{id_cotizacion:data.id_cotizacion,id_depto_tes: this.cmpDeptoTes.getValue()},
-                success:this.successSinc,
-                failure: this.conexionFailure,
-                timeout:this.timeout,
-                scope:this
-            });
-        },
-        
-
-        onSubmitGenOC:function(){
-            var data = this.getSelectedData();
-            Phx.CP.loadingShow();
-            Ext.Ajax.request({
-                url:'../../sis_adquisiciones/control/Cotizacion/generarOC',
-                params:{id_cotizacion:data.id_cotizacion,fecha_oc: this.cmpFechaOC.getValue().dateFormat('d/m/Y')},
-                success:this.successSinc,
-                failure: this.conexionFailure,
-                timeout:this.timeout,
-                scope:this
-            });
-            
-            
-        },
-        antEstado:function(res,eve)
+    
+      onButtonReporte:function(){
+        var rec=this.sm.getSelected();
+                Ext.Ajax.request({
+                    url:'../../sis_adquisiciones/control/Cotizacion/reporteCotizacion',
+                    params:{'id_cotizacion':rec.data.id_cotizacion,'tipo':rec.data.estado},
+                    success: this.successExport,
+                    failure: function() {
+                        console.log("fail");
+                    },
+                    timeout: function() {
+                        console.log("timeout");
+                    },
+                    scope:this
+                });  
+    },
+     antEstado:function(res,eve)
         {                   
             var d= this.sm.getSelected().data;
             Phx.CP.loadingShow();
@@ -817,81 +498,17 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
             });     
         }, 
         
-        preparaMenu:function(n){
-          var data = this.getSelectedData();
-          var tb =this.tbar;
-          Phx.vista.Cotizacion.superclass.preparaMenu.call(this,n); 
-          this.getBoton('btnReporte').enable();
-
-          //this.getBoton('btnReporte').enable(); 
+         successSinc:function(resp){
+            Phx.CP.loadingHide();
+           
+            var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
+            if(!reg.ROOT.error){
               
-              if(data['estado']==  'borrador'){
-                 this.getBoton('fin_registro').enable();
-                 this.getBoton('btnAdjudicar').disable();
-                 this.getBoton('btnGenOC').disable();
-                 this.getBoton('ant_estado').disable();
-                 this.getBoton('btnRepOC').disable();
-               }
-              else{
-                   this.getBoton('ant_estado').enable();
-                   
-                   if(data['estado']=='cotizado'){
-                     this.getBoton('btnAdjudicar').enable();
-                     this.getBoton('btnGenOC').enable();
-                     this.getBoton('btnRepOC').disable();   
-                   }
-                   else{
-                      this.getBoton('btnAdjudicar').disable(); 
-                      this.getBoton('btnGenOC').disable();
-                      this.getBoton('btnRepOC').enable();
-                   }
-                  
-                   this.getBoton('fin_registro').disable();
-                   this.getBoton('edit').disable();
-                   this.getBoton('new').disable();
-                 }
-               
-               if (data['estado']==  'borrador'||data['estado']=='cotizado'||data['estado']== 'adjudicado'){
-                   
-                    this.getBoton('del').enable();
-               }
-               else{
-                   
-                    this.getBoton('del').disable();
-               }
-               
-               if (data['estado']==  'anulado'){
-                   this.getBoton('ant_estado').disable();
-                   //this.getBoton('btnReporte').disable();
-                   
-               }
-               
-                if (data['estado']!='adjudicado'){
-                   this.getBoton('btnHabPago').disable();
-                 }
-                 else{
-                    this.getBoton('btnHabPago').enable();  
-                 }
-               
-                
-            return tb 
-     }, 
-     
-    
-     
-     liberaMenu:function(){
-        var tb = Phx.vista.Cotizacion.superclass.liberaMenu.call(this);
-        if(tb){
-            this.getBoton('fin_registro').disable();
-            this.getBoton('btnAdjudicar').disable();
-            this.getBoton('btnGenOC').disable();
-            this.getBoton('ant_estado').disable();
-            this.getBoton('btnReporte').disable();
-
-        }
-        
-       return tb
-    }, 
+                this.reload();
+             }else{
+                alert('ocurrio un error durante el proceso')
+            }
+        },
 	
 	bdel:true,
 	bsave:false,

@@ -120,7 +120,7 @@ Phx.vista.SolicitudDet=Ext.extend(Phx.gridInterfaz,{
                renderer:function(value, p, record){return String.format('{0}', record.data['desc_concepto_ingas']);}
             },
             type:'ComboBox',
-            filters:{pfiltro:'conig.desc_ingas',type:'string'},
+            filters:{pfiltro:'cig.desc_ingas',type:'string'},
             id_grupo:1,
             grid:true,
             form:true

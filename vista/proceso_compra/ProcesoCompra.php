@@ -179,6 +179,23 @@ Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
         },
         {
             config:{
+                name: 'instruc_rpc',
+                fieldLabel: 'Ins/RPC',
+                allowBlank: true,
+                anchor: '80%',
+                gwidth: 50,
+                maxLength:50
+            },
+            type:'Field',
+            filters:{pfiltro:'instruc_rpc',type:'string'},
+            id_grupo:1,
+            grid:true,
+            form:false
+        },
+        
+        
+        {
+            config:{
                 name: 'desc_moneda',
                 fieldLabel: 'Moneda',
                 allowBlank: true,
@@ -373,7 +390,9 @@ Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
 		{name:'fecha_mod', type: 'date',dateFormat:'Y-m-d H:i:s.u'},
 		{name:'id_usuario_mod', type: 'numeric'},
 		{name:'usr_reg', type: 'string'},
-		{name:'usr_mod', type: 'string'},'desc_moneda','desc_funcionario','desc_uo','desc_depto','desc_solicitud'
+		{name:'usr_mod', type: 'string'},
+		'desc_moneda','desc_funcionario',
+		'desc_uo','desc_depto','desc_solicitud','instruc_rpc'
 		
 	],
 	
@@ -404,7 +423,7 @@ Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
 	
 	 onButtonCotizacion:function() {
             var rec=this.sm.getSelected();
-            Phx.CP.loadWindows('../../../sis_adquisiciones/vista/cotizacion/Cotizacion.php',
+            Phx.CP.loadWindows('../../../sis_adquisiciones/vista/cotizacion/CotizacionAdq.php',
                     'Cotizacion de solicitud de compra',
                     {
                         width:900,
@@ -412,7 +431,7 @@ Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
                     },
                     rec.data,
                     this.idContenedor,
-                    'Cotizacion'
+                    'CotizacionAdq'
         )
     },
     
@@ -436,7 +455,7 @@ Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
     onButtonNew:function(){         
             Phx.vista.ProcesoCompra.superclass.onButtonNew.call(this);
             this.cmbSolicitud.enable();
-            this.cmbDepto.enablle();          
+            this.cmbDepto.enable();          
     },
     onButtonEdit:function(){         
             Phx.vista.ProcesoCompra.superclass.onButtonEdit.call(this);

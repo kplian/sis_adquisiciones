@@ -275,3 +275,12 @@ select pxp.f_insert_tprocedimiento ('ADQ_HABPAG_IME', 'Habilita los pagos en tes
 
 /***********************************F-DAT-GSS-ADQ-101-22/04/2013*****************************************/
 
+
+
+/***********************************I-DAT-RAC-ADQ-00-07/05/2013*****************************************/
+
+select pxp.f_insert_tgui ('Visto Bueno Cotizacion', 'Visto Bueno Cotizacion', 'VBCOT', 'si', 7, 'sis_adquisiciones/vista/cotizacion/CotizacionVb.php', 2, '', 'CotizacionVb', 'ADQ');
+select pxp.f_insert_testructura_gui ('VBCOT', 'ADQ');
+
+/***********************************F-DAT-RAC-ADQ-00-07/05/2013*****************************************/
+
