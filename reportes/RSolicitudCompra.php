@@ -154,14 +154,15 @@ Class RSolicitudCompra extends Report {
         
 								$pdf->Ln();
 								$pdf->Ln();
-								$pdf->Cell($width4-8, $height, '', 0, 0, 'L', false, '', 0, false, 'T', 'C');
-								$pdf->Cell($width3+$width1, $height, $this->getDataSource()->getParameter('desc_funcionario_apro'), $black, 0, 'C', false, '', 0, false, 'T', 'C');
-								$pdf->Cell($width4-8, $height, '', 0, 0, 'L', false, '', 0, false, 'T', 'C');
-								$pdf->Ln();
-								$pdf->Cell($width4-8, $height, '', 0, 0, 'L', false, '', 0, false, 'T', 'C');
-								$pdf->Cell($width3+$width1, $height, 'Firma Autorizada', 0, 0, 'C', false, '', 0, false, 'T', 'C');
-								$pdf->Cell($width4-8, $height, '', 0, 0, 'L', false, '', 0, false, 'T', 'C');
-															
+								if($this->getDataSource()->getParameter('estado')=='aprobado'){
+											$pdf->Cell($width4-8, $height, '', 0, 0, 'L', false, '', 0, false, 'T', 'C');
+											$pdf->Cell($width3+$width1, $height, $this->getDataSource()->getParameter('desc_funcionario_rpc'), $black, 0, 'C', false, '', 0, false, 'T', 'C');
+											$pdf->Cell($width4-8, $height, '', 0, 0, 'L', false, '', 0, false, 'T', 'C');
+											$pdf->Ln();
+											$pdf->Cell($width4-8, $height, '', 0, 0, 'L', false, '', 0, false, 'T', 'C');
+											$pdf->Cell($width3+$width1, $height, 'Firma Autorizada', 0, 0, 'C', false, '', 0, false, 'T', 'C');
+											$pdf->Cell($width4-8, $height, '', 0, 0, 'L', false, '', 0, false, 'T', 'C');
+								}							
 								$pdf->Ln();
         
         $pdf->Output($fileName, 'F');
