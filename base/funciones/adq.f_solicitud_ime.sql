@@ -1,3 +1,5 @@
+--------------- SQL ---------------
+
 CREATE OR REPLACE FUNCTION adq.f_solicitud_ime (
   p_administrador integer,
   p_id_usuario integer,
@@ -72,7 +74,7 @@ DECLARE
       v_id_funcionario_estado integer;
       
       v_id_depto_estado integer;
-      v_registros		record;
+      v_perdir_obs varchar;
 			    
 BEGIN
 
@@ -216,39 +218,6 @@ BEGIN
             v_id_proceso_macro
 							
 			)RETURNING id_solicitud into v_id_solicitud;
-            
-            /*Insertar los documentos necesarios para la solicitud*/
-            
-            for v_registros in (select * 
-            					from adq.tdocumento_sol d
-                                where d.id_categoria_compra = v_parametros.id_categoria_compra)loop
-        		insert into adq.tdocumento_sol(
-                          id_solicitud,
-                          id_categoria_compra,
-                          nombre_doc,
-                          nombre_arch_doc,
-                          nombre_tipo_doc,
-                          chequeado,
-                          estado_reg,
-                          id_usuario_reg,
-                          fecha_reg,
-                          id_usuario_mod,
-                          fecha_mod
-                                ) values(
-                          v_id_solicitud,
-                          v_parametros.id_categoria_compra,
-                          v_registros.nombre_doc,
-                          v_registros.nombre_arch_doc,
-                          v_registros.nombre_tipo_doc,
-                          'false',
-                          'activo',
-                          p_id_usuario,
-                          now(),
-                          null,
-                          null                                  
-                          );
-            end loop;
-            
 			
 			--Definicion de la respuesta
 			v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Solicitud de Compras almacenado(a) con exito (id_solicitud'||v_id_solicitud||')'); 
@@ -485,10 +454,13 @@ BEGIN
           where s.id_solicitud=v_parametros.id_solicitud;
           
            select 
-            ew.id_tipo_estado 
+            ew.id_tipo_estado ,
+            te.pedir_obs
            into 
-            v_id_tipo_estado
+            v_id_tipo_estado,
+            v_perdir_obs
           from wf.testado_wf ew
+          inner join wf.ttipo_estado te on te.id_tipo_estado = ew.id_tipo_estado
           where ew.id_estado_wf = v_id_estado_wf;
           
           
@@ -525,77 +497,79 @@ BEGIN
             
             v_num_estados= array_length(va_id_tipo_estado, 1);
             
+             IF v_perdir_obs = 'no' THEN
             
-            IF v_num_estados = 1 then
-                  -- si solo hay un estado,  verificamos si tiene mas de un funcionario por este estado
-                 SELECT 
-                 *
-                  into
-                 v_num_funcionarios 
-                 FROM wf.f_funcionario_wf_sel(
-                     p_id_usuario, 
-                     va_id_tipo_estado[1], 
-                     v_fecha_soli,
-                     v_id_estado_wf,
-                     TRUE) AS (total bigint);
-                     
-                IF v_num_funcionarios = 1 THEN
-                -- si solo es un funcionario, recuperamos el funcionario correspondiente
+                IF v_num_estados = 1 then
+                      -- si solo hay un estado,  verificamos si tiene mas de un funcionario por este estado
                      SELECT 
-                         id_funcionario
-                           into
-                         v_id_funcionario_estado
+                     *
+                      into
+                     v_num_funcionarios 
                      FROM wf.f_funcionario_wf_sel(
                          p_id_usuario, 
                          va_id_tipo_estado[1], 
                          v_fecha_soli,
                          v_id_estado_wf,
-                         FALSE) 
-                         AS (id_funcionario integer,
-                           desc_funcionario text,
-                           desc_funcionario_cargo text,
-                           prioridad integer);
-                END IF;    
-                     
-              
-              --verificamos el numero de deptos
-              
-                SELECT 
-                *
-                into
-                  v_num_deptos 
-               FROM wf.f_depto_wf_sel(
-                   p_id_usuario, 
-                   va_id_tipo_estado[1], 
-                   v_fecha_soli,
-                   v_id_estado_wf,
-                   TRUE) AS (total bigint);
-                   
-              IF v_num_deptos = 1 THEN
-                  -- si solo es un funcionario, recuperamos el funcionario correspondiente
-                       SELECT 
-                           id_depto
-                             into
-                           v_id_depto_estado
-                      FROM wf.f_depto_wf_sel(
-                           p_id_usuario, 
-                           va_id_tipo_estado[1], 
-                           v_fecha_soli,
-                           v_id_estado_wf,
-                           FALSE) 
-                           AS (id_depto integer,
-                             codigo_depto varchar,
-                             nombre_corto_depto varchar,
-                             nombre_depto varchar,
-                             prioridad integer);
-                END IF;
-              
-              
-              
-              
-             
-             END IF;
+                         TRUE) AS (total bigint);
+                         
+                    IF v_num_funcionarios = 1 THEN
+                    -- si solo es un funcionario, recuperamos el funcionario correspondiente
+                         SELECT 
+                             id_funcionario
+                               into
+                             v_id_funcionario_estado
+                         FROM wf.f_funcionario_wf_sel(
+                             p_id_usuario, 
+                             va_id_tipo_estado[1], 
+                             v_fecha_soli,
+                             v_id_estado_wf,
+                             FALSE) 
+                             AS (id_funcionario integer,
+                               desc_funcionario text,
+                               desc_funcionario_cargo text,
+                               prioridad integer);
+                    END IF;    
+                         
+                  
+                  --verificamos el numero de deptos
+                  
+                    SELECT 
+                    *
+                    into
+                      v_num_deptos 
+                   FROM wf.f_depto_wf_sel(
+                       p_id_usuario, 
+                       va_id_tipo_estado[1], 
+                       v_fecha_soli,
+                       v_id_estado_wf,
+                       TRUE) AS (total bigint);
+                       
+                  IF v_num_deptos = 1 THEN
+                      -- si solo es un funcionario, recuperamos el funcionario correspondiente
+                           SELECT 
+                               id_depto
+                                 into
+                               v_id_depto_estado
+                          FROM wf.f_depto_wf_sel(
+                               p_id_usuario, 
+                               va_id_tipo_estado[1], 
+                               v_fecha_soli,
+                               v_id_estado_wf,
+                               FALSE) 
+                               AS (id_depto integer,
+                                 codigo_depto varchar,
+                                 nombre_corto_depto varchar,
+                                 nombre_depto varchar,
+                                 prioridad integer);
+                    END IF;
+                  
+                  
+                  
+                  
+                 
+                 END IF;
            
+           END IF;
             
             -- si hay mas de un estado disponible  preguntamos al usuario
             v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Verificacion para el siguiente estado)'); 
@@ -639,7 +613,8 @@ BEGIN
                                                            v_id_estado_wf, 
                                                            v_id_proceso_wf,
                                                            p_id_usuario,
-                                                           v_id_depto);
+                                                           v_id_depto,
+                                                           v_parametros.obs);
             
             
              -- actualiza estado en la solicitud
@@ -648,7 +623,9 @@ BEGIN
                id_estado_wf =  v_id_estado_actual,
                estado = v_codigo_estado,
                id_usuario_mod=p_id_usuario,
-               fecha_mod=now()
+               fecha_mod=now(),
+               instruc_rpc=v_parametros.instruc_rpc
+               
              where id_solicitud = v_parametros.id_solicitud;
              
              
@@ -734,7 +711,8 @@ BEGIN
                           v_parametros.id_estado_wf, 
                           v_id_proceso_wf, 
                           p_id_usuario,
-                          v_id_depto);
+                          v_id_depto,
+                          v_parametros.obs);
                       
                     
                       
@@ -822,10 +800,12 @@ BEGIN
              
              SELECT 
                ps_id_funcionario,
-               ps_codigo_estado 
+               ps_codigo_estado ,
+               ps_id_depto
              into
               v_id_funcionario,
-              v_codigo_estado
+              v_codigo_estado,
+              v_id_depto
                
                 
              FROM wf.f_obtener_estado_segun_log_wf(v_id_estado_wf, v_id_tipo_estado);
@@ -838,7 +818,9 @@ BEGIN
                   v_id_funcionario, 
                   v_parametros.id_estado_wf, 
                   v_id_proceso_wf, 
-                  p_id_usuario);
+                  p_id_usuario,
+                  v_id_depto,
+                  v_parametros.obs);
                       
                     
                       

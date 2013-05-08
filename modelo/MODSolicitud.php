@@ -68,6 +68,7 @@ class MODSolicitud extends MODbase{
 		$this->captura('id_proceso_macro','integer');
 		$this->captura('numero','varchar');
 		$this->captura('desc_funcionario_rpc','text');
+		$this->captura('obs','text');
 		
 		
 		
@@ -218,6 +219,8 @@ class MODSolicitud extends MODbase{
         $this->setParametro('operacion','operacion','varchar');
         $this->setParametro('id_funcionario','id_funcionario','int4');
         $this->setParametro('id_tipo_estado','id_tipo_estado','int4');
+        $this->setParametro('obs','obs','text');
+        $this->setParametro('instruc_rpc','instruc_rpc','varchar');
 
         //Ejecuta la instruccion
         $this->armarConsulta();
@@ -240,6 +243,7 @@ class MODSolicitud extends MODbase{
         $this->setParametro('id_funcionario','id_funcionario','int4');
         $this->setParametro('id_tipo_estado','id_tipo_estado','int4');
         $this->setParametro('id_estado_wf','id_estado_wf','int4');
+          $this->setParametro('obs','obs','text');
 
         //Ejecuta la instruccion
         $this->armarConsulta();
@@ -305,6 +309,28 @@ class MODSolicitud extends MODbase{
 		$this->armarConsulta();
 		$this->ejecutarConsulta();
 		
+		//Devuelve la respuesta
+		return $this->respuesta;
+	}
+
+	function estadosSolicitud(){
+		$this->procedimiento = 'adq.f_solicitud_sel';
+		$this->transaccion = 'ADQ_ESTSOL_SEL';
+		$this->tipo_procedimiento = 'SEL';
+		$this->setCount(false);
+		
+		$this->setParametro('id_solicitud','id_solicitud','int4');
+		
+		$this->captura('nombre','varchar');
+		$this->captura('nombre_estado','varchar');
+		$this->captura('fecha_reg','date');
+		$this->captura('id_tipo_estado','int');
+		$this->captura('id_estado_wf','int');
+		$this->captura('id_estado_anterior','int');		
+				
+		//Ejecuta la instruccion
+		$this->armarConsulta();
+		$this->ejecutarConsulta();
 		//Devuelve la respuesta
 		return $this->respuesta;
 	}

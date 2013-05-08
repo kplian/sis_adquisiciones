@@ -89,7 +89,8 @@ BEGIN
                          dep.codigo as desc_depto,
                          fun.desc_funcionario1 as desc_funcionario,
                          sol.numero as desc_solicitud,
-                         mon.codigo as desc_moneda
+                         mon.codigo as desc_moneda,
+                         sol.instruc_rpc
                    from adq.tproceso_compra proc
                        inner join segu.tusuario usu1 on usu1.id_usuario = proc.id_usuario_reg
                        inner join param.tdepto dep on dep.id_depto = proc.id_depto 

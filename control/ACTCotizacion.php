@@ -27,7 +27,26 @@ class ACTCotizacion extends ACTbase{
 		}
 		$this->res->imprimirRespuesta($this->res->generarJson());
 	}
-				
+	
+	function listarCotizacionRPC(){
+        $this->objParam->defecto('ordenacion','id_cotizacion');
+
+        $this->objParam->defecto('dir_ordenacion','asc');
+        
+       $this->objParam->addParametro('id_funcionario_rpc',$_SESSION["ss_id_funcionario"]); 
+        
+        if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
+            $this->objReporte = new Reporte($this->objParam,$this);
+            $this->res = $this->objReporte->generarReporteListado('MODCotizacion','listarCotizacionRPC');
+        } else{
+            $this->objFunc=$this->create('MODCotizacion');
+            
+            $this->res=$this->objFunc->listarCotizacionRPC($this->objParam);
+        }
+        $this->res->imprimirRespuesta($this->res->generarJson());
+    }
+    
+			
 	function insertarCotizacion(){
 		$this->objFunc=$this->create('MODCotizacion');	
 		if($this->objParam->insertar('id_cotizacion')){
@@ -206,6 +225,12 @@ class ACTCotizacion extends ACTbase{
      function generarOC(){
         $this->objFunc=$this->create('MODCotizacion');  
         $this->res=$this->objFunc->generarOC($this->objParam);
+        $this->res->imprimirRespuesta($this->res->generarJson());
+    }
+    
+    function solicitarAprobacion(){
+        $this->objFunc=$this->create('MODCotizacion');  
+        $this->res=$this->objFunc->solicitarAprobacion($this->objParam);
         $this->res->imprimirRespuesta($this->res->generarJson());
     }
     

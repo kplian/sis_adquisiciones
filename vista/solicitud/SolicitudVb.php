@@ -70,13 +70,13 @@ Phx.vista.SolicitudVb = {
                             direction:'ASC'
                         },
                         totalProperty:'total',
-                        fields: ['id_tipo_estado','codigo','nombre_estado'],
+                        fields: ['id_tipo_estado','codigo_estado','nombre_estado'],
                         // turn on remote sorting
                         remoteSort: true,
                         baseParams:{par_filtro:'tipes.nombre_estado#tipes.codigo'}
                     }),
                     valueField: 'id_tipo_estado',
-                    displayField: 'codigo',
+                    displayField: 'codigo_estado',
                     forceSelection:true,
                     typeAhead: false,
                     triggerAction: 'all',
@@ -87,7 +87,7 @@ Phx.vista.SolicitudVb = {
                     width:210,
                     gwidth:220,
                     minChars:2,
-                    tpl: '<tpl for="."><div class="x-combo-list-item"><p>{codigo}</p>Prioridad: <strong>{nombre_estado}</strong> </div></tpl>'
+                    tpl: '<tpl for="."><div class="x-combo-list-item"><p>{codigo_estado}</p>Prioridad: <strong>{nombre_estado}</strong> </div></tpl>'
                 
                 },
                 {
@@ -127,21 +127,39 @@ Phx.vista.SolicitudVb = {
                     minChars:2,
                     tpl: '<tpl for="."><div class="x-combo-list-item"><p>{desc_funcionario}</p>Prioridad: <strong>{prioridad}</strong> </div></tpl>'
                 
+                },
+                    {
+                        name: 'obs',
+                        xtype: 'textarea',
+                        fieldLabel: 'Intrucciones',
+                        allowBlank: false,
+                        anchor: '80%',
+                        maxLength:500
+                    },
+                  {
+                    xtype: 'combo',
+                    name:'instruc_rpc',
+                    fieldLabel:'Proceder',
+                    allowBlank:false,
+                    emptyText:'Tipo...',
+                    typeAhead: true,
+                    triggerAction: 'all',
+                    lazyRender:true,
+                    mode: 'local',
+                    valueField: 'estilo',
+                    gwidth: 100,
+                    store:['Iniciar Contrato','Orden de Bien/Servicio','Cotizar','Solicitar Pago']
                 }]
         });
         
         
-         
-         
-         
-         
          this.wEstado = new Ext.Window({
             title: 'Estados',
             collapsible: true,
             maximizable: true,
              autoDestroy: true,
-            width: 350,
-            height: 200,
+            width: 380,
+            height: 290,
             layout: 'fit',
             plain: true,
             bodyStyle: 'padding:5px;',
@@ -154,7 +172,14 @@ Phx.vista.SolicitudVb = {
                  handler:this.confSigEstado,
                 scope:this
                 
-            },{
+            },
+             {
+                    text: 'Guardar',
+                    handler:this.antEstadoSubmmit,
+                    scope:this
+                    
+             },
+             {
                 text: 'Cancelar',
                 handler:function(){this.wEstado.hide()},
                 scope:this
@@ -171,6 +196,10 @@ Phx.vista.SolicitudVb = {
         this.cmbFuncionarioWf =this.formEstado.getForm().findField('id_funcionario_wf');
         this.cmbFuncionarioWf.store.on('loadexception', this.conexionFailure,this);
       
+        this.cmpObs=this.formEstado.getForm().findField('obs');
+        
+        this.cmbIntrucRPC =this.formEstado.getForm().findField('instruc_rpc');
+       
         
         this.cmbTipoEstado.on('select',function(){
             
@@ -194,7 +223,9 @@ Phx.vista.SolicitudVb = {
                             id_solicitud:d.id_solicitud,
                             operacion:'cambiar',
                             id_tipo_estado:this.cmbTipoEstado.getValue(),
-                            id_funcionario:this.cmbFuncionarioWf.getValue()
+                            id_funcionario:this.cmbFuncionarioWf.getValue(),
+                            obs:this.cmpObs.getValue(),
+                            instruc_rpc:this.cmbIntrucRPC.getValue()
                             },
                         success:this.successSinc,
                         failure: this.conexionFailure,
@@ -213,39 +244,64 @@ Phx.vista.SolicitudVb = {
             this.cmbFuncionarioWf.reset();
             this.cmbFuncionarioWf.store.baseParams.id_estado_wf=d.id_estado_wf;
             this.cmbFuncionarioWf.store.baseParams.fecha=d.fecha_soli;
+            
+            this.cmbTipoEstado.show();
+            this.cmbFuncionarioWf.show();
+            this.cmbTipoEstado.enable();
          
             Ext.Ajax.request({
                 // form:this.form.getForm().getEl(),
                 url:'../../sis_adquisiciones/control/Solicitud/siguienteEstadoSolicitud',
-                params:{id_solicitud:d.id_solicitud,operacion:'verificar'},
+                params:{id_solicitud:d.id_solicitud,
+                        operacion:'verificar',
+                        obs:this.cmpObs.getValue()},
                 success:this.successSinc,
+                argument:{data:d},
                 failure: this.conexionFailure,
                 timeout:this.timeout,
                 scope:this
             });     
         },
        
-      antEstado:function(res,eve)
-        {                   
+      antEstado:function(res,eve) {                   
+            this.wEstado.buttons[0].hide();
+            this.wEstado.buttons[1].show();
+            this.wEstado.show();
             
+            this.cmbTipoEstado.hide();
+            this.cmbFuncionarioWf.hide();
+            this.cmbTipoEstado.disable();
+            this.cmbFuncionarioWf.disable();
+            this.cmbIntrucRPC.hide();
+            this.cmbIntrucRPC.disable(); 
+            this.cmpObs.setValue('');
+            
+            this.sw_estado =res.argument.estado;
            
+               
+        },
+        
+        antEstadoSubmmit:function(res){
             var d= this.sm.getSelected().data;
            
             Phx.CP.loadingShow();
             var operacion = 'cambiar';
-            operacion=  res.argument.estado == 'inicio'?'inicio':operacion; 
+            operacion=  this.sw_estado == 'inicio'?'inicio':operacion; 
             
             Ext.Ajax.request({
                 // form:this.form.getForm().getEl(),
                 url:'../../sis_adquisiciones/control/Solicitud/anteriorEstadoSolicitud',
                 params:{id_solicitud:d.id_solicitud, 
                         id_estado_wf:d.id_estado_wf, 
-                        operacion: operacion},
+                        operacion: operacion,
+                        obs:this.cmpObs.getValue()},
                 success:this.successSinc,
                 failure: this.conexionFailure,
                 timeout:this.timeout,
                 scope:this
-            });     
+            });  
+            
+            
         }, 
        
        successSinc:function(resp){
@@ -254,7 +310,7 @@ Phx.vista.SolicitudVb = {
             var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
             if(!reg.ROOT.error){
                 
-                console.log('respuesta',reg)
+              
                if (reg.ROOT.datos.operacion=='preguntar_todo'){
                    if(reg.ROOT.datos.num_estados==1 && reg.ROOT.datos.num_funcionarios==1){
                        //directamente mandamos los datos
@@ -268,8 +324,9 @@ Phx.vista.SolicitudVb = {
                             id_tipo_estado:reg.ROOT.datos.id_tipo_estado,
                             id_funcionario:reg.ROOT.datos.id_funcionario_estado,
                             id_depto:reg.ROOT.datos.id_depto_estado,
-                            id_solicitud:d.id_solicitud
-                            
+                            id_solicitud:d.id_solicitud,
+                            obs:this.cmpObs.getValue(),
+                            instruc_rpc:this.cmbIntrucRPC.getValue()
                             },
                         success:this.successSinc,
                         failure: this.conexionFailure,
@@ -280,7 +337,22 @@ Phx.vista.SolicitudVb = {
                    else{
                      this.cmbTipoEstado.store.baseParams.estados= reg.ROOT.datos.estados;
                      this.cmbTipoEstado.modificado=true;
-                     this.cmbFuncionarioWf.disable()
+                 
+                     console.log(resp)
+                      if(resp.argument.data.estado=='vbrpc'){
+                        this.cmbIntrucRPC.show();
+                        this.cmbIntrucRPC.enable();
+                     }
+                     else{
+                         this.cmbIntrucRPC.hide();
+                         this.cmbIntrucRPC.disable(); 
+                         
+                     }
+                     
+                     this.cmpObs.setValue('');
+                     this.cmbFuncionarioWf.disable();
+                     this.wEstado.buttons[1].hide();
+                     this.wEstado.buttons[0].show();
                      this.wEstado.show();  
                   }
                    

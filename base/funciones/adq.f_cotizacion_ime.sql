@@ -90,6 +90,8 @@ DECLARE
      v_id_obligacion_pago integer;
      v_id_obligacion_det integer;
      v_id_gestion integer;
+     v_id_funcionario_rpc integer;
+     v_num_sol varchar;
      
 			    
 BEGIN
@@ -644,7 +646,7 @@ BEGIN
            
            END IF;
            
-             IF  v_estado_cot != 'cotizado' THEN
+             IF  v_estado_cot != 'recomendado' THEN
              
               raise exception 'Solo se admiten cotizaciones en estado cotizado';
              END IF;
@@ -703,7 +705,118 @@ BEGIN
             return v_resp;
 
 		end; 
-    
+    /*********************************    
+ 	#TRANSACCION:  'ADQ_SOLAPRO_IME'
+ 	#DESCRIPCION:	depues de adjudicar pasa al siguiente estado, de solicitud de aprobacion
+ 	#AUTOR:	        Rensi Arteaga Copari	
+ 	#FECHA:		    7-05-2013 14:48:35
+	***********************************/
+
+	elsif(p_transaccion='ADQ_SOLAPRO_IME')then
+
+		begin
+        
+           select
+            c.numero_oc,
+            c.id_estado_wf,
+            c.id_proceso_wf,
+            pc.id_depto,
+            c.estado,
+            sc.id_funcionario_rpc,
+            sc.numero
+           into 
+            v_numero_oc,
+            v_id_estado_wf,
+            v_id_proceso_wf,
+            v_id_depto,
+            v_estado_cot,
+            v_id_funcionario_rpc,
+            v_num_sol
+            
+           from adq.tcotizacion c
+           inner join adq.tproceso_compra pc on pc.id_proceso_compra = c.id_proceso_compra
+           inner join adq.tsolicitud sc on sc.id_solicitud = pc.id_solicitud 
+           where c.id_cotizacion = v_parametros.id_cotizacion;
+           
+           --validamos que la cotizacion por lo menos tenga un item adjudicado
+                    select 
+                    sum(cd.cantidad_adju)
+                    into
+                    v_total_adj
+                   from adq.tcotizacion_det cd
+                   where cd.id_cotizacion = v_parametros.id_cotizacion and cd.estado_reg='activo';
+                   
+                   
+                   IF v_total_adj  <= 0  or v_total_adj is null THEN
+                   
+                     raise exception 'La cotización no tiene items adjudicados';
+                   
+                   END IF;
+           
+           
+                      
+             IF  v_estado_cot != 'cotizado' THEN
+             
+              raise exception 'Solo se admiten cotizaciones en estado cotizado';
+             END IF;
+             
+             --obtenemos el estado siguiente
+             SELECT 
+                 *
+              into
+                va_id_tipo_estado,
+                va_codigo_estado,
+                va_disparador,
+                va_regla,
+                va_prioridad
+            
+            FROM wf.f_obtener_estado_wf(v_id_proceso_wf, v_id_estado_wf,NULL,'siguiente');
+            
+            
+            
+            IF va_codigo_estado[2] is not null THEN
+            
+             raise exception 'El proceso de WF esta mal parametrizado, el estado cotizado de la cotizacion solo admite un estado siguiente';
+            
+            END IF;
+            
+             IF va_codigo_estado[1] is  null THEN
+            
+             raise exception 'El proceso de WF esta mal parametrizado, no se encuentra el estado siguiente ';
+            
+            END IF;
+			
+           --pasamos la cotizacion al siguiente estado
+           
+             v_id_estado_actual =  wf.f_registra_estado_wf(va_id_tipo_estado[1], 
+                                                           v_id_funcionario_rpc, 
+                                                           v_id_estado_wf, 
+                                                           v_id_proceso_wf,
+                                                           p_id_usuario,
+                                                           v_id_depto,
+                                                           'Se requiere la aprobacion de la solicitud '||v_num_sol,
+                                                           '../../../sis_adquisiciones/vista/cotizacion/CotizacionVb.php',
+                                                           'CotizacionVb');
+            
+            
+             -- actualiza estado en la solicitud
+            
+             update adq.tcotizacion  c set 
+               id_estado_wf =  v_id_estado_actual,
+               estado = va_codigo_estado[1],
+               id_usuario_mod=p_id_usuario,
+               fecha_mod=now()
+             where c.id_cotizacion  = v_parametros.id_cotizacion;
+           
+              
+            --Definicion de la respuesta
+            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Solicitud de Aprobacion enviada'); 
+            v_resp = pxp.f_agrega_clave(v_resp,'cantidad',v_total_adj::varchar);
+              
+            --Devuelve la respuesta
+            return v_resp;
+
+		end;
     
     /*********************************    
  	#TRANSACCION:  'ADQ_ANTEST_IME'
@@ -759,7 +872,8 @@ BEGIN
                           v_parametros.id_estado_wf, 
                           v_id_proceso_wf, 
                           p_id_usuario,
-                          v_id_depto);
+                          v_id_depto,
+                          'Solictud de Correción/Revisión por retroceso de estado');
                       
                     
                       

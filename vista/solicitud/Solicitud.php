@@ -20,14 +20,15 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
 		
 
 		this.addButton('btnReporte',{
-            text :'Reporte Solicitud de Compra',
+            text :'',
             iconCls : 'bpdf32',
             disabled: true,
             handler : this.onButtonSolicitud,
             tooltip : '<b>Reporte Solicitud de Compra</b><br/><b>Reporte Solicitud de Compra</b>'
   });
   
-
+  this.addButton('diagrama_gantt',{text:'',iconCls: 'bgantt',disabled:true,handler:diagramGantt,tooltip: '<b>Diagrama Gantt de proceso macro</b>'});
+  
 	 this.addButton('btnChequeoDocumentos',
             {
                 text: 'Chequear Documentos',
@@ -37,6 +38,19 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
                 tooltip: '<b>Documentos de la Solicitud</b><br/>Subir los documetos requeridos en la solicitud seleccionada.'
             }
         );
+        
+  function diagramGantt(){			
+			var data=this.sm.getSelected().data.id_solicitud;
+			Phx.CP.loadingShow();
+			Ext.Ajax.request({
+				url:'../../sis_adquisiciones/control/Solicitud/diagramaGantt',
+				params:{'id_solicitud':data},
+				success:this.successExport,
+				failure: this.conexionFailure,
+				timeout:this.timeout,
+				scope:this
+			});			
+		}
 				
 	},
 			
@@ -210,6 +224,21 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
    		     grid:true,
    			form:true
    	      },
+        {
+            config:{
+                name: 'obs',
+                fieldLabel: 'Instrucciones/Obs',
+                allowBlank: true,
+                anchor: '80%',
+                gwidth: 150,
+                maxLength:4
+            },
+            type:'Field',
+            filters:{pfiltro:'ew.obs',type:'string'},
+            id_grupo:1,
+            grid:true,
+            form:false
+        },
    	      
          {
             config:{
@@ -523,7 +552,8 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
 		'desc_depto',
 		'desc_proceso_macro',
 		'desc_categoria_compra',
-		'id_proceso_macro'
+		'id_proceso_macro',
+		'obs'
 		
 	],
 	
@@ -551,7 +581,7 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
 
         Phx.vista.Solicitud.superclass.preparaMenu.call(this,n);
         this.getBoton('btnReporte').setDisabled(false); 
-        
+        this.getBoton('diagrama_gantt').enable();
          return tb 
      }, 
      liberaMenu:function(){
@@ -559,7 +589,8 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
         if(tb){
            
             this.getBoton('btnReporte').setDisabled(true);
-            this.getBoton('btnChequeoDocumentos').setDisabled(true);           
+            this.getBoton('btnChequeoDocumentos').setDisabled(true);
+            this.getBoton('diagrama_gantt').disable();           
         }
        return tb
     },    
