@@ -257,7 +257,7 @@ BEGIN
               inner join adq.tproceso_compra pc on pc.id_proceso_compra=cot.id_proceso_compra
 			  inner join adq.tsolicitud sol on sol.id_solicitud=pc.id_solicitud
 			  inner join param.tmoneda mon on mon.id_moneda=cot.id_moneda
-              where cot.estado=''adjudicado'' and cot.id_cotizacion='||v_parametros.id_cotizacion|| ' and ';
+              where cot.estado=''adjudicado'' or cot.estado=''pago_habilitado'' and cot.id_cotizacion='||v_parametros.id_cotizacion|| ' and ';
           
           --Definicion de la respuesta
           v_consulta:=v_consulta||v_parametros.filtro;
