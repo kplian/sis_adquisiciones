@@ -30,7 +30,7 @@ DECLARE
 	v_nombre_funcion   	text;
 	v_resp				varchar;
     v_filtro varchar;
-    v_ids_estados		record;
+    v_id_estados		record;
     v_resultado 		record;
 			    
 BEGIN
@@ -322,7 +322,7 @@ BEGIN
 
 	elsif(p_transaccion='ADQ_ESTSOL_SEL')then
     begin 
-      	select sol.id_estado_wf as solicitud, pc.id_estado_wf as proceso, cot.id_estado_wf as cotizacion into v_ids_estados
+      	select sol.id_estado_wf as solicitud, pc.id_estado_wf as proceso, cot.id_estado_wf as cotizacion into v_id_estados
         from adq.tsolicitud sol
         left join adq.tproceso_compra pc on pc.id_solicitud=sol.id_solicitud
         left join adq.tcotizacion cot on cot.id_proceso_compra=pc.id_proceso_compra
@@ -341,7 +341,7 @@ BEGIN
         WITH RECURSIVE estados_solicitud(id_tipo_proceso, id_tipo_estado,id_estado_wf, id_estado_anterior, fecha_reg)AS(
            SELECT et.id_proceso_wf, et.id_tipo_estado, et.id_estado_wf, et.id_estado_anterior, et.fecha_reg
            FROM wf.testado_wf et
-           WHERE et.id_estado_wf IN (v_ids_estados.solicitud,v_ids_estados.proceso,v_ids_estados.cotizacion)      
+           WHERE et.id_estado_wf IN (v_id_estados.solicitud,v_id_estados.proceso,v_id_estados.cotizacion)      
         UNION ALL        
            SELECT et.id_proceso_wf, et.id_tipo_estado, et.id_estado_wf, et.id_estado_anterior, et.fecha_reg
            FROM wf.testado_wf et, estados_solicitud
