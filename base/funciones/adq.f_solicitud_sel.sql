@@ -338,7 +338,7 @@ BEGIN
         ) on commit drop;	
         
 		INSERT INTO estados(
-        WITH RECURSIVE estados_solicitud(id_tipo_proceso, id_tipo_estado,id_estado_wf, id_estado_anterior, fecha_reg)AS(
+        WITH RECURSIVE estados_solicitud(id_proceso_wf, id_tipo_estado,id_estado_wf, id_estado_anterior, fecha_reg)AS(
            SELECT et.id_proceso_wf, et.id_tipo_estado, et.id_estado_wf, et.id_estado_anterior, et.fecha_reg
            FROM wf.testado_wf et
            WHERE et.id_estado_wf IN (v_id_estados.solicitud,v_id_estados.proceso,v_id_estados.cotizacion)      
@@ -350,7 +350,8 @@ BEGIN
          SELECT tp.nombre, te.nombre_estado, es.fecha_reg, es.id_tipo_estado, es.id_estado_wf, COALESCE(es.id_estado_anterior,NULL)
          FROM estados_solicitud es
          INNER JOIN wf.ttipo_estado te on te.id_tipo_estado= es.id_tipo_estado
-         INNER JOIN wf.ttipo_proceso tp on tp.id_tipo_proceso=es.id_tipo_proceso
+         INNER JOIN wf.tproceso_wf pwf on pwf.id_proceso_wf=es.id_proceso_wf
+         INNER JOIN wf.ttipo_proceso tp on tp.id_tipo_proceso=pwf.id_tipo_proceso
          ORDER BY es.id_estado_wf ASC);
          
         --Definicion de la respuesta         	
