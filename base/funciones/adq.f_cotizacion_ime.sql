@@ -91,6 +91,7 @@ DECLARE
      v_id_obligacion_det integer;
      v_id_gestion integer;
      v_id_funcionario_rpc integer;
+     v_num_sol varchar;
      
 			    
 BEGIN
@@ -721,14 +722,17 @@ BEGIN
             c.id_proceso_wf,
             pc.id_depto,
             c.estado,
-            sc.id_funcionario_rpc
+            sc.id_funcionario_rpc,
+            sc.numero
            into 
             v_numero_oc,
             v_id_estado_wf,
             v_id_proceso_wf,
             v_id_depto,
             v_estado_cot,
-            v_id_funcionario_rpc
+            v_id_funcionario_rpc,
+            v_num_sol
+            
            from adq.tcotizacion c
            inner join adq.tproceso_compra pc on pc.id_proceso_compra = c.id_proceso_compra
            inner join adq.tsolicitud sc on sc.id_solicitud = pc.id_solicitud 
@@ -789,7 +793,10 @@ BEGIN
                                                            v_id_estado_wf, 
                                                            v_id_proceso_wf,
                                                            p_id_usuario,
-                                                           v_id_depto);
+                                                           v_id_depto,
+                                                           'Se requiere la aprobacion de la solicitud '||v_num_sol,
+                                                           '../../../sis_adquisiciones/vista/cotizacion/CotizacionVb.php',
+                                                           'CotizacionVb');
             
             
              -- actualiza estado en la solicitud
@@ -865,7 +872,8 @@ BEGIN
                           v_parametros.id_estado_wf, 
                           v_id_proceso_wf, 
                           p_id_usuario,
-                          v_id_depto);
+                          v_id_depto,
+                          'Solictud de Correción/Revisión por retroceso de estado');
                       
                     
                       
