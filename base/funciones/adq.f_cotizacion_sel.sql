@@ -77,7 +77,8 @@ BEGIN
                         cot.id_estado_wf,
                         cot.id_proceso_wf,
                         mon.codigo as desc_moneda,
-                        cot.tipo_cambio_conv
+                        cot.tipo_cambio_conv,
+                        pro.email
 						from adq.tcotizacion cot
 						inner join segu.tusuario usu1 on usu1.id_usuario = cot.id_usuario_reg
 						left join segu.tusuario usu2 on usu2.id_usuario = cot.id_usuario_mod

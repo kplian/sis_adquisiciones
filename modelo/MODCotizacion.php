@@ -52,6 +52,8 @@ class MODCotizacion extends MODbase{
 		
 		$this->captura('tipo_cambio_conv','numeric');
 		
+		$this->captura('email','varchar');
+        
 		
 		
 		//Ejecuta la instruccion
