@@ -171,8 +171,13 @@ Phx.vista.ChequeoDocumentoSol=Ext.extend(Phx.gridInterfaz,{
                 maxLength:150,
                 anchor:'100%',
                 renderer:function (value, p, record){  
-                            if(record.data['extension'].length!=0)
-                            return  String.format('{0}',"<div style='text-align:center'><a href = '../../../sis_adquisiciones/archivos_servidor/"+ record.data['archivo']+"' align='center' width='70' height='70'>Abrir documento</a></div>");
+                            if(record.data['extension'].length!=0) {
+                            	var data = "id=" + record.data['id_documento_sol'];
+                            	data += "&extension=" + record.data['extension'];
+                            	data += "&sistema=sis_adquisiciones";
+                            	data += "&clase=DocumentoSol";
+                            	return  String.format('{0}',"<div style='text-align:center'><a target=_blank href = '../../../lib/lib_control/CTOpenFile.php?"+ data+"' align='center' width='70' height='70'>Abrir documento</a></div>");
+                            }
                         },  
                 buttonCfg: {
                     iconCls: 'upload-icon'
