@@ -428,6 +428,8 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
 		{name:'id_moneda', type: 'numeric'},
 		{name:'moneda', type: 'string'},
 		{name:'id_proceso_compra', type: 'numeric'},
+		{name:'id_solicitud', type: 'numeric'},
+		{name:'id_categoria_compra', type: 'numeric'},
 		{name:'fecha_venc', type: 'date',dateFormat:'Y-m-d'},
 		{name:'obs', type: 'string'},
 		{name:'fecha_adju', type: 'date',dateFormat:'Y-m-d'},

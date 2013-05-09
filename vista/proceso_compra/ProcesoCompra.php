@@ -493,11 +493,14 @@ Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
       var tb =this.tbar;
         
         Phx.vista.ProcesoCompra.superclass.preparaMenu.call(this,n);
+        this.getBoton('btnChequeoDocumentos').enable();
         if(data.estado=='anulado' || data.estado=='desierto'){
             this.getBoton('edit').disable();
             this.getBoton('del').disable();
             this.getBoton('btnCotizacion').disable();
             this.getBoton('btnCuadroComparativo').disable();
+            
+            
         }
         else{
             this.getBoton('btnCotizacion').enable();
@@ -509,7 +512,9 @@ Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
      liberaMenu:function(){
         var tb = Phx.vista.ProcesoCompra.superclass.liberaMenu.call(this);
         if(tb){           
-            this.getBoton('btnCotizacion').setDisabled(true);           
+            this.getBoton('btnCotizacion').setDisabled(true);  
+            this.getBoton('btnChequeoDocumentos').disable(); 
+            this.getBoton('btnCuadroComparativo').disable();        
         }
        return tb
     },

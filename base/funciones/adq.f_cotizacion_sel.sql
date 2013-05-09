@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION adq.f_cotizacion_sel (
   p_administrador integer,
   p_id_usuario integer,
@@ -84,6 +82,7 @@ BEGIN
 						left join segu.tusuario usu2 on usu2.id_usuario = cot.id_usuario_mod
 				        inner join param.tmoneda mon on mon.id_moneda = cot.id_moneda
                         inner join param.vproveedor pro on pro.id_proveedor = cot.id_proveedor
+                        
                         where cot.id_proceso_compra='||v_parametros.id_proceso_compra||' and ';
 			
 			--Definicion de la respuesta
@@ -145,7 +144,9 @@ BEGIN
                         cot.id_estado_wf,
                         cot.id_proceso_wf,
                         mon.codigo as desc_moneda,
-                        cot.tipo_cambio_conv
+                        cot.tipo_cambio_conv,
+                        sol.id_solicitud,
+                        sol.id_categoria_compra
 						from adq.tcotizacion cot
 						inner join segu.tusuario usu1 on usu1.id_usuario = cot.id_usuario_reg
                         inner join adq.tproceso_compra pc on pc.id_proceso_compra = cot.id_proceso_compra

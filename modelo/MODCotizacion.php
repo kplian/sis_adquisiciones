@@ -53,8 +53,7 @@ class MODCotizacion extends MODbase{
 		$this->captura('tipo_cambio_conv','numeric');
 		
 		$this->captura('email','varchar');
-        
-		
+				
 		
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -103,6 +102,8 @@ class MODCotizacion extends MODbase{
         
         $this->captura('tipo_cambio_conv','numeric');
         
+        $this->captura('id_solicitud','integer');
+		$this->captura('id_categoria_compra','integer');
         
         
         //Ejecuta la instruccion

@@ -41,7 +41,7 @@ Phx.vista.ChequeoDocumentoSol=Ext.extend(Phx.gridInterfaz,{
                 height:150
             },rec.data,this.idContenedor,'SubirArchivo')
         }
-        alert(this.id_solicitud);
+        
         this.iniciarEventos();
         this.Atributos[1].valorInicial = this.id_solicitud;
         this.Atributos[4].valorInicial = this.id_categoria_compra;        

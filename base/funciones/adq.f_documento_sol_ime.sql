@@ -154,7 +154,7 @@ BEGIN
       begin
           
           update adq.tdocumento_sol set
-            archivo=v_parametros.archivo,
+            --archivo=v_parametros.archivo,
             extension=v_parametros.extension,
             chequeado = 'true'
             where id_documento_sol=v_parametros.id_documento_sol;
