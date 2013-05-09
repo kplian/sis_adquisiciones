@@ -23,7 +23,16 @@ Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
             disabled: true,
             handler : this.onButtonCotizacion,
             tooltip : '<b>Cotizacion de solicitud de Compra</b><br/><b>Cotizacion de solicitud de Compra</b>'
-  });
+  		});
+  		this.addButton('btnChequeoDocumentos',
+            {
+                text: 'Chequear Documentos',
+                iconCls: 'bchecklist',
+                disabled: true,
+                handler: this.loadCheckDocumentosSol,
+                tooltip: '<b>Documentos del Proceso</b><br/>Subir los documetos requeridos en el proceso seleccionada.'
+            }
+        );
   
 		this.addButton('btnCuadroComparativo',{
 							 text :'Cuadro Comparativo',
@@ -376,6 +385,7 @@ Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
 		{name:'id_depto', type: 'numeric'},
 		{name:'num_convocatoria', type: 'string'},
 		{name:'id_solicitud', type: 'numeric'},
+		{name:'id_categoria_compra', type: 'numeric'},
 		{name:'id_estado_wf', type: 'numeric'},
 		{name:'fecha_ini_proc', type: 'date',dateFormat:'Y-m-d'},
 		{name:'obs_proceso', type: 'string'},
@@ -420,6 +430,20 @@ Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
 	  
 	  
 	},
+	loadCheckDocumentosSol:function() {
+            var rec=this.sm.getSelected();
+            rec.data.nombreVista = this.nombreVista;
+            Phx.CP.loadWindows('../../../sis_adquisiciones/vista/documento_sol/ChequeoDocumentoSol.php',
+                    'Chequeo de documentos de la solicitud',
+                    {
+                        width:700,
+                        height:450
+                    },
+                    rec.data,
+                    this.idContenedor,
+                    'ChequeoDocumentoSol'
+        )
+    },
 	
 	 onButtonCotizacion:function() {
             var rec=this.sm.getSelected();

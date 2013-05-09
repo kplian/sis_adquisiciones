@@ -150,9 +150,10 @@ Phx.vista.SolicitudReq = {
 		    	}, scope : this
 		    });
             
-            
+            this.cmpIdUo.enable();
             this.cmpIdFuncionarioAprobador.reset();
             this.cmpIdFuncionarioAprobador.enable();
+            
            },this);
       
     },
@@ -198,7 +199,7 @@ Phx.vista.SolicitudReq = {
        this.cmpIdFuncionarioAprobador.disable();       
        this.cmpIdUo.disable();
        Phx.vista.SolicitudReq.superclass.onButtonEdit.call(this);
-       this.Cmp.fecha_soli.fireEvent('change');    
+       //this.Cmp.fecha_soli.fireEvent('change');    
     },
     
     onFinalizarSol:function(){

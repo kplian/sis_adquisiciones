@@ -45,8 +45,8 @@ class MODProcesoCompra extends MODbase{
 		$this->captura('desc_solicitud','varchar');
 		$this->captura('desc_moneda','varchar');
 		$this->captura('instruc_rpc','varchar');
-		
-		 
+		$this->captura('id_categoria_compra','int4');
+	 
 		
 		//Ejecuta la instruccion
 		$this->armarConsulta();
