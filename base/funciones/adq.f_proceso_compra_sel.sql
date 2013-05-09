@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION adq.f_proceso_compra_sel (
   p_administrador integer,
   p_id_usuario integer,
@@ -90,7 +88,8 @@ BEGIN
                          fun.desc_funcionario1 as desc_funcionario,
                          sol.numero as desc_solicitud,
                          mon.codigo as desc_moneda,
-                         sol.instruc_rpc
+                         sol.instruc_rpc,
+                         sol.id_categoria_compra
                    from adq.tproceso_compra proc
                        inner join segu.tusuario usu1 on usu1.id_usuario = proc.id_usuario_reg
                        inner join param.tdepto dep on dep.id_depto = proc.id_depto 

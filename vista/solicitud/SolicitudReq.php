@@ -199,6 +199,7 @@ Phx.vista.SolicitudReq = {
        this.cmpIdFuncionarioAprobador.disable();       
        this.cmpIdUo.disable();
        Phx.vista.SolicitudReq.superclass.onButtonEdit.call(this);
+       this.Cmp.id_funcionario.store.baseParams.fecha = this.cmpFechaSoli.getValue().dateFormat(this.cmpFechaSoli.format);
        //this.Cmp.fecha_soli.fireEvent('change');    
     },
     
