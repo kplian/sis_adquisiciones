@@ -68,7 +68,7 @@ class ACTSolicitud extends ACTbase{
  function reporteSolicitud(){
     $dataSource = new DataSource();
     $idSolicitud = $this->objParam->getParametro('id_solicitud');
-    //$this->objParam->addParametroConsulta('id_plan_mant',$idPlanMant);
+    $estado = $this->objParam->getParametro('estado');
     $this->objParam->addParametroConsulta('ordenacion','id_solicitud');
     $this->objParam->addParametroConsulta('dir_ordenacion','ASC');
     $this->objParam->addParametroConsulta('cantidad',1000);
@@ -77,7 +77,8 @@ class ACTSolicitud extends ACTbase{
     $resultSolicitud = $this->objFunc->reporteSolicitud();
     $datosSolicitud = $resultSolicitud->getDatos();
  			
-    //armamos el array parametros y metemos ahi los data sets de las otras tablas
+ 			//armamos el array parametros y metemos ahi los data sets de las otras tablas
+    $dataSource->putParameter('estado',$estado);
     $dataSource->putParameter('id_solicitud', $datosSolicitud[0]['id_solicitud']);
 				$dataSource->putParameter('numero', $datosSolicitud[0]['numero']);
     $dataSource->putParameter('fecha_apro', $datosSolicitud[0]['fecha_apro']);
@@ -96,7 +97,7 @@ class ACTSolicitud extends ACTbase{
     $dataSource->putParameter('lugar_entrega', $datosSolicitud[0]['lugar_entrega']);
 				$dataSource->putParameter('comite_calificacion', $datosSolicitud[0]['comite_calificacion']);
 				$dataSource->putParameter('posibles_proveedores', $datosSolicitud[0]['posibles_proveedores']);
-				$dataSource->putParameter('desc_funcionario_apro', $datosSolicitud[0]['desc_funcionario_apro']);
+				$dataSource->putParameter('desc_funcionario_rpc', $datosSolicitud[0]['desc_funcionario_rpc']);
 				
     //get detalle
     //Reset all extra params:

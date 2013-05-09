@@ -438,7 +438,7 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
 		{name:'fecha_mod', type: 'date',dateFormat:'Y-m-d H:i:s.u'},
 		{name:'id_usuario_mod', type: 'numeric'},
 		{name:'usr_reg', type: 'string'},
-		{name:'usr_mod', type: 'string'},'desc_moneda','tipo_cambio_conv','id_estado_wf','id_proceso_wf'
+		{name:'usr_mod', type: 'string'},'email','desc_moneda','tipo_cambio_conv','id_estado_wf','id_proceso_wf'
 		
 	],
 

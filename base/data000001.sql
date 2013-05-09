@@ -138,9 +138,8 @@ select wf.f_insert_testructura_estado ('en_pago', 'OBLI', 'finalizado', 'OBLI', 
 select wf.f_insert_testructura_estado ('borrador', 'APLAD', 'pendiente', 'APLAD', '1', '', 'activo');
 select wf.f_insert_testructura_estado ('pendiente', 'APLAD', 'devengado', 'APLAD', '1', '', 'activo');
 select wf.f_insert_testructura_estado ('devengado', 'APLAD', 'finalizado', 'APLAD', 1, '', 'activo');
---select wf.f_insert_testructura_estado ('cotizado', 'COT', 'recomendado', 'COT', '1', '', 'activo');
---select wf.f_insert_testructura_estado ('recomendado', 'COT', 'adjudicado', 'COT', '1', '', 'activo');
-select wf.f_insert_testructura_estado ('cotizado', 'COT', 'adjudicado', 'COT', '1', '', 'activo');
+select wf.f_insert_testructura_estado ('cotizado', 'COT', 'recomendado', 'COT', '1', '', 'activo');
+select wf.f_insert_testructura_estado ('recomendado', 'COT', 'adjudicado', 'COT', '1', '', 'activo');
 -------------------------------------
 -- DOCUMENTOS
 ---------------------------------
@@ -288,5 +287,8 @@ select pxp.f_insert_testructura_gui ('VBCOT', 'ADQ');
 /***********************************I-DAT-GSS-ADQ-00-07/05/2013*****************************************/
 
 select pxp.f_insert_tprocedimiento ('ADQ_ESTSOL_SEL', 'Consulta estado de solicitud', 'si', '', '', 'adq.f_solicitud_sel');
+select pxp.f_insert_tprocedimiento ('ADQ_SOLAPRO_IME', 'depues de adjudicar pasa al siguiente estado, de solicitud de aprobacion', 'si', '', '', 'adq.f_cotizacion_ime');
+select pxp.f_insert_tprocedimiento ('ADQ_COTRPC_SEL', 'Consulta de datos para los funcionarios rpc', 'si', '', '', 'adq.f_cotizacion_sel');
+select pxp.f_insert_tprocedimiento ('ADQ_COTRPC_CONT', 'Conteo de registros de la consulta de cotizaciones por RPC', 'si', '', '', 'adq.f_cotizacion_sel');
 
 /***********************************F-DAT-GSS-ADQ-00-07/05/2013*****************************************/

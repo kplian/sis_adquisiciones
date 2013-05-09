@@ -77,7 +77,8 @@ BEGIN
                         cot.id_estado_wf,
                         cot.id_proceso_wf,
                         mon.codigo as desc_moneda,
-                        cot.tipo_cambio_conv
+                        cot.tipo_cambio_conv,
+                        pro.email
 						from adq.tcotizacion cot
 						inner join segu.tusuario usu1 on usu1.id_usuario = cot.id_usuario_reg
 						left join segu.tusuario usu2 on usu2.id_usuario = cot.id_usuario_mod
@@ -256,7 +257,7 @@ BEGIN
               inner join adq.tproceso_compra pc on pc.id_proceso_compra=cot.id_proceso_compra
 			  inner join adq.tsolicitud sol on sol.id_solicitud=pc.id_solicitud
 			  inner join param.tmoneda mon on mon.id_moneda=cot.id_moneda
-              where cot.estado=''adjudicado'' and cot.id_cotizacion='||v_parametros.id_cotizacion|| ' and ';
+              where cot.estado=''adjudicado'' or cot.estado=''pago_habilitado'' and cot.id_cotizacion='||v_parametros.id_cotizacion|| ' and ';
           
           --Definicion de la respuesta
           v_consulta:=v_consulta||v_parametros.filtro;

@@ -600,7 +600,7 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
                 console.debug(rec);
                 Ext.Ajax.request({
                     url:'../../sis_adquisiciones/control/Solicitud/reporteSolicitud',
-                    params:{'id_solicitud':rec.data.id_solicitud},
+                    params:{'id_solicitud':rec.data.id_solicitud,'estado':rec.data.estado},
                     success: this.successExport,
                     failure: function() {
                         console.log("fail");

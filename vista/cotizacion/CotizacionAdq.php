@@ -16,7 +16,9 @@ Phx.vista.CotizacionAdq = {
     nombreVista: 'CotizacionAdq',
     
     constructor: function(config) {
-            Phx.vista.CotizacionAdq.superclass.constructor.call(this,config);
+        
+        
+          Phx.vista.CotizacionAdq.superclass.constructor.call(this,config);
           
          
         
@@ -43,6 +45,11 @@ Phx.vista.CotizacionAdq = {
                     handler : this.onHabPag,
                     tooltip : '<b>Habilitar Pago</b><br/><b> Permite solicitar pagos en el modulo de cuentar por pagar</b>'
           });
+          
+          
+       this.addButton('btnSendMail',{text:'Sol Cotizacion',iconCls: 'bemail',disabled:true,handler:this.onSendMail,tooltip: '<b>Solictar Cotizacion</b><p>Solicta la cotizacion por correo al proveedor</p>'});
+           
+        
         
         this.init();
         this.iniciarEventos();
@@ -310,9 +317,14 @@ Phx.vista.CotizacionAdq = {
                  this.getBoton('btnSolApro').disable();
                  this.getBoton('ant_estado').disable();
                  this.getBoton('btnRepOC').disable();
+                 
+                 if(data.email != '' &&data.email != undefined){ 
+                   this.getBoton('btnSendMail').enable(); 
+                 }
                }
               else{
                    this.getBoton('ant_estado').enable();
+                   this.getBoton('btnSendMail').disable(); 
                    
                    if(data['estado']=='cotizado'){
                      this.getBoton('btnAdjudicar').enable();
@@ -352,7 +364,7 @@ Phx.vista.CotizacionAdq = {
                     this.getBoton('btnHabPago').enable();  
                  }
                
-                
+               
             return tb 
      }, 
      
@@ -365,9 +377,42 @@ Phx.vista.CotizacionAdq = {
             this.getBoton('btnAdjudicar').disable();
             this.getBoton('ant_estado').disable();
             this.getBoton('btnReporte').disable();
-            }
+            this.getBoton('btnSendMail').disable(); 
+         }
        return tb
-    }
+    },
+    
+    onSendMail:function(){
+        
+       Phx.CP.loadingShow();
+        
+        var rec=this.sm.getSelected();
+                Ext.Ajax.request({
+                    url:'../../sis_adquisiciones/control/Cotizacion/sendMailCotizacion',
+                    params:{id_cotizacion:rec.data.id_cotizacion,
+                            id_proceso_compra:rec.data.id_proceso_compra,
+                            total:'unitario',
+                            tipo:rec.data.estado,
+                            email:rec.data.email},
+                    success: this.successMail,
+                    failure: this.conexionFailure,
+                    scope:this
+                }); 
+        
+        
+    },
+    
+      successMail:function(resp){
+            Phx.CP.loadingHide();
+           
+            var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
+            if(!reg.ROOT.error){
+                alert('Correo enviado con exito')
+             }else{
+                alert('ocurrio un error durante el proceso')
+            }
+        }
+        
     
     
 };
