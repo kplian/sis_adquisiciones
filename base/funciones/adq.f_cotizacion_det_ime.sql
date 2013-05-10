@@ -202,6 +202,14 @@ BEGIN
             
             END IF;
             
+             --validar numeros negativos
+            
+            IF( v_parametros.cantidad_coti < 0  or   v_parametros.precio_unitario < 0 ) THEN 
+            
+              raise exception 'No se admiten numeros negativos';
+            
+            END IF;
+            
             
             --calcular el precio unitario en moneda base
             

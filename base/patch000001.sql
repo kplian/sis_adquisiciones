@@ -146,3 +146,30 @@ ALTER TABLE adq.tcategoria_compra
 
 
 
+/***********************************I-SCP-RAC-ADQ-146-13/05/2013****************************************/
+
+CREATE TABLE adq.tgrupo(
+    id_grupo SERIAL NOT NULL,
+    nombre varchar(200),
+    obs text,
+    PRIMARY KEY (id_grupo))
+    INHERITS (pxp.tbase);
+
+
+CREATE TABLE adq.tgrupo_usuario(
+    id_grupo_usuario SERIAL NOT NULL,
+    id_grupo int4 NOT NULL,
+    id_usuario int4,
+    obs text,
+    PRIMARY KEY (id_grupo_usuario))INHERITS (pxp.tbase);
+
+
+CREATE TABLE adq.tgrupo_partida(
+    id_grupo_partida SERIAL NOT NULL,
+    id_grupo int4 NOT NULL,
+    id_partida int4,
+    PRIMARY KEY (id_grupo_partida))
+INHERITS (pxp.tbase);
+
+
+/***********************************F-SCP-RAC-ADQ-146-13/05/2013****************************************/

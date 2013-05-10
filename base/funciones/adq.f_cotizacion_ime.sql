@@ -852,7 +852,25 @@ BEGIN
                            v_codigo_estado,
                            v_id_estado_wf_ant 
                         FROM wf.f_obtener_estado_ant_log_wf(v_parametros.id_estado_wf);
-                        
+                     
+                     
+                       --  recupera el estado actual
+                        SELECT
+                        co.estado
+                        into
+                        v_registros
+                        FROM adq.tcotizacion co
+                        where co.id_cotizacion =v_parametros.id_cotizacion; 
+                     
+                    
+                     
+                       IF  v_registros.estado = 'pago_habilitado'  THEN
+                       
+                         raise exception 'No puede retroceder cuando el pago esta habilitado';
+                       
+                       END IF;  
+                      
+                       
                         
                       -- recupera el proceso_wf
                       
@@ -877,7 +895,7 @@ BEGIN
                       
                     
                       
-                      -- actualiza estado en la solicitud
+                        -- actualiza estado en la solicitud
                         update adq.tcotizacion  s set 
                            id_estado_wf =  v_id_estado_actual,
                            estado = v_codigo_estado,
