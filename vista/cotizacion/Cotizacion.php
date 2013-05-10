@@ -18,7 +18,7 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
     	Phx.vista.Cotizacion.superclass.constructor.call(this,config);
     	
     	 this.addButton('btnReporte',{
-                    text :'Reporte',
+                    text :'Cot.',
                     iconCls : 'bpdf32',
                     disabled: true,
                     handler : this.onButtonReporte,
@@ -26,7 +26,7 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
           });
           
           this.addButton('btnRepOC',{
-            text :'Orden de Compra',
+            text :'O.C.',
             iconCls : 'bpdf32',
             disabled: true,
             handler : this.onButtonRepOC,
