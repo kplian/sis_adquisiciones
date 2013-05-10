@@ -39,6 +39,7 @@ VALUES (1, NULL, E'2013-04-30 18:49:37.675', NULL, E'activo', 3, 5, 52, NULL, E'
 select pxp.f_insert_trol ('solicitante de compra', 'Solicitante de Compra', 'ADQ');
 select pxp.f_insert_trol ('visto bueno de solicitud de compra', 'Visto Bueno Solicitud', 'ADQ');
 select pxp.f_insert_trol ('proceso de compra', 'Proceso de compra encargado', 'ADQ');
+select pxp.f_insert_trol ('visto bueno cotizacion', 'Visto Bueno Cotizacion', 'ADQ');
 
 --roles_gui
 
@@ -53,6 +54,8 @@ select pxp.f_insert_tgui_rol ('ADQ', 'Proceso de compra encargado');
 select pxp.f_insert_tgui_rol ('PROC.1', 'Proceso de compra encargado');
 select pxp.f_insert_tgui_rol ('PROC.1.1', 'Proceso de compra encargado');
 select pxp.f_insert_tgui_rol ('PROC.2', 'Proceso de compra encargado');
+select pxp.f_insert_tgui_rol ('VBCOT', 'Visto Bueno Cotizacion');
+select pxp.f_insert_tgui_rol ('ADQ', 'Visto Bueno Cotizacion');
 
 --procedimientos_gui
 
@@ -138,13 +141,24 @@ select pxp.f_insert_tprocedimiento_gui ('ADQ_TOTALADJ_IME', 'PROC.1.1', 'no');
 select pxp.f_insert_tprocedimiento_gui ('ADQ_ADJDET_IME', 'PROC.1.1', 'no');
 select pxp.f_insert_tprocedimiento_gui ('ADQ_HABPAG_IME', 'PROC.1', 'no');
 select pxp.f_insert_tprocedimiento_gui ('ADQ_SOL_CONT', 'ADQ.3', 'no');
-
 select pxp.f_insert_tprocedimiento_gui ('PM_DEPUSUCOMB_SEL', 'ADQ.3', 'no');
 select pxp.f_insert_tprocedimiento_gui ('PM_DEPUSUCOMB_SEL', 'VBSOL', 'no');
 select pxp.f_insert_tprocedimiento_gui ('PM_DEPUSUCOMB_SEL', 'PROC', 'no');
 select pxp.f_insert_tprocedimiento_gui ('PM_DEPUSUCOMB_SEL', 'PROC.1', 'no');
 select pxp.f_insert_tprocedimiento_gui ('ADQ_ESTSOL_SEL', 'ADQ.3', 'no');
 select pxp.f_insert_tprocedimiento_gui ('ADQ_ESTSOL_SEL', 'VBSOL', 'no');
+select pxp.f_insert_tprocedimiento_gui ('PM_CECCOM_SEL', 'ADQ.3.1', 'no');
+select pxp.f_insert_tprocedimiento_gui ('PM_CECCOM_CONT', 'ADQ.3.1', 'no');
+select pxp.f_insert_tprocedimiento_gui ('PM_CECCOM_SEL', 'VBSOL.1', 'no');
+select pxp.f_insert_tprocedimiento_gui ('PM_CECCOM_SEL', 'PROC.2', 'no');
+select pxp.f_insert_tprocedimiento_gui ('ADQ_SOLAPRO_IME', 'PROC.1', 'no');
+
+select pxp.f_insert_tprocedimiento_gui ('ADQ_COTRPC_SEL', 'VBCOT', 'no');
+select pxp.f_insert_tprocedimiento_gui ('ADQ_GENOC_IME', 'VBCOT', 'no');
+select pxp.f_insert_tprocedimiento_gui ('ADQ_COTOC_REP', 'VBCOT', 'no');
+select pxp.f_insert_tprocedimiento_gui ('ADQ_CTD_SEL', 'VBCOT', 'no');
+select pxp.f_insert_tprocedimiento_gui ('ADQ_COTREP_SEL', 'VBCOT', 'no');
+select pxp.f_insert_tprocedimiento_gui ('ADQ_ANTEST_IME', 'VBCOT', 'no');
 
 --rol_procedimiento_gui
 
@@ -215,11 +229,22 @@ select pxp.f_insert_trol_procedimiento_gui ('Proceso de compra encargado', 'ADQ_
 select pxp.f_insert_trol_procedimiento_gui ('Proceso de compra encargado', 'ADQ_TOTALADJ_IME', 'PROC.1.1');
 select pxp.f_insert_trol_procedimiento_gui ('Proceso de compra encargado', 'ADQ_ADJDET_IME', 'PROC.1.1');
 select pxp.f_insert_trol_procedimiento_gui ('Proceso de compra encargado', 'ADQ_GENOC_IME', 'PROC.1');
-
 select pxp.f_insert_trol_procedimiento_gui ('Solicitante de Compra', 'PM_DEPUSUCOMB_SEL', 'ADQ.3');
 select pxp.f_insert_trol_procedimiento_gui ('Solicitante de Compra', 'ADQ_ESTSOL_SEL', 'ADQ.3');
 select pxp.f_insert_trol_procedimiento_gui ('Visto Bueno Solicitud', 'ADQ_ESTSOL_SEL', 'VBSOL');
 select pxp.f_insert_trol_procedimiento_gui ('Proceso de compra encargado', 'PM_DEPUSUCOMB_SEL', 'PROC');
+select pxp.f_insert_trol_procedimiento_gui ('Solicitante de Compra', 'PM_CECCOM_SEL', 'ADQ.3.1');
+select pxp.f_insert_trol_procedimiento_gui ('Solicitante de Compra', 'PM_CECCOM_CONT', 'ADQ.3.1');
+select pxp.f_insert_trol_procedimiento_gui ('Proceso de compra encargado', 'ADQ_SOLAPRO_IME', 'PROC.1');
+select pxp.f_insert_trol_procedimiento_gui ('Proceso de compra encargado', 'ADQ_PROCPED_SEL', 'PROC');
+
+select pxp.f_insert_trol_procedimiento_gui ('Visto Bueno Cotizacion', 'ADQ_CTD_SEL', 'VBCOT');
+select pxp.f_insert_trol_procedimiento_gui ('Visto Bueno Cotizacion', 'ADQ_COTREP_SEL', 'VBCOT');
+select pxp.f_insert_trol_procedimiento_gui ('Visto Bueno Cotizacion', 'ADQ_COTOC_REP', 'VBCOT');
+select pxp.f_insert_trol_procedimiento_gui ('Visto Bueno Cotizacion', 'ADQ_GENOC_IME', 'VBCOT');
+select pxp.f_insert_trol_procedimiento_gui ('Visto Bueno Cotizacion', 'ADQ_ANTEST_IME', 'VBCOT');
+select pxp.f_insert_trol_procedimiento_gui ('Visto Bueno Cotizacion', 'ADQ_COTRPC_SEL', 'VBCOT');
+
 -------------------------------------------
 -- FIN ROLES 
 -- Autor Gonzalo Sarmiento Sejas
@@ -253,4 +278,7 @@ INSERT INTO segu.tusuario_rol ("id_usuario_rol", "id_rol", "id_usuario", "fecha_
 VALUES (7, 6, 55, NULL, E'activo');
 
 INSERT INTO segu.tusuario_rol ("id_usuario_rol", "id_rol", "id_usuario", "fecha_reg", "estado_reg")
-VALUES (8, 7, 56, NULL, E'activo');
+VALUES (8, 8, 56, NULL, E'activo');
+
+INSERT INTO segu.tusuario_rol ("id_usuario_rol", "id_rol", "id_usuario", "fecha_reg", "estado_reg")
+VALUES (9, 7, 54, NULL, E'activo');

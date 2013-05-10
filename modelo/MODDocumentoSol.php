@@ -154,9 +154,8 @@ class MODDocumentoSol extends MODbase{
         //Define los parametros para la funcion 
         $this->setParametro('id_documento_sol','id_documento_sol','integer');   
         $this->setParametro('extension','extension','varchar');
-        $this->setParametro('archivo','archivo','bytea',false,'',false,array('doc','pdf','docx','jpg','jpeg','bmp','gif','png'));
+        $this->setFile('archivo','id_documento_sol', false, '', array('doc','pdf','docx','jpg','jpeg','bmp','gif','png'));
                 
-        
         //Ejecuta la instruccion
         $this->armarConsulta();
                 

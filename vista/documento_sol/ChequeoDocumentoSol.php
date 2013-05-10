@@ -100,56 +100,21 @@ Phx.vista.ChequeoDocumentoSol=Ext.extend(Phx.gridInterfaz,{
             form:true
         },
         {
-            config: {
-                name: 'id_categoria_compra',
-                fieldLabel: 'Categoria Compra',
-                typeAhead: false,
-                forceSelection: false,
-                allowBlank: false,
-                emptyText: 'Categorias...',
-                store: new Ext.data.JsonStore({
-                    url: '../../sis_adquisiciones/control/CategoriaCompra/listarCategoriaCompra',
-                    id: 'id_categoria_compra',
-                    root: 'datos',
-                    sortInfo: {
-                        field: 'nombre',
-                        direction: 'ASC'
-                    },
-                    totalProperty: 'total',
-                    fields: ['id_categoria_compra', 'codigo', 'nombre'],
-                    // turn on remote sorting
-                    remoteSort: true,
-                    baseParams: {par_filtro: 'catcomp.codigo#catcomp.nombre'}
-                }),
-                valueField: 'id_categoria_compra',
-                displayField: 'nombre',
-                gdisplayField: 'desc_categoria_compra',
-                triggerAction: 'all',
-                lazyRender: true,
-                mode: 'remote',
-                pageSize: 20,
-                queryDelay: 200,
-                anchor: '80%',
-                minChars: 2,
-                renderer: function(value, p, record) {
-                    return String.format('{0}', record.data['desc_categoria_compra']);
-                },
-                tpl: '<tpl for="."><div class="x-combo-list-item"><p>{nombre}</p><p>{codigo}</p> </div></tpl>'
+            //configuracion del componente
+            config:{
+                    labelSeparator:'',
+                    inputType:'hidden',
+                    name: 'id_categoria_compra'
             },
-            type: 'ComboBox',
-            id_grupo: 0,
-            filters: {
-                pfiltro: 'cc.nombre',
-                type: 'string'
-            },
-            grid: true,
-            form: true
+            type:'Field',
+            form:true 
         },
+        
         {
             config:{
                 name: 'nombre_doc',
                 fieldLabel: 'Nombre Documento',
-                allowBlank: true,
+                allowBlank: false,
                 anchor: '80%',
                 gwidth: 150,
                 maxLength:255
@@ -171,8 +136,13 @@ Phx.vista.ChequeoDocumentoSol=Ext.extend(Phx.gridInterfaz,{
                 maxLength:150,
                 anchor:'100%',
                 renderer:function (value, p, record){  
-                            if(record.data['extension'].length!=0)
-                            return  String.format('{0}',"<div style='text-align:center'><a href = '../../../sis_adquisiciones/archivos_servidor/"+ record.data['archivo']+"' align='center' width='70' height='70'>Abrir documento</a></div>");
+                            if(record.data['extension'].length!=0) {
+                            	var data = "id=" + record.data['id_documento_sol'];
+                            	data += "&extension=" + record.data['extension'];
+                            	data += "&sistema=sis_adquisiciones";
+                            	data += "&clase=DocumentoSol";
+                            	return  String.format('{0}',"<div style='text-align:center'><a target=_blank href = '../../../lib/lib_control/CTOpenFile.php?"+ data+"' align='center' width='70' height='70'>Abrir documento</a></div>");
+                            }
                         },  
                 buttonCfg: {
                     iconCls: 'upload-icon'
@@ -183,22 +153,50 @@ Phx.vista.ChequeoDocumentoSol=Ext.extend(Phx.gridInterfaz,{
             id_grupo:0,
             grid:true,
             form:false
-        },        
-        {
-            config:{
-                name: 'nombre_tipo_doc',
-                fieldLabel: 'Extensiones Permitidas',
-                allowBlank: true,
-                anchor: '80%',
-                gwidth: 100,
-                maxLength:255
-            },
-            type:'TextField',
-            filters:{pfiltro:'docsol.nombre_tipo_doc',type:'string'},
-            id_grupo:1,
-            grid:true,
-            form:true
         },
+        {
+            config: {
+                name: 'nombre_tipo_doc',
+                fieldLabel: 'Tipo de Documento',
+                typeAhead: false,
+                forceSelection: false,
+                allowBlank: true,
+                emptyText: 'Tipo de Doc...',
+                store: new Ext.data.JsonStore({
+                    url: '../../sis_adquisiciones/control/DocumentoSol/listarDocumentoSol',
+                    id: 'id_documento_sol',
+                    root: 'datos',
+                    sortInfo: {
+                        field: 'nombre_tipo_doc',
+                        direction: 'ASC'
+                    },
+                    totalProperty: 'total',
+                    fields: ['id_documento_sol', 'nombre_tipo_doc'],
+                    // turn on remote sorting
+                    remoteSort: true                    
+                }),
+                valueField: 'nombre_tipo_doc',
+                displayField: 'nombre_tipo_doc',
+                gdisplayField: 'nombre_tipo_doc',
+                triggerAction: 'all',
+                lazyRender: true,
+                mode: 'remote',
+                pageSize: 20,
+                queryDelay: 200,
+                anchor: '80%',
+                minChars: 2,
+                tpl: '<tpl for="."><div class="x-combo-list-item"><p>{nombre_tipo_doc}</p></div></tpl>'
+            },
+            type: 'ComboBox',
+            id_grupo: 0,
+            filters: {
+                pfiltro: 'docsol.nombre_tipo_doc',
+                type: 'string'
+            },
+            grid: true,
+            form: true
+        },        
+        
         {
             config:{
                 name: 'extension',
@@ -323,9 +321,9 @@ Phx.vista.ChequeoDocumentoSol=Ext.extend(Phx.gridInterfaz,{
         field: 'id_documento_sol',
         direction: 'ASC'
     },
-    bdel:false,
+    bdel:true,
     bnew:true,
-    bedit:false,
+    bedit:true,
     bsave:false,
     fwidht: 450,
     fheight: 300,
@@ -343,7 +341,16 @@ Phx.vista.ChequeoDocumentoSol=Ext.extend(Phx.gridInterfaz,{
     {       
         this.ocultarComponente(this.getComponente('id_categoria_compra'));
         this.ocultarComponente(this.getComponente('chequeado'));
+        this.getComponente('nombre_tipo_doc').store.baseParams = {id_categoria_compra:this.id_categoria_compra,id_solicitud:'',nombre_arch_doc:'',chequeado:''}
     },
+    onButtonEdit : function() {
+    	this.ocultarComponente(this.getComponente('nombre_tipo_doc'));
+    	Phx.vista.ChequeoDocumentoSol.superclass.onButtonEdit.call(this); 
+    },
+    onButtonNew : function() {
+    	this.mostrarComponente(this.getComponente('nombre_tipo_doc'));
+    	Phx.vista.ChequeoDocumentoSol.superclass.onButtonNew.call(this); 
     }
+}
 )
 </script>

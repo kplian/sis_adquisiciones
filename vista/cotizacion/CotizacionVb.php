@@ -31,6 +31,16 @@ Phx.vista.CotizacionVb = {
                     tooltip : '<b>Solictar Aprobación RPC</b><br/><b>La recomendación pasa a revisióon del RPC </b>'
           });
           
+          this.addButton('btnChequeoDocumentos',
+            {
+                text: 'Chequear Documentos',
+                iconCls: 'bchecklist',
+                disabled: true,
+                handler: this.loadCheckDocumentosSol,
+                tooltip: '<b>Documentos del Proceso</b><br/>Subir los documetos requeridos en el proceso seleccionada.'
+            }
+        );
+          
           
         this.store.baseParams={tipo_interfaz:this.nombreVista}; 
         this.load({params:{start:0, limit:this.tam_pag}});
@@ -124,6 +134,20 @@ Phx.vista.CotizacionVb = {
                 alert('ocurrio un error durante el proceso')
             }
         },
+        loadCheckDocumentosSol:function() {
+            var rec=this.sm.getSelected();
+            rec.data.nombreVista = this.nombreVista;
+            Phx.CP.loadWindows('../../../sis_adquisiciones/vista/documento_sol/ChequeoDocumentoSol.php',
+                    'Chequeo de documentos de la solicitud',
+                    {
+                        width:700,
+                        height:450
+                    },
+                    rec.data,
+                    this.idContenedor,
+                    'ChequeoDocumentoSol'
+        	)
+    	},
         
         
         
@@ -142,6 +166,7 @@ Phx.vista.CotizacionVb = {
              }   
            this.getBoton('btnReporte').enable();  
            this.getBoton('ant_estado').enable();
+           this.getBoton('btnChequeoDocumentos').enable(); 
          },
           
             
@@ -152,6 +177,7 @@ Phx.vista.CotizacionVb = {
             this.getBoton('ant_estado').disable();
             this.getBoton('btnRepOC').disable(); 
             this.getBoton('btnReporte').disable();  
+            this.getBoton('btnChequeoDocumentos').disable(); 
             
             }
        return tb

@@ -18,7 +18,7 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
     	Phx.vista.Cotizacion.superclass.constructor.call(this,config);
     	
     	 this.addButton('btnReporte',{
-                    text :'Reporte',
+                    text :'Cot.',
                     iconCls : 'bpdf32',
                     disabled: true,
                     handler : this.onButtonReporte,
@@ -26,7 +26,7 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
           });
           
           this.addButton('btnRepOC',{
-            text :'Orden de Compra',
+            text :'O.C.',
             iconCls : 'bpdf32',
             disabled: true,
             handler : this.onButtonRepOC,
@@ -428,6 +428,8 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
 		{name:'id_moneda', type: 'numeric'},
 		{name:'moneda', type: 'string'},
 		{name:'id_proceso_compra', type: 'numeric'},
+		{name:'id_solicitud', type: 'numeric'},
+		{name:'id_categoria_compra', type: 'numeric'},
 		{name:'fecha_venc', type: 'date',dateFormat:'Y-m-d'},
 		{name:'obs', type: 'string'},
 		{name:'fecha_adju', type: 'date',dateFormat:'Y-m-d'},

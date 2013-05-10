@@ -74,23 +74,17 @@ Phx.vista.TipoDocumento=Ext.extend(Phx.gridInterfaz,{
         },
         {
             config:{
-                name: 'nombre_doc',
-                fieldLabel: 'Nombre documento',
-                allowBlank: true,
-                anchor: '80%',
-                gwidth: 200,
-                maxLength:255
+            	labelSeparator:'',
+                inputType:'hidden',
+                name: 'nombre_doc'
             },
-            type:'TextField',
-            filters:{pfiltro:'docsol.nombre_doc',type:'string'},
-            id_grupo:1,
-            grid:true,
+            type:'Field',
             form:true
         },      
         {
             config:{
                 name: 'nombre_tipo_doc',
-                fieldLabel: 'Extensiones Permitidas',
+                fieldLabel: 'Nombre Tipo de Documento',
                 allowBlank: true,
                 anchor: '80%',
                 gwidth: 160,
