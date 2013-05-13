@@ -141,6 +141,14 @@ class ACTSolicitud extends ACTbase{
 			    $resultSolicitud = $this->objFunc->estadosSolicitud();
 			    $datosSolicitud = $resultSolicitud->getDatos();
 							$dataSource->setDataset($datosSolicitud);
+							
+							$this->objFunc = $this->create('MODSolicitud');
+							$resultSolicitud = $this->objFunc->reporteSolicitud();
+							$datosSolicitud = $resultSolicitud->getDatos();
+							$dataSource->putParameter('numero',$datosSolicitud[0]['numero']);
+							$dataSource->putParameter('num_tramite',$datosSolicitud[0]['num_tramite']);
+							$dataSource->putParameter('desc_uo',$datosSolicitud[0]['desc_uo']);
+							$dataSource->putParameter('desc_proceso_macro',$datosSolicitud[0]['desc_proceso_macro']);
 			  			          
 			    //build the diagram
 			    $nombreArchivo='diagramaGantt.png';

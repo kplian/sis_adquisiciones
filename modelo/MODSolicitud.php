@@ -321,6 +321,7 @@ class MODSolicitud extends MODbase{
 		
 		$this->setParametro('id_solicitud','id_solicitud','int4');
 		
+		$this->captura('funcionario','text');
 		$this->captura('nombre','text');
 		$this->captura('nombre_estado','varchar');
 		$this->captura('fecha_reg','date');
