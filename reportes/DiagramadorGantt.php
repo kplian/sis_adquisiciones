@@ -7,8 +7,8 @@
 *@description Clase que que genera el diagrama Gantt con ayuda de la libreria jpgraph
 */
 require_once(dirname(__FILE__).'/../../pxp/pxpReport/DataSource.php');
-require_once (dirname(__FILE__).'/../../pxp/lib/jpgraph-3.5/src/jpgraph.php');
-require_once (dirname(__FILE__).'/../../pxp/lib/jpgraph-3.5/src/jpgraph_gantt.php');
+require_once (dirname(__FILE__).'/../../pxp/lib/jpgraph/src/jpgraph.php');
+require_once (dirname(__FILE__).'/../../pxp/lib/jpgraph/src/jpgraph_gantt.php');
 
 class DiagramadorGantt{
 	
