@@ -1,0 +1,383 @@
+<?php
+/**
+*@package pXP
+*@file gen-Presolicitud.php
+*@author  (admin)
+*@date 10-05-2013 05:03:41
+*@description Archivo con la interfaz de usuario que permite la ejecucion de todas las funcionalidades del sistema
+*/
+
+header("content-type: text/javascript; charset=UTF-8");
+?>
+<script>
+Phx.vista.Presolicitud=Ext.extend(Phx.gridInterfaz,{
+
+	constructor:function(config){
+		this.maestro=config.maestro;
+    	//llama al constructor de la clase padre
+		Phx.vista.Presolicitud.superclass.constructor.call(this,config);
+		this.init();
+		this.load({params:{start:0, limit:this.tam_pag}});
+		this.iniciarEventos();
+	},
+	tam_pag:50,
+			
+	Atributos:[
+		{
+			//configuracion del componente
+			config:{
+					labelSeparator:'',
+					inputType:'hidden',
+					name: 'id_presolicitud'
+			},
+			type:'Field',
+			form:true 
+		},
+        {
+            config:{
+                name: 'estado',
+                fieldLabel: 'estado',
+                allowBlank: true,
+                anchor: '80%',
+                gwidth: 100,
+                maxLength:30
+            },
+            type:'TextField',
+            filters:{pfiltro:'pres.estado',type:'string'},
+            id_grupo:1,
+            grid:true,
+            form:false
+        },
+        {
+            config:{
+                name:'id_grupo',
+                fieldLabel:'Grupo de Compras',
+                allowBlank:false,
+                emptyText:'Grupo...',
+                store: new Ext.data.JsonStore({
+
+                    url: '../../sis_adquisiciones/control/Grupo/listarGrupo',
+                    id: 'id_grupo',
+                    root: 'datos',
+                    sortInfo:{
+                        field: 'id_grupo',
+                        direction: 'ASC'
+                    },
+                    totalProperty: 'total',
+                    fields: ['id_grupo','nombre','obs'],
+                    // turn on remote sorting
+                    remoteSort: true,
+                    baseParams:{par_filtro:'PERSON.nombre_completo2#cuenta'}
+                }),
+                valueField: 'id_grupo',
+                displayField: 'nombre',
+                gdisplayField:'desc_grupo',//dibuja el campo extra de la consulta al hacer un inner join con orra tabla
+                tpl:'<tpl for="."><div class="x-combo-list-item"><p>{nombre}</p><p>CI:{obs}</p> </div></tpl>',
+                hiddenName: 'id_grupo',
+                forceSelection:true,
+                typeAhead: true,
+                triggerAction: 'all',
+                lazyRender:true,
+                mode:'remote',
+                pageSize:10,
+                queryDelay:1000,
+                width:250,
+                gwidth:280,
+                minChars:2,
+                renderer:function (value, p, record){return String.format('{0}', record.data['desc_grupo']);}
+            },
+            type:'ComboBox',
+            id_grupo:0,
+            filters:{   
+                        pfiltro:'gru.nombre#gru.obs',
+                        type:'string'
+                    },
+           
+            grid:true,
+            form:true
+        },
+		         
+        {
+            config:{
+                name: 'fecha_soli',
+                fieldLabel: 'Fecha Sol.',
+                allowBlank: false,
+                disabled: true,
+                gwidth: 100,
+                        format: 'd/m/Y', 
+                        renderer:function (value,p,record){return value?value.dateFormat('d/m/Y'):''}
+            },
+            type:'DateField',
+            filters:{pfiltro:'pres.fecha_soli',type:'date'},
+            id_grupo:1,
+            grid:true,
+            form:true
+        },
+         {
+            config:{
+                name:'id_funcionario',
+                 hiddenName: 'id_funcionario',
+                origen:'FUNCIONARIO',
+                fieldLabel:'Funcionario',
+                allowBlank:false,
+                gwidth:200,
+                valueField: 'id_funcionario',
+                gdisplayField: 'desc_funcionario',
+                baseParams: { es_combo_solicitud : 'si' },
+                renderer:function(value, p, record){return String.format('{0}', record.data['desc_funcionario']);}
+             },
+            type:'ComboRec',//ComboRec
+            id_grupo:0,
+            filters:{pfiltro:'fun.desc_funcionario1',type:'string'},
+            grid:true,
+            form:true
+         },
+           {
+            config:{
+                name:'id_uo',
+                hiddenName: 'id_uo',
+                origen:'UO',
+                fieldLabel:'UO',
+                gdisplayField:'desc_uo',//mapea al store del grid
+                 disabled:true,
+                gwidth:200,
+                 renderer:function (value, p, record){return String.format('{0}', record.data['desc_uo']);}
+             },
+             type:'ComboRec',
+             id_grupo:1,
+             filters:{   
+                pfiltro:'uo.codigo#uo.nombre_unidad',
+                type:'string'
+             },
+             grid:true,
+             form:true
+           },
+          
+         {
+            config:{
+                name:'id_funcionario_supervisor',
+                hiddenName: 'id_funcionario_supervisor',
+                origen:'FUNCIONARIOCAR',
+                fieldLabel:'Supervisor',
+                allowBlank:false,
+                disabled:true,
+                gwidth:200,
+                valueField: 'id_funcionario',
+                gdisplayField: 'desc_funcionario_apro',
+                renderer:function(value, p, record){return String.format('{0}', record.data['desc_funcionario_supervisor']);}
+             },
+            type:'ComboRec',//ComboRec
+            filters:{pfiltro:'funs.desc_funcionario1',type:'string'},
+            id_grupo:0,
+            grid:true,
+            form:true
+         },
+		{
+			config:{
+				name: 'obs',
+				fieldLabel: 'obs',
+				allowBlank: true,
+				anchor: '80%',
+				gwidth: 100,
+				maxLength:500
+			},
+			type:'TextArea',
+			filters:{pfiltro:'pres.obs',type:'string'},
+			id_grupo:1,
+			grid:true,
+			form:true
+		},
+		{
+			config:{
+				name: 'fecha_reg',
+				fieldLabel: 'Fecha creación',
+				allowBlank: true,
+				anchor: '80%',
+				gwidth: 100,
+						format: 'd/m/Y', 
+						renderer:function (value,p,record){return value?value.dateFormat('d/m/Y H:i:s'):''}
+			},
+			type:'DateField',
+			filters:{pfiltro:'pres.fecha_reg',type:'date'},
+			id_grupo:1,
+			grid:true,
+			form:false
+		},
+        
+        {
+            config:{
+                name: 'estado_reg',
+                fieldLabel: 'Estado Reg.',
+                allowBlank: true,
+                anchor: '80%',
+                gwidth: 100,
+                maxLength:10
+            },
+            type:'TextField',
+            filters:{pfiltro:'pres.estado_reg',type:'string'},
+            id_grupo:1,
+            grid:true,
+            form:false
+        },
+		{
+			config:{
+				name: 'usr_reg',
+				fieldLabel: 'Creado por',
+				allowBlank: true,
+				anchor: '80%',
+				gwidth: 100,
+				maxLength:4
+			},
+			type:'NumberField',
+			filters:{pfiltro:'usu1.cuenta',type:'string'},
+			id_grupo:1,
+			grid:true,
+			form:false
+		},
+		{
+			config:{
+				name: 'fecha_mod',
+				fieldLabel: 'Fecha Modif.',
+				allowBlank: true,
+				anchor: '80%',
+				gwidth: 100,
+						format: 'd/m/Y', 
+						renderer:function (value,p,record){return value?value.dateFormat('d/m/Y H:i:s'):''}
+			},
+			type:'DateField',
+			filters:{pfiltro:'pres.fecha_mod',type:'date'},
+			id_grupo:1,
+			grid:true,
+			form:false
+		},
+		{
+			config:{
+				name: 'usr_mod',
+				fieldLabel: 'Modificado por',
+				allowBlank: true,
+				anchor: '80%',
+				gwidth: 100,
+				maxLength:4
+			},
+			type:'NumberField',
+			filters:{pfiltro:'usu2.cuenta',type:'string'},
+			id_grupo:1,
+			grid:true,
+			form:false
+		}
+	],
+	
+	title:'Presolicitud',
+	ActSave:'../../sis_adquisiciones/control/Presolicitud/insertarPresolicitud',
+	ActDel:'../../sis_adquisiciones/control/Presolicitud/eliminarPresolicitud',
+	ActList:'../../sis_adquisiciones/control/Presolicitud/listarPresolicitud',
+	id_store:'id_presolicitud',
+	fields: [
+		{name:'id_presolicitud', type: 'numeric'},
+		{name:'id_grupo', type: 'numeric'},
+		{name:'id_funcionario_supervisor', type: 'numeric'},
+		{name:'id_funcionario', type: 'numeric'},
+		{name:'estado_reg', type: 'string'},
+		{name:'obs', type: 'string'},
+		{name:'id_uo', type: 'numeric'},
+		{name:'estado', type: 'string'},
+		{name:'id_solicitudes', type: 'numeric'},
+		{name:'fecha_reg', type: 'date',dateFormat:'Y-m-d H:i:s.u'},
+		{name:'id_usuario_reg', type: 'numeric'},
+		{name:'fecha_mod', type: 'date',dateFormat:'Y-m-d H:i:s.u'},
+		{name:'fecha_soli', type: 'date',dateFormat:'Y-m-d'},
+		{name:'id_usuario_mod', type: 'numeric'},
+		{name:'usr_reg', type: 'string'},
+		{name:'usr_mod', type: 'string'},
+		'desc_funcionario_supervisor','desc_funcionario','desc_uo','desc_grupo'
+		
+	],
+	sortInfo:{
+		field: 'id_presolicitud',
+		direction: 'ASC'
+	},
+	bdel:true,
+	bsave:true,
+	  
+    iniciarEventos:function(){
+        
+        this.cmpFechaSoli = this.getComponente('fecha_soli');
+        this.cmpIdUo = this.getComponente('id_uo');
+        this.cmpIdFuncionarioSupervisor = this.getComponente('id_funcionario_supervisor');
+        
+        //inicio de eventos 
+        this.cmpFechaSoli.on('change',function(f){
+             this.cmpIdUo.reset();
+             this.cmpIdFuncionarioSupervisor.reset();
+             this.cmpIdUo.enable();
+             this.Cmp.id_funcionario.enable();             
+             this.Cmp.id_funcionario.store.baseParams.fecha = this.cmpFechaSoli.getValue().dateFormat(this.cmpFechaSoli.format);
+             
+             },this);
+        
+        this.Cmp.id_funcionario.on('select',function(rec){ 
+            
+            //Aprobador  
+            this.cmpIdFuncionarioSupervisor.store.baseParams.id_funcionario=this.Cmp.id_funcionario.getValue();
+            this.cmpIdFuncionarioSupervisor.store.baseParams.fecha = this.cmpFechaSoli.getValue().dateFormat(this.cmpFechaSoli.format);
+            this.cmpIdFuncionarioSupervisor.modificado=true;
+            
+            //Unidad
+            this.Cmp.id_uo.store.baseParams.id_funcionario_uo_presupuesta=this.Cmp.id_funcionario.getValue();
+            this.Cmp.id_uo.store.baseParams.fecha = this.cmpFechaSoli.getValue().dateFormat(this.cmpFechaSoli.format);
+            this.Cmp.id_uo.store.load({params:{start:0,limit:this.tam_pag}, 
+               callback : function (r) {                        
+                    if (r.length > 0 ) {                        
+                        this.Cmp.id_uo.setValue(r[0].data.id_uo);
+                    }     
+                                    
+                }, scope : this
+            });
+            
+            this.cmpIdUo.enable();
+            this.cmpIdFuncionarioSupervisor.reset();
+            this.cmpIdFuncionarioSupervisor.enable();
+            
+           },this);
+      
+    },
+	 onButtonNew:function(){
+       Phx.vista.Presolicitud.superclass.onButtonNew.call(this); 
+       
+       this.cmpIdFuncionarioSupervisor.disable();
+       this.cmpIdUo.disable();
+       this.Cmp.id_funcionario.disable();
+       this.Cmp.fecha_soli.setValue(new Date());
+       this.Cmp.fecha_soli.fireEvent('change');
+       
+       this.Cmp.id_funcionario.store.load({params:{start:0,limit:this.tam_pag}, 
+           callback : function (r) {
+                if (r.length == 1 ) {                       
+                    this.Cmp.id_funcionario.setValue(r[0].data.id_funcionario);
+                    this.Cmp.id_funcionario.fireEvent('select', r[0]);
+                }    
+                                
+            }, scope : this
+        });
+        
+           
+    },
+    onButtonEdit:function(){
+       this.cmpFechaSoli.disable();
+       this.cmpIdFuncionarioSupervisor.disable();       
+       this.cmpIdUo.disable();
+       Phx.vista.Presolicitud.superclass.onButtonEdit.call(this);
+       this.Cmp.id_funcionario.store.baseParams.fecha = this.cmpFechaSoli.getValue().dateFormat(this.cmpFechaSoli.format);
+          
+    },
+    south:{
+          url:'../../../sis_adquisiciones/vista/presolicitud_det/PresolicitudDet.php',
+          title:'Detalle', 
+          height:'50%',
+          cls:'PresolicitudDet'
+         }
+   }
+)
+</script>
+		
+		
