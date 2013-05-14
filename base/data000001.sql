@@ -109,7 +109,7 @@ select wf.f_insert_ttipo_estado ('pago_habilitado', 'Habilitado para pagar', 'no
 select wf.f_insert_ttipo_estado ('finalizada', 'Finalizada', 'no', 'no', 'si', 'ninguno', '', 'anterior', '', '', 'activo', 'COT', '');
 select wf.f_insert_ttipo_estado ('anulado', 'Anulado', 'no', 'no', 'si', 'anterior', '', 'anterior', '', '', 'activo', 'PROC', '');
 select wf.f_insert_ttipo_estado ('registrado', 'Registrado', 'no', 'no', 'no', 'anterior', '', 'anterior', '', '', 'activo', 'OBLI', '');
-select wf.f_insert_ttipo_estado ('en_pago', 'En Pago', 'no', 'si', 'no', 'anterior', '', 'anterior', '', '', 'activo', 'OBLI', 'TPLAP');
+select wf.f_insert_ttipo_estado ('en_pago', 'En Pago', 'no', 'si', 'no', 'anterior', '', 'anterior', '', '', 'activo', 'OBLI', 'APLAD');
 select wf.f_insert_ttipo_estado ('anulado', 'Anulado', 'no', 'no', 'si', 'anterior', '', 'anterior', '', '', 'activo', 'COT', '');
 select wf.f_insert_ttipo_estado ('anulado', 'Anulado', 'no', 'no', 'si', 'anterior', '', 'anterior', '', '', 'activo', 'SOLCO', '');
 select wf.f_insert_ttipo_estado ('borrador', 'Borrador', 'si', 'no', 'no', 'anterior', '', 'anterior', '', '', 'activo', 'OBLI', '');
@@ -137,7 +137,7 @@ select wf.f_insert_testructura_estado ('borrador', 'OBLI', 'registrado', 'OBLI',
 select wf.f_insert_testructura_estado ('en_pago', 'OBLI', 'finalizado', 'OBLI', '1', '', 'activo');
 select wf.f_insert_testructura_estado ('borrador', 'APLAD', 'pendiente', 'APLAD', '1', '', 'activo');
 select wf.f_insert_testructura_estado ('pendiente', 'APLAD', 'devengado', 'APLAD', '1', '', 'activo');
-select wf.f_insert_testructura_estado ('devengado', 'APLAD', 'finalizado', 'APLAD', 1, '', 'activo');
+select wf.f_insert_testructura_estado ('devengado', 'APLAD', 'finalizado', 'APLAD', '1', '', 'activo');
 select wf.f_insert_testructura_estado ('cotizado', 'COT', 'recomendado', 'COT', '1', '', 'activo');
 select wf.f_insert_testructura_estado ('recomendado', 'COT', 'adjudicado', 'COT', '1', '', 'activo');
 -------------------------------------
