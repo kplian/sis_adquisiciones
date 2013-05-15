@@ -13,6 +13,9 @@ class ACTPresolicitud extends ACTbase{
 		$this->objParam->defecto('ordenacion','id_presolicitud');
 
 		$this->objParam->defecto('dir_ordenacion','asc');
+		
+		$this->objParam->addParametro('id_funcionario_usu',$_SESSION["ss_id_funcionario"]); 
+        
 		if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
 			$this->objReporte = new Reporte($this->objParam,$this);
 			$this->res = $this->objReporte->generarReporteListado('MODPresolicitud','listarPresolicitud');
@@ -39,6 +42,31 @@ class ACTPresolicitud extends ACTbase{
 		$this->res=$this->objFunc->eliminarPresolicitud($this->objParam);
 		$this->res->imprimirRespuesta($this->res->generarJson());
 	}
+	
+	function finalizarPresolicitud(){
+        $this->objFunc=$this->create('MODPresolicitud');    
+        $this->res=$this->objFunc->finalizarPresolicitud($this->objParam);
+        $this->res->imprimirRespuesta($this->res->generarJson());
+    }
+    
+    function retrocederPresolicitud(){
+        $this->objFunc=$this->create('MODPresolicitud');    
+        $this->res=$this->objFunc->retrocederPresolicitud($this->objParam);
+        $this->res->imprimirRespuesta($this->res->generarJson());
+    }
+    
+    function aprobarPresolicitud(){
+        $this->objFunc=$this->create('MODPresolicitud');    
+        $this->res=$this->objFunc->aprobarPresolicitud($this->objParam);
+        $this->res->imprimirRespuesta($this->res->generarJson());
+    }
+    
+     function consolidarSolicitud(){
+        $this->objFunc=$this->create('MODPresolicitud');    
+        $this->res=$this->objFunc->consolidarSolicitud($this->objParam);
+        $this->res->imprimirRespuesta($this->res->generarJson());
+    }
+  
 			
 }
 

@@ -29,6 +29,7 @@ DECLARE
 	v_parametros  		record;
 	v_nombre_funcion   	text;
 	v_resp				varchar;
+    v_filtro            varchar;
 			    
 BEGIN
 
@@ -45,6 +46,55 @@ BEGIN
 	if(p_transaccion='ADQ_PRES_SEL')then
      				
     	begin
+        
+          
+        
+           IF  v_parametros.tipo_interfaz = 'PresolicitudVb'   THEN
+               IF p_administrador = 1 THEN
+              	
+                  v_filtro = '0=0';
+             
+               ELSE
+             
+                  v_filtro = ' id_funcionario_supervisor = ' ||v_parametros.id_funcionario_usu::varchar;
+             
+               END IF;
+           
+               v_filtro = v_filtro ||' and (estado = ''pendiente'' or estado =''aprobado'')';
+           
+           ELSEIF  v_parametros.tipo_interfaz = 'PresolicitudCon'   THEN
+           
+           
+              IF p_administrador = 1 THEN
+              	
+                  v_filtro = '0=0';
+             
+               ELSE
+             
+                  v_filtro =  ' '|| p_id_usuario::varchar||'  in (select gu.id_usuario 
+                                              from adq.tgrupo_usuario  gu 
+                                              where gu.id_grupo = gru.id_grupo) ' ;
+             
+               END IF;
+           
+               v_filtro = v_filtro ||' and (estado = ''aprobado'' or estado =''asignado'')';
+           
+           
+           ELSE
+           
+              IF p_administrador = 1 THEN
+              	
+                  v_filtro = '0=0';
+             
+             ELSE
+             
+                  v_filtro = ' id_usuario_reg = ' ||p_id_usuario::varchar;
+             
+             END IF;
+        
+           END IF;
+           
+                
     		--Sentencia de la consulta
 			v_consulta:='select pres.id_presolicitud,
                                  pres.id_grupo,
@@ -65,7 +115,12 @@ BEGIN
                                  fun.desc_funcionario1 as desc_funcionario,
                                  funs.desc_funcionario1 as desc_funcionario_supervisor,
                                  ''(''||uo.codigo ||'') ''||uo.descripcion as desc_uo,
-                                 pres.fecha_soli
+                                 pres.fecha_soli,
+                                 ( select  pxp.list(gp.id_partida::varchar) 
+                                 from adq.tgrupo_partida gp 
+                                 inner join param.tperiodo per on per.id_gestion = gp.id_gestion
+                                 and per.fecha_ini <= pres.fecha_soli and per.fecha_fin >= pres.fecha_soli
+                                 where gp.id_grupo = gru.id_grupo  and gp.estado_reg=''activo'')::varchar  as id_partidas
                           from adq.tpresolicitud pres
                                inner join segu.tusuario usu1 on usu1.id_usuario = pres.id_usuario_reg
                                inner join adq.tgrupo gru on gru.id_grupo = pres.id_grupo
@@ -73,12 +128,13 @@ BEGIN
                                inner join orga.vfuncionario funs on funs.id_funcionario = pres.id_funcionario_supervisor
                                inner join orga.tuo uo on uo.id_uo = pres.id_uo 
                                left join segu.tusuario usu2 on usu2.id_usuario = pres.id_usuario_mod
-				        where  ';
+				        where  '||v_filtro||' and ';
 			
 			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;
 			v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
 
+            raise notice '%',v_consulta;
 			--Devuelve la respuesta
 			return v_consulta;
 						
@@ -94,6 +150,52 @@ BEGIN
 	elsif(p_transaccion='ADQ_PRES_CONT')then
 
 		begin
+        
+           IF  v_parametros.tipo_interfaz = 'PresolicitudVb'   THEN
+               IF p_administrador = 1 THEN
+              	
+                  v_filtro = '0=0';
+             
+               ELSE
+             
+                  v_filtro = ' id_funcionario_supervisor = ' ||v_parametros.id_funcionario_usu::varchar;
+             
+               END IF;
+           
+               v_filtro = v_filtro ||' and (estado = ''pendiente'' or estado =''aprobado'')';
+           
+           ELSEIF  v_parametros.tipo_interfaz = 'PresolicitudCon'   THEN
+           
+           
+              IF p_administrador = 1 THEN
+              	
+                  v_filtro = '0=0';
+             
+               ELSE
+             
+                  v_filtro =  ' '|| p_id_usuario::varchar||'  in (select gu.id_usuario 
+                                              from adq.tgrupo_usuario  gu 
+                                              where gu.id_grupo = gru.id_grupo) ' ;
+             
+               END IF;
+           
+               v_filtro = v_filtro ||' and (estado = ''aprobado'' or estado =''asignado'')';
+           
+           
+           ELSE
+           
+              IF p_administrador = 1 THEN
+              	
+                  v_filtro = '0=0';
+             
+             ELSE
+             
+                  v_filtro = ' id_usuario_reg = ' ||p_id_usuario::varchar;
+             
+             END IF;
+        
+           END IF;
+        
 			--Sentencia de la consulta de conteo de registros
 			v_consulta:='select count(id_presolicitud)
 					     from adq.tpresolicitud pres
@@ -103,7 +205,7 @@ BEGIN
                                inner join orga.vfuncionario funs on funs.id_funcionario = pres.id_funcionario_supervisor
                                inner join orga.tuo uo on uo.id_uo = pres.id_uo 
                                left join segu.tusuario usu2 on usu2.id_usuario = pres.id_usuario_mod
-					    where ';
+					    where '||v_filtro||' and ';
 			
 			--Definicion de la respuesta		    
 			v_consulta:=v_consulta||v_parametros.filtro;
@@ -130,7 +232,7 @@ EXCEPTION
 END;
 $body$
 LANGUAGE 'plpgsql'
-VOLATILE
+STABLE
 CALLED ON NULL INPUT
 SECURITY INVOKER
 COST 100;

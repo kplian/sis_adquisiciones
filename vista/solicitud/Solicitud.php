@@ -611,6 +611,26 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
                     scope:this
                 });  
 	},
+	obtenerSolicitud:function(){
+	    
+	    var d= this.sm.getSelected();
+	    if(d&&d.data){
+    	    if(d.data.estado == 'borrador'){
+    	          return d.data.id_solicitud;
+    	        }
+    	    else{    
+    	      return 'no_borrador';
+    	    }
+    	}
+    	else{
+    	      return 'no_seleccionado';
+    	}    
+	},
+	actualizarSolicitudDet:function(){
+      
+     Phx.CP.getPagina(this.idContenedor+'-south').reload();  
+        
+    },
 
 	sortInfo:{
 		field: 'id_solicitud',

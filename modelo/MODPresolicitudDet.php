@@ -54,7 +54,7 @@ class MODPresolicitudDet extends MODbase{
 				
 		//Define los parametros para la funcion
 		$this->setParametro('descripcion','descripcion','text');
-		$this->setParametro('cantidad','cantidad_pre','numeric');
+		$this->setParametro('cantidad_sol','cantidad','numeric');
 		$this->setParametro('id_centro_costo','id_centro_costo','int4');
 		$this->setParametro('id_concepto_ingas','id_concepto_ingas','int4');
 		$this->setParametro('estado_reg','estado_reg','varchar');
@@ -80,7 +80,7 @@ class MODPresolicitudDet extends MODbase{
 		//Define los parametros para la funcion
 		$this->setParametro('id_presolicitud_det','id_presolicitud_det','int4');
 		$this->setParametro('descripcion','descripcion','text');
-		$this->setParametro('cantidad_pre','cantidad','numeric');
+		$this->setParametro('cantidad_sol','cantidad','numeric');
 		$this->setParametro('id_centro_costo','id_centro_costo','int4');
 		$this->setParametro('id_concepto_ingas','id_concepto_ingas','int4');
 		$this->setParametro('estado_reg','estado_reg','varchar');

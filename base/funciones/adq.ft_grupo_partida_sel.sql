@@ -58,7 +58,8 @@ BEGIN
 						usu1.cuenta as usr_reg,
 						usu2.cuenta as usr_mod,
                         par.nombre_partida,
-                        par.codigo||'' - ''||  par.nombre_partida as desc_partida		
+                        par.codigo||'' - ''||  par.nombre_partida as desc_partida,
+                        grpa.id_gestion		
 						from adq.tgrupo_partida grpa
 						inner join segu.tusuario usu1 on usu1.id_usuario = grpa.id_usuario_reg
                         inner join pre.tpartida par on par.id_partida = grpa.id_partida

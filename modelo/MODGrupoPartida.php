@@ -32,6 +32,7 @@ class MODGrupoPartida extends MODbase{
 		$this->captura('usr_mod','varchar');
 		$this->captura('nombre_partida','varchar');
 		$this->captura('desc_partida','text');
+		$this->captura('id_gestion','int4');
 		
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -50,6 +51,7 @@ class MODGrupoPartida extends MODbase{
 		//Define los parametros para la funcion
 		$this->setParametro('id_partida','id_partida','int4');
 		$this->setParametro('id_grupo','id_grupo','int4');
+		$this->setParametro('id_gestion','id_gestion','int4');
 		$this->setParametro('estado_reg','estado_reg','varchar');
 
 		//Ejecuta la instruccion
@@ -70,6 +72,7 @@ class MODGrupoPartida extends MODbase{
 		$this->setParametro('id_grupo_partida','id_grupo_partida','int4');
 		$this->setParametro('id_partida','id_partida','int4');
 		$this->setParametro('id_grupo','id_grupo','int4');
+		$this->setParametro('id_gestion','id_gestion','int4');
 		$this->setParametro('estado_reg','estado_reg','varchar');
 
 		//Ejecuta la instruccion

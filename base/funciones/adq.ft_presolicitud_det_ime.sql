@@ -48,6 +48,13 @@ BEGIN
 	if(p_transaccion='ADQ_PRED_INS')then
 					
         begin
+        
+           IF v_parametros.cantidad_sol <=0 THEN
+           
+             raise exception 'La cantidad debe ser mayor a cero';
+           
+           END IF;
+        
         	--Sentencia de la insercion
         	insert into adq.tpresolicitud_det(
 			descripcion,
@@ -63,7 +70,7 @@ BEGIN
 			fecha_mod
           	) values(
 			v_parametros.descripcion,
-			v_parametros.cantidad_pre,
+			v_parametros.cantidad_sol,
 			v_parametros.id_centro_costo,
 			'activo',
 			'pendiente',
@@ -98,7 +105,7 @@ BEGIN
 			--Sentencia de la modificacion
 			update adq.tpresolicitud_det set
 			descripcion = v_parametros.descripcion,
-			cantidad = v_parametros.cantidad_pre,
+			cantidad = v_parametros.cantidad_sol,
 			id_centro_costo = v_parametros.id_centro_costo,
 			id_presolicitud = v_parametros.id_presolicitud,
 			id_concepto_ingas = v_parametros.id_concepto_ingas,
