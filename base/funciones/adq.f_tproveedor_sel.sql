@@ -67,7 +67,12 @@ BEGIN
 						usu2.cuenta as usr_mod,
                         person.nombre_completo1,
                         instit.nombre,
-                        lug.nombre as lugar
+                        lug.nombre as lugar,
+                        (case when person.id_persona is null then
+                        	instit.nombre
+                        else
+                        	person.nombre_completo1
+                        end):: varchar as nombre_proveedor
 						from param.tproveedor provee
 						inner join segu.tusuario usu1 on usu1.id_usuario = provee.id_usuario_reg
 						left join segu.tusuario usu2 on usu2.id_usuario = provee.id_usuario_mod   

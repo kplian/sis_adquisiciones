@@ -13,6 +13,7 @@ header("content-type: text/javascript; charset=UTF-8");
 Phx.vista.Proveedor=Ext.extend(Phx.gridInterfaz,{
 
 	register:'',
+	tipo: '',
 	
 	constructor:function(config){
 		this.maestro=config.maestro;
@@ -24,9 +25,12 @@ Phx.vista.Proveedor=Ext.extend(Phx.gridInterfaz,{
 		//this.load({params:{tipo:this.cmbProveedor.getValue(),start:0, limit:50}});
 		this.cmbProveedor.on('select',this.capturaFiltros,this);
 		this.iniciarEventos();
+		this.cmbProveedor.fireEvent('select');
+		
 	},
 	
 	capturaFiltros:function(combo, record, index){
+		this.tipo = this.cmbProveedor.getValue();
 		this.store.baseParams={tipo:this.cmbProveedor.getValue()};
 		this.load({params:
 			{start:0,
@@ -37,6 +41,43 @@ Phx.vista.Proveedor=Ext.extend(Phx.gridInterfaz,{
 		//Inicializa el objeto de los argumentos extra
 		this.argumentExtraSubmit={};
 		this.argumentExtraSubmit.register=this.register;
+		this.argumentExtraSubmit.tipo=this.tipo;
+		
+	},
+	iniciarEventos : function () {
+		Phx.vista.Proveedor.superclass.iniciarEventos.call();
+		this.getComponente('id_persona').on('select',function(c,r,n){
+					console.log(r.data);				
+					this.blockGroup(1);
+					this.getComponente('ci').setValue(r.data.ci);
+					this.getComponente('nombre').setValue(r.data.nombre);
+					this.getComponente('apellido_paterno').setValue(r.data.ap_paterno);
+					this.getComponente('apellido_materno').setValue(r.data.ap_materno);
+					this.getComponente('celular1').setValue(r.data.celular1);
+					this.getComponente('celular2').setValue(r.data.celular2);
+					this.getComponente('telefono1').setValue(r.data.telefono1);
+					this.getComponente('telefono2').setValue(r.data.telefono2);
+					this.register='before_registered';
+			},this);
+		this.getComponente('id_institucion').on('select',function(c,r,n){
+			this.blockGroup(2);
+			this.getComponente('nombre_institucion').setValue(r.data.nombre);
+			this.getComponente('doc_id').setValue(r.data.doc_id);
+			this.getComponente('codigo_institucion').setValue(r.data.codigo);
+			this.getComponente('casilla').setValue(r.data.casilla);
+			this.getComponente('telefono1_institucion').setValue(r.data.telefono1);
+			this.getComponente('telefono2_institucion').setValue(r.data.telefono2);
+			this.getComponente('celular1_institucion').setValue(r.data.celular1);
+			this.getComponente('celular2_institucion').setValue(r.data.celular2);
+			this.getComponente('fax').setValue(r.data.fax);
+			this.getComponente('email1_institucion').setValue(r.data.email1);
+			this.getComponente('email2_institucion').setValue(r.data.email2);
+			this.getComponente('pag_web').setValue(r.data.pag_web);
+			this.getComponente('observaciones').setValue(r.data.observaciones);
+			this.getComponente('direccion_institucion').setValue(r.data.direccion);
+			this.getComponente('codigo_banco').setValue(r.data.codigo_banco);
+			this.register='before_registered';
+			},this);
 		
 	},		
 	Atributos:[
@@ -50,27 +91,17 @@ Phx.vista.Proveedor=Ext.extend(Phx.gridInterfaz,{
 			type:'Field',
 			form:true 
 		},
-		/*
 		{
 			config:{
-				name: 'tipo',
-				fieldLabel: 'Tipo',
-				allowBlank: false,
-				anchor: '100%',
-				gwidth: 100,
-				maxLength:25,
-				typeAhead:true,
-				triggerAction:'all',
-				mode:'local',
-				store:['persona natural','persona juridica']
+				name: 'nombre_proveedor',
+				fieldLabel: 'Nombre Proveedor',				
+				gwidth: 180
 			},
-			valorInicial:'',
-			type:'ComboBox',
-			filters:{pfiltro:'provee.tipo',type:'string'},
-			id_grupo:0,
+			type:'TextField',
 			grid:true,
-			form:true
-		},*/				
+			form:false
+		},
+					
 	  {
 	   		config:{
 	   				name:'id_persona',
@@ -438,48 +469,7 @@ Phx.vista.Proveedor=Ext.extend(Phx.gridInterfaz,{
 			grid:false,
 			form:true
 		},
-		{
-		config:{
-			fieldLabel: "Foto",
-			gwidth: 130,
-			inputType:'file',
-			name: 'foto',
-			//allowBlank:true,
-			  buttonText: '',	
-			maxLength:150,
-			anchor:'100%',
-			renderer:function (value, p, record){	
-						var momentoActual = new Date();
-					
-						var hora = momentoActual.getHours();
-						var minuto = momentoActual.getMinutes();
-						var segundo = momentoActual.getSeconds();
-						
-						hora_actual = hora+":"+minuto+":"+segundo;
-						
-					
-						
-						//return  String.format('{0}',"<div style='text-align:center'><img src = ../../control/foto_persona/"+ record.data['foto']+"?"+record.data['nombre_foto']+hora_actual+" align='center' width='70' height='70'/></div>");
-						var splittedArray = record.data['foto'].split('.');
-						if (splittedArray[splittedArray.length - 1] != "") {
-							return  String.format('{0}',"<div style='text-align:center'><img src = '../../control/foto_persona/ActionArmafoto.php?nombre="+ record.data['foto']+"&asd="+hora_actual+"' align='center' width='70' height='70'/></div>");
-						} else {
-							return  String.format('{0}',"<div style='text-align:center'><img src = '../../../lib/imagenes/NoPerfilImage.jpg' align='center' width='70' height='70'/></div>");
-						}
-						
-					},	
-			buttonCfg: {
-                iconCls: 'upload-icon'
-            }
-		},
-		//type:'FileUploadField',
-		type:'Field',
-		sortable:false,
-		//filters:{type:'string'},
-		id_grupo:1,
-		grid:false,
-		form:true
-	},
+		
 		{
 			config:{
 				name: 'fecha_nacimiento',
@@ -766,7 +756,8 @@ Phx.vista.Proveedor=Ext.extend(Phx.gridInterfaz,{
 		{name:'nit', type: 'string'},
 		{name:'id_lugar', type: 'string'},
 		{name:'lugar', type: 'string'},
-		{name:'pais', type: 'string'}
+		{name:'pais', type: 'string'},
+		{name:'nombre_proveedor', type: 'string'}
 	],
 	
 	cmbProveedor:new Ext.form.ComboBox({
@@ -805,6 +796,7 @@ Phx.vista.Proveedor=Ext.extend(Phx.gridInterfaz,{
 				
 				//if(n=='persona natural' || n=='0'){
 					this.getComponente('id_persona').enable();
+					console.log(r);
 					this.mostrarComponente(this.getComponente('id_persona'));
 					this.ocultarComponente(this.getComponente('id_institucion'));
 					this.resetGroup(1);
@@ -836,64 +828,62 @@ Phx.vista.Proveedor=Ext.extend(Phx.gridInterfaz,{
 		//},this);
 		
 		
-		this.getComponente('id_persona').on('select',function(c,r,n){				
-					this.blockGroup(1);
-					this.getComponente('ci').setValue(r.data.ci);
-					this.getComponente('nombre').setValue(r.data.nombre);
-					this.getComponente('apellido_paterno').setValue(r.data.ap_paterno);
-					this.getComponente('apellido_materno').setValue(r.data.ap_materno);
-					this.getComponente('celular1').setValue(r.data.celular1);
-					this.getComponente('celular2').setValue(r.data.celular2);
-					this.getComponente('telefono1').setValue(r.data.telefono1);
-					this.getComponente('telefono2').setValue(r.data.telefono2);
-					this.register='before_registered';
-			},this);
-		this.getComponente('id_institucion').on('select',function(c,r,n){
-			this.blockGroup(2);
-			this.getComponente('nombre_institucion').setValue(r.data.nombre);
-			this.getComponente('doc_id').setValue(r.data.doc_id);
-			this.getComponente('codigo_institucion').setValue(r.data.codigo);
-			this.getComponente('casilla').setValue(r.data.casilla);
-			this.getComponente('telefono1_institucion').setValue(r.data.telefono1);
-			this.getComponente('telefono2_institucion').setValue(r.data.telefono2);
-			this.getComponente('celular1_institucion').setValue(r.data.celular1);
-			this.getComponente('celular2_institucion').setValue(r.data.celular2);
-			this.getComponente('fax').setValue(r.data.fax);
-			this.getComponente('email1_institucion').setValue(r.data.email1);
-			this.getComponente('email2_institucion').setValue(r.data.email2);
-			this.getComponente('pag_web').setValue(r.data.pag_web);
-			this.getComponente('observaciones').setValue(r.data.observaciones);
-			this.getComponente('id_persona').setValue(r.data.desc_persona);			
-			this.getComponente('direccion_institucion').setValue(r.data.direccion);
-			this.getComponente('codigo_banco').setValue(r.data.codigo_banco);
-			this.register='before_registered';
-			},this);
+		
 	},
 	
 	onButtonEdit:function(){
 		datos=this.sm.getSelected().data;
 		Phx.vista.Proveedor.superclass.onButtonEdit.call(this); //sobrecarga enable select
-		if(datos.tipo=='persona natural'){
+		//console.log(datos);
+		if(datos.tipo=='persona'){
 			//this.ocultarComponente(this.getComponente('id_institucion'));
-			this.getComponente('id_persona').enable();
+			var cmbPer = this.getComponente('id_persona');
+			cmbPer.enable();
+			cmbPer.getStore().setBaseParam('id_persona',cmbPer.getValue());
+			cmbPer.getStore().load({ params : cmbPer.getParams() ,
+		       callback : function (r) {	       				
+		    		if (r.length > 0 ) {	       				
+	    				cmbPer.setValue(r[0].data.id_persona);
+	    				cmbPer.fireEvent('select', cmbPer, r[0]);
+	    			}     
+		    			    		
+		    	}, scope : this});
+			cmbPer.getStore().setBaseParam('id_persona','');
+			
 			
 			//this.getComponente('id_institucion').allowBlank=true;
 			this.getComponente('id_institucion').reset();
 			this.getComponente('id_institucion').disable();
 			this.mostrarComponente(this.getComponente('id_persona'));
 			this.ocultarComponente(this.getComponente('id_institucion'));
-			this.ocultarComponente(this.getComponente('tipo'));
-			this.getComponente('tipo').setValue('persona natural');
+			this.mostrarGrupo(1);
+			this.ocultarGrupo(2);
+			//this.ocultarComponente(this.getComponente('tipo'));
+			//this.getComponente('tipo').setValue(datos.tipo);
 		}else{
 			
 			//this.getComponente('id_persona').allowBlank=true;
-			this.getComponente('id_institucion').enable();
+			var cmbIns = this.getComponente('id_institucion');
+			cmbIns.enable();
+			cmbIns.getStore().setBaseParam('id_institucion',cmbIns.getValue());
+			cmbIns.getStore().load({ params : cmbIns.getParams() ,
+		       callback : function (r) {	       				
+		    		if (r.length > 0 ) {	       				
+	    				cmbIns.setValue(r[0].data.id_institucion);
+	    				cmbIns.fireEvent('select', cmbIns, r[0]);
+	    			}     
+		    			    		
+		    	}, scope : this});
+			cmbIns.getStore().setBaseParam('id_institucion','');
 			this.getComponente('id_persona').reset();
 			this.getComponente('id_persona').disable();
 			this.ocultarComponente(this.getComponente('id_persona'));
 			this.mostrarComponente(this.getComponente('id_institucion'));
-			this.ocultarComponente(this.getComponente('tipo'));
-		 this.getComponente('tipo').setValue('persona juridica');
+			this.mostrarGrupo(2);
+			this.ocultarGrupo(1);
+			//this.ocultarComponente(this.getComponente('tipo'));
+			//this.getComponente('tipo').setValue(datos.tipo);
+		 
 			
 		}
 		
