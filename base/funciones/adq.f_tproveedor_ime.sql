@@ -40,7 +40,7 @@ DECLARE
     v_registro				record;			    
 BEGIN
 
-    v_nombre_funcion = 'adq.f_proveedor_ime';
+    v_nombre_funcion = 'adq.ft_proveedor_ime';
     v_parametros = pxp.f_get_record(p_tabla);
 
 	/*********************************    
@@ -53,155 +53,123 @@ BEGIN
 	if(p_transaccion='ADQ_PROVEE_INS')then
 					
         begin
-        	cadena_con = migra.f_obtener_cadena_con_dblink();
-             v_res_cone=( select dblink_connect(cadena_con));
-			raise notice 'cadena con %',cadena_con;
-            if v_parametros.register='no_registered' then
-            	begin
-					if v_parametros.tipo='persona natural' then
-                    v_consulta:='
-                    insert into sss.tsg_persona(
-                    nombre,
-                    apellido_paterno,
-                    apellido_materno,
-                    doc_id,
-                    email1,
-                    celular1,
-                    celular2,
-                    telefono1,
-                    telefono2,
-                    genero,
-                    id_tipo_doc_identificacion,
-                    fecha_nacimiento,
-                    direccion
-                    ) values('''
-                    ||COALESCE(v_parametros.nombre::varchar,'NULL')||''','''
-                    ||COALESCE(v_parametros.apellido_paterno::varchar,'NULL')||''','''
-                    ||COALESCE(v_parametros.apellido_materno::varchar,'NULL')||''','''
-                    ||COALESCE(v_parametros.ci::varchar,'NULL')||''','''
-                    ||COALESCE(v_parametros.correo::varchar,'NULL')||''','''
-                    ||COALESCE(v_parametros.celular1::varchar,'NULL')||''','''
-                    ||COALESCE(v_parametros.celular2::varchar,'NULL')||''','''
-                    ||COALESCE(v_parametros.telefono1::varchar,'NULL')||''','''
-                    ||COALESCE(v_parametros.telefono2::varchar,'NULL')||''','''
-                    ||COALESCE(v_parametros.genero::varchar,'NULL')||''','''
-                    ||COALESCE('1'::varchar,'NULL')||''','''
-                    ||COALESCE(v_parametros.fecha_nacimiento::varchar,'NULL')||''','''
-                    ||COALESCE(v_parametros.direccion::varchar,'NULL')||'''
-                    )';
-                    PERFORM * from dblink_exec(cadena_con,v_consulta);                                        
-                    v_consulta:='select per.id_persona from sss.tsg_persona per where per.nombre='''||
-                    v_parametros.nombre::varchar||''' and per.apellido_paterno='''||v_parametros.apellido_paterno::varchar||
-                    ''' and per.apellido_materno='''||v_parametros.apellido_materno::varchar||'''';
-            
-                    select * into v_id_persona from dblink(cadena_con,v_consulta) as ( v_id_persona varchar); 
-            
-                    v_consulta:='
-                    insert into compro.tad_proveedor(
-                    id_institucion,
-                    id_persona,
-                    codigo,
-                    id_lugar
-                    ) values('
-                    ||COALESCE(v_parametros.id_institucion::varchar,'NULL')||','
-                    ||COALESCE(v_id_persona::varchar,'NULL')||','''
-                    ||COALESCE(v_parametros.codigo::varchar,'NULL')||''','
-                    ||COALESCE(v_parametros.id_lugar::varchar,'NULL')||'
-                    )';                    
-                    resp =  dblink_exec(cadena_con,v_consulta);
-                                
-                    elsif v_parametros.tipo='persona juridica' then
-                    v_consulta:='
-                    insert into param.tpm_institucion(
-                    doc_id,
-                    nombre,
-                    casilla,
-                    telefono1,
-                    telefono2,
-                    direccion,
-                    celular1,
-                    celular2,
+        	if v_parametros.register = 'before_registered' then
+            	insert into param.tproveedor
+                (id_usuario_reg, 				fecha_reg,					estado_reg,
+                 id_institucion,				id_persona,					tipo,
+                 numero_sigma,					codigo,						nit,
+                 id_lugar)
+                values 
+                (p_id_usuario,					now(),						'activo',
+                v_parametros.id_institucion,	v_parametros.id_persona,	case when v_parametros.id_persona is NULL THEN
+        																		'institucion'
+                                                                            else
+                                                                            	'persona'
+                                                                            end,
+                v_parametros.numero_sigma,		v_parametros.codigo,		v_parametros.nit,
+                v_parametros.id_lugar)RETURNING id_proveedor into v_id_proveedor;
+            else
+            	if (v_parametros.tipo = 'persona')then
+                	insert into segu.tpersona (
+                               nombre,
+                               apellido_paterno,
+                               apellido_materno,
+                               ci,
+                               correo,
+                               celular1,
+               				   telefono1,
+                               telefono2,
+                               celular2,
+                               --foto,
+                               --extension,
+                               genero,
+                               fecha_nacimiento,
+                               direccion)
+                     values(
+                            v_parametros.nombre,
+                            v_parametros.apellido_paterno,
+                            v_parametros.apellido_materno,
+                            v_parametros.ci,
+                            v_parametros.correo,
+                            v_parametros.celular1,
+                            v_parametros.telefono1,
+                            v_parametros.telefono2,
+                            v_parametros.celular2,
+                            --v_parametros.foto,
+                            --v_parametros.extension,
+                            v_parametros.genero,
+                            v_parametros.fecha_nacimiento,
+                            v_parametros.direccion)  
+                        
+               		RETURNING id_persona INTO v_id_persona;
+                else
+                	--Sentencia de la insercion
+                    insert into param.tinstitucion(
                     fax,
-                    email1,
+                    estado_reg,        			
+                    casilla,
+                    direccion,
+                    doc_id,
+                    telefono2,
                     email2,
-                    pag_web,
+                    celular1,
+                    email1,        			
+                    nombre,
                     observaciones,
+                    telefono1,
+                    celular2,
                     codigo_banco,
-                    id_tipo_doc_institucion,
+                    pag_web,
+                    id_usuario_reg,
+                    fecha_reg,
+                    id_usuario_mod,
+                    fecha_mod,
                     codigo
-                    ) values('''
-                    ||COALESCE(v_parametros.doc_id::varchar,'NULL')||''','''
-                    ||COALESCE(v_parametros.nombre_institucion::varchar,'NULL')||''','''
-                    ||COALESCE(v_parametros.casilla::varchar,'NULL')||''','''
-                    ||COALESCE(v_parametros.telefono1_institucion::varchar,'NULL')||''','''
-                    ||COALESCE(v_parametros.telefono2_institucion::varchar,'NULL')||''','''
-                    ||COALESCE(v_parametros.direccion_institucion::varchar,'NULL')||''','''
-                    ||COALESCE(v_parametros.celular1_institucion::varchar,'NULL')||''','''
-                    ||COALESCE(v_parametros.celular2_institucion::varchar,'NULL')||''','''
-                    ||COALESCE(v_parametros.fax::varchar,'NULL')||''','''
-                    ||COALESCE(v_parametros.email1_institucion::varchar,'NULL')||''','''
-                    ||COALESCE(v_parametros.email2_institucion::varchar,'NULL')||''','''
-                    ||COALESCE(v_parametros.pag_web::varchar,'NULL')||''','''
-                    ||COALESCE(v_parametros.observaciones::varchar,'NULL')||''','''
-                    ||COALESCE(v_parametros.codigo_banco::varchar,'NULL')||''','''
-                    ||COALESCE('1'::varchar,'NULL')||''','''
-                    ||COALESCE(v_parametros.codigo::varchar,'NULL')||'''
-                    )';
-                    PERFORM * from dblink_exec(cadena_con,v_consulta);                                        
-                    v_consulta:='select inst.id_institucion from param.tpm_institucion inst where inst.nombre='''||
-                    v_parametros.nombre_institucion::varchar||''' and inst.doc_id='''||v_parametros.doc_id::varchar||
-                    ''' and inst.codigo='''||v_parametros.codigo::varchar||'''';
-            
-                    select * into v_id_institucion from dblink(cadena_con,v_consulta) as ( v_id_institucion varchar); 
-                    --resp =  dblink_exec(cadena_con,v_consulta);                    
-            
-                    v_consulta:='
-                    insert into compro.tad_proveedor(
-                    id_institucion,
-                    id_persona,
-                    codigo,
-                    id_lugar
-                    ) values('
-                    ||COALESCE(v_id_institucion::varchar,'NULL')||','
-                    ||COALESCE(v_parametros.id_persona::varchar,'NULL')||','''
-                    ||COALESCE(v_parametros.codigo::varchar,'NULL')||''','
-                    ||COALESCE(v_parametros.id_lugar::varchar,'NULL')||'
-                    )';                    
-                    resp =  dblink_exec(cadena_con,v_consulta);
+                    ) values(
+                    v_parametros.fax,
+                    'activo',
+                    v_parametros.casilla,
+                    v_parametros.direccion_institucion,
+                    v_parametros.doc_id,
+                    v_parametros.telefono2_institucion,
+                    v_parametros.email2_institucion,
+                    v_parametros.celular1_institucion,
+                    v_parametros.email1_institucion,
+                    v_parametros.nombre_institucion,
+                    v_parametros.observaciones,
+                    v_parametros.telefono1_institucion,
+                    v_parametros.celular2_institucion,
+                    v_parametros.codigo_banco,
+                    v_parametros.pag_web,
+                    p_id_usuario,
+                    now(),
+                    null,
+                    null,
+                    v_parametros.codigo
                     
-                    end if;
-                end;
-            elsif v_parametros.register='before_registered' then
-			raise notice '%', 'entra a before';            	
-        	--Sentencia de la insercion
-            v_consulta:='
-        	insert into compro.tad_proveedor(
-			id_institucion,
-			id_persona,
-			codigo,
-			id_lugar
-          	) values('
-            ||COALESCE(v_parametros.id_institucion::varchar,'NULL')||','
-            ||COALESCE(v_parametros.id_persona::varchar,'NULL')||','''
-            ||COALESCE(v_parametros.codigo::varchar,'NULL')||''','
-            ||COALESCE(v_parametros.id_lugar::varchar,'NULL')||'
-			)';
-            
-            resp =  dblink_exec(cadena_con,v_consulta);
-            
-			raise notice 'resp %', resp;
+                    )RETURNING id_institucion into v_id_institucion;
+                end if;
+                
+                	insert into param.tproveedor
+                    (id_usuario_reg, 				fecha_reg,					estado_reg,
+                     id_institucion,				id_persona,					tipo,
+                     numero_sigma,					codigo,						nit,
+                     id_lugar)
+                    values 
+                    (p_id_usuario,					now(),						'activo',
+                    v_id_institucion,				v_id_persona,				case when v_id_persona is NULL THEN
+                                                                                    'institucion'
+                                                                                else
+                                                                                    'persona'
+                                                                                end,
+                    v_parametros.numero_sigma,		v_parametros.codigo,		v_parametros.nit,
+                    v_parametros.id_lugar)RETURNING id_proveedor into v_id_proveedor;
             end if;
             
-            v_consulta:='select migracion.f_sincronizacion()';
-            raise notice 'antes sincronizacion %',v_consulta;            
-            select * into v_registro from dblink(cadena_con,v_consulta) as t1(proname boolean);
-            raise notice 'despues sincronizacion %',v_consulta;            
---			resp = dblink(cadena_con,v_consulta);
             
 			--Definicion de la respuesta
-			v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Proveedor almacenado(a) con exito');
-            --if v_parametros.id_persona is null then v_parametros.id_persona else v_parametros.id_institucion end if||')'); 
-            --v_resp = pxp.f_agrega_clave(v_resp,'id_proveedor',v_id_proveedor::varchar);
+			v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Proveedor almacenado(a) con exito');            
+            v_resp = pxp.f_agrega_clave(v_resp,'id_proveedor',v_id_proveedor::varchar);
 
             --Devuelve la respuesta
             return v_resp;
@@ -216,38 +184,19 @@ BEGIN
 	***********************************/
 
 	elsif(p_transaccion='ADQ_PROVEE_MOD')then
-		cadena_con = migra.f_obtener_cadena_con_dblink();
-        v_res_cone=( select dblink_connect(cadena_con));
-        raise notice '%',v_res_cone;
+		
 		begin
-			--Sentencia de la modificacion
-            v_consulta:='update compro.tad_proveedor set
-			id_persona ='||COALESCE(v_parametros.id_persona::varchar,'NULL')||',
-            id_institucion ='||COALESCE(v_parametros.id_institucion::varchar,'NULL')||',
-            codigo ='''||COALESCE(v_parametros.codigo::varchar,'NULL')||''',
-            id_lugar ='''||COALESCE(v_parametros.id_lugar::varchar,'NULL')||'''
-            where id_proveedor='||v_parametros.id_proveedor||'';
-            raise notice 'prov %',v_consulta;            
-            resp =  dblink_exec(cadena_con,v_consulta);
-            if v_parametros.tipo='persona natural' then
-            	v_consulta:='update sss.tsg_persona set 
-                doc_id ='''||v_parametros.nit||'''               
-                where id_persona='''||v_parametros.id_persona||'';
-
-                resp =  dblink_exec(cadena_con,v_consulta);
-			end if;
-			if v_parametros.tipo='persona juridica' then
-            	v_consulta:='update param.tpm_institucion set                
-                doc_id ='''||v_parametros.nit||'''
-                where id_persona='||v_parametros.id_institucion||'';           
-
-                resp =  dblink_exec(cadena_con,v_consulta);
-            end if;
+			       
             
-            update param.tproveedor set
-            numero_sigma = v_parametros.numero_sigma,
-			id_usuario_mod = p_id_usuario,
-			fecha_mod = now()
+            	update param.tproveedor set
+            	numero_sigma = v_parametros.numero_sigma,
+                id_institucion = v_parametros.id_institucion,
+                id_persona = v_parametros.id_persona,
+                id_lugar = v_parametros.id_lugar,
+                nit = v_parametros.nit,
+                codigo = v_parametros.codigo,
+				id_usuario_mod = p_id_usuario,
+				fecha_mod = now()
 			where id_proveedor=v_parametros.id_proveedor;
                
 			--Definicion de la respuesta
