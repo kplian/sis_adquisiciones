@@ -357,13 +357,16 @@ Phx.vista.CotizacionAdq = {
                    
                }
                
-                if (data['estado']!='adjudicado'){
+               if (data['estado']!='adjudicado'){
                    this.getBoton('btnHabPago').disable();
-                 }
-                 else{
+               }
+               else{
                     this.getBoton('btnHabPago').enable();  
-                 }
-               
+               }
+                 
+               if (data['estado']=='pago_habilitado'){
+                   this.getBoton('ant_estado').disable();
+               }
                
             return tb 
      }, 

@@ -146,3 +146,60 @@ ALTER TABLE adq.tcategoria_compra
 
 
 
+/***********************************I-SCP-RAC-ADQ-146-13/05/2013****************************************/
+
+CREATE TABLE adq.tgrupo(
+    id_grupo SERIAL NOT NULL,
+    nombre varchar(200),
+    obs text,
+    PRIMARY KEY (id_grupo))
+    INHERITS (pxp.tbase);
+
+
+CREATE TABLE adq.tgrupo_usuario(
+    id_grupo_usuario SERIAL NOT NULL,
+    id_grupo int4 NOT NULL,
+    id_usuario int4,
+    obs text,
+    PRIMARY KEY (id_grupo_usuario))INHERITS (pxp.tbase);
+
+
+CREATE TABLE adq.tgrupo_partida(
+    id_grupo_partida SERIAL NOT NULL,
+    id_grupo int4 NOT NULL,
+    id_partida int4,
+    PRIMARY KEY (id_grupo_partida))
+INHERITS (pxp.tbase);
+
+CREATE TABLE adq.tpresolicitud(
+    id_presolicitud SERIAL NOT NULL,
+    id_grupo int4 NOT NULL,
+    id_funcionario int4,
+    id_funcionario_supervisor int4,
+    id_uo int4,
+    id_solicitudes int4,
+    estado varchar(30),
+    obs text,
+    fecha_soli DATE DEFAULT now() NOT NULL, 
+    PRIMARY KEY (id_presolicitud))
+INHERITS (pxp.tbase);  
+
+CREATE TABLE adq.tpresolicitud_det(
+    id_presolicitud_det SERIAL NOT NULL,
+    id_presolicitud int4 NOT NULL,
+    id_solicitud_det int4,
+    id_concepto_ingas int4,
+    id_centro_costo int4,
+    descripcion text,
+    cantidad numeric(19, 2),
+    estado varchar(30),
+    PRIMARY KEY (id_presolicitud_det))
+INHERITS (pxp.tbase);
+
+
+/***********************************F-SCP-RAC-ADQ-146-13/05/2013****************************************/
+
+
+
+
+

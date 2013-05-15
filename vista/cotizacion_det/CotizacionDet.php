@@ -11,7 +11,7 @@ header("content-type: text/javascript; charset=UTF-8");
 ?>
 <script>
 Phx.vista.CotizacionDet=Ext.extend(Phx.gridInterfaz,{
-
+    bnew:false,
 	constructor:function(config){
 		this.maestro=config.maestro;
     	//llama al constructor de la clase padre
@@ -21,7 +21,7 @@ Phx.vista.CotizacionDet=Ext.extend(Phx.gridInterfaz,{
 		this.bloquearMenus();
 		//this.load({params:{start:0, limit:this.tam_pag}})
 		
-		this.addButton('adjudicar_det',{text:'Adjudicar Item',iconCls: 'bchecklist',disabled:true,handler:this.adjudicar_det,tooltip: '<b>Adjudicar</b><p>Permite adjudicar de manera parcial</p>'});
+		this.addButton('adjudicar_det',{text:'Recomendar Item',iconCls: 'bchecklist',disabled:true,handler:this.adjudicar_det,tooltip: '<b>Adjudicar</b><p>Permite adjudicar de manera parcial</p>'});
             
         
 		//formulario de adjudicacion parcil
@@ -540,14 +540,14 @@ Phx.vista.CotizacionDet=Ext.extend(Phx.gridInterfaz,{
             if(this.maestro.estado ==  'borrador'){ 
                 
                 this.getBoton('edit').enable();
-                this.getBoton('new').enable();
+                //this.getBoton('new').enable();
                 this.getBoton('del').enable();
                 this.getBoton('save').enable();
              } 
              else{
                  
                 this.getBoton('edit').disable();
-                this.getBoton('new').disable();
+               // this.getBoton('new').disable();
                 this.getBoton('del').disable();
                 this.getBoton('save').disable(); 
                  
@@ -564,7 +564,7 @@ Phx.vista.CotizacionDet=Ext.extend(Phx.gridInterfaz,{
             
             if(this.maestro&&this.maestro.estado !=  'borrador'){ 
                 this.getBoton('edit').disable();
-                this.getBoton('new').disable();
+                //this.getBoton('new').disable();
                 this.getBoton('del').disable();
                 this.getBoton('save').disable();
              } 
@@ -592,13 +592,13 @@ Phx.vista.CotizacionDet=Ext.extend(Phx.gridInterfaz,{
        
        if(this.maestro.estado ==  'borrador'){
              
-             this.getBoton('new').enable();
+             //this.getBoton('new').enable();
              
          }
          else{
              
              this.getBoton('edit').disable();
-             this.getBoton('new').disable();
+             //this.getBoton('new').disable();
              this.getBoton('del').disable();
              this.getBoton('save').disable();
           }

@@ -109,7 +109,7 @@ select wf.f_insert_ttipo_estado ('pago_habilitado', 'Habilitado para pagar', 'no
 select wf.f_insert_ttipo_estado ('finalizada', 'Finalizada', 'no', 'no', 'si', 'ninguno', '', 'anterior', '', '', 'activo', 'COT', '');
 select wf.f_insert_ttipo_estado ('anulado', 'Anulado', 'no', 'no', 'si', 'anterior', '', 'anterior', '', '', 'activo', 'PROC', '');
 select wf.f_insert_ttipo_estado ('registrado', 'Registrado', 'no', 'no', 'no', 'anterior', '', 'anterior', '', '', 'activo', 'OBLI', '');
-select wf.f_insert_ttipo_estado ('en_pago', 'En Pago', 'no', 'si', 'no', 'anterior', '', 'anterior', '', '', 'activo', 'OBLI', 'TPLAP');
+select wf.f_insert_ttipo_estado ('en_pago', 'En Pago', 'no', 'si', 'no', 'anterior', '', 'anterior', '', '', 'activo', 'OBLI', 'APLAD');
 select wf.f_insert_ttipo_estado ('anulado', 'Anulado', 'no', 'no', 'si', 'anterior', '', 'anterior', '', '', 'activo', 'COT', '');
 select wf.f_insert_ttipo_estado ('anulado', 'Anulado', 'no', 'no', 'si', 'anterior', '', 'anterior', '', '', 'activo', 'SOLCO', '');
 select wf.f_insert_ttipo_estado ('borrador', 'Borrador', 'si', 'no', 'no', 'anterior', '', 'anterior', '', '', 'activo', 'OBLI', '');
@@ -137,7 +137,7 @@ select wf.f_insert_testructura_estado ('borrador', 'OBLI', 'registrado', 'OBLI',
 select wf.f_insert_testructura_estado ('en_pago', 'OBLI', 'finalizado', 'OBLI', '1', '', 'activo');
 select wf.f_insert_testructura_estado ('borrador', 'APLAD', 'pendiente', 'APLAD', '1', '', 'activo');
 select wf.f_insert_testructura_estado ('pendiente', 'APLAD', 'devengado', 'APLAD', '1', '', 'activo');
-select wf.f_insert_testructura_estado ('devengado', 'APLAD', 'finalizado', 'APLAD', 1, '', 'activo');
+select wf.f_insert_testructura_estado ('devengado', 'APLAD', 'finalizado', 'APLAD', '1', '', 'activo');
 select wf.f_insert_testructura_estado ('cotizado', 'COT', 'recomendado', 'COT', '1', '', 'activo');
 select wf.f_insert_testructura_estado ('recomendado', 'COT', 'adjudicado', 'COT', '1', '', 'activo');
 -------------------------------------
@@ -292,3 +292,12 @@ select pxp.f_insert_tprocedimiento ('ADQ_COTRPC_SEL', 'Consulta de datos para lo
 select pxp.f_insert_tprocedimiento ('ADQ_COTRPC_CONT', 'Conteo de registros de la consulta de cotizaciones por RPC', 'si', '', '', 'adq.f_cotizacion_sel');
 
 /***********************************F-DAT-GSS-ADQ-00-07/05/2013*****************************************/
+
+
+/***********************************I-DAT-RAC-ADQ-00-11/05/2013*****************************************/
+
+select pxp.f_insert_tgui ('Grupos de Presolicitudes', 'Configurar de grupos para presolicitudes', 'GRUP', 'si', 2, 'sis_adquisiciones/vista/grupo/Grupo.php', 3, '', 'Grupo', 'ADQ');
+select pxp.f_insert_testructura_gui ('GRUP', 'ADQ.1');
+
+/***********************************F-DAT-RAC-ADQ-00-11/05/2013*****************************************/
+

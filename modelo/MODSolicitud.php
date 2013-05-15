@@ -321,13 +321,13 @@ class MODSolicitud extends MODbase{
 		
 		$this->setParametro('id_solicitud','id_solicitud','int4');
 		
-		$this->captura('nombre','varchar');
+		$this->captura('funcionario','text');
+		$this->captura('nombre','text');
 		$this->captura('nombre_estado','varchar');
 		$this->captura('fecha_reg','date');
 		$this->captura('id_tipo_estado','int');
 		$this->captura('id_estado_wf','int');
 		$this->captura('id_estado_anterior','int');		
-				
 		//Ejecuta la instruccion
 		$this->armarConsulta();
 		$this->ejecutarConsulta();

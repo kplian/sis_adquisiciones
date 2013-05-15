@@ -283,10 +283,7 @@ Phx.vista.SolicitudDet=Ext.extend(Phx.gridInterfaz,{
             id_grupo:1,
             grid:true,
             form:false
-        }
-        
-        ,
-		
+        },
 		{
 			config:{
 				name: 'nombre_partida',
