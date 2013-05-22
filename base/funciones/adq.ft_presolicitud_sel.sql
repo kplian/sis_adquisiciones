@@ -214,7 +214,57 @@ BEGIN
 			return v_consulta;
 
 		end;
-					
+        
+    /*********************************    
+ 	#TRANSACCION:  'ADQ_PRESREP_SEL'
+ 	#DESCRIPCION:	Consulta de datos con id_presolicitud 
+ 	#AUTOR:		Gonzalo Sarmiento Sejas
+ 	#FECHA:		21-05-2013
+	***********************************/
+	
+    elsif(p_transaccion='ADQ_PRESREP_SEL')then
+    	begin
+    		--Sentencia de la consulta de conteo de registros
+			v_consulta:='select pres.id_presolicitud,
+                                 pres.id_grupo,
+                                 pres.id_funcionario_supervisor,
+                                 pres.id_funcionario,
+                                 pres.estado_reg,
+                                 pres.obs,
+                                 pres.id_uo,
+                                 pres.estado,
+                                 pres.id_solicitudes,
+                                 pres.fecha_reg,
+                                 pres.id_usuario_reg,
+                                 pres.fecha_mod,
+                                 pres.id_usuario_mod,
+                                 usu1.cuenta as usr_reg,
+                                 usu2.cuenta as usr_mod,
+                                 gru.nombre as desc_grupo,
+                                 fun.desc_funcionario1 as desc_funcionario,
+                                 funs.desc_funcionario1 as desc_funcionario_supervisor,
+                                 ''(''||uo.codigo ||'') ''||uo.descripcion as desc_uo,
+                                 pres.fecha_soli,
+                                 ( select  pxp.list(gp.id_partida::varchar) 
+                                 from adq.tgrupo_partida gp 
+                                 inner join param.tperiodo per on per.id_gestion = gp.id_gestion
+                                 and per.fecha_ini <= pres.fecha_soli and per.fecha_fin >= pres.fecha_soli
+                                 where gp.id_grupo = gru.id_grupo  and gp.estado_reg=''activo'')::varchar  as id_partidas
+                          from adq.tpresolicitud pres
+                               inner join segu.tusuario usu1 on usu1.id_usuario = pres.id_usuario_reg
+                               inner join adq.tgrupo gru on gru.id_grupo = pres.id_grupo
+                               inner join orga.vfuncionario fun on fun.id_funcionario = pres.id_funcionario
+                               inner join orga.vfuncionario funs on funs.id_funcionario = pres.id_funcionario_supervisor
+                               inner join orga.tuo uo on uo.id_uo = pres.id_uo 
+                               left join segu.tusuario usu2 on usu2.id_usuario = pres.id_usuario_mod
+				        where pres.id_presolicitud='||v_parametros.id_presolicitud||' and ';
+			
+			--Definicion de la respuesta		    
+			v_consulta:=v_consulta||v_parametros.filtro;
+
+			--Devuelve la respuesta
+			return v_consulta;
+    	end;    			
 	else
 					     
 		raise exception 'Transaccion inexistente';

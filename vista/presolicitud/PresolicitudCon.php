@@ -65,7 +65,7 @@ Phx.vista.PresolicitudCon = {
           this.getBoton('apr_requerimiento').disable();
         }
         this.getBoton('ant_estado').enable();
-       
+        this.getBoton('btnReporte').enable();  
          return tb 
      }, 
      liberaMenu:function(){
@@ -74,7 +74,7 @@ Phx.vista.PresolicitudCon = {
            
             this.getBoton('apr_requerimiento').disable();
             this.getBoton('ant_estado').disable(); 
-                       
+            this.getBoton('btnReporte').disable();             
         }
        return tb
     },

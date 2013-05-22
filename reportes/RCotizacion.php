@@ -15,7 +15,7 @@ require_once dirname(__FILE__).'/../../pxp/pxpReport/Report.php';
     
     public function Header() {
         $height = 20;
-								$this->Image(dirname(__FILE__).'/boa-airline-logo.jpg', $x+10, $y+10, 36);
+								$this->Image(dirname(__FILE__).'/../../pxp/lib'.$_SESSION['_DIR_LOGO'], $x+10, $y+10, 36);
         $this->Cell(20, $height, '', 0, 0, 'C', false, '', 1, false, 'T', 'C');
 								
         $this->SetFontSize(16);

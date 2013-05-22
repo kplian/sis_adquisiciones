@@ -197,7 +197,45 @@ class MODPresolicitud extends MODbase{
         //Devuelve la respuesta
         return $this->respuesta;
     }
-    
+
+  function reportePresolicitud(){
+					//Definicion de variables para ejecucion del procedimientp
+					$this->procedimiento='adq.ft_presolicitud_sel';
+					$this->transaccion='ADQ_PRESREP_SEL';
+					$this->tipo_procedimiento='SEL';//tipo de transaccion
+					
+					$this->setParametro('id_presolicitud','id_presolicitud','int4');
+							
+					//Definicion de la lista del resultado del query
+					$this->captura('id_presolicitud','int4');
+					$this->captura('id_grupo','int4');
+					$this->captura('id_funcionario_supervisor','int4');
+					$this->captura('id_funcionario','int4');
+					$this->captura('estado_reg','varchar');
+					$this->captura('obs','text');
+					$this->captura('id_uo','int4');
+					$this->captura('estado','varchar');
+					$this->captura('id_solicitudes','int4');
+					$this->captura('fecha_reg','timestamp');
+					$this->captura('id_usuario_reg','int4');
+					$this->captura('fecha_mod','timestamp');
+					$this->captura('id_usuario_mod','int4');
+					$this->captura('usr_reg','varchar');
+					$this->captura('usr_mod','varchar');
+					$this->captura('desc_grupo','varchar');
+					$this->captura('desc_funcionario','text');
+					$this->captura('desc_funcionario_supervisor','text');
+					$this->captura('desc_uo','text');
+					$this->captura('fecha_soli','date');
+					$this->captura('id_partidas','varchar');					
+					
+					//Ejecuta la instruccion
+					$this->armarConsulta();
+					$this->ejecutarConsulta();
+					
+					//Devuelve la respuesta
+					return $this->respuesta;
+	}
 			
 }
 ?>

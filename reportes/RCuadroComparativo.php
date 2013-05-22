@@ -18,7 +18,7 @@ class RCuadroComparativo extends Report{
     $objDrawing = new PHPExcel_Worksheet_Drawing();
 				$objDrawing->setName('Logo');
 				$objDrawing->setDescription('Logo');
-				$objDrawing->setPath(dirname(__FILE__).'/boa-airline-logo.jpg');
+				$objDrawing->setPath(dirname(__FILE__).'/../../pxp/lib'.$_SESSION['_DIR_LOGO']);
 				$objDrawing->setHeight(60);
 				$objDrawing->setCoordinates('H1');
 				$objDrawing->setWorksheet($objectPHPExcel->getActiveSheet());

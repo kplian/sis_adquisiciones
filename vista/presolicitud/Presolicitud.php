@@ -18,10 +18,17 @@ Phx.vista.Presolicitud=Ext.extend(Phx.gridInterfaz,{
 		Phx.vista.Presolicitud.superclass.constructor.call(this,config);
 		  
 		this.init();
+		
+		this.addButton('btnReporte',{
+            text :'',
+            iconCls : 'bpdf32',
+            disabled: true,
+            handler : this.onButtonPresolicitud,
+            tooltip : '<b>Reporte Presolicitud de Compra</b><br/><b>Reporte Presolicitud de Compra</b>'
+  });
+  
 		this.addButton('ant_estado',{argument: {estado: 'anterior'},text:'Anterior',iconCls: 'batras',disabled:true,handler:this.antEstado,tooltip: '<b>Pasar al Anterior Estado</b>'});
-       
-		
-		
+  
 	},
 	tam_pag:50,
 			
@@ -315,6 +322,24 @@ Phx.vista.Presolicitud=Ext.extend(Phx.gridInterfaz,{
 	    
 	    
 	},
+	
+	onButtonPresolicitud:function(){
+	    var rec=this.sm.getSelected();
+                console.debug(rec);
+                Ext.Ajax.request({
+                    url:'../../sis_adquisiciones/control/Presolicitud/reportePresolicitud',
+                    params:{'id_presolicitud':rec.data.id_presolicitud,'estado':rec.data.estado},
+                    success: this.successExport,
+                    failure: function() {
+                        console.log("fail");
+                    },
+                    timeout: function() {
+                        console.log("timeout");
+                    },
+                    scope:this
+                });  
+	},
+	
 	successSinc:function(resp){
             
             Phx.CP.loadingHide();

@@ -149,7 +149,7 @@ Phx.vista.PresolicitudReq = {
           }
             
         }
-      
+        this.getBoton('btnReporte').enable();  
        
          return tb 
      }, 
@@ -158,7 +158,7 @@ Phx.vista.PresolicitudReq = {
         if(tb){
            
             this.getBoton('fin_requerimiento').disable();
-                       
+            this.getBoton('btnReporte').disable();             
         }
        return tb
     },
