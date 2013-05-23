@@ -1,0 +1,175 @@
+<?php
+/**
+*@package pXP
+*@file gen-SistemaDist.php
+*@author  (fprudencio)
+*@date 20-09-2011 10:22:05
+*@description Archivo con la interfaz de usuario que permite la ejecucion de todas las funcionalidades del sistema
+*/
+header("content-type: text/javascript; charset=UTF-8");
+?>
+<script>
+Phx.vista.PresolicitudReq = {
+	require:'../../../sis_adquisiciones/vista/presolicitud/Presolicitud.php',
+	requireclase:'Phx.vista.Presolicitud',
+	title:'Presolicitud',
+	nombreVista: 'PresolicitudReq',
+	
+	constructor: function(config) {
+    	Phx.vista.PresolicitudReq.superclass.constructor.call(this,config);
+    	this.addButton('fin_requerimiento',{text:'Finalizar',iconCls: 'badelante',disabled:true,handler:this.fin_requerimiento,tooltip: '<b>Finalizar</b>'});
+        this.iniciarEventos();
+        this.init();
+        this.store.baseParams={tipo_interfaz:this.nombreVista};
+		this.load({params:{start:0, limit:this.tam_pag}});
+		
+		
+	},
+      
+    iniciarEventos:function(){
+        
+        this.cmpFechaSoli = this.getComponente('fecha_soli');
+        this.cmpIdUo = this.getComponente('id_uo');
+        this.cmpIdFuncionarioSupervisor = this.getComponente('id_funcionario_supervisor');
+        
+        //inicio de eventos 
+        this.cmpFechaSoli.on('change',function(f){
+             this.cmpIdUo.reset();
+             this.cmpIdFuncionarioSupervisor.reset();
+             this.cmpIdUo.enable();
+             this.Cmp.id_funcionario.enable();             
+             this.Cmp.id_funcionario.store.baseParams.fecha = this.cmpFechaSoli.getValue().dateFormat(this.cmpFechaSoli.format);
+             
+             },this);
+        
+        this.Cmp.id_funcionario.on('select',function(rec){ 
+            
+            //Aprobador  
+            this.cmpIdFuncionarioSupervisor.store.baseParams.id_funcionario=this.Cmp.id_funcionario.getValue();
+            this.cmpIdFuncionarioSupervisor.store.baseParams.fecha = this.cmpFechaSoli.getValue().dateFormat(this.cmpFechaSoli.format);
+            this.cmpIdFuncionarioSupervisor.modificado=true;
+            
+            //Unidad
+            this.Cmp.id_uo.store.baseParams.id_funcionario_uo_presupuesta=this.Cmp.id_funcionario.getValue();
+            this.Cmp.id_uo.store.baseParams.fecha = this.cmpFechaSoli.getValue().dateFormat(this.cmpFechaSoli.format);
+            this.Cmp.id_uo.store.load({params:{start:0,limit:this.tam_pag}, 
+               callback : function (r) {                        
+                    if (r.length > 0 ) {                        
+                        this.Cmp.id_uo.setValue(r[0].data.id_uo);
+                    }     
+                                    
+                }, scope : this
+            });
+            
+            this.cmpIdUo.enable();
+            this.cmpIdFuncionarioSupervisor.reset();
+            this.cmpIdFuncionarioSupervisor.enable();
+            
+           },this);
+      
+    },
+     onButtonNew:function(){
+       Phx.vista.Presolicitud.superclass.onButtonNew.call(this); 
+       
+       this.cmpIdFuncionarioSupervisor.disable();
+       this.cmpIdUo.disable();
+       this.Cmp.id_funcionario.disable();
+       this.Cmp.fecha_soli.setValue(new Date());
+       this.Cmp.fecha_soli.fireEvent('change');
+       
+       this.Cmp.id_funcionario.store.load({params:{start:0,limit:this.tam_pag}, 
+           callback : function (r) {
+                if (r.length == 1 ) {                       
+                    this.Cmp.id_funcionario.setValue(r[0].data.id_funcionario);
+                    this.Cmp.id_funcionario.fireEvent('select', r[0]);
+                }    
+                                
+            }, scope : this
+        });
+        
+           
+    },
+    fin_requerimiento:function()
+        {                   
+            var d= this.sm.getSelected().data;
+           
+            Phx.CP.loadingShow();
+           
+            Ext.Ajax.request({
+                // form:this.form.getForm().getEl(),
+                url:'../../sis_adquisiciones/control/Presolicitud/finalizarPresolicitud',
+                params:{id_presolicitud:d.id_presolicitud,operacion:'verificar'},
+                success:this.successSinc,
+                failure: this.conexionFailure,
+                timeout:this.timeout,
+                scope:this
+            });     
+     },
+      successSinc:function(resp){
+            
+            Phx.CP.loadingHide();
+            var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
+            if(!reg.ROOT.error){
+               
+               this.reload();
+                
+            }else{
+                
+                alert('ocurrio un error durante el proceso')
+            }
+           
+            
+        },
+    onButtonEdit:function(){
+       this.cmpFechaSoli.disable();
+       this.cmpIdFuncionarioSupervisor.disable();       
+       this.cmpIdUo.disable();
+       Phx.vista.PresolicitudReq.superclass.onButtonEdit.call(this);
+       this.Cmp.id_funcionario.store.baseParams.fecha = this.cmpFechaSoli.getValue().dateFormat(this.cmpFechaSoli.format);
+          
+    },
+    preparaMenu:function(n){
+      var data = this.getSelectedData();
+      var tb =this.tbar;
+        Phx.vista.PresolicitudReq.superclass.preparaMenu.call(this,n);
+        if(data.estado=='borrador'){
+         this.getBoton('fin_requerimiento').enable();
+         
+        }
+        else{
+          this.getBoton('fin_requerimiento').disable(); 
+          
+          if (data.estado=='pendiente'){
+               this.getBoton('ant_estado').enable();
+              
+          } 
+          else{
+               this.getBoton('ant_estado').disable();
+              
+          }
+            
+        }
+        this.getBoton('btnReporte').enable();  
+       
+         return tb 
+     }, 
+     liberaMenu:function(){
+        var tb = Phx.vista.PresolicitudReq.superclass.liberaMenu.call(this);
+        if(tb){
+           
+            this.getBoton('fin_requerimiento').disable();
+            this.getBoton('btnReporte').disable();             
+        }
+       return tb
+    },
+    
+	
+	south:
+          { 
+          url:'../../../sis_adquisiciones/vista/presolicitud_det/PresolicitudReqDet.php',
+          title:'Detalle', 
+          height:'50%',
+          cls:'PresolicitudReqDet'
+         }
+};
+</script>

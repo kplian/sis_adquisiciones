@@ -23,7 +23,7 @@ require_once dirname(__FILE__).'/../../pxp/pxpReport/Report.php';
         
 								$x=$this->getX();
 								$y=$this->getY();
-        $this->Image(dirname(__FILE__).'/boa-airline-logo.jpg', $x, $y, 36);
+        $this->Image(dirname(__FILE__).'/../../pxp/lib'.$_SESSION['_DIR_LOGO'], $x, $y, 36);
         
     }
     

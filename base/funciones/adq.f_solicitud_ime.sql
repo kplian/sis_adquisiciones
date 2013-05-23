@@ -315,8 +315,18 @@ BEGIN
               where sd.id_solicitud = v_parametros.id_solicitud
               and sd.estado_reg = 'activo';
               
+              
               IF  v_total_soli=0  THEN
               	raise exception ' La Solicitud  tiene que ser por un valor mayor a 0';
+              END IF;
+            --  
+             IF exists ( select 1
+              from adq.tsolicitud_det sd
+              where sd.id_solicitud = v_parametros.id_solicitud
+              and sd.estado_reg = 'activo' and (COALESCE( sd.precio_ga_mb,0)  + COALESCE(sd.precio_sg_mb,0)=0)) THEN
+                
+                  raise exception 'Al menos uno del los items tiene un precio total de 0, verifique e intentelo nuevamente';
+              
               END IF;
               
                --Definicion de la respuesta

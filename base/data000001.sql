@@ -298,6 +298,19 @@ select pxp.f_insert_tprocedimiento ('ADQ_COTRPC_CONT', 'Conteo de registros de l
 
 select pxp.f_insert_tgui ('Grupos de Presolicitudes', 'Configurar de grupos para presolicitudes', 'GRUP', 'si', 2, 'sis_adquisiciones/vista/grupo/Grupo.php', 3, '', 'Grupo', 'ADQ');
 select pxp.f_insert_testructura_gui ('GRUP', 'ADQ.1');
+select pxp.f_insert_tgui ('Presolicitud de Compra', 'Presolicitud de Compra', 'PRECOM', 'si', 8, 'sis_adquisiciones/vista/presolicitud/PresolicitudReq.php', 2, '', 'PresolicitudReq', 'ADQ');
+select pxp.f_insert_tgui ('Visto Bueno Presolicitud', 'Visto bueno de presolicitudes', 'VBPRE', 'si', 9, 'sis_adquisiciones/vista/presolicitud/PresolicitudVb.php', 2, '', 'PresolicitudVb', 'ADQ');
+select pxp.f_insert_tgui ('Consolidad Presolicitudes', 'Consolidar presolicitudes', 'COPRE', 'si', 10, 'sis_adquisiciones/vista/solicitud/SolicitudReqCon.php', 2, '', 'SolicitudReqCon', 'ADQ');
+select pxp.f_insert_testructura_gui ('PRECOM', 'ADQ');
+select pxp.f_insert_testructura_gui ('VBPRE', 'ADQ');
+select pxp.f_insert_testructura_gui ('COPRE', 'ADQ');
 
 /***********************************F-DAT-RAC-ADQ-00-11/05/2013*****************************************/
+
+
+
+
+
+
+
 

@@ -16,9 +16,19 @@ Phx.vista.Presolicitud=Ext.extend(Phx.gridInterfaz,{
 		this.maestro=config.maestro;
     	//llama al constructor de la clase padre
 		Phx.vista.Presolicitud.superclass.constructor.call(this,config);
+		  
 		this.init();
-		this.load({params:{start:0, limit:this.tam_pag}});
-		this.iniciarEventos();
+		
+		this.addButton('btnReporte',{
+            text :'',
+            iconCls : 'bpdf32',
+            disabled: true,
+            handler : this.onButtonPresolicitud,
+            tooltip : '<b>Reporte Presolicitud de Compra</b><br/><b>Reporte Presolicitud de Compra</b>'
+  });
+  
+		this.addButton('ant_estado',{argument: {estado: 'anterior'},text:'Anterior',iconCls: 'batras',disabled:true,handler:this.antEstado,tooltip: '<b>Pasar al Anterior Estado</b>'});
+  
 	},
 	tam_pag:50,
 			
@@ -289,93 +299,69 @@ Phx.vista.Presolicitud=Ext.extend(Phx.gridInterfaz,{
 		{name:'id_usuario_mod', type: 'numeric'},
 		{name:'usr_reg', type: 'string'},
 		{name:'usr_mod', type: 'string'},
-		'desc_funcionario_supervisor','desc_funcionario','desc_uo','desc_grupo'
+		'desc_funcionario_supervisor',
+		'desc_funcionario',
+		'desc_uo',
+		'desc_grupo','id_partidas'
 		
 	],
+	antEstado:function(){
+	   var d= this.sm.getSelected().data;
+           
+            Phx.CP.loadingShow();
+           
+            Ext.Ajax.request({
+                // form:this.form.getForm().getEl(),
+                url:'../../sis_adquisiciones/control/Presolicitud/retrocederPresolicitud',
+                params:{id_presolicitud:d.id_presolicitud,estado:d.estado},
+                success:this.successSinc,
+                failure: this.conexionFailure,
+                timeout:this.timeout,
+                scope:this
+            });  
+	    
+	    
+	},
+	
+	onButtonPresolicitud:function(){
+	    var rec=this.sm.getSelected();
+                console.debug(rec);
+                Ext.Ajax.request({
+                    url:'../../sis_adquisiciones/control/Presolicitud/reportePresolicitud',
+                    params:{'id_presolicitud':rec.data.id_presolicitud,'estado':rec.data.estado},
+                    success: this.successExport,
+                    failure: function() {
+                        console.log("fail");
+                    },
+                    timeout: function() {
+                        console.log("timeout");
+                    },
+                    scope:this
+                });  
+	},
+	
+	successSinc:function(resp){
+            
+            Phx.CP.loadingHide();
+            var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
+            if(!reg.ROOT.error){
+               
+               this.reload();
+                
+            }else{
+                
+                alert('ocurrio un error durante el proceso')
+            }
+           
+            
+        },
+	
 	sortInfo:{
 		field: 'id_presolicitud',
 		direction: 'ASC'
 	},
 	bdel:true,
-	bsave:true,
-	  
-    iniciarEventos:function(){
-        
-        this.cmpFechaSoli = this.getComponente('fecha_soli');
-        this.cmpIdUo = this.getComponente('id_uo');
-        this.cmpIdFuncionarioSupervisor = this.getComponente('id_funcionario_supervisor');
-        
-        //inicio de eventos 
-        this.cmpFechaSoli.on('change',function(f){
-             this.cmpIdUo.reset();
-             this.cmpIdFuncionarioSupervisor.reset();
-             this.cmpIdUo.enable();
-             this.Cmp.id_funcionario.enable();             
-             this.Cmp.id_funcionario.store.baseParams.fecha = this.cmpFechaSoli.getValue().dateFormat(this.cmpFechaSoli.format);
-             
-             },this);
-        
-        this.Cmp.id_funcionario.on('select',function(rec){ 
-            
-            //Aprobador  
-            this.cmpIdFuncionarioSupervisor.store.baseParams.id_funcionario=this.Cmp.id_funcionario.getValue();
-            this.cmpIdFuncionarioSupervisor.store.baseParams.fecha = this.cmpFechaSoli.getValue().dateFormat(this.cmpFechaSoli.format);
-            this.cmpIdFuncionarioSupervisor.modificado=true;
-            
-            //Unidad
-            this.Cmp.id_uo.store.baseParams.id_funcionario_uo_presupuesta=this.Cmp.id_funcionario.getValue();
-            this.Cmp.id_uo.store.baseParams.fecha = this.cmpFechaSoli.getValue().dateFormat(this.cmpFechaSoli.format);
-            this.Cmp.id_uo.store.load({params:{start:0,limit:this.tam_pag}, 
-               callback : function (r) {                        
-                    if (r.length > 0 ) {                        
-                        this.Cmp.id_uo.setValue(r[0].data.id_uo);
-                    }     
-                                    
-                }, scope : this
-            });
-            
-            this.cmpIdUo.enable();
-            this.cmpIdFuncionarioSupervisor.reset();
-            this.cmpIdFuncionarioSupervisor.enable();
-            
-           },this);
-      
-    },
-	 onButtonNew:function(){
-       Phx.vista.Presolicitud.superclass.onButtonNew.call(this); 
-       
-       this.cmpIdFuncionarioSupervisor.disable();
-       this.cmpIdUo.disable();
-       this.Cmp.id_funcionario.disable();
-       this.Cmp.fecha_soli.setValue(new Date());
-       this.Cmp.fecha_soli.fireEvent('change');
-       
-       this.Cmp.id_funcionario.store.load({params:{start:0,limit:this.tam_pag}, 
-           callback : function (r) {
-                if (r.length == 1 ) {                       
-                    this.Cmp.id_funcionario.setValue(r[0].data.id_funcionario);
-                    this.Cmp.id_funcionario.fireEvent('select', r[0]);
-                }    
-                                
-            }, scope : this
-        });
-        
-           
-    },
-    onButtonEdit:function(){
-       this.cmpFechaSoli.disable();
-       this.cmpIdFuncionarioSupervisor.disable();       
-       this.cmpIdUo.disable();
-       Phx.vista.Presolicitud.superclass.onButtonEdit.call(this);
-       this.Cmp.id_funcionario.store.baseParams.fecha = this.cmpFechaSoli.getValue().dateFormat(this.cmpFechaSoli.format);
-          
-    },
-    south:{
-          url:'../../../sis_adquisiciones/vista/presolicitud_det/PresolicitudDet.php',
-          title:'Detalle', 
-          height:'50%',
-          cls:'PresolicitudDet'
-         }
+	bsave:false
    }
 )
 </script>

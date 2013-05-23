@@ -16,8 +16,7 @@ Phx.vista.PresolicitudDet=Ext.extend(Phx.gridInterfaz,{
 		this.maestro=config.maestro;
     	//llama al constructor de la clase padre
 		Phx.vista.PresolicitudDet.superclass.constructor.call(this,config);
-		this.init();
-		this.load({params:{start:0, limit:this.tam_pag}})
+		
 	},
 	tam_pag:50,
 			
@@ -104,7 +103,7 @@ Phx.vista.PresolicitudDet=Ext.extend(Phx.gridInterfaz,{
                 allowBlank: false,
                 emptyText : 'Concepto...',
                 store : new Ext.data.JsonStore({
-                            url:'../../sis_parametros/control/ConceptoIngas/listarConceptoIngas',
+                            url:'../../sis_parametros/control/ConceptoIngas/listarConceptoIngasPorPartidas',
                             id : 'id_concepto_ingas',
                             root: 'datos',
                             sortInfo:{
@@ -280,6 +279,8 @@ Phx.vista.PresolicitudDet=Ext.extend(Phx.gridInterfaz,{
 	bsave:true,
     onReloadPage:function(m){
         this.maestro=m;
+        this.Cmp.id_concepto_ingas.store.baseParams.id_partidas= this.maestro.id_partidas
+        
         this.store.baseParams={id_presolicitud:this.maestro.id_presolicitud};
       
         this.load({params:{start:0, limit:this.tam_pag}})

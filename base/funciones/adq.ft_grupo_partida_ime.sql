@@ -1,8 +1,13 @@
-CREATE OR REPLACE FUNCTION "adq"."ft_grupo_partida_ime" (	
-				p_administrador integer, p_id_usuario integer, p_tabla character varying, p_transaccion character varying)
-RETURNS character varying AS
-$BODY$
+--------------- SQL ---------------
 
+CREATE OR REPLACE FUNCTION adq.ft_grupo_partida_ime (
+  p_administrador integer,
+  p_id_usuario integer,
+  p_tabla varchar,
+  p_transaccion varchar
+)
+RETURNS varchar AS
+$body$
 /**************************************************************************
  SISTEMA:		Adquisiciones
  FUNCION: 		adq.ft_grupo_partida_ime
@@ -51,7 +56,8 @@ BEGIN
 			id_usuario_reg,
 			fecha_reg,
 			fecha_mod,
-			id_usuario_mod
+			id_usuario_mod,
+            id_gestion
           	) values(
 			v_parametros.id_partida,
 			v_parametros.id_grupo,
@@ -59,7 +65,8 @@ BEGIN
 			p_id_usuario,
 			now(),
 			null,
-			null
+			null,
+            v_parametros.id_gestion
 							
 			)RETURNING id_grupo_partida into v_id_grupo_partida;
 			
@@ -87,7 +94,8 @@ BEGIN
 			id_partida = v_parametros.id_partida,
 			id_grupo = v_parametros.id_grupo,
 			fecha_mod = now(),
-			id_usuario_mod = p_id_usuario
+			id_usuario_mod = p_id_usuario,
+            id_gestion= v_parametros.id_gestion
 			where id_grupo_partida=v_parametros.id_grupo_partida;
                
 			--Definicion de la respuesta
@@ -138,7 +146,9 @@ EXCEPTION
 		raise exception '%',v_resp;
 				        
 END;
-$BODY$
-LANGUAGE 'plpgsql' VOLATILE
+$body$
+LANGUAGE 'plpgsql'
+VOLATILE
+CALLED ON NULL INPUT
+SECURITY INVOKER
 COST 100;
-ALTER FUNCTION "adq"."ft_grupo_partida_ime"(integer, integer, character varying, character varying) OWNER TO postgres;

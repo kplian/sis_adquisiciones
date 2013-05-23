@@ -168,6 +168,7 @@ CREATE TABLE adq.tgrupo_partida(
     id_grupo_partida SERIAL NOT NULL,
     id_grupo int4 NOT NULL,
     id_partida int4,
+    id_gestion int4,
     PRIMARY KEY (id_grupo_partida))
 INHERITS (pxp.tbase);
 
