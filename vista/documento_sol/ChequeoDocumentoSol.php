@@ -159,7 +159,7 @@ Phx.vista.ChequeoDocumentoSol=Ext.extend(Phx.gridInterfaz,{
                 name: 'nombre_tipo_doc',
                 fieldLabel: 'Tipo de Documento',
                 typeAhead: false,
-                forceSelection: false,
+                forceSelection: true,
                 allowBlank: true,
                 emptyText: 'Tipo de Doc...',
                 store: new Ext.data.JsonStore({
@@ -171,9 +171,10 @@ Phx.vista.ChequeoDocumentoSol=Ext.extend(Phx.gridInterfaz,{
                         direction: 'ASC'
                     },
                     totalProperty: 'total',
-                    fields: ['id_documento_sol', 'nombre_tipo_doc'],
+                    fields: ['id_documento_sol', 'nombre_tipo_doc'],                    
                     // turn on remote sorting
-                    remoteSort: true                    
+                    remoteSort: true,
+                    baseParams:{par_filtro:'docsol.nombre_tipo_doc'}                 
                 }),
                 valueField: 'nombre_tipo_doc',
                 displayField: 'nombre_tipo_doc',
@@ -341,7 +342,11 @@ Phx.vista.ChequeoDocumentoSol=Ext.extend(Phx.gridInterfaz,{
     {       
         this.ocultarComponente(this.getComponente('id_categoria_compra'));
         this.ocultarComponente(this.getComponente('chequeado'));
-        this.getComponente('nombre_tipo_doc').store.baseParams = {id_categoria_compra:this.id_categoria_compra,id_solicitud:'',nombre_arch_doc:'',chequeado:''}
+        //this.getComponente('nombre_tipo_doc').store.baseParams = {id_categoria_compra:this.id_categoria_compra,id_solicitud:'',nombre_arch_doc:'',chequeado:''}
+        this.getComponente('nombre_tipo_doc').store.setBaseParam('id_categoria_compra',this.id_categoria_compra);
+        this.getComponente('nombre_tipo_doc').store.setBaseParam('id_solicitud','');
+        this.getComponente('nombre_tipo_doc').store.setBaseParam('nombre_arch_doc','');
+        this.getComponente('nombre_tipo_doc').store.setBaseParam('chequeado','');
     },
     onButtonEdit : function() {
     	this.ocultarComponente(this.getComponente('nombre_tipo_doc'));
