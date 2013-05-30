@@ -58,11 +58,14 @@ BEGIN
             if (v_parametros.id_funcionario_usu is null) then
               	v_parametros.id_funcionario_usu = -1;
             end if;
-            IF p_administrador !=1  and lower(v_parametros.tipo_interfaz) = 'solicitudrq' THEN
+            
+           -- raise exception '%',v_parametros.tipo_interfaz;
+            
+            IF p_administrador !=1  and lower(v_parametros.tipo_interfaz) = 'solicitudreq' THEN
                                         
               v_filtro = '(ew.id_funcionario='||v_parametros.id_funcionario_usu::varchar||'  or sol.id_usuario_reg='||p_id_usuario||' ) and ';
             
-               
+         
             END IF;
             
             IF  lower(v_parametros.tipo_interfaz) = 'solicitudvb' THEN
@@ -148,12 +151,16 @@ BEGIN
                         inner join wf.testado_wf ew on ew.id_estado_wf = sol.id_estado_wf
                         
 				        where  '||v_filtro;
+                        
+                        
 			
 			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;
 			v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
 
-             raise notice '%',v_consulta;
+
+                 raise notice '%',v_consulta;
+            
 			--Devuelve la respuesta
 			return v_consulta;
 						
@@ -262,7 +269,7 @@ BEGIN
             	v_parametros.id_funcionario_usu = -1;
             end if;
             
-            IF p_administrador !=1  and lower(v_parametros.tipo_interfaz) = 'solicitudrq' THEN
+            IF p_administrador !=1  and lower(v_parametros.tipo_interfaz) = 'solicitudreq' THEN
                                         
               v_filtro = '(ew.id_funcionario='||v_parametros.id_funcionario_usu::varchar||'  or sol.id_usuario_reg='||p_id_usuario||' ) and ';
             

@@ -294,7 +294,7 @@ select pxp.f_insert_tprocedimiento ('ADQ_COTRPC_CONT', 'Conteo de registros de l
 /***********************************F-DAT-GSS-ADQ-00-07/05/2013*****************************************/
 
 
-/***********************************I-DAT-RAC-ADQ-00-11/05/2013*****************************************/
+/***********************************I-DAT-RAC-ADQ-00-29/05/2013*****************************************/
 
 select pxp.f_insert_tgui ('Grupos de Presolicitudes', 'Configurar de grupos para presolicitudes', 'GRUP', 'si', 2, 'sis_adquisiciones/vista/grupo/Grupo.php', 3, '', 'Grupo', 'ADQ');
 select pxp.f_insert_testructura_gui ('GRUP', 'ADQ.1');
@@ -305,7 +305,7 @@ select pxp.f_insert_testructura_gui ('PRECOM', 'ADQ');
 select pxp.f_insert_testructura_gui ('VBPRE', 'ADQ');
 select pxp.f_insert_testructura_gui ('COPRE', 'ADQ');
 
-/***********************************F-DAT-RAC-ADQ-00-11/05/2013*****************************************/
+/***********************************F-DAT-RAC-ADQ-00-29/05/2013*****************************************/
 
 
 

@@ -75,6 +75,9 @@ DECLARE
       
       v_id_depto_estado integer;
       v_perdir_obs varchar;
+     
+      v_uo_sol varchar;
+      v_obs text;
 			    
 BEGIN
 
@@ -285,12 +288,68 @@ BEGIN
 	elsif(p_transaccion='ADQ_SOL_ELI')then
 
 		begin
-			--Sentencia de la eliminacion
-			delete from adq.tsolicitud
-            where id_solicitud=v_parametros.id_solicitud;
+          
+          
+          --obtenemos datos bascios
+            select 
+            	s.id_estado_wf,
+            	s.id_proceso_wf,
+            	s.estado,
+            	s.id_depto,
+                s.id_solicitud
+            into
+            	v_id_estado_wf,
+                v_id_proceso_wf,
+                v_codigo_estado,
+                v_id_depto,
+                v_id_solicitud
+            
+            from adq.tsolicitud s 
+            where s.id_solicitud = v_parametros.id_solicitud;
+        
+            IF v_codigo_estado !='borrador' THEN
+            
+               raise exception 'Solo pueden anularce solicitud de en borrador';
+              
+            
+            END IF;
+        
+        
+        
+			-- si todas las cotizaciones estan anuladas anulamos el proceso
+            
+             select 
+              te.id_tipo_estado
+             into
+              v_id_tipo_estado
+             from wf.tproceso_wf pw 
+             inner join wf.ttipo_proceso tp on pw.id_tipo_proceso = tp.id_tipo_proceso
+             inner join wf.ttipo_estado te on te.id_tipo_proceso = tp.id_tipo_proceso and te.codigo = 'anulado'               
+             where pw.id_proceso_wf = v_id_proceso_wf;
+               
+              
+              
+               -- pasamos la cotizacion al siguiente estado
+           
+               v_id_estado_actual =  wf.f_registra_estado_wf(v_id_tipo_estado, 
+                                                           NULL, 
+                                                           v_id_estado_wf, 
+                                                           v_id_proceso_wf,
+                                                           p_id_usuario,
+                                                           v_id_depto);
+            
+            
+               -- actualiza estado en la cotizacion
+              
+               update adq.tsolicitud  set 
+                 id_estado_wf =  v_id_estado_actual,
+                 estado = 'anulado',
+                 id_usuario_mod=p_id_usuario,
+                 fecha_mod=now()
+               where id_solicitud  = v_parametros.id_solicitud;
                
             --Definicion de la respuesta
-            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Solicitud de Compras eliminado(a)'); 
+            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Solicitud de Compras anulada'); 
             v_resp = pxp.f_agrega_clave(v_resp,'id_solicitud',v_parametros.id_solicitud::varchar);
               
             --Devuelve la respuesta
@@ -403,11 +462,34 @@ BEGIN
           
           --registra estado eactual en el WF
           
+          
+          /*
+            p_id_tipo_estado_siguiente integer,
+            p_id_funcionario integer,
+            p_id_estado_wf_anterior integer,
+            p_id_proceso_wf integer,
+            p_id_usuario integer,
+            p_id_depto integer = NULL::integer,
+            p_obs text = ''::text,
+            p_acceso_directo varchar = ''::character varying,
+            p_clase varchar = NULL::character varying,
+            p_parametros varchar = '{}'::character varying,
+            p_tipo varchar = 'notificacion'::character varying,
+            p_titulo varchar = 'Visto Bueno'::character varying
+          */
+          
            v_id_estado_actual =  wf.f_registra_estado_wf(va_id_tipo_estado[1], 
                                                          v_id_funcionario_aprobador, 
                                                          v_id_estado_wf, 
                                                          v_id_proceso_wf,
-                                                         p_id_usuario);
+                                                         p_id_usuario,
+                                                         NULL,
+                                                         'Solicitud a espera de aprobación',
+                                                         '../../../sis_adquisiciones/vista/solicitud/SolicitudVb.php',
+                                                         'SolicitudVb');
+                                                         
+                                                         
+                                                         
                                                          
          
         
@@ -605,13 +687,36 @@ BEGIN
             select
              te.codigo
             into
-             v_codigo_estado
+             v_codigo_estado_siguiente
             from wf.ttipo_estado te
             where te.id_tipo_estado = v_parametros.id_tipo_estado;
             
             IF  pxp.f_existe_parametro('p_tabla','id_depto') THEN
              
-             v_id_depto = v_parametros.if_depto;
+             v_id_depto = v_parametros.id_depto;
+            
+            END IF;
+            
+            
+            v_obs=v_parametros.obs;
+            
+            IF v_codigo_estado_siguiente =  'aprobado' THEN
+            --si el siguient estado es aprobado obtenemos el depto que le correponde de la solictud de compra
+            
+              select 
+                 s.id_depto,
+                 s.numero,
+                 uo.nombre_unidad 
+              into 
+                 v_id_depto,
+                 v_num_sol,
+                 v_uo_sol
+              from  adq.tsolicitud s
+              inner join orga.tuo uo on uo.id_uo = s.id_uo 
+              where s.id_solicitud = v_parametros.id_solicitud;
+              
+              v_obs =  'La solicitud '||v_num_sol||' fue aprobada para la uo '||v_uo_sol||' ('||v_parametros.obs||')';
+              
             
             END IF;
             
@@ -624,14 +729,14 @@ BEGIN
                                                            v_id_proceso_wf,
                                                            p_id_usuario,
                                                            v_id_depto,
-                                                           v_parametros.obs);
+                                                           v_obs);
             
             
              -- actualiza estado en la solicitud
             
              update adq.tsolicitud  s set 
                id_estado_wf =  v_id_estado_actual,
-               estado = v_codigo_estado,
+               estado = v_codigo_estado_siguiente,
                id_usuario_mod=p_id_usuario,
                fecha_mod=now(),
                instruc_rpc=v_parametros.instruc_rpc
