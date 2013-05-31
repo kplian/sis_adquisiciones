@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION adq.f_solicitud_sel (
   p_administrador integer,
   p_id_usuario integer,
@@ -34,7 +32,6 @@ DECLARE
     v_resultado 		record;
 	v_cotizaciones		record;
     v_obligaciones		record;
-			    
 BEGIN
 
 	v_nombre_funcion = 'adq.f_solicitud_sel';
@@ -58,11 +55,14 @@ BEGIN
             if (v_parametros.id_funcionario_usu is null) then
               	v_parametros.id_funcionario_usu = -1;
             end if;
-            IF p_administrador !=1  and lower(v_parametros.tipo_interfaz) = 'solicitudrq' THEN
+            
+           -- raise exception '%',v_parametros.tipo_interfaz;
+            
+            IF p_administrador !=1  and lower(v_parametros.tipo_interfaz) = 'solicitudreq' THEN
                                         
               v_filtro = '(ew.id_funcionario='||v_parametros.id_funcionario_usu::varchar||'  or sol.id_usuario_reg='||p_id_usuario||' ) and ';
             
-               
+         
             END IF;
             
             IF  lower(v_parametros.tipo_interfaz) = 'solicitudvb' THEN
@@ -148,12 +148,16 @@ BEGIN
                         inner join wf.testado_wf ew on ew.id_estado_wf = sol.id_estado_wf
                         
 				        where  '||v_filtro;
+                        
+                        
 			
 			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;
 			v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
 
-             raise notice '%',v_consulta;
+
+                 raise notice '%',v_consulta;
+            
 			--Devuelve la respuesta
 			return v_consulta;
 						
@@ -262,7 +266,7 @@ BEGIN
             	v_parametros.id_funcionario_usu = -1;
             end if;
             
-            IF p_administrador !=1  and lower(v_parametros.tipo_interfaz) = 'solicitudrq' THEN
+            IF p_administrador !=1  and lower(v_parametros.tipo_interfaz) = 'solicitudreq' THEN
                                         
               v_filtro = '(ew.id_funcionario='||v_parametros.id_funcionario_usu::varchar||'  or sol.id_usuario_reg='||p_id_usuario||' ) and ';
             
@@ -356,8 +360,8 @@ BEGIN
          INNER JOIN wf.ttipo_estado te on te.id_tipo_estado=es.id_tipo_estado
          INNER JOIN orga.tfuncionario fun on fun.id_funcionario=es.id_funcionario
          INNER JOIN segu.vpersona perf on perf.id_persona=fun.id_persona
-         order by id_estado_wf);         
-    
+         order by id_estado_wf);       
+    	
 		create temporary table flujo_cotizaciones(
             funcionario text,
             nombre text,
@@ -374,7 +378,11 @@ BEGIN
             select cot.id_estado_wf,cot.numero_oc, prv.desc_proveedor
             from adq.tcotizacion cot
             inner join param.vproveedor prv on prv.id_proveedor=cot.id_proveedor
-            where cot.id_proceso_compra=v_id_estados.id_proceso_compra
+            where cot.id_proceso_compra IN (
+	            		  select pc.id_proceso_compra as id_proceso_compra
+                          from adq.tsolicitud sol
+                          left join adq.tproceso_compra pc on pc.id_solicitud=sol.id_solicitud
+                          where sol.id_solicitud=v_parametros.id_solicitud)
         )LOOP
         	   INSERT INTO flujo_cotizaciones(
         	   WITH RECURSIVE estados_solicitud(id_depto, id_proceso_wf, id_tipo_estado,id_estado_wf, id_estado_anterior, fecha_reg)AS(
@@ -416,7 +424,11 @@ BEGIN
             from adq.tcotizacion cot
             inner join tes.tobligacion_pago op on op.numero=cot.numero_oc
             inner join param.vproveedor prv on prv.id_proveedor=cot.id_proveedor
-            where cot.id_proceso_compra=v_id_estados.id_proceso_compra
+            where cot.id_proceso_compra IN (
+	            		  select pc.id_proceso_compra as id_proceso_compra
+                          from adq.tsolicitud sol
+                          left join adq.tproceso_compra pc on pc.id_solicitud=sol.id_solicitud
+                          where sol.id_solicitud=v_parametros.id_solicitud)
         )LOOP
         	   INSERT INTO flujo_obligaciones(
                WITH RECURSIVE estados_obligaciones(id_depto, id_proceso_wf, id_tipo_estado,id_estado_wf, id_estado_anterior, fecha_reg)AS(
