@@ -211,7 +211,7 @@ Phx.vista.SolicitudDet=Ext.extend(Phx.gridInterfaz,{
                 allowBlank: true,
                 emptyText : 'OT...',
                 store : new Ext.data.JsonStore({
-                            url:'../../sis_contabilidad/control/OrdenTrabajo/listarOrdentrabajo',
+                            url:'../../sis_contabilidad/control/OrdenTrabajo/listarOrdenTrabajo',
                             id : 'id_orden_trabajo',
                             root: 'datos',
                             sortInfo:{
