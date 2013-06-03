@@ -40,48 +40,25 @@ Phx.vista.SolicitudDet=Ext.extend(Phx.gridInterfaz,{
             type:'Field',
             form:true
         },
-		{
+        {
             config:{
-                name: 'id_centro_costo',
-                fieldLabel: 'Centro Costo',
-                allowBlank: false,
-                emptyText : 'Centro Costo...',
-                store : new Ext.data.JsonStore({
-                            url:'../../sis_parametros/control/CentroCosto/listarCentroCostoCombo',
-                            id : 'id_centro_costo',
-                            root: 'datos',
-                            sortInfo:{
-                                    field: 'codigo_cc',
-                                    direction: 'ASC'
-                            },
-                            totalProperty: 'total',
-                            fields: ['id_centro_costo','codigo_cc'],
-                            remoteSort: true,
-                            baseParams:{par_filtro:'codigo_cc'}
-                }),
-                valueField: 'id_centro_costo',
-               displayField: 'codigo_cc',
-               gdisplayField: 'desc_centro_costo',
-               hiddenName: 'id_centro_costo',
-               forceSelection:true,
-               typeAhead: true,
-               triggerAction: 'all',
-                listWidth:350,
-               lazyRender:true,
-               mode:'remote',
-               pageSize:10,
-               queryDelay:1000,
-               width:350,
-               gwidth:350,
-               minChars:2,
-               renderer:function(value, p, record){return String.format('{0}', record.data['desc_centro_costo']);}
-            },
-            type:'ComboBox',
+                    name:'id_centro_costo',
+                    origen:'CENTROCOSTO',
+                    fieldLabel: 'Centro de Costos',
+                    url: '../../sis_parametros/control/CentroCosto/listarCentroCostoFiltradoXDepto',
+                    emptyText : 'Centro Costo...',
+                    allowBlank:false,
+                    gdisplayField:'desc_centro_costo',//mapea al store del grid
+                    gwidth:200,
+                    renderer:function (value, p, record){return String.format('{0}', record.data['desc_centro_costo']);}
+                },
+            type:'ComboRec',
+            id_grupo:0,
             filters:{pfiltro:'cc.codigo_cc',type:'string'},
-            id_grupo:1,
             grid:true,
             form:true
         },
+		
         {
             config:{
                 name: 'id_concepto_ingas',
@@ -484,8 +461,8 @@ Phx.vista.SolicitudDet=Ext.extend(Phx.gridInterfaz,{
 	
     loadValoresIniciales:function()
     {
-        
-        this.getComponente('id_solicitud').setValue(this.maestro.id_solicitud);
+        this.Cmp.id_solicitud.setValue(this.maestro.id_solicitud);
+        this.Cmp.id_centro_costo.store.baseParams.id_depto =this.maestro.id_depto;
         Phx.vista.SolicitudDet.superclass.loadValoresIniciales.call(this);
     },
     

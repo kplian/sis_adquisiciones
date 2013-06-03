@@ -154,6 +154,7 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
    			config:{
    				name:'id_depto',
    				 hiddenName: 'id_depto',
+   				 url: '../../sis_parametros/control/Depto/listarDeptoFiltradoXUsuario',
 	   				origen:'DEPTO',
 	   				allowBlank:false,
 	   				fieldLabel: 'Depto',
