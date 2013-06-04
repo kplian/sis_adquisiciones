@@ -93,6 +93,9 @@ DECLARE
      v_id_funcionario_rpc integer;
      v_num_sol varchar;
      
+     v_cad_ep varchar;
+     v_cad_uo varchar;
+     
 			    
 BEGIN
 
@@ -891,7 +894,7 @@ BEGIN
                           v_id_proceso_wf, 
                           p_id_usuario,
                           v_id_depto,
-                          'Solictud de Correción/Revisión por retroceso de estado');
+                          'Solictud de Correción/Revisión por retroceso de estado en la cotiazacion');
                       
                     
                       
@@ -1316,6 +1319,45 @@ BEGIN
             return v_resp;
 
 		end;
+     /*********************************    
+ 	#TRANSACCION:  'ADQ_OBEPUO_IME'
+ 	#DESCRIPCION:	Obtener listado de up y ep correspondientes a los centros de costo
+                    del detalle de la cotizacion adjudicados al proveedor 
+                    
+ 	#AUTOR:	        Rensi Arteaga Copari
+ 	#FECHA:		    1-4-2013 14:48:35
+	***********************************/
+
+	elsif(p_transaccion='ADQ_OBEPUO_IME')then
+
+		begin
+			
+         
+        
+            select 
+              pxp.list(cc.id_uo::text),
+              pxp.list(cc.id_ep::text)
+            into
+              v_cad_uo,
+              v_cad_ep
+            from adq.tcotizacion_det cd
+            inner join adq.tsolicitud_det sd on sd.id_solicitud_det = cd.id_solicitud_det
+            inner join param.tcentro_costo cc on sd.id_centro_costo = cc.id_centro_costo
+            where cd.id_cotizacion = v_parametros.id_cotizacion 
+            and cd.estado_reg = 'activo' and cd.cantidad_adju > 0;
+        
+           
+             --Definicion de la respuesta
+            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','UOs, EPs retornados'); 
+            v_resp = pxp.f_agrega_clave(v_resp,'eps',v_cad_ep::varchar);
+            v_resp = pxp.f_agrega_clave(v_resp,'uos',v_cad_uo::varchar);
+              
+            --Devuelve la respuesta
+            return v_resp;
+
+		end;
+        
+    
     
     else
      

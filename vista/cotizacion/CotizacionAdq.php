@@ -72,7 +72,7 @@ Phx.vista.CotizacionAdq = {
                     emptyText:'Elija un Depto',
                     store:new Ext.data.JsonStore(
                     {
-                        url: '../../sis_parametros/control/Depto/listarDepto',
+                        url: '../../sis_adquisiciones/control/Cotizacion/listarDeptoFiltradoCotizacion',
                         id: 'id_depto',
                         root: 'datos',
                         sortInfo:{
@@ -278,9 +278,10 @@ Phx.vista.CotizacionAdq = {
                                 
 
         onHabPag:function(){
-            console.log(this.id_depto);
+           
+            var data = this.getSelectedData();
             this.cmpDeptoTes.reset();
-            this.cmpDeptoTes.store.baseParams.id_depto = this.id_depto;
+            this.cmpDeptoTes.store.baseParams.id_cotizacion = data.id_cotizacion;
             this.cmpDeptoTes.modificado = true;
             this.wDEPTO.show();
             

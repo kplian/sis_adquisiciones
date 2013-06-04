@@ -296,6 +296,42 @@ class ACTCotizacion extends ACTbase{
         $this->res=$this->objFunc->habilitarPago($this->objParam);
         $this->res->imprimirRespuesta($this->res->generarJson());
     }
+    
+  
+    function listarDeptoFiltradoCotizacion(){
+            
+        $this->objFunc=$this->create('MODCotizacion'); 
+        $this->res=$this->objFunc->obtnerUosEpsDetalleAdjudicado($this->objParam);
+        
+        //si sucede un error
+        if($this->res->getTipo()=='ERROR'){
+            
+            $this->res->imprimirRespuesta($this->res->generarJson());
+            exit;
+        }
+
+        $this->datos=array();
+        $this->datos=$this->res->getDatos();
+        $uos=$this->datos[0]['uos'];
+        $eps=$this->datos[0]['eps'];
+   
+        
+        $this->objParam->addParametro('eps',$eps); 
+        $this->objParam->addParametro('uos',$uos); 
+        
+        
+        // parametros de ordenacion por defecto
+        $this->objParam->defecto('ordenacion','depto');
+        $this->objParam->defecto('dir_ordenacion','asc');
+       
+        $this->objFunc=$this->create('sis_parametros/MODDepto'); 
+        //ejecuta el metodo de lista personas a travez de la intefaz objetoFunSeguridad 
+        $this->res=$this->objFunc->listarDeptoFiltradoXUOsEPs($this->objParam);
+        $this->res->imprimirRespuesta($this->res->generarJson());
+        
+        
+    }
+    
 
 }
 

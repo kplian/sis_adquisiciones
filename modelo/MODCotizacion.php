@@ -206,6 +206,24 @@ class MODCotizacion extends MODbase{
 		return $this->respuesta;
 	}
 	
+	function obtnerUosEpsDetalleAdjudicado(){
+        //Definicion de variables para ejecucion del procedimiento
+        $this->procedimiento='adq.f_cotizacion_ime';
+        $this->transaccion='ADQ_OBEPUO_IME';
+        $this->tipo_procedimiento='IME';
+                
+        //Define los parametros para la funcion
+        $this->setParametro('id_cotizacion','id_cotizacion','int4');
+
+        //Ejecuta la instruccion
+        $this->armarConsulta();
+        $this->ejecutarConsulta();
+
+        //Devuelve la respuesta
+        return $this->respuesta;
+    }
+    
+	
 
 	function reporteCotizacion(){
 		//Definicion de variables para ejecucion del procedimientp

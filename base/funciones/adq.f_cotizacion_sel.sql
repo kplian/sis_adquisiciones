@@ -1,3 +1,5 @@
+--------------- SQL ---------------
+
 CREATE OR REPLACE FUNCTION adq.f_cotizacion_sel (
   p_administrador integer,
   p_id_usuario integer,
@@ -330,7 +332,10 @@ BEGIN
 			return v_consulta;
 
 		end;				
-	else
+	
+    
+    
+    else
 					     
 		raise exception 'Transaccion inexistente';
 					         

@@ -28,7 +28,7 @@ Phx.vista.CotizacionVb = {
                     iconCls : 'bok',
                     disabled: true,
                     handler : this.onGenOC,
-                    tooltip : '<b>Solictar Aprobación RPC</b><br/><b>La recomendación pasa a revisióon del RPC </b>'
+                    tooltip : '<b>Aprobar Adjudicación</b><br/><b> La REcomendación queda aprobada </b>'
           });
           
           this.addButton('btnChequeoDocumentos',
