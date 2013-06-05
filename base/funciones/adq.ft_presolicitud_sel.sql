@@ -120,13 +120,17 @@ BEGIN
                                  from adq.tgrupo_partida gp 
                                  inner join param.tperiodo per on per.id_gestion = gp.id_gestion
                                  and per.fecha_ini <= pres.fecha_soli and per.fecha_fin >= pres.fecha_soli
-                                 where gp.id_grupo = gru.id_grupo  and gp.estado_reg=''activo'')::varchar  as id_partidas
+                                 where gp.id_grupo = gru.id_grupo  and gp.estado_reg=''activo'')::varchar  as id_partidas,
+                                 pres.id_depto,
+                                 d.codigo||'' ''||d.nombre as desc_depto,
+                                 pres.id_gestion
                           from adq.tpresolicitud pres
                                inner join segu.tusuario usu1 on usu1.id_usuario = pres.id_usuario_reg
                                inner join adq.tgrupo gru on gru.id_grupo = pres.id_grupo
                                inner join orga.vfuncionario fun on fun.id_funcionario = pres.id_funcionario
                                inner join orga.vfuncionario funs on funs.id_funcionario = pres.id_funcionario_supervisor
                                inner join orga.tuo uo on uo.id_uo = pres.id_uo 
+                               inner join param.tdepto d on d.id_depto= pres.id_depto
                                left join segu.tusuario usu2 on usu2.id_usuario = pres.id_usuario_mod
 				        where  '||v_filtro||' and ';
 			
@@ -205,6 +209,7 @@ BEGIN
                                inner join orga.vfuncionario funs on funs.id_funcionario = pres.id_funcionario_supervisor
                                inner join orga.tuo uo on uo.id_uo = pres.id_uo 
                                left join segu.tusuario usu2 on usu2.id_usuario = pres.id_usuario_mod
+                               inner join param.tdepto d on d.id_depto= pres.id_depto
 					    where '||v_filtro||' and ';
 			
 			--Definicion de la respuesta		    

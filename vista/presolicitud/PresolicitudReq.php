@@ -34,6 +34,7 @@ Phx.vista.PresolicitudReq = {
         
         //inicio de eventos 
         this.cmpFechaSoli.on('change',function(f){
+             this.obtenerGestion(this.cmpFechaSoli);
              this.cmpIdUo.reset();
              this.cmpIdFuncionarioSupervisor.reset();
              this.cmpIdUo.enable();
@@ -76,6 +77,9 @@ Phx.vista.PresolicitudReq = {
        this.Cmp.id_funcionario.disable();
        this.Cmp.fecha_soli.setValue(new Date());
        this.Cmp.fecha_soli.fireEvent('change');
+       
+       this.Cmp.id_depto.enable();
+       this.Cmp.id_funcionario.enable();
        
        this.Cmp.id_funcionario.store.load({params:{start:0,limit:this.tam_pag}, 
            callback : function (r) {
@@ -124,6 +128,8 @@ Phx.vista.PresolicitudReq = {
        this.cmpFechaSoli.disable();
        this.cmpIdFuncionarioSupervisor.disable();       
        this.cmpIdUo.disable();
+       this.Cmp.id_depto.disable();
+       this.Cmp.id_funcionario.disable();
        Phx.vista.PresolicitudReq.superclass.onButtonEdit.call(this);
        this.Cmp.id_funcionario.store.baseParams.fecha = this.cmpFechaSoli.getValue().dateFormat(this.cmpFechaSoli.format);
           
@@ -163,6 +169,33 @@ Phx.vista.PresolicitudReq = {
        return tb
     },
     
+     obtenerGestion:function(x){
+         
+         var fecha = x.getValue().dateFormat(x.format);
+            Phx.CP.loadingShow();
+            Ext.Ajax.request({
+                    // form:this.form.getForm().getEl(),
+                    url:'../../sis_parametros/control/Gestion/obtenerGestionByFecha',
+                    params:{fecha:fecha},
+                    success:this.successGestion,
+                    failure: this.conexionFailure,
+                    timeout:this.timeout,
+                    scope:this
+             });
+        }, 
+    successGestion:function(resp){
+       Phx.CP.loadingHide();
+            var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
+            if(!reg.ROOT.error){
+                
+                this.Cmp.id_gestion.setValue(reg.ROOT.datos.id_gestion);
+                
+               
+            }else{
+                
+                alert('ocurrio al obtener la gestion')
+            } 
+    },
 	
 	south:
           { 

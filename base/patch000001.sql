@@ -202,6 +202,18 @@ INHERITS (pxp.tbase);
 
 
 
+/***********************************I-SCP-RAC-ADQ-0-05/05/2013****************************************/
 
+ALTER TABLE adq.tpresolicitud
+  ADD COLUMN id_depto INTEGER;
+  
+ALTER TABLE adq.tpresolicitud
+  ADD COLUMN id_gestion INTEGER;  
 
+--------------- SQL ---------------
+
+ALTER TABLE adq.tpresolicitud
+  ALTER COLUMN id_gestion SET NOT NULL;
+
+/***********************************F-SCP-RAC-ADQ-0-05/05/2013****************************************/
 

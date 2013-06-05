@@ -44,6 +44,16 @@ Phx.vista.Presolicitud=Ext.extend(Phx.gridInterfaz,{
 			form:true 
 		},
         {
+            //configuracion del componente
+            config:{
+                    labelSeparator:'',
+                    inputType:'hidden',
+                    name: 'id_gestion'
+            },
+            type:'Field',
+            form:true 
+        },
+        {
             config:{
                 name: 'estado',
                 fieldLabel: 'estado',
@@ -57,6 +67,28 @@ Phx.vista.Presolicitud=Ext.extend(Phx.gridInterfaz,{
             id_grupo:1,
             grid:true,
             form:false
+        },
+       
+        {
+            config:{
+                name:'id_depto',
+                 hiddenName: 'id_depto',
+                 url: '../../sis_parametros/control/Depto/listarDeptoFiltradoXUsuario',
+                    origen:'DEPTO',
+                    allowBlank:false,
+                    fieldLabel: 'Depto',
+                    gdisplayField:'desc_depto',//dibuja el campo extra de la consulta al hacer un inner join con orra tabla
+                    width:250,
+                    gwidth:180,
+                    baseParams:{estado:'activo',codigo_subsistema:'ADQ'},//parametros adicionales que se le pasan al store
+                    renderer:function (value, p, record){return String.format('{0}', record.data['desc_depto']);}
+            },
+            //type:'TrigguerCombo',
+            type:'ComboRec',
+            id_grupo:0,
+            filters:{pfiltro:'d.nombre#d.codigo',type:'string'},
+            grid:true,
+            form:true
         },
         {
             config:{
@@ -302,7 +334,8 @@ Phx.vista.Presolicitud=Ext.extend(Phx.gridInterfaz,{
 		'desc_funcionario_supervisor',
 		'desc_funcionario',
 		'desc_uo',
-		'desc_grupo','id_partidas'
+		'desc_grupo','id_partidas',
+		'id_depto','desc_depto','id_gestion'
 		
 	],
 	antEstado:function(){

@@ -462,7 +462,7 @@ Phx.vista.SolicitudDet=Ext.extend(Phx.gridInterfaz,{
     loadValoresIniciales:function()
     {
         this.Cmp.id_solicitud.setValue(this.maestro.id_solicitud);
-        this.Cmp.id_centro_costo.store.baseParams.id_depto =this.maestro.id_depto;
+       
         Phx.vista.SolicitudDet.superclass.loadValoresIniciales.call(this);
     },
     

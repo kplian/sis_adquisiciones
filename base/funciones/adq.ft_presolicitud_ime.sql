@@ -40,6 +40,7 @@ DECLARE
     v_id_auxiliar   integer;
     v_id_solicitud_det integer;
     v_aux varchar;
+    v_registros_pre record;
 			    
 BEGIN
 
@@ -70,7 +71,9 @@ BEGIN
 			id_usuario_reg,
 			fecha_mod,
 			id_usuario_mod,
-            fecha_soli
+            fecha_soli,
+            id_depto,
+            id_gestion
           	) values(
 			v_parametros.id_grupo,
 			v_parametros.id_funcionario_supervisor,
@@ -84,7 +87,9 @@ BEGIN
 			p_id_usuario,
 			null,
 			null,
-            v_parametros.fecha_soli
+            v_parametros.fecha_soli,
+            v_parametros.id_depto,
+            v_parametros.id_gestion
 							
 			)RETURNING id_presolicitud into v_id_presolicitud;
 			
@@ -116,7 +121,9 @@ BEGIN
 			id_uo = v_parametros.id_uo,
 			
 			fecha_mod = now(),
-			id_usuario_mod = p_id_usuario
+			id_usuario_mod = p_id_usuario,
+            id_depto=  v_parametros.id_depto
+            
 			where id_presolicitud=v_parametros.id_presolicitud;
                
 			--Definicion de la respuesta
@@ -214,6 +221,11 @@ BEGIN
             ELSEIF  v_parametros.estado = 'pendiente' THEN
               
               v_estado = 'borrador';
+              
+            ELSEIF  v_parametros.estado = 'asignado' THEN
+              
+              v_estado = 'aprobado';  
+              
             
             ELSEIF  v_parametros.estado = 'borrador' THEN
             
@@ -244,6 +256,21 @@ BEGIN
             fecha_mod = now()
             where id_presolicitud = v_parametros.id_presolicitud;
             
+            
+            
+            -- if si el estado al que retorna es de aporobado verifica el detalle y las libera
+            
+            IF v_estado = 'aprobado' THEN
+            
+              update adq.tpresolicitud_det 
+              set
+              estado = 'pendiente',
+              id_usuario_mod = p_id_usuario,
+              fecha_mod = now()
+              where id_presolicitud = v_parametros.id_presolicitud;
+                 
+            
+            END IF;
                
             --Definicion de la respuesta
             v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Retrocede el estado de presolicitud a '||v_estado::varchar); 
@@ -323,7 +350,8 @@ BEGIN
            --validar solilctud
            
            select
-            s.estado
+            s.estado,
+            s.id_depto
             into 
             v_registros 
             from adq.tsolicitud s
@@ -340,19 +368,30 @@ BEGIN
            
            
             select
-            pre.estado
+            pre.estado,
+            pre.id_depto
             into 
-            v_registros 
+            v_registros_pre 
             from adq.tpresolicitud pre
             where pre.id_presolicitud = v_parametros.id_presolicitud;
             
             
             
-            IF v_registros.estado != 'aprobado' and v_registros.estado != 'asignado' THEN
+            IF v_registros_pre.estado != 'aprobado' and v_registros_pre.estado != 'asignado' THEN
             
                raise exception 'Solo pueden consolidarce presolicitudes aprobadas';
             
             END IF;
+            
+            IF v_registros_pre.id_depto != v_registros.id_depto   THEN
+            
+             
+               raise exception 'Solo puede consolidar presolicitudes del mismo departamento que la solicitud';
+            
+            
+            END IF;
+            
+            
         
         v_aux = COALESCE(v_parametros.id_presolicitud_dets,'0');
        

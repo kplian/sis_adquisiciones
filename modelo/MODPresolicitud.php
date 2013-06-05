@@ -43,6 +43,9 @@ class MODPresolicitud extends MODbase{
 		$this->captura('desc_uo','text');
 		$this->captura('fecha_soli','date');
 		$this->captura('id_partidas','varchar');
+		$this->captura('id_depto','int4');
+		$this->captura('desc_depto','text');
+		$this->captura('id_gestion','int4');
 		
 		
 		
@@ -69,6 +72,8 @@ class MODPresolicitud extends MODbase{
 		$this->setParametro('id_uo','id_uo','int4');
 		$this->setParametro('estado','estado','varchar');
 		$this->setParametro('fecha_soli','fecha_soli','date');
+		$this->setParametro('id_depto','id_depto','int4');
+		$this->setParametro('id_gestion','id_gestion','int4');
 		
 		
 		//Ejecuta la instruccion
@@ -95,6 +100,9 @@ class MODPresolicitud extends MODbase{
 		$this->setParametro('id_uo','id_uo','int4');
 		$this->setParametro('estado','estado','varchar');
 		$this->setParametro('fecha_soli','fecha_soli','date');
+		$this->setParametro('id_depto','id_depto','int4');
+		$this->setParametro('id_gestion','id_gestion','int4');
+        
         
 
 		//Ejecuta la instruccion

@@ -1,3 +1,5 @@
+--------------- SQL ---------------
+
 CREATE OR REPLACE FUNCTION adq.f_proceso_compra_sel (
   p_administrador integer,
   p_id_usuario integer,
@@ -105,6 +107,8 @@ BEGIN
 
 			--Devuelve la respuesta
 			return v_consulta;
+            
+         
 						
 		end;
         

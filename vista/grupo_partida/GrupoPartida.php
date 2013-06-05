@@ -50,50 +50,31 @@ Phx.vista.GrupoPartida=Ext.extend(Phx.gridInterfaz,{
             type:'Field',
             form:true
         },
-		   
+		 
+		
         {
-            config:{
-                name:'id_partida',
-                fieldLabel:'Partida',
-                allowBlank:true,
-                emptyText:'Partida...',
-                store: new Ext.data.JsonStore({
-                         url: '../../sis_presupuestos/control/Partida/listarPartida',
-                         id: 'id_partida',
-                         root: 'datos',
-                         sortInfo:{
-                            field: 'codigo',
-                            direction: 'ASC'
-                    },
-                    totalProperty: 'total',
-                    fields: ['id_partida','codigo','nombre_partida'],
-                    // turn on remote sorting
-                    remoteSort: true,
-                    baseParams:{par_filtro:'codigo#nombre_partida',sw_transaccional:'movimiento'}
-                    }),
-                valueField: 'id_partida',
-                displayField: 'nombre_partida',
-                tpl:'<tpl for="."><div class="x-combo-list-item"><p>CODIGO:{codigo}</p><p>{nombre_partida}</p></div></tpl>',
-                hiddenName: 'id_partida',
-                forceSelection:true,
-                typeAhead: true,
-                triggerAction: 'all',
-                lazyRender:true,
-                mode:'remote',
-                pageSize:10,
-                queryDelay:1000,
-                gwidth:280,
-                anchor:'80%',       
-                renderer:function(value, p, record){return String.format('{0}', record.data['desc_partida']);}
-            },
-            type:'ComboBox',
-            id_grupo:0,
-            filters:{   
-                        pfiltro:'codigo#nombre_partida',
-                        type:'string'
-                    },
-            grid:true,
-            form:true
+                config:{
+                    sysorigen:'sis_presupuestos',
+                    name:'id_partida',
+                    origen:'PARTIDA',
+                    allowBlank:true,
+                    fieldLabel:'Partida',
+                    gdisplayField:'nombre_partida',//mapea al store del grid
+                    gwidth:200,
+                    // renderer:function (value, p, record){return String.format('{0}',record.data['codigo_partida'] + '-' + record.data['nombre_partida']);}
+                    renderer:function(value, p, record){return String.format('{0}', record.data['desc_partida']);}
+            
+                 
+                 },
+                type:'ComboRec',
+                id_grupo:0,
+                filters:{   
+                    pfiltro:'par.codigo#par.nombre_partida',
+                    type:'string'
+                },
+               
+                grid:true,
+                form:true
         },
 		{
 			config:{
@@ -276,10 +257,12 @@ Phx.vista.GrupoPartida=Ext.extend(Phx.gridInterfaz,{
     loadValoresIniciales:function()
     {
         Phx.vista.GrupoPartida.superclass.loadValoresIniciales.call(this);
-        this.getComponente('id_grupo').setValue(this.maestro.id_grupo);   
-        this.getComponente('id_gestion').setValue(this.cmbGestion.getValue());      
+         this.Cmp.id_grupo.setValue(this.maestro.id_grupo);   
+         this.Cmp.id_gestion.setValue(this.cmbGestion.getValue()); 
+         this.Cmp.id_partida.store.baseParams.id_gestion = this.cmbGestion.getValue();
+         this.Cmp.id_partida.modificado = true;    
     }
-	}
+ }
 )
 </script>
 		

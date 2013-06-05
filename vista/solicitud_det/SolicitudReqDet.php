@@ -29,10 +29,11 @@ Phx.vista.SolicitudReqDet = {
        
        this.store.baseParams={id_solicitud:this.maestro.id_solicitud};
        this.getComponente('id_concepto_ingas').store.baseParams.tipo=this.maestro.tipo;
-       this.getComponente('id_centro_costo').store.baseParams.id_gestion=this.maestro.id_gestion;
-       this.getComponente('id_centro_costo').store.baseParams.codigo_subsistema='ADQ';
+       this.Cmp.id_centro_costo.store.baseParams.id_gestion=this.maestro.id_gestion;
+       this.Cmp.id_centro_costo.store.baseParams.codigo_subsistema='ADQ';
+       this.Cmp.id_centro_costo.store.baseParams.id_depto =this.maestro.id_depto;
        this.getComponente('id_concepto_ingas').modificado = true;
-       this.getComponente('id_centro_costo').modificado=true;
+       this.Cmp.id_centro_costo.modificado=true;
        this.load({params:{start:0, limit:50}});
               
        
