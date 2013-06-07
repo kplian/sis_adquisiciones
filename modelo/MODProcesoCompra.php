@@ -56,6 +56,24 @@ class MODProcesoCompra extends MODbase{
 		return $this->respuesta;
 	}
 
+	function listarProcesoCompraSolicitud(){
+		//Definicion de variables para ejecucion del procedimientp
+		$this->procedimiento='adq.f_proceso_compra_sel';
+		$this->transaccion='ADQ_PROCSOL_SEL';
+		$this->tipo_procedimiento='SEL';//tipo de transaccion
+		$this->setCount(false);
+		
+		$this->setParametro('id_solicitud','id_solicitud','int4');
+		//Definicion de la lista del resultado del query
+		$this->captura('id_proceso_compra','int4');	 
+		
+		//Ejecuta la instruccion
+		$this->armarConsulta();
+		$this->ejecutarConsulta();
+		//Devuelve la respuesta
+		return $this->respuesta;
+	}
+	
 function listarProcesoCompraPedido(){
 		//Definicion de variables para ejecucion del procedimientp
 		$this->procedimiento='adq.f_proceso_compra_sel';

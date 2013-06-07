@@ -63,6 +63,43 @@ class MODCotizacion extends MODbase{
 		return $this->respuesta;
 	}
 	
+	
+	function listarCotizacionProcesoCompra(){
+		//Definicion de variables para ejecucion del procedimientp
+		$this->procedimiento='adq.f_cotizacion_sel';
+		$this->transaccion='ADQ_COTPROC_SEL';
+		$this->tipo_procedimiento='SEL';//tipo de transaccion
+		$this->setCount(false);
+		
+		$this->setParametro('id_proceso_compra','id_proceso_compra','int4');
+		//Definicion de la lista del resultado del query
+		$this->captura('id_cotizacion','int4');	 
+		
+		//Ejecuta la instruccion
+		$this->armarConsulta();
+		$this->ejecutarConsulta();
+		//Devuelve la respuesta
+		return $this->respuesta;
+	}
+	
+	function listarObligacionPagoCotizacion(){
+		//Definicion de variables para ejecucion del procedimientp
+		$this->procedimiento='adq.f_cotizacion_sel';
+		$this->transaccion='ADQ_OBPGCOT_SEL';
+		$this->tipo_procedimiento='SEL';//tipo de transaccion
+		$this->setCount(false);
+		
+		$this->setParametro('id_cotizacion','id_cotizacion','int4');
+		//Definicion de la lista del resultado del query
+		$this->captura('id_obligacion_pago','int4');	 
+		
+		//Ejecuta la instruccion
+		$this->armarConsulta();
+		$this->ejecutarConsulta();
+		//Devuelve la respuesta
+		return $this->respuesta;
+	}
+	
 	function listarCotizacionRPC(){
         //Definicion de variables para ejecucion del procedimientp
         $this->procedimiento='adq.f_cotizacion_sel';
@@ -420,7 +457,27 @@ class MODCotizacion extends MODbase{
         return $this->respuesta;
     }
     
-    
+    function estadosCotizacion(){
+					$this->procedimiento = 'adq.f_cotizacion_sel';
+					$this->transaccion = 'ADQ_ESTCOT_SEL';
+					$this->tipo_procedimiento = 'SEL';
+					$this->setCount(false);
+					
+					$this->setParametro('id_cotizacion','id_cotizacion','int4');
+					
+					$this->captura('funcionario','text');
+					$this->captura('nombre','text');
+					$this->captura('nombre_estado','varchar');
+					$this->captura('fecha_reg','date');
+					$this->captura('id_tipo_estado','int');
+					$this->captura('id_estado_wf','int');
+					$this->captura('id_estado_anterior','int');		
+					//Ejecuta la instruccion
+					$this->armarConsulta();
+					$this->ejecutarConsulta();
+					//Devuelve la respuesta
+					return $this->respuesta;
+				}
     
 	
 

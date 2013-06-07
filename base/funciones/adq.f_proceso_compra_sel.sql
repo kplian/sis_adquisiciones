@@ -182,6 +182,49 @@ BEGIN
 						
 		end;
 
+
+    /*********************************    
+ 	#TRANSACCION:  'ADQ_PROCSOL_SEL'
+ 	#DESCRIPCION:	Consulta de datos
+ 	#AUTOR:		Gonzalo Sarmiento Sejas
+ 	#FECHA:		31-05-2013 12:55:30
+	***********************************/
+
+	elsif(p_transaccion='ADQ_PROCSOL_SEL')then
+     				
+    	begin
+        
+        v_filadd='';
+        
+           IF   p_administrador != 1 THEN
+           
+             select  
+                 pxp.aggarray(depu.id_depto)
+              into 
+                 va_id_depto
+             from param.tdepto_usuario depu 
+             where depu.id_usuario =  p_id_usuario; 
+        
+           v_filadd='(dep.id_depto  in ('|| COALESCE(array_to_string(va_id_depto,','),'0')||')) and';
+          
+          END IF;
+        
+        
+    		--Sentencia de la consulta
+			v_consulta:='select proc.id_proceso_compra
+                   from adq.tproceso_compra proc
+                       inner join adq.tsolicitud sol on sol.id_solicitud = proc.id_solicitud
+                       where sol.id_solicitud='||v_parametros.id_solicitud||' and '||v_filadd||'  ';
+			
+			--Definicion de la respuesta
+			v_consulta:=v_consulta||v_parametros.filtro;
+			v_consulta:=v_consulta||' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
+			
+			--Devuelve la respuesta
+			return v_consulta;
+						
+		end;
+
 	/*********************************    
  	#TRANSACCION:  'ADQ_PROC_CONT'
  	#DESCRIPCION:	Conteo de registros

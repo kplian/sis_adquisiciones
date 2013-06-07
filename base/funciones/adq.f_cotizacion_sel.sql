@@ -30,6 +30,7 @@ DECLARE
 	v_nombre_funcion   	text;
 	v_resp				varchar;
     v_add_filtro 		varchar;
+    v_cotizaciones		record;
 			    
 BEGIN
 
@@ -95,6 +96,60 @@ BEGIN
 			return v_consulta;
 						
 		end;
+        
+    /*********************************    
+ 	#TRANSACCION:  'ADQ_COTPROC_SEL'
+ 	#DESCRIPCION:	Consulta de datos
+ 	#AUTOR:		Gonzalo Sarmiento Sejas
+ 	#FECHA:		06-06-2013 12:55:30
+	***********************************/
+
+	elsif(p_transaccion='ADQ_COTPROC_SEL')then
+     				
+    	begin
+        
+    		--Sentencia de la consulta
+			v_consulta:='select cot.id_cotizacion
+                        from adq.tcotizacion cot
+                        inner join adq.tproceso_compra pc on pc.id_proceso_compra=cot.id_proceso_compra 
+                        where pc.id_proceso_compra='||v_parametros.id_proceso_compra||' and ';
+			
+			--Definicion de la respuesta
+			v_consulta:=v_consulta||v_parametros.filtro;
+			v_consulta:=v_consulta||' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
+			
+			--Devuelve la respuesta
+			return v_consulta;
+						
+		end;
+        
+     /*********************************    
+ 	#TRANSACCION:  'ADQ_OBPGCOT_SEL'
+ 	#DESCRIPCION:	Consulta de datos
+ 	#AUTOR:		Gonzalo Sarmiento Sejas
+ 	#FECHA:		06-06-2013 12:55:30
+	***********************************/
+
+	elsif(p_transaccion='ADQ_OBPGCOT_SEL')then
+     				
+    	begin
+        
+    		--Sentencia de la consulta
+			v_consulta:='select op.id_obligacion_pago
+                        from adq.tcotizacion cot
+                        inner join tes.tobligacion_pago op on op.id_obligacion_pago=cot.id_obligacion_pago
+                        where cot.id_cotizacion='||v_parametros.id_cotizacion||' and ';
+			
+			--Definicion de la respuesta
+			v_consulta:=v_consulta||v_parametros.filtro;
+			v_consulta:=v_consulta||' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
+			
+			--Devuelve la respuesta
+			return v_consulta;
+						
+		end;   
+         
+    
 	/*********************************    
  	#TRANSACCION:  'ADQ_COTRPC_SEL'
  	#DESCRIPCION:	Consulta de datos para los funcionarios rpc
@@ -221,6 +276,59 @@ BEGIN
 			--Devuelve la respuesta
 			return v_consulta;
         end;
+        
+   /*********************************    
+ 	#TRANSACCION:  'ADQ_ESTCOT_SEL'
+ 	#DESCRIPCION:	Consulta de registros para los reportes
+ 	#AUTOR:		Gonzalo Sarmiento Sejas	
+ 	#FECHA:		31-04-2013
+	***********************************/
+	elsif (p_transaccion='ADQ_ESTCOT_SEL')then
+    	begin
+        
+        create temporary table flujo_cotizaciones(
+        funcionario text,
+        nombre text,
+        nombre_estado varchar,
+        fecha_reg date,
+        id_tipo_estado int4,
+        id_estado_wf int4,
+        id_estado_anterior int4
+        ) on commit drop;   
+    
+    	--recupera el flujo de control de las cotizaciones
+        
+    	FOR v_cotizaciones IN( 
+            select cot.id_estado_wf,cot.numero_oc, prv.desc_proveedor
+            from adq.tcotizacion cot
+            inner join param.vproveedor prv on prv.id_proveedor=cot.id_proveedor
+            where cot.id_cotizacion=v_parametros.id_cotizacion
+        )LOOP
+        	   INSERT INTO flujo_cotizaciones(
+        	   WITH RECURSIVE estados_solicitud(id_depto, id_proceso_wf, id_tipo_estado,id_estado_wf, id_estado_anterior, fecha_reg)AS(
+                  SELECT et.id_depto, et.id_proceso_wf, et.id_tipo_estado, et.id_estado_wf, et.id_estado_anterior, et.fecha_reg
+                  FROM wf.testado_wf et
+                  WHERE et.id_estado_wf=v_cotizaciones.id_estado_wf     
+               UNION ALL        
+                  SELECT et.id_depto, et.id_proceso_wf, et.id_tipo_estado, et.id_estado_wf, et.id_estado_anterior, et.fecha_reg
+                  FROM wf.testado_wf et, estados_solicitud
+                  WHERE et.id_estado_wf=estados_solicitud.id_estado_anterior         
+               )SELECT dep.nombre::text, tp.nombre||'-'||prv.desc_proveedor, te.nombre_estado, es.fecha_reg, es.id_tipo_estado, es.id_estado_wf, COALESCE(es.id_estado_anterior,NULL) as id_estado_anterior
+                      FROM estados_solicitud es
+                      INNER JOIN wf.ttipo_estado te on te.id_tipo_estado= es.id_tipo_estado
+                      INNER JOIN wf.tproceso_wf pwf on pwf.id_proceso_wf=es.id_proceso_wf
+                      INNER JOIN wf.ttipo_proceso tp on tp.id_tipo_proceso=pwf.id_tipo_proceso
+                      INNER JOIN adq.tcotizacion cot on  cot.id_proceso_wf=pwf.id_proceso_wf
+                      INNER JOIN param.vproveedor prv on prv.id_proveedor=cot.id_proveedor
+                      INNER JOIN param.tdepto dep on dep.id_depto=es.id_depto
+                      ORDER BY es.id_estado_wf ASC
+                      );      
+        END LOOP;
+        	
+        	v_consulta:='select * from flujo_cotizaciones';
+			--Devuelve la respuesta
+			return v_consulta;
+        end;
 
 	/*********************************    
  	#TRANSACCION:  'ADQ_COTOC_REP'
@@ -306,6 +414,8 @@ BEGIN
 			return v_consulta;
 
 		end;
+        
+      
 	/*********************************    
  	#TRANSACCION:  'ADQ_COT_CONT'
  	#DESCRIPCION:	Conteo de registros de la consulta de cotizaciones 
