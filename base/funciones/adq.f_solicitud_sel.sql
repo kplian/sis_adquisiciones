@@ -55,14 +55,11 @@ BEGIN
             if (v_parametros.id_funcionario_usu is null) then
               	v_parametros.id_funcionario_usu = -1;
             end if;
-            
-           -- raise exception '%',v_parametros.tipo_interfaz;
-            
             IF p_administrador !=1  and lower(v_parametros.tipo_interfaz) = 'solicitudreq' THEN
                                         
               v_filtro = '(ew.id_funcionario='||v_parametros.id_funcionario_usu::varchar||'  or sol.id_usuario_reg='||p_id_usuario||' ) and ';
             
-         
+               
             END IF;
             
             IF  lower(v_parametros.tipo_interfaz) = 'solicitudvb' THEN
@@ -148,16 +145,12 @@ BEGIN
                         inner join wf.testado_wf ew on ew.id_estado_wf = sol.id_estado_wf
                         
 				        where  '||v_filtro;
-                        
-                        
 			
 			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;
 			v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
 
-
-                 raise notice '%',v_consulta;
-            
+             raise notice '%',v_consulta;
 			--Devuelve la respuesta
 			return v_consulta;
 						
@@ -323,17 +316,17 @@ BEGIN
  	#TRANSACCION:  'ADQ_ESTSOL_SEL'
  	#DESCRIPCION:	Consulta estado de solicitud
  	#AUTOR:		Gonzalo Sarmiento Sejas	
- 	#FECHA:		02-05-2013
+ 	#FECHA:		02-06-2013
 	***********************************/
 
 	elsif(p_transaccion='ADQ_ESTSOL_SEL')then
     begin 
-		select sol.id_estado_wf as ult_est_sol, pc.id_estado_wf as ult_est_prc, pc.id_proceso_compra as id_proceso_compra into v_id_estados
+		select sol.id_estado_wf as ult_est_sol into v_id_estados
         from adq.tsolicitud sol
         left join adq.tproceso_compra pc on pc.id_solicitud=sol.id_solicitud
         where sol.id_solicitud=v_parametros.id_solicitud;
-
-        create temp table flujo_sol_proc(
+        
+        create temp table flujo_solicitud(
         	funcionario text,
             nombre text,
             nombre_estado varchar,
@@ -344,11 +337,11 @@ BEGIN
         ) on commit drop;	
         
 		--recupera el flujo de control de las solicitudes y del proceso de compra
-		INSERT INTO flujo_sol_proc(
+		INSERT INTO flujo_solicitud(
         WITH RECURSIVE estados_solicitud_proceso(id_funcionario, id_proceso_wf, id_tipo_estado,id_estado_wf, id_estado_anterior, fecha_reg)AS(
      		SELECT et.id_funcionario, et.id_proceso_wf, et.id_tipo_estado, et.id_estado_wf, et.id_estado_anterior, et.fecha_reg
     		FROM wf.testado_wf et
-     		WHERE et.id_estado_wf  in (v_id_estados.ult_est_sol,v_id_estados.ult_est_prc)     
+     		WHERE et.id_estado_wf  in (v_id_estados.ult_est_sol)     
      	UNION ALL        
       		SELECT et.id_funcionario, et.id_proceso_wf, et.id_tipo_estado, et.id_estado_wf, et.id_estado_anterior, et.fecha_reg
         	FROM wf.testado_wf et, estados_solicitud_proceso
@@ -362,52 +355,25 @@ BEGIN
          INNER JOIN segu.vpersona perf on perf.id_persona=fun.id_persona
          order by id_estado_wf);       
     	
-		create temporary table flujo_cotizaciones(
-            funcionario text,
-            nombre text,
-            nombre_estado varchar,
-            fecha_reg date,
-            id_tipo_estado int4,
-            id_estado_wf int4,
-            id_estado_anterior int4
-        ) on commit drop;   
-    
-    	--recupera el flujo de control de las cotizaciones
-        
-    	FOR v_cotizaciones IN( 
-            select cot.id_estado_wf,cot.numero_oc, prv.desc_proveedor
-            from adq.tcotizacion cot
-            inner join param.vproveedor prv on prv.id_proveedor=cot.id_proveedor
-            where cot.id_proceso_compra IN (
-	            		  select pc.id_proceso_compra as id_proceso_compra
-                          from adq.tsolicitud sol
-                          left join adq.tproceso_compra pc on pc.id_solicitud=sol.id_solicitud
-                          where sol.id_solicitud=v_parametros.id_solicitud)
-        )LOOP
-        	   INSERT INTO flujo_cotizaciones(
-        	   WITH RECURSIVE estados_solicitud(id_depto, id_proceso_wf, id_tipo_estado,id_estado_wf, id_estado_anterior, fecha_reg)AS(
-                  SELECT et.id_depto, et.id_proceso_wf, et.id_tipo_estado, et.id_estado_wf, et.id_estado_anterior, et.fecha_reg
-                  FROM wf.testado_wf et
-                  WHERE et.id_estado_wf=v_cotizaciones.id_estado_wf     
-               UNION ALL        
-                  SELECT et.id_depto, et.id_proceso_wf, et.id_tipo_estado, et.id_estado_wf, et.id_estado_anterior, et.fecha_reg
-                  FROM wf.testado_wf et, estados_solicitud
-                  WHERE et.id_estado_wf=estados_solicitud.id_estado_anterior         
-               )SELECT dep.nombre::text, tp.nombre||'-'||prv.desc_proveedor, te.nombre_estado, es.fecha_reg, es.id_tipo_estado, es.id_estado_wf, COALESCE(es.id_estado_anterior,NULL) as id_estado_anterior
-               
-               FROM estados_solicitud es
-                      INNER JOIN wf.ttipo_estado te on te.id_tipo_estado= es.id_tipo_estado
-                      INNER JOIN wf.tproceso_wf pwf on pwf.id_proceso_wf=es.id_proceso_wf
-                      INNER JOIN wf.ttipo_proceso tp on tp.id_tipo_proceso=pwf.id_tipo_proceso
-                      INNER JOIN adq.tcotizacion cot on  cot.id_proceso_wf=pwf.id_proceso_wf
-                      INNER JOIN param.vproveedor prv on prv.id_proveedor=cot.id_proveedor
-                      INNER JOIN param.tdepto dep on dep.id_depto=es.id_depto
-                      ORDER BY es.id_estado_wf ASC
-                      );      
-        END LOOP;
-       
-    
-   		create temporary table flujo_obligaciones(
+        --Definicion de la respuesta         	
+        v_consulta:='select * from flujo_solicitud';
+
+        --Devuelve la respuesta
+        return v_consulta;
+
+	end;
+   
+	/*********************************    
+ 	#TRANSACCION:  'ADQ_ESTPROC_SEL'
+ 	#DESCRIPCION:	Consulta estado de procesos
+ 	#AUTOR:		Gonzalo Sarmiento Sejas	
+ 	#FECHA:		31-05-2013
+	***********************************/
+
+	elsif(p_transaccion='ADQ_ESTPROC_SEL')then
+    begin 
+
+        create temp table flujo_proceso(
         	funcionario text,
             nombre text,
             nombre_estado varchar,
@@ -415,68 +381,39 @@ BEGIN
             id_tipo_estado int4,
             id_estado_wf int4,
             id_estado_anterior int4
-        ) on commit drop;   
-    
-    	--recupera el flujo de control de las obligaciones
+        ) on commit drop;	
         
-    	FOR v_obligaciones IN( 
-            select op.id_estado_wf, prv.desc_proveedor
-            from adq.tcotizacion cot
-            inner join tes.tobligacion_pago op on op.numero=cot.numero_oc
-            inner join param.vproveedor prv on prv.id_proveedor=cot.id_proveedor
-            where cot.id_proceso_compra IN (
-	            		  select pc.id_proceso_compra as id_proceso_compra
-                          from adq.tsolicitud sol
-                          left join adq.tproceso_compra pc on pc.id_solicitud=sol.id_solicitud
-                          where sol.id_solicitud=v_parametros.id_solicitud)
-        )LOOP
-        	   INSERT INTO flujo_obligaciones(
-               WITH RECURSIVE estados_obligaciones(id_depto, id_proceso_wf, id_tipo_estado,id_estado_wf, id_estado_anterior, fecha_reg)AS(
-                   SELECT et.id_depto, et.id_proceso_wf, et.id_tipo_estado, et.id_estado_wf, et.id_estado_anterior, et.fecha_reg
-                   FROM wf.testado_wf et
-                   WHERE et.id_estado_wf=v_obligaciones.id_estado_wf
-                UNION ALL        
-                   SELECT et.id_depto, et.id_proceso_wf, et.id_tipo_estado, et.id_estado_wf, et.id_estado_anterior, et.fecha_reg
-                   FROM wf.testado_wf et, estados_obligaciones
-                   WHERE et.id_estado_wf=estados_obligaciones.id_estado_anterior         
-                )SELECT dep.nombre::text, tp.nombre||'-'||prv.desc_proveedor, te.nombre_estado, eo.fecha_reg, eo.id_tipo_estado, eo.id_estado_wf, COALESCE(eo.id_estado_anterior,NULL) as id_estado_anterior
-                 FROM estados_obligaciones eo
-                 INNER JOIN wf.ttipo_estado te on te.id_tipo_estado= eo.id_tipo_estado
-                 INNER JOIN wf.tproceso_wf pwf on pwf.id_proceso_wf=eo.id_proceso_wf
-                 INNER JOIN wf.ttipo_proceso tp on tp.id_tipo_proceso=pwf.id_tipo_proceso         
-                 INNER JOIN tes.tobligacion_pago op on op.id_proceso_wf=pwf.id_proceso_wf
-                 INNER JOIN param.vproveedor prv on prv.id_proveedor=op.id_proveedor
-                 INNER JOIN param.tdepto dep on dep.id_depto=eo.id_depto
-                 ORDER BY eo.id_estado_wf ASC
-                 );      
-        END LOOP;    
-    
-    	create temporary table respuesta(
-	        funcionario	text,
-            nombre text,
-            nombre_estado varchar,
-            fecha_reg date,
-            id_tipo_estado int4,
-            id_estado_wf int4,
-            id_estado_anterior int4
-        ) on commit drop; 
-        
-        INSERT INTO respuesta(
-        SELECT * FROM flujo_sol_proc
-        UNION ALL
-        SELECT * FROM flujo_cotizaciones
-        UNION ALL
-		SELECT * FROM flujo_obligaciones
-        );
-        
+		--recupera el flujo de control de las solicitudes y del proceso de compra
+		INSERT INTO flujo_proceso(
+        WITH RECURSIVE estados_solicitud_proceso(id_funcionario, id_proceso_wf, id_tipo_estado,id_estado_wf, id_estado_anterior, fecha_reg)AS(
+     		SELECT et.id_funcionario, et.id_proceso_wf, et.id_tipo_estado, et.id_estado_wf, et.id_estado_anterior, et.fecha_reg
+    		FROM wf.testado_wf et
+     		WHERE et.id_estado_wf  in (		
+            			select pc.id_estado_wf as ult_est_prc
+				        from adq.tsolicitud sol
+        				left join adq.tproceso_compra pc on pc.id_solicitud=sol.id_solicitud
+        				where pc.id_proceso_compra=v_parametros.id_proceso_compra)     
+     	UNION ALL        
+      		SELECT et.id_funcionario, et.id_proceso_wf, et.id_tipo_estado, et.id_estado_wf, et.id_estado_anterior, et.fecha_reg
+        	FROM wf.testado_wf et, estados_solicitud_proceso
+      		WHERE et.id_estado_wf=estados_solicitud_proceso.id_estado_anterior         
+     	)SELECT perf.nombre_completo1 as funcionario, tp.nombre,te.nombre_estado, es.fecha_reg,es.id_tipo_estado, es.id_estado_wf, COALESCE(es.id_estado_anterior,NULL) as id_estado_anterior
+         FROM estados_solicitud_proceso es
+         INNER JOIN wf.tproceso_wf pwf on pwf.id_proceso_wf=es.id_proceso_wf
+         INNER JOIN wf.ttipo_proceso tp on tp.id_tipo_proceso=pwf.id_tipo_proceso
+         INNER JOIN wf.ttipo_estado te on te.id_tipo_estado=es.id_tipo_estado
+         LEFT JOIN orga.tfuncionario fun on fun.id_funcionario=es.id_funcionario
+         LEFT JOIN segu.vpersona perf on perf.id_persona=fun.id_persona
+         order by id_estado_wf);       
+    	
         --Definicion de la respuesta         	
-        v_consulta:='select * from respuesta';
+        v_consulta:='select * from flujo_proceso';
 
         --Devuelve la respuesta
         return v_consulta;
 
 	end;
-    					
+					
 	else
 					     
 		raise exception 'Transaccion inexistente';

@@ -130,9 +130,9 @@ class ACTSolicitud extends ACTbase{
     }
 
     function diagramaGantt(){
-						$dataSource = new DataSource();
+						 $dataSource = new DataSource();
+						 $dataSourceSolicitud = new DataSource();
 			    $idSolicitud = $this->objParam->getParametro('id_solicitud');
-			    //$this->objParam->addParametroConsulta('id_plan_mant',$idPlanMant);
 			    $this->objParam->addParametroConsulta('ordenacion','id_solicitud');
 			    $this->objParam->addParametroConsulta('dir_ordenacion','ASC');
 			    $this->objParam->addParametroConsulta('cantidad',1000);
@@ -140,8 +140,58 @@ class ACTSolicitud extends ACTbase{
 			    $this->objFunc = $this->create('MODSolicitud');
 			    $resultSolicitud = $this->objFunc->estadosSolicitud();
 			    $datosSolicitud = $resultSolicitud->getDatos();
-							$dataSource->setDataset($datosSolicitud);
 							
+							$dataSourceSolicitud->setDataset($datosSolicitud);
+							
+							$this->objFunc = $this->create('MODProcesoCompra');
+			    $resultProcesoSolicitud = $this->objFunc->listarProcesoCompraSolicitud();
+			    $datosProcesoSolicitud = $resultProcesoSolicitud->getDatos();
+							
+							if(count($datosProcesoSolicitud)!=0){
+									for ($i=0 ; $i<count($datosProcesoSolicitud); $i++) {
+													$dataSourceProceso = new DataSource();
+												 $this->objParam->addParametro('id_proceso_compra', $datosProcesoSolicitud[$i]['id_proceso_compra']);		
+													$this->objFunc = $this->create('MODSolicitud');
+								     $resultProceso = $this->objFunc->estadosProceso();
+								     $datosProceso = $resultProceso->getDatos();
+													$dataSourceProceso->setDataSet($datosProceso);
+													
+													//$this->objParam->addParametro('id_proceso_compra', $datosProcesoSolicitud[$i]['id_proceso_compra']);
+													$this->objFunc = $this->create('MODCotizacion');											
+					    				$resultCotizacionProceso = $this->objFunc->listarCotizacionProcesoCompra();
+					    				$datosCotizacionProceso = $resultCotizacionProceso->getDatos();
+													
+													if(count($datosCotizacionProceso)!=0){
+															for ($j=0 ; $j<count($datosCotizacionProceso); $j++) {
+																		$dataSourceCotizacion = new DataSource();
+																		$this->objParam->addParametro('id_cotizacion', $datosCotizacionProceso[$j]['id_cotizacion']);
+																		$this->objFunc = $this->create('MODCotizacion');														
+													     $resultCotizacion = $this->objFunc->estadosCotizacion();
+													     $datosCotizacion = $resultCotizacion->getDatos();
+																		$dataSourceCotizacion->setDataSet($datosCotizacion);											
+																		
+																		$this->objFunc = $this->create('MODCotizacion');											
+										    				$resultObligacionPagoCotizacion = $this->objFunc->listarObligacionPagoCotizacion();
+										    				$datosObligacionPagoCotizacion = $resultObligacionPagoCotizacion->getDatos();
+																		
+																		if(count($datosObligacionPagoCotizacion)!=0){
+																					for ($k=0 ; $k<count($datosObligacionPagoCotizacion); $k++) {																		
+																							 $dataSourcePago = new DataSource();
+																						  $this->objParam->addParametro('id_obligacion_pago', $datosObligacionPagoCotizacion[$k]['id_obligacion_pago']);
+																							 $this->objFunc = $this->create('sis_tesoreria/MODObligacionPago');
+																			     $resultPago = $this->objFunc->estadosPago();
+																			     $datosPago = $resultPago->getDatos();
+																							 $dataSourcePago->setDataSet($datosPago);
+																							 $dataSourceCotizacion->putParameter('dataSourcePago',$dataSourcePago);
+																					}											 
+																		}
+																		$dataSourceProceso->putParameter("dataSourceCotizacion.$j",$dataSourceCotizacion);
+															}
+													}
+													$dataSourceSolicitud->putParameter("dataSourceProceso.$i",$dataSourceProceso);															
+									}
+							}
+							$dataSource->setDataset($dataSourceSolicitud);
 							$this->objFunc = $this->create('MODSolicitud');
 							$resultSolicitud = $this->objFunc->reporteSolicitud();
 							$datosSolicitud = $resultSolicitud->getDatos();
@@ -149,8 +199,8 @@ class ACTSolicitud extends ACTbase{
 							$dataSource->putParameter('num_tramite',$datosSolicitud[0]['num_tramite']);
 							$dataSource->putParameter('desc_uo',$datosSolicitud[0]['desc_uo']);
 							$dataSource->putParameter('desc_proceso_macro',$datosSolicitud[0]['desc_proceso_macro']);
-			  			          
-			    //build the diagram
+			  		
+			  		//build the diagram
 			    $nombreArchivo='diagramaGantt.png';
 			    $diagramador = new DiagramadorGantt();
 							$diagramador->setDataSource($dataSource);
