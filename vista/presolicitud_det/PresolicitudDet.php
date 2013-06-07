@@ -59,6 +59,7 @@ Phx.vista.PresolicitudDet=Ext.extend(Phx.gridInterfaz,{
             config:{
                     name:'id_centro_costo',
                     origen:'CENTROCOSTO',
+                    baseParams:{filtrar:'grupo_ep'},
                     fieldLabel: 'Centro de Costos',
                     url: '../../sis_parametros/control/CentroCosto/listarCentroCostoFiltradoXDepto',
                     emptyText : 'Centro Costo...',

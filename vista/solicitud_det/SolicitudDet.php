@@ -50,6 +50,7 @@ Phx.vista.SolicitudDet=Ext.extend(Phx.gridInterfaz,{
                     allowBlank:false,
                     gdisplayField:'desc_centro_costo',//mapea al store del grid
                     gwidth:200,
+                    baseParams:{filtrar:'grupo_ep'},
                     renderer:function (value, p, record){return String.format('{0}', record.data['desc_centro_costo']);}
                 },
             type:'ComboRec',

@@ -60,7 +60,7 @@ BEGIN
              
                END IF;
            
-               v_filtro = v_filtro ||' and (estado = ''pendiente'' or estado =''aprobado'')';
+               v_filtro = v_filtro ||' and (pres.estado = ''pendiente'' or pres.estado =''aprobado'')';
            
            ELSEIF  v_parametros.tipo_interfaz = 'PresolicitudCon'   THEN
            
@@ -77,7 +77,7 @@ BEGIN
              
                END IF;
            
-               v_filtro = v_filtro ||' and (estado = ''aprobado'' or estado =''asignado'')';
+               v_filtro = v_filtro ||' and (pres.estado = ''aprobado'' or pres.estado =''asignado'')';
            
            
            ELSE
@@ -88,7 +88,7 @@ BEGIN
              
              ELSE
              
-                  v_filtro = ' id_usuario_reg = ' ||p_id_usuario::varchar;
+                  v_filtro = ' pres.id_usuario_reg = ' ||p_id_usuario::varchar;
              
              END IF;
         
@@ -166,7 +166,7 @@ BEGIN
              
                END IF;
            
-               v_filtro = v_filtro ||' and (estado = ''pendiente'' or estado =''aprobado'')';
+               v_filtro = v_filtro ||' and (pres.estado = ''pendiente'' or pres.estado =''aprobado'')';
            
            ELSEIF  v_parametros.tipo_interfaz = 'PresolicitudCon'   THEN
            
@@ -183,7 +183,7 @@ BEGIN
              
                END IF;
            
-               v_filtro = v_filtro ||' and (estado = ''aprobado'' or estado =''asignado'')';
+               v_filtro = v_filtro ||' and (pres.estado = ''aprobado'' or pres.estado =''asignado'')';
            
            
            ELSE
@@ -194,7 +194,7 @@ BEGIN
              
              ELSE
              
-                  v_filtro = ' id_usuario_reg = ' ||p_id_usuario::varchar;
+                  v_filtro = ' pres.id_usuario_reg = ' ||p_id_usuario::varchar;
              
              END IF;
         

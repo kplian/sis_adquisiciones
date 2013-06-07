@@ -159,7 +159,7 @@ Phx.vista.Presolicitud=Ext.extend(Phx.gridInterfaz,{
             config:{
                 name:'id_funcionario',
                  hiddenName: 'id_funcionario',
-                origen:'FUNCIONARIO',
+                origen:'FUNCIONARIOCAR',
                 fieldLabel:'Funcionario',
                 allowBlank:false,
                 gwidth:200,

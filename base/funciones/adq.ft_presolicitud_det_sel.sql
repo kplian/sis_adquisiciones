@@ -47,14 +47,7 @@ BEGIN
      				
     	begin
         
-           IF p_administrador = 1 THEN
-            	v_filtro = '0=0';
-           ELSE
-           		v_filtro = ' id_usuario_reg = ' ||p_id_usuario::varchar;
-           END IF;
        
-        
-        
     		--Sentencia de la consulta
 			v_consulta:='select pred.id_presolicitud_det,
                                  pred.descripcion,
@@ -78,7 +71,7 @@ BEGIN
                                inner join param.tconcepto_ingas cig on cig.id_concepto_ingas = pred.id_concepto_ingas
                                inner join param.vcentro_costo cc on cc.id_centro_costo = pred.id_centro_costo
                                left join segu.tusuario usu2 on usu2.id_usuario = pred.id_usuario_mod
-				        where  '||v_filtro||' and ';
+				        where   ';
 			
 			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;
@@ -100,11 +93,7 @@ BEGIN
 
 		begin
         
-           IF p_administrador = 1 THEN
-            	v_filtro = '0=0';
-           ELSE
-           		v_filtro = ' id_usuario_reg = ' ||p_id_usuario::varchar;
-           END IF;
+          
         
         
 			--Sentencia de la consulta de conteo de registros
@@ -114,7 +103,7 @@ BEGIN
                                inner join param.tconcepto_ingas cig on cig.id_concepto_ingas = pred.id_concepto_ingas
                                inner join param.vcentro_costo cc on cc.id_centro_costo = pred.id_centro_costo
                                left join segu.tusuario usu2 on usu2.id_usuario = pred.id_usuario_mod
-				         where  '||v_filtro||' and ';
+				         where  ';
 			
 			--Definicion de la respuesta		    
 			v_consulta:=v_consulta||v_parametros.filtro;

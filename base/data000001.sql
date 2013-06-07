@@ -89,6 +89,7 @@ select wf.f_insert_ttipo_proceso ('Inicio de Proceso de COmpra', 'Cotizacion', '
 select wf.f_insert_ttipo_proceso ('Habilitado para pagar', 'ADQ Obligacion de Pago', 'OBLI', 'tes.tobligacion_pago', 'id_obligacion_pago', 'activo', 'si', 'COMINT');
 
 select wf.f_insert_ttipo_proceso ('En Pago', 'ADQ. Plan de Pago Devengado', 'APLAD', 'tes.tplan_pago', 'id_plan_pago', 'activo', 'no', 'COMINT');
+
 select wf.f_insert_ttipo_estado ('borrador', 'Borrador', 'si', 'no', 'no', 'ninguno', '', 'ninguno', '', '', 'activo', 'SOLCO', '');
 select wf.f_insert_ttipo_estado ('proceso', 'En_Proceso', 'no', 'si', 'no', 'todos', '', 'ninguno', '', '', 'activo', 'SOLCO', 'PROC');
 select wf.f_insert_ttipo_estado ('finalizado', 'Finalizado', 'no', 'no', 'si', 'anterior', '', 'anterior', '', '', 'activo', 'SOLCO', '');
@@ -115,12 +116,17 @@ select wf.f_insert_ttipo_estado ('anulado', 'Anulado', 'no', 'no', 'si', 'anteri
 select wf.f_insert_ttipo_estado ('borrador', 'Borrador', 'si', 'no', 'no', 'anterior', '', 'anterior', '', '', 'activo', 'OBLI', '');
 select wf.f_insert_ttipo_estado ('finalizado', 'Finalizado', 'no', 'no', 'si', 'anterior', '', 'anterior', '', '', 'activo', 'OBLI', '');
 select wf.f_insert_ttipo_estado ('anulado', 'Anulado', 'no', 'no', 'si', 'anterior', '', 'anterior', '', '', 'activo', 'OBLI', '');
+
 select wf.f_insert_ttipo_estado ('borrador', 'Borrador', 'si', 'no', 'no', 'anterior', '', 'anterior', '', '', 'activo', 'APLAD', '');
 select wf.f_insert_ttipo_estado ('pendiente', 'Pendiente', 'no', 'no', 'no', 'anterior', '', 'anterior', '', '', 'activo', 'APLAD', '');
-select wf.f_insert_ttipo_estado ('devengado', 'Devengado', 'no', 'si', 'no', 'anterior', '', 'anterior', '', '', 'activo', 'APLAD', '');
-select wf.f_insert_ttipo_estado ('finalizado', 'Finalizado', 'no', 'no', 'si', 'anterior', '', 'anterior', '', '', 'activo', 'APLAD', '');
+
+select wf.f_insert_ttipo_estado ('devengado', 'Devengado', 'no', 'si', 'si', 'anterior', '', 'anterior', '', '', 'activo', 'APLAD', 'APLAP');
+
+
 select wf.f_insert_ttipo_estado ('anulado', 'Anlado', 'no', 'no', 'si', 'anterior', '', 'anterior', '', '', 'activo', 'APLAD', '');
+
 select wf.f_insert_ttipo_estado ('recomendado', 'Recomendado', 'no', 'no', 'no', 'anterior', '', 'anterior', '', '', 'activo', 'COT', '');
+
 select wf.f_insert_testructura_estado ('proceso', 'SOLCO', 'finalizado', 'SOLCO', '2', 'ff2', 'activo');
 select wf.f_insert_testructura_estado ('pendiente', 'SOLCO', 'vbactif', 'SOLCO', '3', '', 'activo');
 select wf.f_insert_testructura_estado ('borrador', 'SOLCO', 'pendiente', 'SOLCO', '0', '', 'activo');
@@ -137,7 +143,6 @@ select wf.f_insert_testructura_estado ('borrador', 'OBLI', 'registrado', 'OBLI',
 select wf.f_insert_testructura_estado ('en_pago', 'OBLI', 'finalizado', 'OBLI', '1', '', 'activo');
 select wf.f_insert_testructura_estado ('borrador', 'APLAD', 'pendiente', 'APLAD', '1', '', 'activo');
 select wf.f_insert_testructura_estado ('pendiente', 'APLAD', 'devengado', 'APLAD', '1', '', 'activo');
-select wf.f_insert_testructura_estado ('devengado', 'APLAD', 'finalizado', 'APLAD', '1', '', 'activo');
 select wf.f_insert_testructura_estado ('cotizado', 'COT', 'recomendado', 'COT', '1', '', 'activo');
 select wf.f_insert_testructura_estado ('recomendado', 'COT', 'adjudicado', 'COT', '1', '', 'activo');
 -------------------------------------
@@ -306,6 +311,24 @@ select pxp.f_insert_testructura_gui ('VBPRE', 'ADQ');
 select pxp.f_insert_testructura_gui ('COPRE', 'ADQ');
 
 /***********************************F-DAT-RAC-ADQ-00-29/05/2013*****************************************/
+
+
+
+/***********************************I-DAT-RAC-ADQ-00-05/06/2013*****************************************/
+
+
+
+select wf.f_insert_ttipo_proceso ('Devengado', 'ADQ Plan de Pago, Pagado ', 'APLAP', '', '', 'activo', 'no', 'COMINT');
+select wf.f_insert_ttipo_estado ('borrador', 'Borrador', 'si', 'no', 'no', 'anterior', '', 'anterior', '', '', 'activo', 'APLAP', '');
+select wf.f_insert_ttipo_estado ('pendiente', 'Pendiente', 'no', 'no', 'no', 'anterior', '', 'anterior', '', '', 'activo', 'APLAP', '');
+select wf.f_insert_ttipo_estado ('pagado', 'Pagado', 'no', 'no', 'si', 'anterior', '', 'anterior', '', '', 'activo', 'APLAP', '');
+select wf.f_insert_ttipo_estado ('anulado', 'Anulado', 'no', 'no', 'si', 'anterior', '', 'anterior', '', '', 'activo', 'APLAP', '');
+select wf.f_insert_testructura_estado ('borrador', 'APLAP', 'pendiente', 'APLAP', '1', '', 'activo');
+select wf.f_insert_testructura_estado ('pendiente', 'APLAP', 'pagado', 'APLAP', '1', '', 'activo');
+
+
+
+/***********************************F-DAT-RAC-ADQ-00-05/06/2013*****************************************/
 
 
 
