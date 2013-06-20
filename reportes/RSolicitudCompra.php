@@ -209,12 +209,12 @@ Class RSolicitudCompra extends Report {
         				$pdf->Ln();
 												$pdf->setFont('','B');
         				$pdf->Cell($width2+$width1, $height, 'Concepto Gasto', $blackAll, 0, 'L', false, '', 1, false, 'T', 'C');
-												$pdf->Cell($width2+25, $height, 'Descripcion', $blackAll, 0, 'L', false, '', 1, false, 'T', 'C');
+												$pdf->Cell($width2+25+$width3*2, $height, 'Descripcion', $blackAll, 0, 'L', false, '', 1, false, 'T', 'C');
 												$pdf->Cell($width1, $height, 'Cantidad', $blackAll, 0, 'L', false, '', 1, false, 'T', 'C');
 												$pdf->Cell($width3, $height, 'Precio Unitario', $blackAll, 0, 'R', false, '', 1, false, 'T', 'C');
 												$pdf->Cell($width3, $height, 'Precio Total', $blackAll, 0, 'R', false, '', 1, false, 'T', 'C');
-												$pdf->Cell($width3, $height, 'Precio Ges. Act.', $blackAll, 0, 'R', false, '', 1, false, 'T', 'C');
-												$pdf->Cell($width3, $height, 'Precio Ges. Sig.', $blackAll, 0, 'R', false, '', 1, false, 'T', 'C');
+												//$pdf->Cell($width3, $height, 'Precio Ges. Act.', $blackAll, 0, 'R', false, '', 1, false, 'T', 'C');
+												//$pdf->Cell($width3, $height, 'Precio Ges. Sig.', $blackAll, 0, 'R', false, '', 1, false, 'T', 'C');
 												$pdf->Ln();
 												$totalRef=0;
 												$totalGa=0;
@@ -224,12 +224,12 @@ Class RSolicitudCompra extends Report {
 												foreach ($row['groupeddata'] as $solicitudDetalle) {
 													  $pdf->setFont('','');
 															$pdf->Cell($width2+$width1, $height, $solicitudDetalle['desc_concepto_ingas'], $blackSide, 0, 'L', false, '', 1, false, 'T', 'C');
-															$pdf->Cell($width2+25, $height, $solicitudDetalle['descripcion'], $blackSide, 0, 'L', false, '', 1, false, 'T', 'C');
+															$pdf->Cell($width2+25+$width3*2, $height, $solicitudDetalle['descripcion'], $blackSide, 0, 'L', false, '', 1, false, 'T', 'C');
 															$pdf->Cell($width1, $height, $solicitudDetalle['cantidad'], $blackSide, 0, 'R', false, '', 1, false, 'T', 'C');
 															$pdf->Cell($width3, $height, number_format($solicitudDetalle['precio_unitario'],2), $blackSide, 0, 'R', false, '', 1, false, 'T', 'C');
 															$pdf->Cell($width3, $height, number_format($solicitudDetalle['precio_total'],2), $blackSide, 0, 'R', false, '', 1, false, 'T', 'C');
-															$pdf->Cell($width3, $height, number_format($solicitudDetalle['precio_ga'],2), $blackSide, 0, 'R', false, '', 1, false, 'T', 'C');
-															$pdf->Cell($width3, $height, number_format($solicitudDetalle['precio_sg'],2), $blackSide, 0, 'R', false, '', 1, false, 'T', 'C');
+															//$pdf->Cell($width3, $height, number_format($solicitudDetalle['precio_ga'],2), $blackSide, 0, 'R', false, '', 1, false, 'T', 'C');
+															//$pdf->Cell($width3, $height, number_format($solicitudDetalle['precio_sg'],2), $blackSide, 0, 'R', false, '', 1, false, 'T', 'C');
 															$totalRef=$totalRef+$solicitudDetalle['precio_total'];
 															$totalGa=$totalGa+$solicitudDetalle['precio_ga'];
 															$totalSg=$totalSg+$solicitudDetalle['precio_sg'];
@@ -242,10 +242,10 @@ Class RSolicitudCompra extends Report {
 												$pdf->setXY($xEnd,$yEnd);
 												$pdf->Cell(185, $height, '', $blackTop, 1, 'L', false, '', 0, false, 'T', 'C');
 												$pdf->setXY($xEnd,$yEnd);
-												$pdf->Cell($width1*2+$width2*2+$width3+25,$height,'','0', 0, 'R', false, '', 1, false, 'T', 'C');
+												$pdf->Cell($width1*2+$width2*2+$width3*3+25,$height,'','0', 0, 'R', false, '', 1, false, 'T', 'C');
 												$pdf->Cell($width3,$height,number_format($totalRef,2),$blackAll, 0, 'R', false, '', 1, false, 'T', 'C');
-												$pdf->Cell($width3,$height,number_format($totalGa,2),$blackAll, 0, 'R', false, '', 1, false, 'T', 'C');
-												$pdf->Cell($width3,$height,number_format($totalSg,2),$blackAll, 0, 'R', false, '', 1, false, 'T', 'C');
+												//$pdf->Cell($width3,$height,number_format($totalGa,2),$blackAll, 0, 'R', false, '', 1, false, 'T', 'C');
+												//$pdf->Cell($width3,$height,number_format($totalSg,2),$blackAll, 0, 'R', false, '', 1, false, 'T', 'C');
 												$pdf->Ln($height*2);
         }												
     }      
