@@ -746,9 +746,17 @@ BEGIN
              
              
              -- TO DO comprometer presupuesto cuando el estado anterior es el pendiente)
-            
-            IF v_codigo_estado =  'pendiente' THEN 
-              -- Comprometer Presupuesto
+             IF v_codigo_estado =  'pendiente' THEN 
+              
+               -- Comprometer Presupuesto
+              
+              
+                 IF not adq.f_gestionar_presupuesto_solicitud(v_parametros.id_solicitud, p_id_usuario, 'comprometer')  THEN
+                 
+                   raise exception 'Error al comprometer el presupeusto';
+                 
+                 END IF;
+              
               
               --modifca bandera de comprometido  
            

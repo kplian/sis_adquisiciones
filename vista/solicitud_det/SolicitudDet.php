@@ -191,9 +191,10 @@ Phx.vista.SolicitudDet=Ext.extend(Phx.gridInterfaz,{
         {
             config:{
                 name: 'precio_sg',
-                fieldLabel: 'Monto Sig. Ges.',
+               // fieldLabel: 'Monto Sig. Ges.',
                 currencyChar:' ',
                 allowBlank: true,
+                inputType:'hidden',
                 
                  width: 100,
                 gwidth: 120,
