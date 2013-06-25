@@ -864,6 +864,12 @@ BEGIN
                          
                            --  llamar a funciond erevertir presupuesto
                            
+                             IF not adq.f_gestionar_presupuesto_solicitud(v_parametros.id_solicitud, p_id_usuario, 'revertir')  THEN
+                 
+                     					 raise exception 'Error al revertir  el presupeusto';
+                 
+                          	 END IF;
+                           
                            
                            --  modifica bandera de presupuesto comprometido
                             
@@ -962,10 +968,16 @@ BEGIN
            
               IF v_presu_comprometido ='si'  THEN
               
-                --TO DO llamada a funcion de reversion de presupuesto
+                  -- llamada a funcion de reversion de presupuesto
                    
-                   
-                 --modifca bandera de comprometido  
+                   IF not adq.f_gestionar_presupuesto_solicitud(v_parametros.id_solicitud, p_id_usuario, 'revertir')  THEN
+                 
+                      raise exception 'Error al revertir  el presupeusto';
+                 
+                   END IF;
+                
+              
+                  --modifca bandera de comprometido  
                    update adq.tsolicitud  s set 
                      presu_comprometido =  'no'
                    where id_solicitud = v_parametros.id_solicitud;
