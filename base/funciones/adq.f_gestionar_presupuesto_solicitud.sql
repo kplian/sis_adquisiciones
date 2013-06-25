@@ -41,12 +41,11 @@ DECLARE
   
   va_fecha                date[];
   
+  v_monto_a_revertir numeric;
+  v_total_adjudicado  numeric;
+  v_aux numeric;
   
-  
-                                      
-  
-  
-  
+
   
 BEGIN
  
@@ -126,7 +125,8 @@ BEGIN
                 update adq.tsolicitud_det  s set
                    id_partida_ejecucion = va_resp_ges[v_cont],
                    fecha_mod = now(),
-                   id_usuario_mod = p_id_usuario
+                   id_usuario_mod = p_id_usuario,
+                   revertido_mb = 0     -- inicializa el monto de reversion 
                 where s.id_solicitud_det =  va_id_solicitud_det[v_cont];
              
              
@@ -144,7 +144,8 @@ BEGIN
            
            
        
-            FOR v_registros in ( SELECT
+            FOR v_registros in ( 
+                            SELECT
                               sd.id_solicitud_det,
                               sd.id_centro_costo,
                               s.id_gestion,
@@ -152,7 +153,8 @@ BEGIN
                               sd.id_partida,
                               sd.precio_ga_mb,
                               p.id_presupuesto,
-                              sd.id_partida_ejecucion
+                              sd.id_partida_ejecucion,
+                              sd.revertido_mb
                               
                               FROM  adq.tsolicitud s 
                               INNER JOIN adq.tsolicitud_det sd on s.id_solicitud = sd.id_solicitud
@@ -175,7 +177,7 @@ BEGIN
                     va_id_presupuesto[v_i] = v_registros.id_presupuesto;
                     va_id_partida[v_i]= v_registros.id_partida;
                     va_momento[v_i]	= 2; --el momento 2 con signo positivo es revertir
-                    va_monto[v_i]  = (v_registros.precio_ga_mb)*-1;
+                    va_monto[v_i]  = (v_registros.precio_ga_mb - v_registros.revertido_mb )*-1;  -- considera la posibilidad de que a este item se le aya revertido algun monto
                     va_id_moneda[v_i]  = v_id_moneda_base;
                     va_id_partida_ejecucion[v_i]= v_registros.id_partida_ejecucion;
                     va_columna_relacion[v_i]= 'id_solicitud_compra';
@@ -200,8 +202,109 @@ BEGIN
        ELSEIF p_operacion = 'revertir_sobrante' THEN
        
        -- revierte el sobrante no adjudicado en el proceso
+               
+           --1)  lista todos los detalle de las solcitudes
+             
+             
            
-           raise exception 'TO DO';
+             v_i = 0;
+            FOR v_registros in ( 
+                          SELECT
+                                      sd.id_solicitud_det,
+                                      sd.id_centro_costo,
+                                      s.id_gestion,
+                                      s.id_solicitud,
+                                      sd.id_partida,
+                                      p.id_presupuesto,
+                                      sd.id_partida_ejecucion,
+                                      sd.revertido_mb,
+                                      sd.precio_ga_mb,
+                                      sd.precio_sg_mb
+                                      
+                                      FROM  adq.tsolicitud s 
+                                      INNER JOIN adq.tsolicitud_det sd on s.id_solicitud = sd.id_solicitud
+                                      inner join pre.tpresupuesto   p  on p.id_centro_costo = sd.id_centro_costo
+                                      WHERE  sd.id_solicitud = p_id_solicitud_compra
+                                             and sd.estado_reg = 'activo' 
+                                             and sd.cantidad > 0 
+                                             ) LOOP
+                                             
+                             IF(v_registros.id_partida_ejecucion is NULL) THEN
+                             
+                                raise exception 'El presupuesto del detalle con el identificador (%)  no se encuntra comprometido',v_registros.id_solicitud_det;
+                             
+                             END IF;
+                             
+                             --calculamos el total adudicado
+                             v_total_adjudicado = 0;
+                             --  suma la adjdicaciones en diferentes solicitudes  (puede no tener ningna adjudicacion)
+            
+                                    
+                             select  sum (cd.cantidad_adju* cd.precio_unitario_mb) into v_total_adjudicado
+                             from adq.tcotizacion_det cd
+                             where cd.id_solicitud_det = v_registros.id_solicitud_det
+                                   and cd.estado_reg = 'activo';
+                             
+                             
+                             
+                             
+                             v_aux =  (v_registros.precio_ga_mb +  COALESCE(v_registros.precio_gs_mb,0)) -  COALESCE(v_registros.revertido_mb,0) - COALESCE(v_total_adjudicado,0);
+                             
+                             
+                             IF v_registros.precio_ga_mb < COALESCE(v_aux,0) THEN
+                               
+                                v_monto_a_revertir = v_registros.precio_ga_mb;
+                             
+                             ELSE 
+                             
+                                v_monto_a_revertir = COALESCE(v_aux,0);
+                             
+                             END IF;
+                             
+                             
+                            
+                             
+                             --solo se revierte si el monto es mayor a cero
+                             IF v_monto_a_revertir > 0 THEN 
+                             
+                                 v_i = v_i +1;                
+                               
+                                -- armamos los array para enviar a presupuestos          
+                       
+                                va_id_presupuesto[v_i] = v_registros.id_presupuesto;
+                                va_id_partida[v_i]= v_registros.id_partida;
+                                va_momento[v_i]	= 2; --el momento 2 con signo positivo es revertir
+                                va_monto[v_i]  = (v_monto_a_revertir)*-1;
+                                va_id_moneda[v_i]  = v_id_moneda_base;
+                                va_id_partida_ejecucion[v_i]= v_registros.id_partida_ejecucion;
+                                va_columna_relacion[v_i]= 'id_solicitud_compra';
+                                va_fk_llave[v_i] = v_registros.id_solicitud;
+                                va_id_solicitud_det[v_i]= v_registros.id_solicitud_det;
+                                va_fecha[v_i]=now()::date;
+                                
+                                 -- actualizamos  el total revertido
+                                
+                                 UPDATE adq.tsolicitud_det sd set
+                                   revertido_mb = revertido_mb + v_monto_a_revertir
+                                 WHERE  sd.id_solicitud_det = v_registros.id_solicitud_det;
+                     
+                             END IF; 
+                             
+                             
+                     END LOOP;
+                     
+                                         
+                     
+                     --llamada a la funcion de para reversion
+                      va_resp_ges =  pre.f_gestionar_presupuesto(va_id_presupuesto, 
+                                                                 va_id_partida, 
+                                                                 va_id_moneda, 
+                                                                 va_monto, 
+                                                                 va_fecha, --p_fecha
+                                                                 va_momento, 
+                                                                 va_id_partida_ejecucion,--  p_id_partida_ejecucion 
+                                                                 va_columna_relacion, 
+                                                                 va_fk_llave);
        
        
        ELSE

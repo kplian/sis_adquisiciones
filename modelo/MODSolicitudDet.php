@@ -56,6 +56,8 @@ class MODSolicitudDet extends MODbase{
         $this->captura('desc_concepto_ingas','varchar');
         
         $this->captura('desc_orden_trabajo','varchar');
+         
+        $this->captura('revertido_mb','numeric');
 		
 		//Ejecuta la instruccion
 		$this->armarConsulta();

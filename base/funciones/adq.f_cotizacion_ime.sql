@@ -522,7 +522,8 @@ BEGIN
                                    cd.cantidad_coti,
                                    cd.cantidad_adju,
                                    sd.precio_unitario_mb as precio_unitario_mb_sol,
-                                   cd.precio_unitario_mb as precio_unitario_mb_coti
+                                   cd.precio_unitario_mb as precio_unitario_mb_coti,
+                                   sd.revertido_mb
                                  from adq.tcotizacion_det cd 
                                  inner join adq.tsolicitud_det sd on sd.id_solicitud_det = cd.id_solicitud_det
                                  where  cd.id_cotizacion = v_parametros.id_cotizacion ) LOOP
@@ -547,10 +548,15 @@ BEGIN
                          
                           END IF;
                           
-                         update adq.tcotizacion_det set
-                         cantidad_adju = v_cantidad_adjudicada
-                         where id_cotizacion_det = v_registros.id_cotizacion_det;
-                     
+                           --validamos que el total revertido no afecte la adjudicacion            
+                           --en caso contrario no se adjudicada nada
+                          IF  ((v_registros.cantidad*v_registros.precio_unitario_mb_sol)- v_registros.revertido_mb)  >= (v_cantidad_adjudicada * v_registros.precio_unitario_mb_coti)   THEN
+                               
+                               update adq.tcotizacion_det set
+                               cantidad_adju = v_cantidad_adjudicada
+                               where id_cotizacion_det = v_registros.id_cotizacion_det;
+                         
+                          END IF;
                      
                      END IF;     
                 
@@ -1189,6 +1195,11 @@ BEGIN
               
             )LOOP
             
+            
+              --TO DO,  para el pago de dos gestion  gestion hay que  
+              --        mandar solamente el total comprometido  de la gestion actual menos el revrtido
+              --         o el monto total adjudicado, el que sea menor.  
+            
                -- inserta detalle obligacion
                 IF((v_registros.cantidad_adju *v_registros.precio_unitario) > 0)THEN
                    
@@ -1219,7 +1230,7 @@ BEGIN
                         v_registros.id_cuenta,
                         v_registros.id_auxiliar,
                         v_registros.id_partida_ejecucion,
-                        (v_registros.cantidad_adju *v_registros.precio_unitario),
+                        (v_registros.cantidad_adju *v_registros.precio_unitario), 
                         (v_registros.cantidad_adju *v_registros.precio_unitario_mb),
                         v_registros.descripcion
                       )RETURNING id_obligacion_det into v_id_obligacion_det;

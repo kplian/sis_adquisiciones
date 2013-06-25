@@ -50,6 +50,7 @@ DECLARE
      v_cantidad_coti integer;
      
      v_cantidad_adju integer;
+     v_revertido_mb numeric;
      
      
      
@@ -273,7 +274,7 @@ BEGIN
 	elsif(p_transaccion='ADQ_TOTALADJ_IME')then
 
 		begin
-			--Sentencia de la eliminacion
+			
 			
            v_total_adj = adq.f_calcular_total_adj_cot_det(v_parametros.id_cotizacion_det);
             
@@ -299,7 +300,7 @@ BEGIN
 
 		begin
         
-            --recupera datos de la colitud y la cotizacion
+            --recupera datos de la solicitud y la cotizacion
         
             
             select
@@ -308,7 +309,8 @@ BEGIN
                cd.cantidad_coti,
                cd.cantidad_adju,
                sd.precio_unitario_mb,
-               cd.precio_unitario_mb
+               cd.precio_unitario_mb,
+               sd.revertido_mb
             into 
                v_id_solicitud_det,
                v_cantidad_sol,
@@ -316,6 +318,7 @@ BEGIN
                v_cantidad_adju,
                v_precio_unitario_mb_sol,
                v_precio_unitario_mb_coti
+               v_revertido_mb
             from adq.tsolicitud_det sd
             inner join adq.tcotizacion_det cd on  cd.id_solicitud_det = sd.id_solicitud_det
             where cd.id_cotizacion_det = v_parametros.id_cotizacion_det;
@@ -350,9 +353,19 @@ BEGIN
                  IF  v_cantidad_coti >= v_parametros.cantidad_adjudicada THEN
             
             
-                   update adq.tcotizacion_det set
-                   cantidad_adju = v_parametros.cantidad_adjudicada
-                   where id_cotizacion_det = v_parametros.id_cotizacion_det;
+                     --validamos que el total revertido no afecte la adjudicacion            
+            
+                    IF  ((v_cantidad_sol*v_precio_unitario_mb_sol)- v_revertido_mb)  >= (v_parametros.cantidad_adjudicada * v_precio_unitario_mb_coti)   THEN
+                       
+                       update adq.tcotizacion_det set
+                       cantidad_adju = v_parametros.cantidad_adjudicada
+                       where id_cotizacion_det = v_parametros.id_cotizacion_det;
+                    
+                    ELSE
+                      
+                       raise exception 'La reversion que se realizo sobre este item no permite adjudicar a este precio';
+                    
+                    END IF;
                  
                  ELSE
                   raise exception 'la cantidad adjudicada tiene que ser menor o igual cotizada';
@@ -364,6 +377,7 @@ BEGIN
               raise exception 'la cantidad adjudicada tiene que ser menor o igual que la solicitada y que el total adjudicado';
             
             END IF;
+           
             
             
             

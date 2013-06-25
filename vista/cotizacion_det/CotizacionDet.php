@@ -357,6 +357,20 @@ Phx.vista.CotizacionDet=Ext.extend(Phx.gridInterfaz,{
 			grid:true,
 			form:false
 		},
+        {
+            config:{
+                name: 'revertido_mb',
+                fieldLabel: 'Revertido MB',
+                anchor: '80%',
+                gwidth: 100,
+                maxLength:10
+            },
+            type:'Field',
+            filters:{pfiltro:'sold.revertido_mb',type:'numeric'},
+            id_grupo:1,
+            grid:true,
+            form:false
+        },
 		{
 			config:{
 				name: 'obs',
@@ -491,7 +505,7 @@ Phx.vista.CotizacionDet=Ext.extend(Phx.gridInterfaz,{
 		{name:'usr_mod', type: 'string'},
 		'desc_centro_costo',
         'cantidad_sol',
-        'precio_unitario_sol',
+        'precio_unitario_sol','revertido_mb',
         'descripcion_sol','precio_unitario_mb_sol','precio_unitario_mb'],
 	sortInfo:{
 		field: 'id_cotizacion_det',

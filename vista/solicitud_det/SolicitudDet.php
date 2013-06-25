@@ -337,7 +337,23 @@ Phx.vista.SolicitudDet=Ext.extend(Phx.gridInterfaz,{
             grid:true,
             form:false
         },
-		
+        {
+            config:{
+                name: 'revertido_mb',
+                fieldLabel: 'Revertido MB',
+                anchor: '80%',
+                gwidth: 100,
+                maxLength:10
+            },
+            type:'Field',
+            filters:{pfiltro:'sold.revertido_mb',type:'numeric'},
+            id_grupo:1,
+            grid:true,
+            form:false
+        },
+		 
+		 
+		 
 		{
 			config:{
 				name: 'estado_reg',
@@ -453,7 +469,8 @@ Phx.vista.SolicitudDet=Ext.extend(Phx.gridInterfaz,{
 		'codigo_auxiliar',
 		'nombre_auxiliar',
 		'desc_concepto_ingas',
-         'desc_orden_trabajo'
+        'desc_orden_trabajo',
+        'revertido_mb'
 		
 	],
 	sortInfo:{
