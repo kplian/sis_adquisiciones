@@ -103,35 +103,37 @@ BEGIN
              
              END LOOP;
              
-             --llamada a la funcion de compromiso
-              va_resp_ges =  pre.f_gestionar_presupuesto(va_id_presupuesto, 
-                                                         va_id_partida, 
-                                                         va_id_moneda, 
-                                                         va_monto, 
-                                                         va_fecha, --p_fecha
-                                                         va_momento, 
-                                                         NULL,--  p_id_partida_ejecucion 
-                                                         va_columna_relacion, 
-                                                         va_fk_llave);
-             
-             
-             
-             --actualizacion de los id_partida_ejecucion en el detalle de solicitud
-           
-             
-             FOR v_cont IN 1..v_i LOOP
-             
+              IF v_i > 0 THEN 
+              
+                    --llamada a la funcion de compromiso
+                    va_resp_ges =  pre.f_gestionar_presupuesto(va_id_presupuesto, 
+                                                               va_id_partida, 
+                                                               va_id_moneda, 
+                                                               va_monto, 
+                                                               va_fecha, --p_fecha
+                                                               va_momento, 
+                                                               NULL,--  p_id_partida_ejecucion 
+                                                               va_columna_relacion, 
+                                                               va_fk_llave);
+                 
                 
-                update adq.tsolicitud_det  s set
-                   id_partida_ejecucion = va_resp_ges[v_cont],
-                   fecha_mod = now(),
-                   id_usuario_mod = p_id_usuario,
-                   revertido_mb = 0     -- inicializa el monto de reversion 
-                where s.id_solicitud_det =  va_id_solicitud_det[v_cont];
-             
-             
-             END LOOP;
-            
+                 
+                 --actualizacion de los id_partida_ejecucion en el detalle de solicitud
+               
+                 
+                   FOR v_cont IN 1..v_i LOOP
+                   
+                      
+                      update adq.tsolicitud_det  s set
+                         id_partida_ejecucion = va_resp_ges[v_cont],
+                         fecha_mod = now(),
+                         id_usuario_mod = p_id_usuario,
+                         revertido_mb = 0     -- inicializa el monto de reversion 
+                      where s.id_solicitud_det =  va_id_solicitud_det[v_cont];
+                   
+                     
+                   END LOOP;
+             END IF;
       
       
       
@@ -141,10 +143,7 @@ BEGIN
        
            v_i = 0;
            
-           
-           
-       
-            FOR v_registros in ( 
+           FOR v_registros in ( 
                             SELECT
                               sd.id_solicitud_det,
                               sd.id_centro_costo,
@@ -168,36 +167,37 @@ BEGIN
                         raise exception 'El presupuesto del detalle con el identificador (%)  no se encuntra comprometido',v_registros.id_solicitud_det;
                      
                      END IF;
+                      --armamos los array para enviar a presupuestos          
+                    IF (v_registros.precio_ga_mb - v_registros.revertido_mb ) != 0 THEN
                      
-                     
-                     v_i = v_i +1;                
-                   
-                   --armamos los array para enviar a presupuestos          
-           
-                    va_id_presupuesto[v_i] = v_registros.id_presupuesto;
-                    va_id_partida[v_i]= v_registros.id_partida;
-                    va_momento[v_i]	= 2; --el momento 2 con signo positivo es revertir
-                    va_monto[v_i]  = (v_registros.precio_ga_mb - v_registros.revertido_mb )*-1;  -- considera la posibilidad de que a este item se le aya revertido algun monto
-                    va_id_moneda[v_i]  = v_id_moneda_base;
-                    va_id_partida_ejecucion[v_i]= v_registros.id_partida_ejecucion;
-                    va_columna_relacion[v_i]= 'id_solicitud_compra';
-                    va_fk_llave[v_i] = v_registros.id_solicitud;
-                    va_id_solicitud_det[v_i]= v_registros.id_solicitud_det;
-                    va_fecha[v_i]=now()::date;
-             
+                       	v_i = v_i +1;                
+                       
+                        va_id_presupuesto[v_i] = v_registros.id_presupuesto;
+                        va_id_partida[v_i]= v_registros.id_partida;
+                        va_momento[v_i]	= 2; --el momento 2 con signo positivo es revertir
+                        va_monto[v_i]  = (v_registros.precio_ga_mb - v_registros.revertido_mb )*-1;  -- considera la posibilidad de que a este item se le aya revertido algun monto
+                        va_id_moneda[v_i]  = v_id_moneda_base;
+                        va_id_partida_ejecucion[v_i]= v_registros.id_partida_ejecucion;
+                        va_columna_relacion[v_i]= 'id_solicitud_compra';
+                        va_fk_llave[v_i] = v_registros.id_solicitud;
+                        va_id_solicitud_det[v_i]= v_registros.id_solicitud_det;
+                        va_fecha[v_i]=now()::date;
+                    END IF;
              
              END LOOP;
              
              --llamada a la funcion de para reversion
-              va_resp_ges =  pre.f_gestionar_presupuesto(va_id_presupuesto, 
-                                                         va_id_partida, 
-                                                         va_id_moneda, 
-                                                         va_monto, 
-                                                         va_fecha, --p_fecha
-                                                         va_momento, 
-                                                         va_id_partida_ejecucion,--  p_id_partida_ejecucion 
-                                                         va_columna_relacion, 
-                                                         va_fk_llave);
+               IF v_i > 0 THEN 
+                  va_resp_ges =  pre.f_gestionar_presupuesto(va_id_presupuesto, 
+                                                             va_id_partida, 
+                                                             va_id_moneda, 
+                                                             va_monto, 
+                                                             va_fecha, --p_fecha
+                                                             va_momento, 
+                                                             va_id_partida_ejecucion,--  p_id_partida_ejecucion 
+                                                             va_columna_relacion, 
+                                                             va_fk_llave);
+               END IF;
              
        ELSEIF p_operacion = 'revertir_sobrante' THEN
        
@@ -248,7 +248,7 @@ BEGIN
                              
                              
                              
-                             v_aux =  (v_registros.precio_ga_mb +  COALESCE(v_registros.precio_gs_mb,0)) -  COALESCE(v_registros.revertido_mb,0) - COALESCE(v_total_adjudicado,0);
+                             v_aux =  (v_registros.precio_ga_mb +  COALESCE(v_registros.precio_sg_mb,0)) -  COALESCE(v_registros.revertido_mb,0) - COALESCE(v_total_adjudicado,0);
                              
                              
                              IF v_registros.precio_ga_mb < COALESCE(v_aux,0) THEN
@@ -293,18 +293,19 @@ BEGIN
                              
                      END LOOP;
                      
-                                         
+                       IF v_i > 0 THEN                  
                      
-                     --llamada a la funcion de para reversion
-                      va_resp_ges =  pre.f_gestionar_presupuesto(va_id_presupuesto, 
-                                                                 va_id_partida, 
-                                                                 va_id_moneda, 
-                                                                 va_monto, 
-                                                                 va_fecha, --p_fecha
-                                                                 va_momento, 
-                                                                 va_id_partida_ejecucion,--  p_id_partida_ejecucion 
-                                                                 va_columna_relacion, 
-                                                                 va_fk_llave);
+                       --llamada a la funcion de para reversion
+                        va_resp_ges =  pre.f_gestionar_presupuesto(va_id_presupuesto, 
+                                                                   va_id_partida, 
+                                                                   va_id_moneda, 
+                                                                   va_monto, 
+                                                                   va_fecha, --p_fecha
+                                                                   va_momento, 
+                                                                   va_id_partida_ejecucion,--  p_id_partida_ejecucion 
+                                                                   va_columna_relacion, 
+                                                                   va_fk_llave);
+                      END IF;
        
        
        ELSE

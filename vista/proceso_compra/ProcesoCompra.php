@@ -42,8 +42,9 @@ Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
 							 tooltip : '<b>Cuadro Comparativo</b><br/><b>Cuadro Comparativo de Cotizaciones</b>'
 	 });
 	 
-		this.load({params:{start:0, limit:this.tam_pag}});
-		this.iniciarEventos();
+	  this.addButton('btnRevePres',{text:'Revertir Presupuesto',iconCls: 'balert',disabled:true,handler:this.onBtnRevPres,tooltip: '<b>Revertir Presupeusto</b> Revierte todo el presupuesto no adjudicado para la solicitud.'});
+      this.load({params:{start:0, limit:this.tam_pag}});
+	  this.iniciarEventos();
 	
 	},
 	tam_pag:50,
@@ -445,6 +446,40 @@ Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
         )
     },
 	
+	onBtnRevPres:function(){
+	    if(confirm('¿Está seguro de revertir el Presupuesto?. Esta acción no se puede deshacer')){
+	      if(confirm('¿Está realmente seguro?')){
+                var data=this.sm.getSelected().data;
+                Phx.CP.loadingShow();
+                Ext.Ajax.request({
+                    url:'../../sis_adquisiciones/control/ProcesoCompra/revertirPresupuesto',
+                    params:{'id_proceso_compra':data.id_proceso_compra,'id_solicitud':data.id_solicitud},
+                    success:this.successRevPre,
+                    failure: this.conexionFailure,
+                    timeout:this.timeout,
+                    scope:this
+                });
+              
+	        
+	      }
+	    }
+	},
+	
+	successRevPre:function(resp){
+            
+            Phx.CP.loadingHide();
+            var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
+            if(!reg.ROOT.error){
+                this.reload();
+             
+            }else{
+                
+                alert('ocurrio un error durante el proceso')
+            }
+           
+            
+     },
+	
 	 onButtonCotizacion:function() {
             var rec=this.sm.getSelected();
             Phx.CP.loadWindows('../../../sis_adquisiciones/vista/cotizacion/CotizacionAdq.php',
@@ -459,7 +494,7 @@ Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
         )
     },
     
-		onCuadroComparativo: function(){
+	onCuadroComparativo: function(){
 					var rec=this.sm.getSelected();
          console.debug(rec);
          Ext.Ajax.request({
@@ -499,12 +534,12 @@ Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
             this.getBoton('del').disable();
             this.getBoton('btnCotizacion').disable();
             this.getBoton('btnCuadroComparativo').disable();
-            
-            
+            this.getBoton('btnRevePres').disable();
         }
         else{
             this.getBoton('btnCotizacion').enable();
             this.getBoton('btnCuadroComparativo').enable();
+            this.getBoton('btnRevePres').enable();
         }
          return tb 
      },
@@ -535,5 +570,3 @@ Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
 	}
 )
 </script>
-		
-		

@@ -51,6 +51,7 @@ DECLARE
      
      v_cantidad_adju integer;
      v_revertido_mb numeric;
+     v_total_costo_mb numeric;
      
      
      
@@ -301,7 +302,7 @@ BEGIN
 		begin
         
             --recupera datos de la solicitud y la cotizacion
-        
+            v_revertido_mb=0;
             
             select
                sd.id_solicitud_det, 
@@ -317,12 +318,13 @@ BEGIN
                v_cantidad_coti,
                v_cantidad_adju,
                v_precio_unitario_mb_sol,
-               v_precio_unitario_mb_coti
+               v_precio_unitario_mb_coti,
                v_revertido_mb
             from adq.tsolicitud_det sd
             inner join adq.tcotizacion_det cd on  cd.id_solicitud_det = sd.id_solicitud_det
             where cd.id_cotizacion_det = v_parametros.id_cotizacion_det;
             
+          --  raise exception 'xxx ,  %, %, %',v_revertido_mb,v_id_solicitud_det, v_parametros.id_cotizacion_det;
             
             
             IF v_precio_unitario_mb_coti > v_precio_unitario_mb_sol THEN
@@ -338,6 +340,7 @@ BEGIN
 			--calcula el total adjudicado en otras cotizaciones
 			
              v_total_adj = adq.f_calcular_total_adj_cot_det(v_parametros.id_cotizacion_det);
+             v_total_costo_mb= adq.f_calcular_total_costo_mb_adj_cot_det(v_parametros.id_cotizacion_det);
             
             
             IF v_parametros.cantidad_adjudicada <0 THEN
@@ -353,9 +356,11 @@ BEGIN
                  IF  v_cantidad_coti >= v_parametros.cantidad_adjudicada THEN
             
             
-                     --validamos que el total revertido no afecte la adjudicacion            
+                     --validamos que el total revertido no afecte la adjudicacion  
+                     --raise exception '(%*%)- % = %  >= %',v_cantidad_sol,v_precio_unitario_mb_sol,v_revertido_mb,((v_cantidad_sol*v_precio_unitario_mb_sol)- v_revertido_mb - v_total_costo_mb),(v_parametros.cantidad_adjudicada * v_precio_unitario_mb_coti);
+                               
             
-                    IF  ((v_cantidad_sol*v_precio_unitario_mb_sol)- v_revertido_mb)  >= (v_parametros.cantidad_adjudicada * v_precio_unitario_mb_coti)   THEN
+                    IF  ((v_cantidad_sol*v_precio_unitario_mb_sol)- v_revertido_mb - v_total_costo_mb)  >= (v_parametros.cantidad_adjudicada * v_precio_unitario_mb_coti)   THEN
                        
                        update adq.tcotizacion_det set
                        cantidad_adju = v_parametros.cantidad_adjudicada

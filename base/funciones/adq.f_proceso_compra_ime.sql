@@ -60,6 +60,7 @@ DECLARE
     v_id_solicitud integer;
     v_id_usuario_reg integer;
     v_id_estado_wf_ant  integer;
+    v_registros record;
 			    
 BEGIN
 
@@ -259,17 +260,11 @@ BEGIN
 		begin
 			--Sentencia de la modificacion
 			update adq.tproceso_compra set
-			id_depto = v_parametros.id_depto,
 			num_convocatoria = v_parametros.num_convocatoria,
-			id_solicitud = v_parametros.id_solicitud,
-			id_estado_wf = v_parametros.id_estado_wf,
 			fache_ini_proc = v_parametros.fache_ini_proc,
 			obs_proceso = v_parametros.obs_proceso,
-			id_proceso_wf = v_parametros.id_proceso_wf,
-			num_tramite = v_parametros.num_tramite,
 			codigo_proceso = v_parametros.codigo_proceso,
-			estado = v_parametros.estado,
-			num_cotizacion = v_parametros.num_cotizacion,
+		    num_cotizacion = v_parametros.num_cotizacion,
 			fecha_mod = now(),
 			id_usuario_mod = p_id_usuario
 			where id_proceso_compra=v_parametros.id_proceso_compra;
@@ -282,6 +277,9 @@ BEGIN
             return v_resp;
             
 		end;
+        
+        
+        
 
 	/*********************************    
  	#TRANSACCION:  'ADQ_PROC_ELI'
@@ -448,7 +446,57 @@ BEGIN
             return v_resp;
 
 		end;
-         
+    /*********************************    
+ 	#TRANSACCION:   'ADQ_REVPRE_IME'
+ 	#DESCRIPCION:	 Reversion del presupuesto sobrante no adjudicado en el proceso
+ 	#AUTOR:		Rensi ARteaga Copari	
+ 	#FECHA:		28-06-2013 12:55:29
+	***********************************/
+
+	elsif(p_transaccion='ADQ_REVPRE_IME')then
+
+		begin
+			 
+            --verifico que el proceso este activo
+            
+            
+            select 
+             	pc.id_solicitud,
+             	pc.estado_reg ,
+                pc.estado
+             into
+            	 v_registros
+            from 
+            adq.tproceso_compra pc
+            where pc.id_proceso_compra = v_parametros.id_proceso_compra;
+        
+            IF v_registros.estado_reg != 'activo' THEN
+            
+              raise exception 'El proceso no se encuentra activo';
+            
+            END IF;
+            
+            IF v_registros.estado in  ('anulado','desierto') THEN
+            
+              raise exception 'El proceso esta naulado o es desierto';
+            
+            END IF;
+            
+            --llamada a la funcion de reversion
+              IF not adq.f_gestionar_presupuesto_solicitud(v_registros.id_solicitud, p_id_usuario, 'revertir_sobrante')  THEN
+                 
+                   raise exception 'Error al revertir  el presupeusto sobrante';
+                 
+             END IF;
+               
+			--Definicion de la respuesta
+            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','REversion de presupuesto sobrante para la solicitud id '||v_registros.id_solicitud); 
+            v_resp = pxp.f_agrega_clave(v_resp,'id_proceso_compra',v_parametros.id_proceso_compra::varchar);
+               
+            --Devuelve la respuesta
+            return v_resp;
+            
+		end;     
 	else
      
     	raise exception 'Transaccion inexistente: %',p_transaccion;

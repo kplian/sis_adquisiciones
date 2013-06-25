@@ -96,6 +96,9 @@ DECLARE
      v_cad_ep varchar;
      v_cad_uo varchar;
      
+     v_sw boolean;
+     v_total_costo_mb numeric;
+     
 			    
 BEGIN
 
@@ -510,7 +513,7 @@ BEGIN
 	elsif(p_transaccion='ADQ_ADJTODO_IME')then
 
 		begin
-			
+			v_sw = FALSE;
                
            --si ya tien item adjudicados no se los toca
            
@@ -531,7 +534,7 @@ BEGIN
             
             
                v_total_adj = adq.f_calcular_total_adj_cot_det(v_registros.id_cotizacion_det);
-            
+               v_total_costo_mb= adq.f_calcular_total_costo_mb_adj_cot_det(v_registros.id_cotizacion_det);
             
                --si ya tien item adjudicados no se los toca
                 IF v_registros.cantidad_adju = 0   THEN
@@ -550,13 +553,19 @@ BEGIN
                           
                            --validamos que el total revertido no afecte la adjudicacion            
                            --en caso contrario no se adjudicada nada
-                          IF  ((v_registros.cantidad*v_registros.precio_unitario_mb_sol)- v_registros.revertido_mb)  >= (v_cantidad_adjudicada * v_registros.precio_unitario_mb_coti)   THEN
+                          IF  ((v_registros.cantidad*v_registros.precio_unitario_mb_sol)- v_registros.revertido_mb - v_total_costo_mb)  >= (v_cantidad_adjudicada * v_registros.precio_unitario_mb_coti)   THEN
                                
                                update adq.tcotizacion_det set
                                cantidad_adju = v_cantidad_adjudicada
                                where id_cotizacion_det = v_registros.id_cotizacion_det;
                          
+                              v_sw  = TRUE;
+                          
                           END IF;
+                          
+                          
+                          
+                          
                      
                      END IF;     
                 
@@ -564,6 +573,12 @@ BEGIN
                 END   IF;
              END LOOP;
         
+             
+             IF v_sw = FALSE THEN
+             
+                raise exception 'No hay nada para adjudicar (Verifique el presupuesto revertido)';
+             
+             END IF;
            
              --Definicion de la respuesta
             v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Cotizaciones eliminado(a)'); 

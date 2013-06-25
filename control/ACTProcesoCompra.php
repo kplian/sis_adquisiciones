@@ -39,15 +39,22 @@ class ACTProcesoCompra extends ACTbase{
 	}
 						
 	function eliminarProcesoCompra(){
-			$this->objFunc=$this->create('MODProcesoCompra');	
+	    $this->objFunc=$this->create('MODProcesoCompra');	
 		$this->res=$this->objFunc->eliminarProcesoCompra($this->objParam);
 		$this->res->imprimirRespuesta($this->res->generarJson());
 	}
+	
+	function revertirPresupuesto(){
+        $this->objFunc=$this->create('MODProcesoCompra');   
+        $this->res=$this->objFunc->revertirPresupuesto($this->objParam);
+        $this->res->imprimirRespuesta($this->res->generarJson());
+    }
+    
 		
 	
 		function cuadroComparativo(){
 			
-    $dataSource = new DataSource();
+                $dataSource = new DataSource();
 				
 				$this->objParam->addParametroConsulta('ordenacion','id_proceso_compra');
     $this->objParam->addParametroConsulta('dir_ordenacion','ASC');
