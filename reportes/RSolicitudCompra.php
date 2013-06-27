@@ -197,7 +197,7 @@ Class RSolicitudCompra extends Report {
         				$xRef=$pdf->getX();
 												$yRef=$pdf->getY();
         				$pdf->Cell($width2, $height, $row['totalRef'], 0, 0, 'R', false, '', 0, false, 'T', 'C');
-												if($row['disponible']=='true'){
+												if($row['groupeddata'][0]['disponible']=='true'){
 													 $pdf->setTextColor(0,0,0);
 													 $pdf->Cell($width2, $height, 'DISPONIBLE', 0, 0, 'R', false, '', 0, false, 'T', 'C');
 												}else{
