@@ -352,6 +352,7 @@ BEGIN
                     ins.email1 as email_institucion,
                     ins.fax as fax_institucion,
                     cot.fecha_entrega,
+                    (cot.fecha_entrega - cot.fecha_adju) as dias_entrega,
                     sol.lugar_entrega,
                     cot.numero_oc,
                     cot.tipo_entrega,
@@ -366,7 +367,7 @@ BEGIN
               inner join adq.tproceso_compra pc on pc.id_proceso_compra=cot.id_proceso_compra
 			  inner join adq.tsolicitud sol on sol.id_solicitud=pc.id_solicitud
 			  inner join param.tmoneda mon on mon.id_moneda=cot.id_moneda
-              where cot.id_proveedor='||v_parametros.id_proveedor|| ' and cot.estado=''adjudicado'' or cot.estado=''pago_habilitado'' and ';
+              where (cot.estado=''adjudicado'' or cot.estado=''pago_habilitado'' or cot.estado=''finalizado'') and cot.id_cotizacion='||v_parametros.id_cotizacion||' and ';
           
           --Definicion de la respuesta
           v_consulta:=v_consulta||v_parametros.filtro;

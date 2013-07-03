@@ -183,6 +183,7 @@ class ACTCotizacion extends ACTbase{
                     $dataSource->putParameter('fax', $datosOrdenCompra[0]['fax_institucion']);
                   }
                 $dataSource->putParameter('fecha_entrega', $datosOrdenCompra[0]['fecha_entrega']);
+                $dataSource->putParameter('dias_entrega', $datosOrdenCompra[0]['dias_entrega']);
                 $dataSource->putParameter('lugar_entrega', $datosOrdenCompra[0]['lugar_entrega']);
                 $dataSource->putParameter('numero_oc', $datosOrdenCompra[0]['numero_oc']);
                 $dataSource->putParameter('tipo_entrega', $datosOrdenCompra[0]['tipo_entrega']);

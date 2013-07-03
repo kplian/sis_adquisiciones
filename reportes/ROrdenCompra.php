@@ -214,7 +214,7 @@ Class ROrdenCompra extends Report {
 								$pdf->MultiCell(0, $height, 'Firma Proveedor o Sello ', 1,'R', false ,1);							
 								$pdf->MultiCell(0, $height, 'La presente Orden de '.$tipo.' tiene calidad de contrato de suministro de acuerdo a los articulos 919 al 925 del Código de Comercio.', 1,'L', false ,1);
 								$pdf->Ln($height);
-								$pdf->MultiCell(0, $height, 'El proveedor se compromete a entregar el suministro en el plazo de dias calendarios que seran computables a partir de la fecha de elaboracion de la presente orden de '.$tipo.'. El incumplimiento se sancionara con una multa del ??% del monto de contrato por cada dia calendario de retraso, multa que no debe exceder del ??%.', 1,'L', false ,1);
+								$pdf->MultiCell(0, $height, 'El proveedor se compromete a entregar el suministro en el plazo de '.$this->getDataSource()->getParameter('dias_entrega').' dias calendarios que seran computables a partir de la fecha de elaboracion de la presente orden de '.$tipo.'. El incumplimiento se sancionara con una multa del 0,1% del monto de contrato por cada dia calendario de retraso, multa que no debe exceder del 2%.', 1,'L', false ,1);
         $pdf->Output($fileName, 'F');
     }
     

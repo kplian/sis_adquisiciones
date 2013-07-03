@@ -407,6 +407,7 @@ class MODCotizacion extends MODbase{
 		$this->captura('email_institucion','varchar');
 		$this->captura('fax_institucion','varchar');
 		$this->captura('fecha_entrega','date');
+		$this->captura('dias_entrega','int4');
 		$this->captura('lugar_entrega','varchar');
 		$this->captura('numero_oc','varchar');
 		$this->captura('tipo_entrega','varchar');
