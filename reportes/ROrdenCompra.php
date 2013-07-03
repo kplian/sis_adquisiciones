@@ -263,8 +263,9 @@ Class ROrdenCompra extends Report {
 												$totalItem =$row['cantidad_adju']*$row['precio_unitario'];
 												$pdf->Cell($width1, $height, number_format($totalItem,2), 1, 0, 'R', false, '', 1, false, 'T', 'C');
 												$pdf->Ln();
-												$totalOrdenCompra=$totalOrdenCompra + $totalItem;																																				        
-        } 
+												$totalOrdenCompra=$totalOrdenCompra + $totalItem;																																														        
+        }
+								$height=5;		 								
 								$obj = new Numbers_Words_es_AR;
 								$numero=explode('.', number_format($totalOrdenCompra,2));
 								$pdf->Cell($width2+$width1+$width1/2+$width1/4, $height, 'SON: '. strtoupper(trim($obj->toWords(str_replace(',', '', $numero[0])))).' '.$numero[1].'/'.'100 '.strtoupper($this->getDataSource()->getParameter('moneda')), 1, 0, 'L', false, '', 1, false, 'T', 'C');
