@@ -369,6 +369,10 @@ Phx.vista.CotizacionAdq = {
                    this.getBoton('ant_estado').disable();
                }
                
+               if (data['estado']=='recomendado'){
+                   this.getBoton('btnRepOC').disable();
+               }
+               
             return tb 
      }, 
      

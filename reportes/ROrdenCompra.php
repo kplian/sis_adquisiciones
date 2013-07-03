@@ -247,10 +247,18 @@ Class ROrdenCompra extends Report {
         $pdf->SetFontSize(6.5);
 								$totalOrdenCompra=0.00;
         foreach($dataSource->getDataset() as $row) {
-        				$pdf->SetFont('', '');
+        				$pdf->SetFont('', '');												
+												$xAntesMultiCell = $pdf->getX();
+												$yAntesMultiCell = $pdf->getY();		
             //$totalItem
+            $pdf->setX($pdf->getX()+$width1-5);
+												$pdf->MultiCell($width2, $height, $row['desc_solicitud_det']."\r\n".'  - '.$row['descripcion_sol'], 1,'L', false ,1);
+												$yDespuesMultiCell= $pdf->getY();
+												$height = $pdf->getY()-$yAntesMultiCell;
+												$pdf->setX($xAntesMultiCell);
+												$pdf->setY($yAntesMultiCell);
 												$pdf->Cell($width1-5, $height, $row['cantidad_adju'], 1, 0, 'L', false, '', 1, false, 'T', 'C');
-            $pdf->Cell($width2, $height, $row['desc_solicitud_det'], 1, 0, 'L', false, '', 1, false, 'T', 'C');
+            $pdf->setX($xAntesMultiCell+$width2+$width1-5);
             $pdf->Cell($width1, $height, number_format($row['precio_unitario'],2), 1, 0, 'R', false, '', 1, false, 'T', 'C');
 												$totalItem =$row['cantidad_adju']*$row['precio_unitario'];
 												$pdf->Cell($width1, $height, number_format($totalItem,2), 1, 0, 'R', false, '', 1, false, 'T', 'C');
