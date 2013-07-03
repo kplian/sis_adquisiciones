@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION adq.f_cotizacion_sel (
   p_administrador integer,
   p_id_usuario integer,
@@ -368,7 +366,7 @@ BEGIN
               inner join adq.tproceso_compra pc on pc.id_proceso_compra=cot.id_proceso_compra
 			  inner join adq.tsolicitud sol on sol.id_solicitud=pc.id_solicitud
 			  inner join param.tmoneda mon on mon.id_moneda=cot.id_moneda
-              where cot.estado=''adjudicado'' or cot.estado=''pago_habilitado'' and cot.id_cotizacion='||v_parametros.id_cotizacion|| ' and ';
+              where cot.id_proveedor='||v_parametros.id_proveedor|| ' and cot.estado=''adjudicado'' or cot.estado=''pago_habilitado'' and ';
           
           --Definicion de la respuesta
           v_consulta:=v_consulta||v_parametros.filtro;

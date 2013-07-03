@@ -454,7 +454,7 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
                 console.debug(rec);
                 Ext.Ajax.request({
                     url:'../../sis_adquisiciones/control/Cotizacion/reporteOC',
-                    params:{'id_cotizacion':rec.data.id_cotizacion},
+                    params:{'id_cotizacion':rec.data.id_cotizacion,'id_proveedor':rec.data.id_proveedor},
                     success: this.successExport,
                     failure: function() {
                         console.log("fail");

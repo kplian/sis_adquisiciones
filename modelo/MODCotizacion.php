@@ -391,6 +391,7 @@ class MODCotizacion extends MODbase{
 		$this->tipo_procedimiento='SEL';
 		
 		$this->setParametro('id_cotizacion','id_cotizacion','int4');
+		$this->setParametro('id_proveedor','id_proveedor','int4');
 		$this->captura('desc_proveedor','varchar');
 		$this->captura('id_persona','int4');
 		$this->captura('dir_persona','varchar');

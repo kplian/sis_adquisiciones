@@ -209,7 +209,7 @@ Class ROrdenCompra extends Report {
 								$pdf->Cell($width1, $height, 'NOTA:', 0, 0, 'L', false, '', 0, false, 'T', 'C');							 
         $pdf->SetFont('','');
 								$pdf->setFontSize(7);								
-        $pdf->MultiCell(0, $height, $this->getDataSource()->getParameter('desc_proveedor').'se compromete a entregar los '.$tipo.' de acuerdo a la presente orden de '.$tipo.'; a cuyo fin y en señal de conformidad suscribe al pie del presente', 1,'L', false ,1);
+        $pdf->MultiCell(0, $height, $this->getDataSource()->getParameter('desc_proveedor').' se compromete a entregar los '.$tipo.' de acuerdo a la presente orden de '.$tipo.'; a cuyo fin y en señal de conformidad suscribe al pie del presente', 1,'L', false ,1);
 								$pdf->Ln($height*3);
 								$pdf->MultiCell(0, $height, 'Firma Proveedor o Sello ', 1,'R', false ,1);							
 								$pdf->MultiCell(0, $height, 'La presente Orden de '.$tipo.' tiene calidad de contrato de suministro de acuerdo a los articulos 919 al 925 del Código de Comercio.', 1,'L', false ,1);
