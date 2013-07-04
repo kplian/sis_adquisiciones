@@ -117,11 +117,12 @@ Class RSolicitudCompra extends Report {
 								$pdf->SetFillColor(192,192,192, true);
         $pdf->Cell($width3+$width2, $height, $this->getDataSource()->getParameter('desc_categoria_compra'), $white, 0, 'L', true, '', 0, false, 'T', 'C');
         $pdf->Ln();
-        $pdf->SetFont('', 'B');
+        $pdf->SetFont('', 'B');								
         $pdf->Cell($width3, $height, 'Unidad Organizacional:', 0, 0, 'L', false, '', 0, false, 'T', 'C');
         $pdf->SetFont('', '');
         $pdf->SetFillColor(192,192,192, true);
-        $pdf->Cell($width3+$width2, $height, $this->getDataSource()->getParameter('desc_uo'), $white, 0, 'L', true, '', 0, false, 'T', 'C');        
+								$pdf->MultiCell($width3+$width2, $height, $this->getDataSource()->getParameter('desc_uo'), 0,'L', true ,0);
+        //$pdf->Cell($width3+$width2, $height, $this->getDataSource()->getParameter('desc_uo'), $white, 0, 'L', true, '', 1, false, 'T', 'C');        
         $pdf->Cell(5, $height, '', 0, 0, 'L', false, '', 0, false, 'T', 'C');
         $pdf->SetFont('', 'B');
         $pdf->Cell($width3, $height, 'Funcionario:', 0, 0, 'L', false, '', 0, false, 'T', 'C');
@@ -188,7 +189,8 @@ Class RSolicitudCompra extends Report {
          			$pdf->Cell($width2, $height, 'Nombre Partida', 0, 0, 'L', false, '', 0, false, 'T', 'C');
         				$pdf->Cell($width2*3+10, $height, 'Centro de Costo', 0, 0, 'L', false, '', 0, false, 'T', 'C');
         				$pdf->Cell($width2, $height, '', 0, 0, 'R', false, '', 0, false, 'T', 'C');
-        				$pdf->Cell($width2, $height, 'Disponibilidad', 0, 0, 'R', false, '', 0, false, 'T', 'C');
+        				if($this->getDataSource()->getParameter('estado')=='borrador')
+        							$pdf->Cell($width2, $height, 'Disponibilidad', 0, 0, 'R', false, '', 0, false, 'T', 'C');
         				$pdf->Ln();
 												$pdf->setFont('','');
 												$pdf->Cell($width2, $height, $row['groupeddata'][0]['codigo_partida'], 0, 0, 'L', false, '', 0, false, 'T', 'C');
@@ -197,14 +199,16 @@ Class RSolicitudCompra extends Report {
         				$xRef=$pdf->getX();
 												$yRef=$pdf->getY();
         				$pdf->Cell($width2, $height, $row['totalRef'], 0, 0, 'R', false, '', 0, false, 'T', 'C');
-												if($row['groupeddata'][0]['disponible']=='true'){
-													 $pdf->setTextColor(0,0,0);
-													 $pdf->Cell($width2, $height, 'DISPONIBLE', 0, 0, 'R', false, '', 0, false, 'T', 'C');
-												}else{
-														$pdf->setTextColor(255,0,0);
-													 $pdf->Cell($width2, $height, 'NO DISPONIBLE', 0, 0, 'R', false, '', 0, false, 'T', 'C');
+												if($this->getDataSource()->getParameter('estado')=='borrador'){
+																if($row['groupeddata'][0]['disponible']=='true'){
+																	 $pdf->setTextColor(0,0,0);
+																	 $pdf->Cell($width2, $height, 'DISPONIBLE', 0, 0, 'R', false, '', 0, false, 'T', 'C');
+																}else{
+																		$pdf->setTextColor(255,0,0);
+																	 $pdf->Cell($width2, $height, 'NO DISPONIBLE', 0, 0, 'R', false, '', 0, false, 'T', 'C');
+																}
+																$pdf->setTextColor(0,0,0);
 												}
-												$pdf->setTextColor(0,0,0);
         				//$pdf->Cell($width2, $height, ($row['disponible']==true)?'DISPONIBLE':'NO DISPONIBLE', 0, 0, 'R', false, '', 0, false, 'T', 'C');
         				$pdf->Ln();
 												$pdf->setFont('','B');
@@ -223,11 +227,19 @@ Class RSolicitudCompra extends Report {
 												$yEnd=0;
 												foreach ($row['groupeddata'] as $solicitudDetalle) {
 													  $pdf->setFont('','');
-															$pdf->Cell($width2+$width1, $height, $solicitudDetalle['desc_concepto_ingas'], $blackSide, 0, 'L', false, '', 1, false, 'T', 'C');
-															$pdf->Cell($width2+25+$width3*2, $height, $solicitudDetalle['descripcion'], $blackSide, 0, 'L', false, '', 1, false, 'T', 'C');
-															$pdf->Cell($width1, $height, $solicitudDetalle['cantidad'], $blackSide, 0, 'R', false, '', 1, false, 'T', 'C');
-															$pdf->Cell($width3, $height, number_format($solicitudDetalle['precio_unitario'],2), $blackSide, 0, 'R', false, '', 1, false, 'T', 'C');
-															$pdf->Cell($width3, $height, number_format($solicitudDetalle['precio_total'],2), $blackSide, 0, 'R', false, '', 1, false, 'T', 'C');
+															$xAntesMultiCell = $pdf->getX();
+															$yAntesMultiCell = $pdf->getY();
+															$pdf->setX($xAntesMultiCell+$width2+$width1);
+															$pdf->MultiCell($width2+25+$width3*2, $height, $solicitudDetalle['descripcion'], 1,'L', false ,1);
+															$height = $pdf->getY() - $yAntesMultiCell;
+															$pdf->setX($xAntesMultiCell);
+															$pdf->setY($yAntesMultiCell);
+															$pdf->Cell($width2+$width1, $height, $solicitudDetalle['desc_concepto_ingas'], $blackAll, 0, 'L', false, '', 1, false, 'T', 'C');
+															$pdf->setX($xAntesMultiCell+$width2*2+25+$width3*2+$width1);
+															//$pdf->Cell($width2+25+$width3*2, $height, $solicitudDetalle['descripcion'], $blackSide, 0, 'L', false, '', 1, false, 'T', 'C');
+															$pdf->Cell($width1, $height, $solicitudDetalle['cantidad'], $blackAll, 0, 'R', false, '', 1, false, 'T', 'C');
+															$pdf->Cell($width3, $height, number_format($solicitudDetalle['precio_unitario'],2), $blackAll, 0, 'R', false, '', 1, false, 'T', 'C');
+															$pdf->Cell($width3, $height, number_format($solicitudDetalle['precio_total'],2), $blackAll, 0, 'R', false, '', 1, false, 'T', 'C');
 															//$pdf->Cell($width3, $height, number_format($solicitudDetalle['precio_ga'],2), $blackSide, 0, 'R', false, '', 1, false, 'T', 'C');
 															//$pdf->Cell($width3, $height, number_format($solicitudDetalle['precio_sg'],2), $blackSide, 0, 'R', false, '', 1, false, 'T', 'C');
 															$totalRef=$totalRef+$solicitudDetalle['precio_total'];
