@@ -40,7 +40,14 @@ Phx.vista.CotizacionVb = {
                 tooltip: '<b>Documentos del Proceso</b><br/>Subir los documetos requeridos en el proceso seleccionada.'
             }
         );
-          
+        
+        this.addButton('btnCuadroComparativo',{
+											 text :'Cuadro Comparativo',
+											 iconCls : 'bexcel',
+											 disabled: true,
+											 handler : this.onCuadroComparativo,
+											 tooltip : '<b>Cuadro Comparativo</b><br/><b>Cuadro Comparativo de Cotizaciones</b>'
+	 						});         
           
         this.store.baseParams={tipo_interfaz:this.nombreVista}; 
         this.load({params:{start:0, limit:this.tam_pag}});
@@ -148,8 +155,23 @@ Phx.vista.CotizacionVb = {
                     'ChequeoDocumentoSol'
         	)
     	},
-        
-        
+    	
+    	onCuadroComparativo: function(){
+							var rec=this.sm.getSelected();
+		         console.debug(rec);
+		         Ext.Ajax.request({
+		             url:'../../sis_adquisiciones/control/ProcesoCompra/cuadroComparativo',
+		             params:{'id_proceso_compra':rec.data.id_proceso_compra},
+		             success: this.successExport,
+		             failure: function() {
+		                 console.log("fail");
+		             },
+		             timeout: function() {
+		                 console.log("timeout");
+		             },
+		             scope:this
+		         });
+			   },
         
        preparaMenu:function(n){
           var data = this.getSelectedData();
@@ -159,10 +181,12 @@ Phx.vista.CotizacionVb = {
             if(data['estado']==  'recomendado'){
                  this.getBoton('btnGenOC').enable();
                 this.getBoton('btnRepOC').disable(); 
+                this.getBoton('btnCuadroComparativo').enable();
               }
             if(data['estado']==  'adjudicado'){
                  this.getBoton('btnGenOC').disable();
-                 this.getBoton('btnRepOC').enable(); 
+                 this.getBoton('btnRepOC').enable();
+                 this.getBoton('btnCuadroComparativo').disable(); 
              }   
            this.getBoton('btnReporte').enable();  
            this.getBoton('ant_estado').enable();
