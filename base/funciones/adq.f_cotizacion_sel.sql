@@ -358,7 +358,7 @@ BEGIN
                     cot.tipo_entrega,
                     cot.id_proceso_compra,
                     sol.tipo,
-                    current_date as fecha_oc,
+                    cot.fecha_adju as fecha_oc,
                     mon.moneda
               from adq.tcotizacion cot 
               inner join param.vproveedor pv on pv.id_proveedor=cot.id_proveedor
