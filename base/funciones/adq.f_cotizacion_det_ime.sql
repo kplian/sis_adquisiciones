@@ -52,6 +52,15 @@ DECLARE
      v_cantidad_adju integer;
      v_revertido_mb numeric;
      v_total_costo_mb numeric;
+     v_id_partida_ejecucion integer;
+     
+     v_precio_sg_mb numeric;
+     v_precio_ga_mb numeric;
+     v_id_moneda_base integer;
+     
+     
+     v_comprometido_ga numeric;
+     v_ejecutado       numeric;
      
      
      
@@ -303,6 +312,7 @@ BEGIN
         
             --recupera datos de la solicitud y la cotizacion
             v_revertido_mb=0;
+            v_id_moneda_base =  param.f_get_moneda_base();
             
             select
                sd.id_solicitud_det, 
@@ -311,7 +321,10 @@ BEGIN
                cd.cantidad_adju,
                sd.precio_unitario_mb,
                cd.precio_unitario_mb,
-               sd.revertido_mb
+               sd.revertido_mb,
+               sd.id_partida_ejecucion,
+               sd.precio_sg_mb,
+               sd.precio_ga_mb
             into 
                v_id_solicitud_det,
                v_cantidad_sol,
@@ -319,7 +332,10 @@ BEGIN
                v_cantidad_adju,
                v_precio_unitario_mb_sol,
                v_precio_unitario_mb_coti,
-               v_revertido_mb
+               v_revertido_mb,
+               v_id_partida_ejecucion,
+               v_precio_sg_mb,
+               v_precio_ga_mb
             from adq.tsolicitud_det sd
             inner join adq.tcotizacion_det cd on  cd.id_solicitud_det = sd.id_solicitud_det
             where cd.id_cotizacion_det = v_parametros.id_cotizacion_det;
@@ -341,6 +357,8 @@ BEGIN
 			
              v_total_adj = adq.f_calcular_total_adj_cot_det(v_parametros.id_cotizacion_det);
              v_total_costo_mb= adq.f_calcular_total_costo_mb_adj_cot_det(v_parametros.id_cotizacion_det);
+             
+             
             
             
             IF v_parametros.cantidad_adjudicada <0 THEN
@@ -356,11 +374,23 @@ BEGIN
                  IF  v_cantidad_coti >= v_parametros.cantidad_adjudicada THEN
             
             
-                     --validamos que el total revertido no afecte la adjudicacion  
+                     
                      --raise exception '(%*%)- % = %  >= %',v_cantidad_sol,v_precio_unitario_mb_sol,v_revertido_mb,((v_cantidad_sol*v_precio_unitario_mb_sol)- v_revertido_mb - v_total_costo_mb),(v_parametros.cantidad_adjudicada * v_precio_unitario_mb_coti);
                                
-            
-                    IF  ((v_cantidad_sol*v_precio_unitario_mb_sol)- v_revertido_mb - v_total_costo_mb)  >= (v_parametros.cantidad_adjudicada * v_precio_unitario_mb_coti)   THEN
+                     --calcula el comprometido
+                     v_comprometido_ga=0;
+                     v_ejecutado=0;
+                                     
+                     SELECT 
+                           COALESCE(ps_comprometido,0), 
+                           COALESCE(ps_ejecutado,0)  
+                       into 
+                           v_comprometido_ga,    --esta en moneda base
+                           v_ejecutado
+                     FROM pre.f_verificar_com_eje_pag(v_id_partida_ejecucion, v_id_moneda_base);
+                    
+                     --validamos que el total revertido no afecte la adjudicacion 
+                    IF  ((v_comprometido_ga+ COALESCE(v_precio_sg_mb,0)) - v_total_costo_mb)  >= (v_parametros.cantidad_adjudicada * v_precio_unitario_mb_coti)   THEN
                        
                        update adq.tcotizacion_det set
                        cantidad_adju = v_parametros.cantidad_adjudicada
@@ -368,7 +398,7 @@ BEGIN
                     
                     ELSE
                       
-                       raise exception 'La reversion que se realizo sobre este item no permite adjudicar a este precio';
+                       raise exception 'La reversiones realizadas sobre este item no permiten adjudicar a este precio, solo dispone de un total en moneda base de: %',((v_comprometido_ga+ COALESCE(v_precio_sg_mb,0)) - v_total_costo_mb) ;
                     
                     END IF;
                  

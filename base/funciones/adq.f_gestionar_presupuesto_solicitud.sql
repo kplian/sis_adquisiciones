@@ -41,9 +41,12 @@ DECLARE
   
   va_fecha                date[];
   
-  v_monto_a_revertir numeric;
-  v_total_adjudicado  numeric;
-  v_aux numeric;
+  v_monto_a_revertir 	numeric;
+  v_total_adjudicado  	numeric;
+  v_aux 				numeric;
+  v_comprometido  	    numeric;
+  v_comprometido_ga     numeric;
+  v_ejecutado     	    numeric;
   
 
   
@@ -84,6 +87,8 @@ BEGIN
                         raise exception 'El presupuesto ya se encuentra comprometido';
                      
                      END IF;
+                     
+                     
                      
                      v_i = v_i +1;                
                    
@@ -167,15 +172,31 @@ BEGIN
                         raise exception 'El presupuesto del detalle con el identificador (%)  no se encuntra comprometido',v_registros.id_solicitud_det;
                      
                      END IF;
+                     
+                     v_comprometido=0;
+                     v_ejecutado=0;
+                             
+                     
+                     SELECT 
+                           COALESCE(ps_comprometido,0), 
+                           COALESCE(ps_ejecutado,0)  
+                       into 
+                           v_comprometido,
+                           v_ejecutado
+                     FROM pre.f_verificar_com_eje_pag(v_registros.id_partida_ejecucion, v_id_moneda_base);
+                     
+                     
+                     
+                     
                       --armamos los array para enviar a presupuestos          
-                    IF (v_registros.precio_ga_mb - v_registros.revertido_mb ) != 0 THEN
+                    IF v_comprometido != 0 THEN
                      
                        	v_i = v_i +1;                
                        
                         va_id_presupuesto[v_i] = v_registros.id_presupuesto;
                         va_id_partida[v_i]= v_registros.id_partida;
                         va_momento[v_i]	= 2; --el momento 2 con signo positivo es revertir
-                        va_monto[v_i]  = (v_registros.precio_ga_mb - v_registros.revertido_mb )*-1;  -- considera la posibilidad de que a este item se le aya revertido algun monto
+                        va_monto[v_i]  = (v_comprometido)*-1;  -- considera la posibilidad de que a este item se le aya revertido algun monto
                         va_id_moneda[v_i]  = v_id_moneda_base;
                         va_id_partida_ejecucion[v_i]= v_registros.id_partida_ejecucion;
                         va_columna_relacion[v_i]= 'id_solicitud_compra';
@@ -246,23 +267,20 @@ BEGIN
                                    and cd.estado_reg = 'activo';
                              
                              
+                             v_comprometido_ga=0;
+                             v_ejecutado=0;
+                             
+                             SELECT 
+                                   COALESCE(ps_comprometido,0), 
+                                   COALESCE(ps_ejecutado,0)  
+                               into 
+                                   v_comprometido_ga,
+                                   v_ejecutado
+                             FROM pre.f_verificar_com_eje_pag(v_registros.id_partida_ejecucion, v_id_moneda_base);
                              
                              
-                             v_aux =  (v_registros.precio_ga_mb +  COALESCE(v_registros.precio_sg_mb,0)) -  COALESCE(v_registros.revertido_mb,0) - COALESCE(v_total_adjudicado,0);
+                             v_monto_a_revertir =  v_comprometido_ga - COALESCE(v_total_adjudicado,0);
                              
-                             
-                             IF v_registros.precio_ga_mb < COALESCE(v_aux,0) THEN
-                               
-                                v_monto_a_revertir = v_registros.precio_ga_mb;
-                             
-                             ELSE 
-                             
-                                v_monto_a_revertir = COALESCE(v_aux,0);
-                             
-                             END IF;
-                             
-                             
-                            
                              
                              --solo se revierte si el monto es mayor a cero
                              IF v_monto_a_revertir > 0 THEN 
