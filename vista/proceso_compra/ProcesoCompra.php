@@ -17,34 +17,14 @@ Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
     	//llama al constructor de la clase padre
 		Phx.vista.ProcesoCompra.superclass.constructor.call(this,config);
 		this.init();
-		this.addButton('btnCotizacion',{
-            text :'Cotizacion',
-            iconCls : 'bdocuments',
-            disabled: true,
-            handler : this.onButtonCotizacion,
-            tooltip : '<b>Cotizacion de solicitud de Compra</b><br/><b>Cotizacion de solicitud de Compra</b>'
-  		});
-  		this.addButton('btnChequeoDocumentos',
-            {
-                text: 'Chequear Documentos',
-                iconCls: 'bchecklist',
-                disabled: true,
-                handler: this.loadCheckDocumentosSol,
-                tooltip: '<b>Documentos del Proceso</b><br/>Subir los documetos requeridos en el proceso seleccionada.'
-            }
-        );
-  
-		this.addButton('btnCuadroComparativo',{
-							 text :'Cuadro Comparativo',
-							 iconCls : 'bexcel',
-							 disabled: true,
-							 handler : this.onCuadroComparativo,
-							 tooltip : '<b>Cuadro Comparativo</b><br/><b>Cuadro Comparativo de Cotizaciones</b>'
-	 });
-	 
-	  this.addButton('btnRevePres',{text:'Revertir Presupuesto',iconCls: 'balert',disabled:true,handler:this.onBtnRevPres,tooltip: '<b>Revertir Presupeusto</b> Revierte todo el presupuesto no adjudicado para la solicitud.'});
-      this.load({params:{start:0, limit:this.tam_pag}});
-	  this.iniciarEventos();
+		this.addButton('btnCotizacion',{text :'Cotizacion',iconCls:'bdocuments',disabled: true, handler : this.onButtonCotizacion,tooltip : '<b>Cotizacion de solicitud de Compra</b><br/><b>Cotizacion de solicitud de Compra</b>'});
+  		this.addButton('btnChequeoDocumentos',{text: 'Documentos',iconCls: 'bchecklist',disabled: true,handler: this.loadCheckDocumentosSol,tooltip: '<b>Documentos del Proceso</b><br/>Subir los documetos requeridos en el proceso seleccionada.'});
+        this.addButton('btnCuadroComparativo',{text :'Cuadro Comparativo',iconCls : 'bexcel',disabled: true,handler : this.onCuadroComparativo,tooltip : '<b>Cuadro Comparativo</b><br/><b>Cuadro Comparativo de Cotizaciones</b>'});
+	    this.addButton('btnRevePres',{text:'Rev. Pre.',iconCls: 'balert',disabled:true,handler:this.onBtnRevPres,tooltip: '<b>Revertir Presupeusto</b> Revierte todo el presupuesto no adjudicado para la solicitud.'});
+        this.addButton('btnFinPro',{text:'Fin Proc.',iconCls: 'balert',disabled:true,handler:this.onBtnFinPro,tooltip: '<b>Finzalizar Proceso</b> Finaliza el proceso y la solicitud y revierte el presupeusto. No  puede deshacerse'});
+      
+        this.load({params:{start:0, limit:this.tam_pag}});
+	    this.iniciarEventos();
 	
 	},
 	tam_pag:50,
@@ -71,6 +51,9 @@ Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
                 renderer: function(value,p,record){
                         if(record.data.estado=='anulado'||record.data.estado=='desierto'){
                              return String.format('<b><font color="red">{0}</font></b>', value);
+                         }
+                         else if(record.data.estado=='finalizado'){
+                             return String.format('<b><font color="green">{0}</font></b>', value);
                          }
                          else{
                             return String.format('{0}', value);
@@ -141,6 +124,9 @@ Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
                 renderer: function(value, p, record) {
                         if(record.data.estado=='anulado'||record.data.estado=='desierto'){
                              return String.format('<b><font color="red">{0}</font></b>', record.data['desc_solicitud']);
+                         }
+                         else if(record.data.estado=='finalizado'){
+                             return String.format('<b><font color="green">{0}</font></b>', record.data['desc_solicitud']);
                          }
                          else{
                             return String.format('{0}', record.data['desc_solicitud']);
@@ -447,7 +433,7 @@ Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
     },
 	
 	onBtnRevPres:function(){
-	    if(confirm('¿Está seguro de revertir el Presupuesto?. Esta acción no se puede deshacer')){
+	    if(confirm('¿Está seguro de revertir el Presupuesto?. Esta acción no puede deshacerse')){
 	      if(confirm('¿Está realmente seguro?')){
                 var data=this.sm.getSelected().data;
                 Phx.CP.loadingShow();
@@ -465,19 +451,31 @@ Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
 	    }
 	},
 	
+	onBtnFinPro:function(){
+        if(confirm('¿Está seguro Finalizar el Proceso?. Esta acción no puede deshacerse')){
+          if(confirm('¿Está realmente seguro?')){
+                var data=this.sm.getSelected().data;
+                Phx.CP.loadingShow();
+                Ext.Ajax.request({
+                    url:'../../sis_adquisiciones/control/ProcesoCompra/finalizarProceso',
+                    params:{'id_proceso_compra':data.id_proceso_compra,'id_solicitud':data.id_solicitud},
+                    success:this.successRevPre,
+                    failure: this.conexionFailure,
+                    timeout:this.timeout,
+                    scope:this
+                });
+           }
+        }
+    },
+	
 	successRevPre:function(resp){
-            
             Phx.CP.loadingHide();
             var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
             if(!reg.ROOT.error){
                 this.reload();
-             
             }else{
-                
                 alert('ocurrio un error durante el proceso')
             }
-           
-            
      },
 	
 	 onButtonCotizacion:function() {
@@ -529,17 +527,21 @@ Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
         
         Phx.vista.ProcesoCompra.superclass.preparaMenu.call(this,n);
         this.getBoton('btnChequeoDocumentos').enable();
-        if(data.estado=='anulado' || data.estado=='desierto'){
+        if(data.estado=='anulado' || data.estado=='desierto'|| data.estado=='finalizado'){
             this.getBoton('edit').disable();
             this.getBoton('del').disable();
             this.getBoton('btnCotizacion').disable();
             this.getBoton('btnCuadroComparativo').disable();
             this.getBoton('btnRevePres').disable();
+            this.getBoton('btnFinPro').disable();
+             
+            
         }
         else{
             this.getBoton('btnCotizacion').enable();
             this.getBoton('btnCuadroComparativo').enable();
             this.getBoton('btnRevePres').enable();
+            this.getBoton('btnFinPro').enable();
         }
          return tb 
      },

@@ -446,11 +446,187 @@ BEGIN
             return v_resp;
 
 		end;
+        
+     /*********************************    
+ 	#TRANSACCION:  'ADQ_FINPRO_IME'
+ 	#DESCRIPCION:	Finaliza el proceso de compra, la solictud y revierte el presupeusto sobrante.
+ 	#AUTOR:		rac	
+ 	#FECHA:		10-07-2013 12:55:29
+	***********************************/
+
+	elsif(p_transaccion='ADQ_FINPRO_IME')then
+
+		begin
+			
+            --obtenemos datos bascios
+            select 
+            	p.id_estado_wf,
+            	p.id_proceso_wf,
+            	p.estado,
+            	p.id_depto,
+                p.id_solicitud
+            into
+            	v_id_estado_wf,
+                v_id_proceso_wf,
+                v_codigo_estado,
+                v_id_depto,
+                v_id_solicitud
+            
+            from adq.tproceso_compra p 
+            where p.id_proceso_compra = v_parametros.id_proceso_compra;
+            
+             -- verificamos si tiene cotizacion
+             
+             select 
+              count(c.id_cotizacion)
+             into
+              v_coun_num_cot 
+             from adq.tcotizacion c
+             where c.id_proceso_compra = v_parametros.id_proceso_compra; 
+            
+             IF v_coun_num_cot > 0 THEN 
+             
+             	v_estado = 'finalizado';
+             
+             ELSE
+             	 -- sino tiene cotizacion se declara desierto
+             	v_estado = 'desierto';
+             
+             END IF;
+            
+            
+            -- si tiene cotizacion verificamos que todas estan anuladas o finalizadas
+            IF v_estado = 'finalizado' THEN
+              select 
+                count(c.id_cotizacion)
+               into
+                v_coun_num_cot 
+               from adq.tcotizacion c
+               where c.id_proceso_compra = v_parametros.id_proceso_compra and c.estado !='anulado' and c.estado !='finalizada'; 
+            
+            
+                 IF v_coun_num_cot >0 THEN
+                 
+                   raise exception 'Todas las cotizaciones tienen que estar anuladas o finalizadas';
+                 
+                 END IF;
+            
+            
+            END IF;
+            
+            -- si todas las cotizaciones estan anuladas o finzalidas,  finzalimos el proceso
+            
+             select 
+              te.id_tipo_estado
+             into
+              v_id_tipo_estado
+             from wf.tproceso_wf pw 
+             inner join wf.ttipo_proceso tp on pw.id_tipo_proceso = tp.id_tipo_proceso
+             inner join wf.ttipo_estado te on te.id_tipo_proceso = tp.id_tipo_proceso and te.codigo = v_estado               
+             where pw.id_proceso_wf = v_id_proceso_wf;
+               
+              
+              
+               -- pasamos la cotizacion al siguiente estado
+           
+               v_id_estado_actual =  wf.f_registra_estado_wf(v_id_tipo_estado, 
+                                                           NULL, 
+                                                           v_id_estado_wf, 
+                                                           v_id_proceso_wf,
+                                                           p_id_usuario,
+                                                           v_id_depto);
+            
+            
+               -- actualiza estado en la cotizacion
+              
+               update adq.tproceso_compra  set 
+                 id_estado_wf =  v_id_estado_actual,
+                 estado = v_estado,
+                 id_usuario_mod=p_id_usuario,
+                 fecha_mod=now()
+               where id_proceso_compra  = v_parametros.id_proceso_compra;
+           
+             -------------------------------------------------
+              -- Finalizamos la solictud de Compra
+             --------------------------------------------------
+             
+             --recuperamos datos de la solicitud
+             
+             select 
+             s.id_estado_wf,
+             s.id_proceso_wf
+             into
+             v_id_estado_wf,
+             v_id_proceso_wf
+             from adq.tsolicitud s
+             where s.id_solicitud = v_id_solicitud;
+             
+             --recupera estado  finalizado
+             
+             v_id_tipo_estado = NULL;
+             select 
+              te.id_tipo_estado
+             into
+              v_id_tipo_estado
+             from wf.tproceso_wf pw 
+             inner join wf.ttipo_proceso tp on pw.id_tipo_proceso = tp.id_tipo_proceso
+             inner join wf.ttipo_estado te on te.id_tipo_proceso = tp.id_tipo_proceso and te.codigo = 'finalizado'               
+             where pw.id_proceso_wf = v_id_proceso_wf;
+             
+             
+             IF v_id_tipo_estado is NULL THEN
+             
+               raise exception '?No se encontro el estado finalizado para la solictud en WF';
+               
+             
+             END IF;
+             -- registra nuevo estado
+             
+            
+                      
+              v_id_estado_actual = wf.f_registra_estado_wf(
+                                                            v_id_tipo_estado, 
+                                                            v_id_funcionario, 
+                                                            v_id_estado_wf, 
+                                                            v_id_proceso_wf, 
+                                                            p_id_usuario,
+                                                            v_id_depto);
+                      
+                    
+                      
+              -- actualiza estado en la solicitud
+                update adq.tsolicitud  s set 
+                   id_estado_wf =  v_id_estado_actual,
+                   estado = 'finalizado',
+                   id_usuario_mod=p_id_usuario,
+                   fecha_mod=now()
+                 where id_solicitud =v_id_solicitud;
+             
+             ----------------------------------------------------
+             -- REVIERTE EL PRESUPUESTO SOBRANTE DE LA SOLICITUD
+             -----------------------------------------------------
+             --llamada a la funcion de reversion
+              IF not adq.f_gestionar_presupuesto_solicitud(v_id_solicitud, p_id_usuario, 'revertir')  THEN
+                 
+                   raise exception 'Error al revertir  el presupeusto sobrante';
+                 
+             END IF;
+             
+              
+            --Definicion de la respuesta
+            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Proceso de Compra y la solcitud fueron finalizados y el presupuesto revertido'); 
+            v_resp = pxp.f_agrega_clave(v_resp,'id_proceso_compra',v_parametros.id_proceso_compra::varchar);
+              
+            --Devuelve la respuesta
+            return v_resp;
+
+		end;   
+        
     /*********************************    
  	#TRANSACCION:   'ADQ_REVPRE_IME'
  	#DESCRIPCION:	 Reversion del presupuesto sobrante no adjudicado en el proceso
  	#AUTOR:		Rensi ARteaga Copari	
- 	#FECHA:		28-06-2013 12:55:29
+ 	#FECHA:		29-06-2013 12:55:29
 	***********************************/
 
 	elsif(p_transaccion='ADQ_REVPRE_IME')then

@@ -352,10 +352,9 @@ Phx.vista.CotizacionAdq = {
                     this.getBoton('del').disable();
                }
                
-               if (data['estado']==  'anulado'){
+               if (data['estado']==  'anulado' || data['estado']=='finalizada'){
                    this.getBoton('ant_estado').disable();
-                   //this.getBoton('btnReporte').disable();
-                   
+                   this.getBoton('fin_registro').disable();
                }
                
                if (data['estado']!='adjudicado'){
@@ -372,6 +371,7 @@ Phx.vista.CotizacionAdq = {
                if (data['estado']=='recomendado'){
                    this.getBoton('btnRepOC').disable();
                }
+               
                
             return tb 
      }, 

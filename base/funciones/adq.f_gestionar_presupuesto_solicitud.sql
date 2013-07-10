@@ -76,7 +76,7 @@ BEGIN
                               
                               FROM  adq.tsolicitud s 
                               INNER JOIN adq.tsolicitud_det sd on s.id_solicitud = sd.id_solicitud
-                              inner join pre.tpresupuesto   p  on p.id_centro_costo = sd.id_centro_costo 
+                              inner join pre.tpresupuesto   p  on p.id_centro_costo = sd.id_centro_costo and sd.estado_reg = 'activo'
                               WHERE  sd.id_solicitud = p_id_solicitud_compra
                                      and sd.estado_reg = 'activo' 
                                      and sd.cantidad > 0 ) LOOP
@@ -161,7 +161,7 @@ BEGIN
                               sd.revertido_mb
                               
                               FROM  adq.tsolicitud s 
-                              INNER JOIN adq.tsolicitud_det sd on s.id_solicitud = sd.id_solicitud
+                              INNER JOIN adq.tsolicitud_det sd on s.id_solicitud = sd.id_solicitud and sd.estado_reg = 'activo'
                               inner join pre.tpresupuesto   p  on p.id_centro_costo = sd.id_centro_costo 
                               WHERE  sd.id_solicitud = p_id_solicitud_compra
                                      and sd.estado_reg = 'activo' 

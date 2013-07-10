@@ -24,11 +24,11 @@ Phx.vista.CotizacionVb = {
         Phx.vista.CotizacionVb.superclass.constructor.call(this,config);
         
          this.addButton('btnGenOC',{
-                    text :'Sol. Aprobacion',
+                    text :'Aprobar',
                     iconCls : 'bok',
                     disabled: true,
                     handler : this.onGenOC,
-                    tooltip : '<b>Aprobar Adjudicación</b><br/><b> La REcomendación queda aprobada </b>'
+                    tooltip : '<b>Aprobar Adjudicación</b><br/><b> La Recomendación queda aprobada </b>'
           });
           
           this.addButton('btnChequeoDocumentos',
@@ -187,7 +187,8 @@ Phx.vista.CotizacionVb = {
                  this.getBoton('btnGenOC').disable();
                  this.getBoton('btnRepOC').enable();
                  this.getBoton('btnCuadroComparativo').disable(); 
-             }   
+             } 
+           
            this.getBoton('btnReporte').enable();  
            this.getBoton('ant_estado').enable();
            this.getBoton('btnChequeoDocumentos').enable(); 
