@@ -64,7 +64,7 @@ BEGIN
 						sold.precio_ga_mb,
 						sold.estado_reg,
 						sold.id_partida_ejecucion,
-						pre.f_verificar_presupuesto_partida(sold.id_centro_costo,sold.id_partida,1,adq.f_calcular_monto_total(sold.id_centro_costo,sold.id_partida,1)) as disponible,
+						''false''::varchar as disponible,
 						sold.precio_ga,
 						sold.id_usuario_reg,
 						sold.fecha_reg,

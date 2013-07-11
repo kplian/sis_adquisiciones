@@ -41,6 +41,7 @@ DECLARE
     v_monto_ga_mb numeric;
     v_monto_sg_mb numeric;
     v_precio_unitario_mb numeric;
+    v_id_gestion integer;
     
     
 			    
@@ -62,23 +63,35 @@ BEGIN
         
            -- obtener parametros de solicitud
             
-            select s.id_moneda, s.fecha_soli  into v_id_moneda, v_fecha_soli
+            select
+             s.id_moneda, 
+             s.fecha_soli,
+             s.id_gestion 
+            into
+              v_id_moneda, 
+              v_fecha_soli,
+              v_id_gestion
             from adq.tsolicitud s
             where  s.id_solicitud = v_parametros.id_solicitud;
         
         
             --obtener partida, cuenta auxiliar del concepto de gasto
-            
+             --recueprar la partida de la parametrizacion
+          v_id_partida = NULL;
           
+          SELECT 
+              ps_id_partida ,
+              ps_id_cuenta,
+              ps_id_auxiliar
+            into 
+              v_id_partida,
+              v_id_cuenta, 
+              v_id_auxiliar
+          FROM conta.f_get_config_relacion_contable('CUECOMP', v_id_gestion, v_parametros.id_concepto_ingas, v_parametros.id_centro_costo);
+          
+        
+           
             
-            SELECT ps_id_partida, 
-                   ps_id_cuenta, 
-                   ps_id_auxiliar 
-             into
-                   v_id_partida, 
-                   v_id_cuenta, 
-                   v_id_auxiliar       
-            FROM pre.f_obtener_partida_cuenta_cig(v_parametros.id_concepto_ingas, v_parametros.id_centro_costo);
             
             
             --obetener el precio en la moneda base del sistema
