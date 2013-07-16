@@ -98,8 +98,8 @@ class RCuadroComparativo extends Report{
 							for($i=0;$i<count($itemsCotizadosPorProveedor);$i++){
 											if($datasetItems[$i]['desc_concepto_ingas']==$itemsCotizadosPorProveedor[$i]['desc_solicitud_det']){
 										 			$objectActiveSheet->setCellValueByColumnAndRow($column, $fileItemCotizado, $itemsCotizadosPorProveedor[$i]['cantidad_coti']);
-													 $objectActiveSheet->getStyleByColumnAndRow($column,$fileItemCotizado)->applyFromArray($styleArrayCell);
-													 $objectActiveSheet->setCellValueByColumnAndRow($column+1, $fileItemCotizado, $itemsCotizadosPorProveedor[$i]['precio_unitario']);
+													 $objectActiveSheet->getStyleByColumnAndRow($column,$fileItemCotizado)->applyFromArray($styleArrayCell);														
+													 $objectActiveSheet->setCellValueByColumnAndRow($column+1, $fileItemCotizado, $itemsCotizadosPorProveedor[$i]['precio_unitario']*$provider['tipo_cambio_conv']);
 														$objectActiveSheet->getStyleByColumnAndRow($column+1,$fileItemCotizado)->applyFromArray($styleArrayCell);
 														$objectActiveSheet->setCellValueByColumnAndRow($column+2, $fileItemCotizado, $itemsCotizadosPorProveedor[$i]['cantidad_coti']*$itemCotizado['precio_unitario']);
 														$objectActiveSheet->getStyleByColumnAndRow($column+2,$fileItemCotizado)->applyFromArray($styleArrayCell);
