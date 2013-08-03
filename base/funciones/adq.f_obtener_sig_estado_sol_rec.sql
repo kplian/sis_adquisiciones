@@ -72,7 +72,7 @@ BEGIN
    --si el estado siguiente es de activos dijo o de la uti verificamos
    --verificamos las partida en el detalle de la solicitud correponden con las configuradas para su revision
    --si no pasamos al siguiente estado recursicamente 
-   if va_codigo_estado[1] in ('vbactif','vbuti') then
+   if va_codigo_estado[1] in ('vbactif','vbuti','vbalm') then
    
             select 
             te.obs

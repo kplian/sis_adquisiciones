@@ -63,41 +63,45 @@ class ACTSolicitud extends ACTbase{
             $this->objFunc=$this->create('MODSolicitud');   
         $this->res=$this->objFunc->finalizarSolicitud($this->objParam);
         $this->res->imprimirRespuesta($this->res->generarJson());
- }
+    }
 
  function reporteSolicitud(){
     $dataSource = new DataSource();
+    
     $idSolicitud = $this->objParam->getParametro('id_solicitud');
     $estado = $this->objParam->getParametro('estado');
+    
     $this->objParam->addParametroConsulta('ordenacion','id_solicitud');
     $this->objParam->addParametroConsulta('dir_ordenacion','ASC');
     $this->objParam->addParametroConsulta('cantidad',1000);
     $this->objParam->addParametroConsulta('puntero',0);
+    
     $this->objFunc = $this->create('MODSolicitud');
+    
     $resultSolicitud = $this->objFunc->reporteSolicitud();
+    
     $datosSolicitud = $resultSolicitud->getDatos();
  			
- 			//armamos el array parametros y metemos ahi los data sets de las otras tablas
+ 	//armamos el array parametros y metemos ahi los data sets de las otras tablas
     $dataSource->putParameter('estado',$estado);
     $dataSource->putParameter('id_solicitud', $datosSolicitud[0]['id_solicitud']);
-				$dataSource->putParameter('numero', $datosSolicitud[0]['numero']);
+	$dataSource->putParameter('numero', $datosSolicitud[0]['numero']);
     $dataSource->putParameter('fecha_apro', $datosSolicitud[0]['fecha_apro']);
     $dataSource->putParameter('desc_moneda', $datosSolicitud[0]['desc_moneda']);
     $dataSource->putParameter('tipo', $datosSolicitud[0]['tipo']);
-				$dataSource->putParameter('desc_gestion', $datosSolicitud[0]['desc_gestion']);
+	$dataSource->putParameter('desc_gestion', $datosSolicitud[0]['desc_gestion']);
     $dataSource->putParameter('fecha_soli', $datosSolicitud[0]['fecha_soli']);
-				$dataSource->putParameter('desc_categoria_compra', $datosSolicitud[0]['desc_categoria_compra']);
-    
+	$dataSource->putParameter('desc_categoria_compra', $datosSolicitud[0]['desc_categoria_compra']);
     $dataSource->putParameter('desc_proceso_macro', $datosSolicitud[0]['desc_proceso_macro']);
     $dataSource->putParameter('desc_funcionario', $datosSolicitud[0]['desc_funcionario']);
     $dataSource->putParameter('desc_uo', $datosSolicitud[0]['desc_uo']);
-				$dataSource->putParameter('desc_depto', $datosSolicitud[0]['desc_depto']);
+	$dataSource->putParameter('desc_depto', $datosSolicitud[0]['desc_depto']);
 				
     $dataSource->putParameter('justificacion', $datosSolicitud[0]['justificacion']);
     $dataSource->putParameter('lugar_entrega', $datosSolicitud[0]['lugar_entrega']);
-				$dataSource->putParameter('comite_calificacion', $datosSolicitud[0]['comite_calificacion']);
-				$dataSource->putParameter('posibles_proveedores', $datosSolicitud[0]['posibles_proveedores']);
-				$dataSource->putParameter('desc_funcionario_rpc', $datosSolicitud[0]['desc_funcionario_rpc']);
+	$dataSource->putParameter('comite_calificacion', $datosSolicitud[0]['comite_calificacion']);
+	$dataSource->putParameter('posibles_proveedores', $datosSolicitud[0]['posibles_proveedores']);
+	$dataSource->putParameter('desc_funcionario_rpc', $datosSolicitud[0]['desc_funcionario_rpc']);
 				
     //get detalle
     //Reset all extra params:
@@ -105,16 +109,20 @@ class ACTSolicitud extends ACTbase{
     $this->objParam->defecto('cantidad', 1000);
     $this->objParam->defecto('puntero', 0);
     $this->objParam->addParametro('id_solicitud', $idSolicitud );
-    
     $modSolicitudDet = $this->create('MODSolicitudDet');
+    
     $resultSolicitudDet = $modSolicitudDet->listarSolicitudDet();
-				$solicitudDetAgrupado = $this->groupArray($resultSolicitudDet->getDatos(), 'codigo_partida','desc_centro_costo');
+	
+	$solicitudDetAgrupado = $this->groupArray($resultSolicitudDet->getDatos(), 'codigo_partida','desc_centro_costo');
+    
     $solicitudDetDataSource = new DataSource();
-				$solicitudDetDataSource->setDataSet($solicitudDetAgrupado);
+    
+	$solicitudDetDataSource->setDataSet($solicitudDetAgrupado);
     $dataSource->putParameter('detalleDataSource', $solicitudDetDataSource);
             
     //build the report
     $reporte = new RSolicitudCompra();
+    
     $reporte->setDataSource($dataSource);
     $nombreArchivo = 'SolicitudCompra.pdf';
     $reportWriter = new ReportWriter($reporte, dirname(__FILE__).'/../../reportes_generados/'.$nombreArchivo);
@@ -130,8 +138,8 @@ class ACTSolicitud extends ACTbase{
     }
 
     function diagramaGantt(){
-						 $dataSource = new DataSource();
-						 $dataSourceSolicitud = new DataSource();
+				$dataSource = new DataSource();
+				$dataSourceSolicitud = new DataSource();
 			    $idSolicitud = $this->objParam->getParametro('id_solicitud');
 			    $this->objParam->addParametroConsulta('ordenacion','id_solicitud');
 			    $this->objParam->addParametroConsulta('dir_ordenacion','ASC');
@@ -141,9 +149,9 @@ class ACTSolicitud extends ACTbase{
 			    $resultSolicitud = $this->objFunc->estadosSolicitud();
 			    $datosSolicitud = $resultSolicitud->getDatos();
 							
-							$dataSourceSolicitud->setDataset($datosSolicitud);
+				$dataSourceSolicitud->setDataset($datosSolicitud);
 							
-							$this->objFunc = $this->create('MODProcesoCompra');
+				$this->objFunc = $this->create('MODProcesoCompra');
 			    $resultProcesoSolicitud = $this->objFunc->listarProcesoCompraSolicitud();
 			    $datosProcesoSolicitud = $resultProcesoSolicitud->getDatos();
 							
@@ -235,10 +243,10 @@ class ACTSolicitud extends ACTbase{
 	 	$keys = array_keys($array[0]);
 	 	$removekey = array_search($groupkey, $keys);
 	 	$removekeyTwo = array_search($groupkeyTwo, $keys);
-			if ($removekey===false)
-	 		return array("Clave \"$groupkey\" no existe");
-			if($removekeyTwo===false)
-	 		return array("Clave \"$groupkeyTwo\" no existe");
+		if ($removekey===false)
+ 		     return array("Clave \"$groupkey\" no existe");
+		if($removekeyTwo===false)
+ 		     return array("Clave \"$groupkeyTwo\" no existe");
 	 	$groupcriteria = array();
 	 	$arrayResp=array();
 	 	foreach($array as $value)
