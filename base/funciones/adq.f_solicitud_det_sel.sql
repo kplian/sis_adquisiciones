@@ -81,7 +81,8 @@ BEGIN
                         aux.nombre_auxiliar,
                         cig.desc_ingas as desc_concepto_ingas,
                         ot.desc_orden as desc_orden_trabajo,
-                        sold.revertido_mb
+                        sold.revertido_mb,
+                        pre.id_presupuesto
                          
 						from adq.tsolicitud_det sold
                         inner join param.tconcepto_ingas cig on cig.id_concepto_ingas = sold.id_concepto_ingas
@@ -90,6 +91,7 @@ BEGIN
                         inner join pre.tpartida par on par.id_partida = sold.id_partida
                         inner join conta.tcuenta cta on cta.id_cuenta = sold.id_cuenta
                         inner join conta.tauxiliar aux on aux.id_auxiliar = sold.id_auxiliar
+                        inner join pre.tpresupuesto pre on pre.id_centro_costo = cc.id_centro_costo 
 						left join segu.tusuario usu2 on usu2.id_usuario = sold.id_usuario_mod
                         left join conta.torden_trabajo ot on ot.id_orden_trabajo = sold.id_orden_trabajo
                         where sold.id_solicitud='||v_parametros.id_solicitud||' and ';
@@ -123,6 +125,7 @@ BEGIN
                         inner join pre.tpartida par on par.id_partida = sold.id_partida
                         inner join conta.tcuenta cta on cta.id_cuenta = sold.id_cuenta
                         inner join conta.tauxiliar aux on aux.id_auxiliar = sold.id_auxiliar
+                        inner join pre.tpresupuesto pre on pre.id_centro_costo = cc.id_centro_costo 
 						left join segu.tusuario usu2 on usu2.id_usuario = sold.id_usuario_mod
                         left join conta.torden_trabajo ot on ot.id_orden_trabajo = sold.id_orden_trabajo
                         where sold.id_solicitud='||v_parametros.id_solicitud||' and ';

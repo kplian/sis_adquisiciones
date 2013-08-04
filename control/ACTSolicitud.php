@@ -65,77 +65,7 @@ class ACTSolicitud extends ACTbase{
         $this->res->imprimirRespuesta($this->res->generarJson());
     }
 
- function reporteSolicitud(){
-    $dataSource = new DataSource();
-    
-    $idSolicitud = $this->objParam->getParametro('id_solicitud');
-    $estado = $this->objParam->getParametro('estado');
-    
-    $this->objParam->addParametroConsulta('ordenacion','id_solicitud');
-    $this->objParam->addParametroConsulta('dir_ordenacion','ASC');
-    $this->objParam->addParametroConsulta('cantidad',1000);
-    $this->objParam->addParametroConsulta('puntero',0);
-    
-    $this->objFunc = $this->create('MODSolicitud');
-    
-    $resultSolicitud = $this->objFunc->reporteSolicitud();
-    
-    $datosSolicitud = $resultSolicitud->getDatos();
- 			
- 	//armamos el array parametros y metemos ahi los data sets de las otras tablas
-    $dataSource->putParameter('estado',$estado);
-    $dataSource->putParameter('id_solicitud', $datosSolicitud[0]['id_solicitud']);
-	$dataSource->putParameter('numero', $datosSolicitud[0]['numero']);
-    $dataSource->putParameter('fecha_apro', $datosSolicitud[0]['fecha_apro']);
-    $dataSource->putParameter('desc_moneda', $datosSolicitud[0]['desc_moneda']);
-    $dataSource->putParameter('tipo', $datosSolicitud[0]['tipo']);
-	$dataSource->putParameter('desc_gestion', $datosSolicitud[0]['desc_gestion']);
-    $dataSource->putParameter('fecha_soli', $datosSolicitud[0]['fecha_soli']);
-	$dataSource->putParameter('desc_categoria_compra', $datosSolicitud[0]['desc_categoria_compra']);
-    $dataSource->putParameter('desc_proceso_macro', $datosSolicitud[0]['desc_proceso_macro']);
-    $dataSource->putParameter('desc_funcionario', $datosSolicitud[0]['desc_funcionario']);
-    $dataSource->putParameter('desc_uo', $datosSolicitud[0]['desc_uo']);
-	$dataSource->putParameter('desc_depto', $datosSolicitud[0]['desc_depto']);
-				
-    $dataSource->putParameter('justificacion', $datosSolicitud[0]['justificacion']);
-    $dataSource->putParameter('lugar_entrega', $datosSolicitud[0]['lugar_entrega']);
-	$dataSource->putParameter('comite_calificacion', $datosSolicitud[0]['comite_calificacion']);
-	$dataSource->putParameter('posibles_proveedores', $datosSolicitud[0]['posibles_proveedores']);
-	$dataSource->putParameter('desc_funcionario_rpc', $datosSolicitud[0]['desc_funcionario_rpc']);
-				
-    //get detalle
-    //Reset all extra params:
-    $this->objParam->defecto('ordenacion', 'id_solicitud_det');
-    $this->objParam->defecto('cantidad', 1000);
-    $this->objParam->defecto('puntero', 0);
-    $this->objParam->addParametro('id_solicitud', $idSolicitud );
-    $modSolicitudDet = $this->create('MODSolicitudDet');
-    
-    $resultSolicitudDet = $modSolicitudDet->listarSolicitudDet();
-	
-	$solicitudDetAgrupado = $this->groupArray($resultSolicitudDet->getDatos(), 'codigo_partida','desc_centro_costo');
-    
-    $solicitudDetDataSource = new DataSource();
-    
-	$solicitudDetDataSource->setDataSet($solicitudDetAgrupado);
-    $dataSource->putParameter('detalleDataSource', $solicitudDetDataSource);
-            
-    //build the report
-    $reporte = new RSolicitudCompra();
-    
-    $reporte->setDataSource($dataSource);
-    $nombreArchivo = 'SolicitudCompra.pdf';
-    $reportWriter = new ReportWriter($reporte, dirname(__FILE__).'/../../reportes_generados/'.$nombreArchivo);
-    $reportWriter->writeReport(ReportWriter::PDF);
-    
-    $mensajeExito = new Mensaje();
-    $mensajeExito->setMensaje('EXITO','Reporte.php','Reporte generado',
-                                    'Se generó con éxito el reporte: '.$nombreArchivo,'control');
-    $mensajeExito->setArchivoGenerado($nombreArchivo);
-    $this->res = $mensajeExito;
-    $this->res->imprimirRespuesta($this->res->generarJson());
-
-    }
+ 
 
     function diagramaGantt(){
 				$dataSource = new DataSource();
@@ -236,35 +166,177 @@ class ACTSolicitud extends ACTbase{
         $this->res->imprimirRespuesta($this->res->generarJson());
     }
     
-   function groupArray($array,$groupkey,$groupkeyTwo)
+   function reporteSolicitud(){
+    $dataSource = new DataSource();
+    
+    $idSolicitud = $this->objParam->getParametro('id_solicitud');
+    $estado = $this->objParam->getParametro('estado');
+    
+    $this->objParam->addParametroConsulta('ordenacion','id_solicitud');
+    $this->objParam->addParametroConsulta('dir_ordenacion','ASC');
+    $this->objParam->addParametroConsulta('cantidad',1000);
+    $this->objParam->addParametroConsulta('puntero',0);
+    
+    $this->objFunc = $this->create('MODSolicitud');
+    
+    $resultSolicitud = $this->objFunc->reporteSolicitud();
+    
+    $datosSolicitud = $resultSolicitud->getDatos();
+            
+    //armamos el array parametros y metemos ahi los data sets de las otras tablas
+    $dataSource->putParameter('estado',$estado);
+    $dataSource->putParameter('id_solicitud', $datosSolicitud[0]['id_solicitud']);
+    $dataSource->putParameter('numero', $datosSolicitud[0]['numero']);
+    $dataSource->putParameter('fecha_apro', $datosSolicitud[0]['fecha_apro']);
+    $dataSource->putParameter('desc_moneda', $datosSolicitud[0]['desc_moneda']);
+    $dataSource->putParameter('tipo', $datosSolicitud[0]['tipo']);
+    $dataSource->putParameter('desc_gestion', $datosSolicitud[0]['desc_gestion']);
+    $dataSource->putParameter('fecha_soli', $datosSolicitud[0]['fecha_soli']);
+    $dataSource->putParameter('desc_categoria_compra', $datosSolicitud[0]['desc_categoria_compra']);
+    $dataSource->putParameter('desc_proceso_macro', $datosSolicitud[0]['desc_proceso_macro']);
+    $dataSource->putParameter('desc_funcionario', $datosSolicitud[0]['desc_funcionario']);
+    $dataSource->putParameter('desc_uo', $datosSolicitud[0]['desc_uo']);
+    $dataSource->putParameter('desc_depto', $datosSolicitud[0]['desc_depto']);
+                
+    $dataSource->putParameter('justificacion', $datosSolicitud[0]['justificacion']);
+    $dataSource->putParameter('lugar_entrega', $datosSolicitud[0]['lugar_entrega']);
+    $dataSource->putParameter('comite_calificacion', $datosSolicitud[0]['comite_calificacion']);
+    $dataSource->putParameter('posibles_proveedores', $datosSolicitud[0]['posibles_proveedores']);
+    $dataSource->putParameter('desc_funcionario_rpc', $datosSolicitud[0]['desc_funcionario_rpc']);
+                
+    //get detalle
+    //Reset all extra params:
+    $this->objParam->defecto('ordenacion', 'id_solicitud_det');
+    $this->objParam->defecto('cantidad', 1000);
+    $this->objParam->defecto('puntero', 0);
+    $this->objParam->addParametro('id_solicitud', $idSolicitud );
+    $modSolicitudDet = $this->create('MODSolicitudDet');
+    //lista el detalle de la solicitud
+    $resultSolicitudDet = $modSolicitudDet->listarSolicitudDet();
+    
+    //agrupa el detalle de la solcitud por centros de costos y partidas
+    
+    $solicitudDetAgrupado = $this->groupArray($resultSolicitudDet->getDatos(), 'codigo_partida','desc_centro_costo', $datosSolicitud[0]['id_moneda'],$datosSolicitud[0]['estado']);
+    
+    $solicitudDetDataSource = new DataSource();
+    
+    $solicitudDetDataSource->setDataSet($solicitudDetAgrupado);
+    
+    //inserta el detalle de la colistud como origen de datos
+    
+    $dataSource->putParameter('detalleDataSource', $solicitudDetDataSource);
+            
+    //build the report
+    $reporte = new RSolicitudCompra();
+    
+    $reporte->setDataSource($dataSource);
+    $nombreArchivo = 'SolicitudCompra.pdf';
+    $reportWriter = new ReportWriter($reporte, dirname(__FILE__).'/../../reportes_generados/'.$nombreArchivo);
+    $reportWriter->writeReport(ReportWriter::PDF);
+    
+    $mensajeExito = new Mensaje();
+    $mensajeExito->setMensaje('EXITO','Reporte.php','Reporte generado',
+                                    'Se generó con éxito el reporte: '.$nombreArchivo,'control');
+    $mensajeExito->setArchivoGenerado($nombreArchivo);
+    $this->res = $mensajeExito;
+    $this->res->imprimirRespuesta($this->res->generarJson());
+
+    } 
+    
+    /*
+    
+    Autor: GSS
+    DESCRIPTION:  Agrupa los detalles de la solcitud
+    $solicitudDetAgrupado = $this->groupArray(
+        $resultSolicitudDet->getDatos(), 
+        'codigo_partida',
+        'desc_centro_costo');
+    
+    */
+    
+   function groupArray($array,$groupkey,$groupkeyTwo,$id_moneda,$estado_sol)
 	{
 	 if (count($array)>0)
 	 {
+	 	//recupera las llaves del array    
 	 	$keys = array_keys($array[0]);
+	 	
 	 	$removekey = array_search($groupkey, $keys);
 	 	$removekeyTwo = array_search($groupkeyTwo, $keys);
+	 	
 		if ($removekey===false)
  		     return array("Clave \"$groupkey\" no existe");
 		if($removekeyTwo===false)
  		     return array("Clave \"$groupkeyTwo\" no existe");
+ 		     
 	 	$groupcriteria = array();
 	 	$arrayResp=array();
+	 	
+	 	//recorre el resultado de la consulta 
 	 	foreach($array as $value)
 	 	{
+	 		//por cada registro almacena el valor correspondiente en $item     
 	 		$item=null;
 	 		foreach ($keys as $key)
 	 		{
 	 			$item[$key] = $value[$key];
 	 		}
+	 		
+	 		//buscar si el grupo ya se incerto
 	 	 	$busca = array_search($value[$groupkey].$value[$groupkeyTwo], $groupcriteria);
+	 		
 	 		if ($busca === false)
 	 		{
+	 		     //si el grupo no existe lo crea
+	 		    
 	 			$groupcriteria[]=$value[$groupkey].$value[$groupkeyTwo];
 	 			$arrayResp[]=array($groupkey.$groupkeyTwo=>$value[$groupkey].$value[$groupkeyTwo],'groupeddata'=>array());
+	 			//coloca el indice en la ultima posicion insertada
 	 			$busca=count($arrayResp)-1;
 	 		}
+	 		
+	 		//inserta el registro en el grupo correspondiente
 	 		$arrayResp[$busca]['groupeddata'][]=$item;
+	 		$arrayResp[$busca]['presu_verificado']=false;
 	 	}
+	 	
+	 	//TODO,  solo verificar si el estado es borrador o pendiente
+	 	//suma y verifica el presupuesto
+	 	
+	 	if ($estado_sol == 'borrador' || $estado_sol == 'pendiente'){
+    	 	foreach($arrayResp as $value)
+            {
+                  
+                  $total_pre = 0;
+                  
+                 $busca = array_search($value[$groupkey].$value[$groupkeyTwo], $groupcriteria);
+                 foreach($value[groupeddata] as $value_det){
+                       //sumamos el monto a comprometer   
+                      $total_pre = $total_pre + $value_det["precio_ga"];
+                 }
+                 $value_det = $value[groupeddata][0];
+                 $this->objParam = new CTParametro(null,null,null);
+                 $this->objParam->addParametro('id_presupuesto',$value_det["id_presupuesto"]);
+                 $this->objParam->addParametro('id_partida',$value_det["id_partida"]);
+                 $this->objParam->addParametro('id_moneda',$id_moneda);
+                 $this->objParam->addParametro('monto_total',$total_pre);
+                 $this->objFunc = $this->create('sis_presupuestos/MODPresupuesto');
+                 $resultSolicitud = $this->objFunc->verificarPresupuesto();
+                 
+                 $arrayResp[$busca]["presu_verificado"]=$resultSolicitud->datos["presu_verificado"];
+                 
+                 if($resultSolicitud->getTipo()=='ERROR'){
+                              
+                      $resultSolicitud->imprimirRespuesta($resultSolicitud-> generarMensajeJson());
+                      exit;
+                 }
+                 
+                 // print_r( $resultSolicitud->getTipo()); 
+                  
+            }
+            
+        }
+	 	
 	 	return $arrayResp;
 	 }
 	 else

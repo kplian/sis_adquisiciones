@@ -761,7 +761,8 @@ BEGIN
               --modifca bandera de comprometido  
            
                    update adq.tsolicitud  s set 
-                     presu_comprometido =  'si'
+                     presu_comprometido =  'si',
+                     fecha_apro = now()
                    where id_solicitud = v_parametros.id_solicitud;
             
             
@@ -874,8 +875,9 @@ BEGIN
                            --  modifica bandera de presupuesto comprometido
                             
                            --modifca bandera de comprometido  
-                             update adq.tsolicitud  s set 
-                               presu_comprometido =  'no'
+                             update adq.tsolicitud   set 
+                               presu_comprometido =  'no',
+                               fecha_apro = NULL
                              where id_solicitud = v_parametros.id_solicitud;
                            
                          

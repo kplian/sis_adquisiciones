@@ -598,19 +598,14 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
        
 	onButtonSolicitud:function(){
 	    var rec=this.sm.getSelected();
-                console.debug(rec);
-                Ext.Ajax.request({
-                    url:'../../sis_adquisiciones/control/Solicitud/reporteSolicitud',
-                    params:{'id_solicitud':rec.data.id_solicitud,'estado':rec.data.estado},
-                    success: this.successExport,
-                    failure: function() {
-                        console.log("fail");
-                    },
-                    timeout: function() {
-                        console.log("timeout");
-                    },
-                    scope:this
-                });  
+        Ext.Ajax.request({
+            url:'../../sis_adquisiciones/control/Solicitud/reporteSolicitud',
+            params:{'id_solicitud':rec.data.id_solicitud,'estado':rec.data.estado},
+            success: this.successExport,
+            failure: this.conexionFailure,
+            timeout:this.timeout,
+            scope:this
+        });  
 	},
 	obtenerSolicitud:function(){
 	    
