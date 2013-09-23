@@ -313,12 +313,13 @@ class ACTCotizacion extends ACTbase{
 
         $this->datos=array();
         $this->datos=$this->res->getDatos();
-        $uos=$this->datos[0]['uos'];
-        $eps=$this->datos[0]['eps'];
+        
+       $uos=$this->res->datos['uos'];
+        $eps=$this->res->datos['eps'];
    
         
-        $this->objParam->addParametro('eps',$eps); 
-        $this->objParam->addParametro('uos',$uos); 
+        $this->objParam->addParametro('eps',$eps);
+        $this->objParam->addParametro('uos',$uos);
         
         
         // parametros de ordenacion por defecto
