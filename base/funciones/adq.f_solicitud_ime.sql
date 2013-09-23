@@ -849,19 +849,12 @@ BEGIN
                          where id_solicitud = v_parametros.id_solicitud;
                          
                          
-                        --TO DO,  cuando revertir????
+                      
                       
                         -- cuando el estado al que regresa es pendiente revierte presusupesto comprometido
                          IF v_codigo_estado = 'pendiente'  THEN
                          
-                            -- actualiza estado en la solicitud
-                            update adq.tsolicitud  s set 
-                               id_estado_wf =  v_id_estado_actual,
-                               estado = v_codigo_estado,
-                               id_usuario_mod=p_id_usuario,
-                               fecha_mod=now()
-                             where id_solicitud = v_parametros.id_solicitud;
-                         
+                                                    
                          
                            --  llamar a funciond erevertir presupuesto
                            
