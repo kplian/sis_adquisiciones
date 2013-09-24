@@ -191,7 +191,8 @@ BEGIN
                      p_id_usuario,
                      v_id_estado_actual, 
                      NULL, 
-                     v_parametros.id_depto);
+                     v_parametros.id_depto,
+                     v_parametros.codigo_proceso);
             
             
            --registra el estado del WF para el proceso

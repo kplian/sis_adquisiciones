@@ -40,11 +40,11 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
         );
         
   function diagramGantt(){			
-			var data=this.sm.getSelected().data.id_solicitud;
+			var data=this.sm.getSelected().data.id_proceso_wf;
 			Phx.CP.loadingShow();
 			Ext.Ajax.request({
-				url:'../../sis_adquisiciones/control/Solicitud/diagramaGantt',
-				params:{'id_solicitud':data},
+				url:'../../sis_workflow/control/ProcesoWf/diagramaGanttTramite',
+				params:{'id_proceso_wf':data},
 				success:this.successExport,
 				failure: this.conexionFailure,
 				timeout:this.timeout,
