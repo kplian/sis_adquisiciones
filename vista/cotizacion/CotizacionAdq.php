@@ -48,6 +48,14 @@ Phx.vista.CotizacionAdq = {
           
           
        this.addButton('btnSendMail',{text:'Sol Cotizacion',iconCls: 'bemail',disabled:true,handler:this.onSendMail,tooltip: '<b>Solictar Cotizacion</b><p>Solicta la cotizacion por correo al proveedor</p>'});
+       
+       this.addButton('btnPreing',{
+                    text :'Preingreso',
+                    iconCls : 'bchecklist',
+                    disabled: true,
+                    handler : this.onPreing,
+                    tooltip : '<b>Preingreso</b><br/><b>Generación del Preingreso</b>'
+          });
            
         
         
@@ -300,6 +308,30 @@ Phx.vista.CotizacionAdq = {
             });
         },
         
+        onPreing:function(){
+            var rec = this.sm.getSelected();
+            if(rec.data){
+            	Ext.Msg.confirm('Confirmación',
+				'¿Está seguro de generar el Preingreso?', 
+				function(btn) {
+					if (btn == "yes") {
+						Phx.CP.loadingShow();
+			            Ext.Ajax.request({
+			                url:'../../sis_adquisiciones/control/Cotizacion/generarPreingreso',
+			                params:{id_cotizacion:rec.data.id_cotizacion},
+			                success:this.successSinc,
+			                failure: this.conexionFailure,
+			                timeout:this.timeout,
+			                scope:this
+			            });
+					}
+				},this);
+  
+            } else{
+            	Ext.Msg.alert('Mensaje','Seleccione un registro y vuelva a intentarlo');
+            }
+        },
+        
 
        
        
@@ -366,6 +398,7 @@ Phx.vista.CotizacionAdq = {
                  
                if (data['estado']=='pago_habilitado'){
                    this.getBoton('ant_estado').disable();
+                   this.getBoton('btnPreing').enable();
                }
                
                if (data['estado']=='recomendado'){
@@ -386,6 +419,7 @@ Phx.vista.CotizacionAdq = {
             this.getBoton('ant_estado').disable();
             this.getBoton('btnReporte').disable();
             this.getBoton('btnSendMail').disable(); 
+            this.getBoton('btnPreing').disable();
          }
        return tb
     },

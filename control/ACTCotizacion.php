@@ -333,6 +333,12 @@ class ACTCotizacion extends ACTbase{
         
         
     }
+
+	function generarPreingreso(){
+        $this->objFunc=$this->create('MODCotizacion');  
+        $this->res=$this->objFunc->generarPreingreso($this->objParam);
+        $this->res->imprimirRespuesta($this->res->generarJson());
+    }
     
 
 }

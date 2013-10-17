@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION adq.f_cotizacion_ime (
   p_administrador integer,
   p_id_usuario integer,
@@ -102,6 +100,7 @@ DECLARE
      v_comprometido_ga numeric;
      v_ejecutado numeric;
      v_id_moneda_base integer;
+     v_result varchar;
      
 			    
 BEGIN
@@ -217,19 +216,14 @@ BEGIN
           
                  --registra estado de cotizacion
           
-                 SELECT
-                           ps_id_proceso_wf,
-                           ps_id_estado_wf,
-                           ps_codigo_estado
-                     into
-                           v_id_proceso_wf,
-                           v_id_estado_wf,
-                           v_codigo_estado
-                  FROM wf.f_registra_proceso_disparado_wf(
-                           p_id_usuario,
-                           v_id_estado_wf_pro, 
-                           NULL, 
-                           v_id_depto);
+                 SELECT ps_id_proceso_wf,
+                        ps_id_estado_wf,
+                        ps_codigo_estado
+                 into v_id_proceso_wf,
+                      v_id_estado_wf,
+                      v_codigo_estado
+                 FROM wf.f_registra_proceso_disparado_wf(p_id_usuario,
+                  v_id_estado_wf_pro, NULL, v_id_depto);
           ELSE
         
           
@@ -1338,7 +1332,7 @@ BEGIN
             ----------------------------------------
              
             --registra estado de cotizacion
-          
+
              SELECT
                        ps_id_proceso_wf,
                        ps_id_estado_wf,
@@ -1351,8 +1345,9 @@ BEGIN
                        p_id_usuario,
                        v_id_estado_actual, 
                        NULL, 
-                       v_parametros.id_depto_tes);
-        
+                       v_parametros.id_depto_tes,
+                       '---',
+                       'OBLI');
         
              update tes.tobligacion_pago  o set 
                id_estado_wf =  v_id_estado_wf,
@@ -1403,6 +1398,28 @@ BEGIN
             v_resp = pxp.f_agrega_clave(v_resp,'mensaje','UOs, EPs retornados'); 
             v_resp = pxp.f_agrega_clave(v_resp,'eps',v_cad_ep::varchar);
             v_resp = pxp.f_agrega_clave(v_resp,'uos',v_cad_uo::varchar);
+              
+            --Devuelve la respuesta
+            return v_resp;
+
+		end;
+		
+	/*********************************    
+ 	#TRANSACCION:  'ADQ_PREING_GEN'
+ 	#DESCRIPCION:	Genera el preingreso a almacén o activos
+ 	#AUTOR:	        RCM
+ 	#FECHA:		    02/10/2013
+	***********************************/
+
+	elsif(p_transaccion='ADQ_PREING_GEN')then
+
+		begin
+
+			--Llamada a función de generación del preingreso			
+         	v_result = adq.f_genera_preingreso(p_id_usuario, v_parametros.id_cotizacion);
+        
+             --Definicion de la respuesta
+            v_resp = pxp.f_agrega_clave(v_resp,'mensaje',v_result); 
               
             --Devuelve la respuesta
             return v_resp;
