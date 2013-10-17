@@ -70,12 +70,14 @@ class ACTSolicitud extends ACTbase{
     function diagramaGantt(){
 				$dataSource = new DataSource();
 				$dataSourceSolicitud = new DataSource();
+				
 			    $idSolicitud = $this->objParam->getParametro('id_solicitud');
 			    $this->objParam->addParametroConsulta('ordenacion','id_solicitud');
 			    $this->objParam->addParametroConsulta('dir_ordenacion','ASC');
 			    $this->objParam->addParametroConsulta('cantidad',1000);
 			    $this->objParam->addParametroConsulta('puntero',0);
 			    $this->objFunc = $this->create('MODSolicitud');
+			    
 			    $resultSolicitud = $this->objFunc->estadosSolicitud();
 			    $datosSolicitud = $resultSolicitud->getDatos();
 							

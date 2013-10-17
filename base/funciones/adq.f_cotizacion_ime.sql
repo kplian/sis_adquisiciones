@@ -101,6 +101,7 @@ DECLARE
      v_ejecutado numeric;
      v_id_moneda_base integer;
      v_result varchar;
+     v_dec_proveedor text;
      
 			    
 BEGIN
@@ -138,6 +139,17 @@ BEGIN
             v_id_solicitud
            from adq.tproceso_compra pc
            where pc.id_proceso_compra = v_parametros.id_proceso_compra;
+           
+           
+           --recupera el nomber del proveedor
+           
+           select 
+             p.desc_proveedor
+           into
+            v_dec_proveedor
+           from param.vproveedor p 
+           where p.id_proveedor= v_parametros.id_proveedor;
+           
            
 
           -- raise exception ' xxxxxxxx   % - %', v_estado_pro, v_parametros.id_proceso_compra;
@@ -209,21 +221,28 @@ BEGIN
                                p_id_usuario,
                                v_id_estado_actual, 
                                NULL, 
-                               v_id_depto);
+                               v_id_depto, 
+                               v_dec_proveedor::varchar);
                   
           
            ELSEIF  v_estado_pro = 'proceso' THEN
           
                  --registra estado de cotizacion
           
-                 SELECT ps_id_proceso_wf,
-                        ps_id_estado_wf,
-                        ps_codigo_estado
-                 into v_id_proceso_wf,
-                      v_id_estado_wf,
-                      v_codigo_estado
-                 FROM wf.f_registra_proceso_disparado_wf(p_id_usuario,
-                  v_id_estado_wf_pro, NULL, v_id_depto);
+                 SELECT
+                           ps_id_proceso_wf,
+                           ps_id_estado_wf,
+                           ps_codigo_estado
+                     into
+                           v_id_proceso_wf,
+                           v_id_estado_wf,
+                           v_codigo_estado
+                  FROM wf.f_registra_proceso_disparado_wf(
+                           p_id_usuario,
+                           v_id_estado_wf_pro, 
+                           NULL, 
+                           v_id_depto,
+                           v_dec_proveedor::varchar);
           ELSE
         
           

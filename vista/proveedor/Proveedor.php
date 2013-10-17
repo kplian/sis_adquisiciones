@@ -98,6 +98,7 @@ Phx.vista.Proveedor=Ext.extend(Phx.gridInterfaz,{
 				gwidth: 180
 			},
 			type:'TextField',
+			filters:{pfiltro:'instit.nombre#person.nombre_completo1',type:'string'},
 			grid:true,
 			form:false
 		},
@@ -796,8 +797,7 @@ Phx.vista.Proveedor=Ext.extend(Phx.gridInterfaz,{
 				
 				//if(n=='persona natural' || n=='0'){
 					this.getComponente('id_persona').enable();
-					console.log(r);
-					this.mostrarComponente(this.getComponente('id_persona'));
+				    this.mostrarComponente(this.getComponente('id_persona'));
 					this.ocultarComponente(this.getComponente('id_institucion'));
 					this.resetGroup(1);
 					this.unblockGroup(1);

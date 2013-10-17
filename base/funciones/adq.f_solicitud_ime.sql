@@ -156,7 +156,9 @@ BEGIN
              p_id_usuario, 
              v_parametros.id_gestion, 
              v_codigo_tipo_proceso, 
-             v_parametros.id_funcionario);
+             v_parametros.id_funcionario,
+             NULL,
+             v_num_sol);
         
         -- obtiene el funcionario aprobador
         
