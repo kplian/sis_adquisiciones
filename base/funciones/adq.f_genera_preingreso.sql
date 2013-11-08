@@ -26,6 +26,7 @@ DECLARE
     v_id_depto integer;
     v_af integer;
     v_alm integer;
+    v_id_depto_conta integer;
 
 BEGIN
 
@@ -37,7 +38,7 @@ BEGIN
     --OBTENCION DE DATOS
     ---------------------
 	--Cotización
-    select cot.id_proceso_wf, cot.id_estado_wf, cot.estado, cot.id_moneda,
+    select cot.id_cotizacion,cot.id_proceso_wf, cot.id_estado_wf, cot.estado, cot.id_moneda,
     cot.id_obligacion_pago, sol.justificacion
     into v_rec_cot
     from adq.tcotizacion cot
@@ -52,7 +53,7 @@ BEGIN
     --VALIDACIONES
     ---------------
 	--Existencia de la cotización en estado 'pago_habilitado'
-	if v_rec_cot.id_proceso_wf is null then
+	if v_rec_cot.id_cotizacion is null then
     	raise exception 'Cotización no encontrada';
     end if;
     if v_rec_cot.id_obligacion_pago is null then
@@ -60,22 +61,23 @@ BEGIN
     end if;
     
     --Verifica que no haya generado ya un Preingreso
-    /*if exists(select 1
+    if exists(select 1
               from alm.tpreingreso
-              where id_cotizacion = p_id_cotizacion) then
+              where id_cotizacion = p_id_cotizacion
+              and estado in ('borrador','finalizado')) then
     	raise exception 'El Preingreso ya fue generado anteriormente.';
-    end if;*/
+    end if;
 	
     --Verifica que la primera cuota haya sido al menos devengada
-    /*select od.estado_reg
-    into v_estado_cuota
+    select od.estado_reg, op.id_depto
+    into v_estado_cuota, v_id_depto_conta
     from tes.tobligacion_pago op
     inner join tes.tobligacion_det od
     on od.id_obligacion_pago = op.id_obligacion_pago
     where op.id_obligacion_pago = v_rec_cot.id_obligacion_pago
     order by od.id_obligacion_det asc limit 1;
     
-    if v_estado_cuota != 'devengado' then
+    /*if v_estado_cuota != 'devengado' then
     	raise exception 'La cotización aún no ha sido Devengada';
     end if;*/
     
@@ -123,11 +125,11 @@ BEGIN
         insert into alm.tpreingreso(
         id_usuario_reg, fecha_reg, estado_reg, id_cotizacion,
         id_depto, id_estado_wf, id_proceso_wf, estado, id_moneda,
-        tipo, descripcion
+        tipo, descripcion, id_depto_conta
         ) values(
         p_id_usuario, now(),'activo',p_id_cotizacion,
         null, v_id_estado_wf, v_id_proceso_wf, v_codigo_estado, v_id_moneda,
-        'almacen', v_rec_cot.justificacion
+        'almacen', v_rec_cot.justificacion, v_id_depto_conta
         ) returning id_preingreso into v_id_preingreso;
         
         --Generación del detalle del preingreso  de activo fijo
@@ -189,7 +191,6 @@ BEGIN
     else
     	raise exception 'No se ha generado ningún preingreso';
     end if;
-    
     
     return v_resp;
     
