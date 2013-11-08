@@ -1,10 +1,10 @@
 <?php
 /**
 *@package pXP
-*@file gen-SistemaDist.php
-*@author  (fprudencio)
+*@file gen-SolicitudReq.php
+*@author  (rarteaga)
 *@date 20-09-2011 10:22:05
-*@description Archivo con la interfaz de usuario que permite la ejecucion de todas las funcionalidades del sistema
+*@Interface para el inicio de solicitudes de compra
 */
 header("content-type: text/javascript; charset=UTF-8");
 ?>

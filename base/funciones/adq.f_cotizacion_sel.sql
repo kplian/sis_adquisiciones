@@ -1,3 +1,5 @@
+--------------- SQL ---------------
+
 CREATE OR REPLACE FUNCTION adq.f_cotizacion_sel (
   p_administrador integer,
   p_id_usuario integer,
@@ -77,8 +79,12 @@ BEGIN
                         cot.id_proceso_wf,
                         mon.codigo as desc_moneda,
                         cot.tipo_cambio_conv,
-                        pro.email
+                        pro.email,
+                        sol.numero,
+                        sol.num_tramite
 						from adq.tcotizacion cot
+                        inner join adq.tproceso_compra proc on proc.id_proceso_compra = cot.id_proceso_compra
+                        inner join adq.tsolicitud sol on sol.id_solicitud = proc.id_solicitud
 						inner join segu.tusuario usu1 on usu1.id_usuario = cot.id_usuario_reg
 						left join segu.tusuario usu2 on usu2.id_usuario = cot.id_usuario_mod
 				        inner join param.tmoneda mon on mon.id_moneda = cot.id_moneda
@@ -148,25 +154,65 @@ BEGIN
 		end;   
          
     
-	/*********************************    
+    /*********************************    
  	#TRANSACCION:  'ADQ_COTRPC_SEL'
- 	#DESCRIPCION:	Consulta de datos para los funcionarios rpc
+ 	#DESCRIPCION:	Consulta de cotizaciones por estado dinamicos WF
  	#AUTOR:	     Rensi Arteaga Copari
- 	#FECHA:		07-05-2013 14:48:35
+ 	#FECHA:		3-11-2013 14:48:35
 	***********************************/
 
 	elsif(p_transaccion='ADQ_COTRPC_SEL')then
      				
     	begin
         
-            IF p_administrador != 1 THEN
+           
             
-            	v_add_filtro = 'sol.id_funcionario_rpc = '||v_parametros.id_funcionario_rpc||'  and  ';
+            
+            v_add_filtro='';
+            
+            if (v_parametros.id_funcionario_usu is null) then
+              	
+                v_parametros.id_funcionario_usu = -1;
+            
+            end if;
+            
+           
+            IF  lower(v_parametros.tipo_interfaz) = 'cotizacionvb' THEN
+                                        
+               
+                IF p_administrador != 1 THEN
+            
+            	    v_add_filtro = '(cot.estado=''recomendado''  or  cot.estado=''adjudicado'') and  sol.id_funcionario_rpc = '||v_parametros.id_funcionario_rpc||'  and  ';
                 
-            ELSE 
-               v_add_filtro='  ';
+                ELSE 
+                    v_add_filtro='  (cot.estado=''recomendado''  or  cot.estado=''adjudicado'') and ';
+            
+                END IF;
+            
+            
             
             END IF;
+            
+            
+            
+            IF  lower(v_parametros.tipo_interfaz) = 'cotizacionvbdin' THEN
+            
+                       
+                IF p_administrador !=1 THEN
+                
+                             
+                      v_add_filtro = '  ( ( (ew.id_funcionario='||v_parametros.id_funcionario_usu::varchar||' ) and  (lower(cot.estado)!=''borrador'') and  (lower(cot.estado)!=''recomendado'') and  (lower(cot.estado)!=''cotizado'') and  (lower(cot.estado)!=''adjudicado'') and  (lower(cot.estado)!=''pago_habilitado'')  and  (lower(cot.estado)!=''finalizado'') )  or    ((cot.estado=''recomendado''  or  cot.estado=''adjudicado'') and  sol.id_funcionario_rpc = '||v_parametros.id_funcionario_rpc||')) and ';
+                  
+                 
+                 
+                 ELSE
+                      v_add_filtro = ' (lower(cot.estado)!=''borrador'') and   (lower(cot.estado)!=''cotizado'') and  (lower(cot.estado)!=''pago_habilitado'')  and  (lower(cot.estado)!=''finalizado'') and ';
+                  
+                END IF;
+            
+            END IF;  
+            
+            raise notice 'tipo interface %',v_parametros.tipo_interfaz;
         
     		--Sentencia de la consulta
 			v_consulta:='select
@@ -201,7 +247,9 @@ BEGIN
                         mon.codigo as desc_moneda,
                         cot.tipo_cambio_conv,
                         sol.id_solicitud,
-                        sol.id_categoria_compra
+                        sol.id_categoria_compra,
+                        sol.numero,
+                        sol.num_tramite
 						from adq.tcotizacion cot
 						inner join segu.tusuario usu1 on usu1.id_usuario = cot.id_usuario_reg
                         inner join adq.tproceso_compra pc on pc.id_proceso_compra = cot.id_proceso_compra
@@ -209,16 +257,98 @@ BEGIN
 						left join segu.tusuario usu2 on usu2.id_usuario = cot.id_usuario_mod
 				        inner join param.tmoneda mon on mon.id_moneda = cot.id_moneda
                         inner join param.vproveedor pro on pro.id_proveedor = cot.id_proveedor
-                        where  (cot.estado=''recomendado''  or  cot.estado=''adjudicado'') and '|| v_add_filtro ||' ';
+                        inner join wf.testado_wf ew on ew.id_estado_wf = cot.id_estado_wf
+                        where  '|| v_add_filtro ||' ';
 			
 			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;
 			v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
 
+            raise notice  '%',v_consulta;
+
 			--Devuelve la respuesta
 			return v_consulta;
 						
+		end;   
+    
+    /*********************************    
+ 	#TRANSACCION:  'ADQ_COTRPC_CONT'
+ 	#DESCRIPCION:	Conteo de registros de la consulta de cotizaciones por RPC
+ 	#AUTOR:		    Rensi Arteaga Copari
+ 	#FECHA:		21-03-2013 14:48:35
+	***********************************/
+
+	elsif(p_transaccion='ADQ_COTRPC_CONT')then
+
+		begin
+        
+           
+        
+            v_add_filtro='';
+            
+            if (v_parametros.id_funcionario_usu is null) then
+              	
+                v_parametros.id_funcionario_usu = -1;
+            
+            end if;
+            
+           
+            IF  lower(v_parametros.tipo_interfaz) = 'cotizacionvb' THEN
+                                        
+               
+                IF p_administrador != 1 THEN
+            
+            	    v_add_filtro = '(cot.estado=''recomendado''  or  cot.estado=''adjudicado'') and  sol.id_funcionario_rpc = '||v_parametros.id_funcionario_rpc||'  and  ';
+                
+                ELSE 
+                    v_add_filtro='  (cot.estado=''recomendado''  or  cot.estado=''adjudicado'') and ';
+            
+                END IF;
+            
+            
+            
+            END IF;
+            
+            
+            
+            IF  lower(v_parametros.tipo_interfaz) = 'cotizacionvbdin' THEN
+            
+                       
+                IF p_administrador !=1 THEN
+                
+                             
+                      v_add_filtro = '  ( ( (ew.id_funcionario='||v_parametros.id_funcionario_usu::varchar||' ) and  (lower(cot.estado)!=''borrador'') and  (lower(cot.estado)!=''recomendado'') and  (lower(cot.estado)!=''cotizado'') and  (lower(cot.estado)!=''adjudicado'') and  (lower(cot.estado)!=''pago_habilitado'')  and  (lower(cot.estado)!=''finalizado'') )  or    ((cot.estado=''recomendado''  or  cot.estado=''adjudicado'') and  sol.id_funcionario_rpc = '||v_parametros.id_funcionario_rpc||')) and ';
+                  
+                 
+                 
+                 ELSE
+                      v_add_filtro = ' (lower(cot.estado)!=''borrador'') and   (lower(cot.estado)!=''cotizado'') and  (lower(cot.estado)!=''pago_habilitado'')  and  (lower(cot.estado)!=''finalizado'') and ';
+                  
+                END IF;
+            
+            END IF;  
+        
+        
+			--Sentencia de la consulta de conteo de registros
+			v_consulta:='select count(id_cotizacion)
+					    from adq.tcotizacion cot
+						inner join segu.tusuario usu1 on usu1.id_usuario = cot.id_usuario_reg
+                        inner join adq.tproceso_compra pc on pc.id_proceso_compra = cot.id_proceso_compra
+                        inner join adq.tsolicitud sol on sol.id_solicitud = pc.id_solicitud
+						left join segu.tusuario usu2 on usu2.id_usuario = cot.id_usuario_mod
+				        inner join param.tmoneda mon on mon.id_moneda = cot.id_moneda
+                        inner join param.vproveedor pro on pro.id_proveedor = cot.id_proveedor
+                        inner join wf.testado_wf ew on ew.id_estado_wf = cot.id_estado_wf
+                        where (cot.estado=''recomendado''  or  cot.estado=''adjudicado'')  and '|| v_add_filtro ||' ';
+			--Definicion de la respuesta		    
+			v_consulta:=v_consulta||v_parametros.filtro;
+
+			--Devuelve la respuesta
+			return v_consulta;
+
 		end;
+        
+        
     /*********************************    
  	#TRANSACCION:  'ADQ_COTREP_SEL'
  	#DESCRIPCION:	Consulta de registros para los reportes
@@ -377,42 +507,7 @@ BEGIN
           return v_consulta;
         end;
         
-	/*********************************    
- 	#TRANSACCION:  'ADQ_COTRPC_CONT'
- 	#DESCRIPCION:	Conteo de registros de la consulta de cotizaciones por RPC
- 	#AUTOR:		    Rensi Arteaga Copari
- 	#FECHA:		21-03-2013 14:48:35
-	***********************************/
-
-	elsif(p_transaccion='ADQ_COTRPC_CONT')then
-
-		begin
-        
-            IF p_administrador != 1 THEN
-            
-            	v_add_filtro = 'sol.id_funcionario_rpc = '||v_parametros.id_funcionario_rpc||'  and';
-                
-            ELSE 
-               v_add_filtro='  ';
-            
-            END IF;
-			--Sentencia de la consulta de conteo de registros
-			v_consulta:='select count(id_cotizacion)
-					    from adq.tcotizacion cot
-						inner join segu.tusuario usu1 on usu1.id_usuario = cot.id_usuario_reg
-                        inner join adq.tproceso_compra pc on pc.id_proceso_compra = cot.id_proceso_compra
-                        inner join adq.tsolicitud sol on sol.id_solicitud = pc.id_solicitud
-						left join segu.tusuario usu2 on usu2.id_usuario = cot.id_usuario_mod
-				        inner join param.tmoneda mon on mon.id_moneda = cot.id_moneda
-                        inner join param.vproveedor pro on pro.id_proveedor = cot.id_proveedor
-                        where (cot.estado=''recomendado''  or  cot.estado=''adjudicado'')  and '|| v_add_filtro ||' ';
-			--Definicion de la respuesta		    
-			v_consulta:=v_consulta||v_parametros.filtro;
-
-			--Devuelve la respuesta
-			return v_consulta;
-
-		end;
+	
         
       
 	/*********************************    
@@ -426,8 +521,10 @@ BEGIN
 
 		begin
 			--Sentencia de la consulta de conteo de registros
-			v_consulta:='select count(id_cotizacion)
+			v_consulta:='select count(cot.id_cotizacion)
 					    from adq.tcotizacion cot
+                        inner join adq.tproceso_compra proc on proc.id_proceso_compra = cot.id_proceso_compra
+                        inner join adq.tsolicitud sol on sol.id_solicitud = proc.id_solicitud
 						inner join segu.tusuario usu1 on usu1.id_usuario = cot.id_usuario_reg
 						left join segu.tusuario usu2 on usu2.id_usuario = cot.id_usuario_mod
 				        inner join param.tmoneda mon on mon.id_moneda = cot.id_moneda

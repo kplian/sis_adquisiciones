@@ -5,13 +5,13 @@
 *@author  (fprudencio)
 *@date 20-09-2011 10:22:05
 *@description Archivo con la interfaz de usuario que permite 
-*dar el visto a solicitudes de compra
+*el inico de procesos de compra a partir de las solicitude aprobadas
 *
 */
 header("content-type: text/javascript; charset=UTF-8");
 ?>
 <script>
-Phx.vista.SolicitudVb = {
+Phx.vista.SolicitudApro = {
     bedit:false,
     bnew:false,
     bsave:false,
@@ -19,11 +19,14 @@ Phx.vista.SolicitudVb = {
 	require:'../../../sis_adquisiciones/vista/solicitud/Solicitud.php',
 	requireclase:'Phx.vista.Solicitud',
 	title:'Solicitud',
-	nombreVista: 'solicitudVb',
+	nombreVista: 'solicitudApro',
+	
 	
 	constructor: function(config) {
 	    
 	    this.maestro=config.maestro;
+	    
+	    this.initButtons=[this.cmbDeptoAdq];
 	    
 	    this.Atributos[this.getIndAtributo('id_funcionario')].form=false;
         this.Atributos[this.getIndAtributo('id_funcionario_aprobador')].form=false;
@@ -35,16 +38,65 @@ Phx.vista.SolicitudVb = {
         this.Atributos[this.getIndAtributo('id_depto')].form=false;
         
         
-    	Phx.vista.SolicitudVb.superclass.constructor.call(this,config);
+    	Phx.vista.SolicitudApro.superclass.constructor.call(this,config);
+    	
     	this.addButton('ini_estado',{  argument: {estado: 'inicio'},text:'Dev. a Borrador',iconCls: 'batras',disabled:true,handler:this.antEstado,tooltip: '<b>Retorna la Solcitud al estado borrador</b>'});
         this.addButton('ant_estado',{argument: {estado: 'anterior'},text:'Anterior',iconCls: 'batras',disabled:true,handler:this.antEstado,tooltip: '<b>Pasar al Anterior Estado</b>'});
-        this.addButton('sig_estado',{text:'Siguiente',iconCls: 'badelante',disabled:true,handler:this.sigEstado,tooltip: '<b>Pasar al Siguiente Estado</b>'});
+        this.addButton('ini_proc',{text:'Ini Proc',iconCls: 'badelante',disabled:true,handler:this.initProceso,tooltip: '<b>Iniciar un nuevo Proceso</b>'});
+        
+        
+        this.init()
         
         //formulario para preguntar sobre siguiente estado
-        //agrega ventana para selecion de RPC
-            
-                
-       this.formEstado = new Ext.form.FormPanel({
+        this.crearFormEstados(); 
+        //formulario para crear nuevos procesos
+        this.crearFormInitProceso();     
+      
+        this.bloquearOrdenamientoGrid();
+        
+        //evento del combo depto
+        this.sw_init = true
+        this.cmbDeptoAdq.on('select',function(){
+             this.desbloquearOrdenamientoGrid();
+             this.store.baseParams.id_depto =this.cmbDeptoAdq.getValue();
+             if(this.sw_init){
+                  
+                  this.store.load({params:{start:0, limit:this.tam_pag}}); 
+                  this.sw_init = true;
+              }
+             else{
+                  this.store.reload();
+                  
+             }
+         },this);
+        
+        this.store.baseParams={tipo_interfaz:this.nombreVista,tipo_interfaz:'aprobadores',filtro_aprobadas:1};
+       
+        
+        
+        
+		
+	},
+	
+	
+	
+	cmbDeptoAdq:new Ext.form.ComboRec({
+                name:'id_depto',
+                hiddenName: 'id_depto',
+                origen:'DEPTO',
+                allowBlank:false,
+                fieldLabel: 'Depto',
+                gdisplayField:'desc_depto',//dibuja el campo extra de la consulta al hacer un inner join con orra tabla
+                width:180,
+                gwidth:100,
+                baseParams:{estado:'activo',codigo_subsistema:'ADQ',tipo_filtro:'DEPTO_UO'},//parametros adicionales que se le pasan al store
+                renderer:function (value, p, record){return String.format('{0}', record.data['desc_depto']);}
+            }),
+	
+	   
+    crearFormEstados:function(){
+        
+        this.formEstado = new Ext.form.FormPanel({
             baseCls: 'x-plain',
             autoDestroy: true,
            
@@ -188,13 +240,8 @@ Phx.vista.SolicitudVb = {
             }]
         });
         
-        
-        this.store.baseParams={tipo_interfaz:this.nombreVista};
-        this.load({params:{start:0, limit:this.tam_pag}}); 
-        
         this.cmbTipoEstado =this.formEstado.getForm().findField('id_tipo_estado');
         this.cmbTipoEstado.store.on('loadexception', this.conexionFailure,this);
-     
         this.cmbFuncionarioWf =this.formEstado.getForm().findField('id_funcionario_wf');
         this.cmbFuncionarioWf.store.on('loadexception', this.conexionFailure,this);
       
@@ -222,12 +269,155 @@ Phx.vista.SolicitudVb = {
         },this);
         
         
-		
-	},
+        
+    },
+    
+        
+    crearFormInitProceso:function(){
+        
+        this.formProceso = new Ext.form.FormPanel({
+            baseCls: 'x-plain',
+            autoDestroy: true,
+           
+            border: false,
+            layout: 'form',
+            autoHeight: true,
+           
+    
+            items: [
+                   {
+                     xtype: 'textfield',
+                     labelSeparator:'',
+                     inputType:'hidden',
+                     name: 'id_solicitud',  
+                   },
+                   {
+                     xtype: 'textfield',
+                     labelSeparator:'',
+                     inputType:'hidden',
+                     name: 'id_depto',  
+                   },
+                   {
+                     xtype: 'textfield',
+                     labelSeparator:'',
+                     inputType:'hidden',
+                     name: 'id_proceso_copra',  
+                   },
+                
+                
+                    {
+                        xtype: 'textfield',
+                        name: 'num_tramite',
+                        fieldLabel: 'N# Tramite',
+                        readOnly:true,
+                        allowBlank: true,
+                        anchor: '80%',
+                        gwidth: 130,
+                        maxLength:200
+                    },
+                    {
+                        xtype: 'textarea',
+                        name: 'instruc_rpc',
+                        fieldLabel: 'Ins/RPC',
+                        readOnly:true,
+                        allowBlank: true,
+                        anchor: '90%',
+                        //width: 350,
+                        height:100,
+                        maxLength:450
+                    },
+                    {
+                        xtype: 'textfield',
+                        name: 'codigo_proceso',
+                        fieldLabel: 'Código Proceso',
+                        allowBlank: true,
+                        anchor: '80%',
+                        gwidth: 100,
+                        maxLength:50
+                    },
+                    {
+                        xtype: 'datefield',
+                        name: 'fecha_ini_proc',
+                        fieldLabel: 'Fecha Inicio',
+                        allowBlank: false,
+                        anchor: '80%',
+                        gwidth: 100,
+                        format: 'd/m/Y',   
+                        
+                    },
+                    {
+                        xtype: 'textarea',
+                        name: 'obs_proceso',
+                        fieldLabel: 'Observaciones',
+                        allowBlank: true,
+                        anchor: '90%',
+                        width: 350,
+                        maxLength:500   
+                        
+                    }
+                    
+                    ]
+        });
+        
+        
+         this.winProc = new Ext.Window({
+            title: 'Nuevo Proceso',
+            collapsible: true,
+            maximizable: true,
+             autoDestroy: true,
+            width: 430,
+            height: 350,
+            layout: 'fit',
+            plain: true,
+            bodyStyle: 'padding:5px;',
+            buttonAlign: 'center',
+            items: this.formProceso,
+            modal:true,
+             closeAction: 'hide',
+            buttons: [{
+                text: 'Guardar',
+                 handler:this.guardarProceso,
+                scope:this
+                
+            },
+             {
+                text: 'Cancelar',
+                handler:function(){this.winProc.hide()},
+                scope:this
+            }]
+        });
+        
+        this.cmbNumTramite =this.formProceso.getForm().findField('num_tramite');
+        this.cmbIdSolicitud =this.formProceso.getForm().findField('id_solicitud');
+        this.cmbIdDepto =this.formProceso.getForm().findField('id_depto');
+       
+        this.cmbInstrucRPC =this.formProceso.getForm().findField('instruc_rpc');
+        
+         
+        
+    },
+    
+    initProceso:function(){
+       
+        var d= this.sm.getSelected().data;
+        if(d){
+            console.log(d)
+            this.cmbNumTramite.setValue(d.num_tramite);
+            this.cmbIdSolicitud.setValue(d.id_solicitud);
+            this.cmbIdDepto.setValue(this.cmbDeptoAdq.getValue());
+            this.cmbInstrucRPC.setValue(d.obs+' \n----- \n Intr:'+d.instruc_rpc)
+            this.winProc.show(); 
+            
+        }
+         
+        
+    },
+    
+    
 	confSigEstado :function() {                   
             var d= this.sm.getSelected().data;
            
-            if ( this.formEstado .getForm().isValid()){
+            if (this.formEstado .getForm().isValid()){
                  Phx.CP.loadingShow();
                     Ext.Ajax.request({
                         // form:this.form.getForm().getEl(),
@@ -246,7 +436,48 @@ Phx.vista.SolicitudVb = {
                         scope:this
                     }); 
               }    
-        },   
+        }, 
+        
+        
+    /*Registra nuevos procesos*/    
+    guardarProceso :function() {                   
+            var d= this.sm.getSelected().data;
+            
+            if (this.formProceso.getForm().isValid()){
+                 Phx.CP.loadingShow();
+                    Ext.Ajax.request({
+                        // form:this.form.getForm().getEl(),
+                        url:'../../sis_adquisiciones/control/ProcesoCompra/insertarProcesoCompra',
+                        params:this.formProceso.getForm().getValues(),
+                        success:this.successSinc,
+                        failure: this.conexionFailure,
+                        timeout:this.timeout,
+                        scope:this
+                    }); 
+            }
+            
+                
+        }, 
+           
+  
+    validarFiltros:function(){
+        if(this.cmbDeptoAdq.isValid()){
+            return true;
+        }
+        else{
+            return false;
+        }
+        
+    },
+    onButtonAct:function(){
+        if(!this.validarFiltros()){
+            alert('Especifique los filtros antes')
+         }
+        else{
+            this.store.baseParams.id_depto=this.cmbDeptoAdq.getValue();
+            Phx.vista.SolicitudApro.superclass.onButtonAct.call(this);
+        }
+    },   
     
     sigEstado:function(){                   
             var d= this.sm.getSelected().data;
@@ -321,77 +552,12 @@ Phx.vista.SolicitudVb = {
             Phx.CP.loadingHide();
             var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
             if(!reg.ROOT.error){
-                
               
-               if (reg.ROOT.datos.operacion=='preguntar_todo'){
-                   if(reg.ROOT.datos.num_estados==1 && reg.ROOT.datos.num_funcionarios==1){
-                       //directamente mandamos los datos
-                       Phx.CP.loadingShow();
-                       var d= this.sm.getSelected().data;
-                       Ext.Ajax.request({
-                        // form:this.form.getForm().getEl(),
-                        url:'../../sis_adquisiciones/control/Solicitud/siguienteEstadoSolicitud',
-                        params:{id_solicitud:d.id_solicitud,
-                            operacion:'cambiar',
-                            id_tipo_estado:reg.ROOT.datos.id_tipo_estado,
-                            id_funcionario:reg.ROOT.datos.id_funcionario_estado,
-                            id_depto:reg.ROOT.datos.id_depto_estado,
-                            id_solicitud:d.id_solicitud,
-                            obs:this.cmpObs.getValue(),
-                            instruc_rpc:this.cmbIntrucRPC.getValue()
-                            },
-                        success:this.successSinc,
-                        failure: this.conexionFailure,
-                        timeout:this.timeout,
-                        scope:this
-                    }); 
-                 }
-                   else{
-                     this.cmbTipoEstado.store.baseParams.estados= reg.ROOT.datos.estados;
-                     this.cmbTipoEstado.modificado=true;
-                 
-                     console.log(resp)
-                      if(resp.argument.data.estado=='vbrpc'){
-                        this.cmbIntrucRPC.show();
-                        this.cmbIntrucRPC.enable();
-                     }
-                     else{
-                         this.cmbIntrucRPC.hide();
-                         this.cmbIntrucRPC.disable(); 
-                         
-                     }
-                     
-                     this.cmpObs.setValue('');
-                     this.cmbFuncionarioWf.disable();
-                     this.wEstado.buttons[1].hide();
-                     this.wEstado.buttons[0].show();
-                     this.wEstado.show();  
-                     
-                     
-                     //precarga como de estado
-                     this.cmbTipoEstado.store.load({params:{start:0,limit:this.tam_pag}, 
-                       callback : function (r) {
-                            if (r.length == 1 ) {                       
-                                this.cmbTipoEstado.setValue(r[0].data.id_tipo_estado);
-                                this.cmbTipoEstado.fireEvent('select', r[0]);
-                            }    
-                                            
-                        }, scope : this
-                    });
-                     
-                  }
-                   
-               }
-               
-                if (reg.ROOT.datos.operacion=='cambio_exitoso'){
-                
                   this.reload();
                   this.wEstado.hide();
-                
-                }
-               
-                
-            }else{
+                  this.winProc.hide()
+             }
+            else{
                 
                 alert('ocurrio un error durante el proceso')
             }
@@ -402,23 +568,23 @@ Phx.vista.SolicitudVb = {
   preparaMenu:function(n){
       var data = this.getSelectedData();
       var tb =this.tbar;
-      Phx.vista.SolicitudVb.superclass.preparaMenu.call(this,n);  
+      Phx.vista.SolicitudApro.superclass.preparaMenu.call(this,n);  
           
         if(data.estado =='aprobado' ){ 
             this.getBoton('ant_estado').enable();
-            this.getBoton('sig_estado').disable();
+            this.getBoton('ini_proc').enable();
             this.getBoton('ini_estado').enable();
         }
         if(data.estado =='proceso'){
             this.getBoton('ant_estado').disable();
-            this.getBoton('sig_estado').disable();
+            this.getBoton('ini_proc').disable();
             this.getBoton('ini_estado').disable();
         }
         
         if(data.estado !='aprobado' && data.estado !='proceso' ){
-            this.getBoton('ant_estado').enable();
-            this.getBoton('sig_estado').enable();
-            this.getBoton('ini_estado').enable();
+            this.getBoton('ant_estado').disable();
+            this.getBoton('ini_proc').disable();
+            this.getBoton('ini_estado').disable();
         }
        
        
@@ -426,9 +592,9 @@ Phx.vista.SolicitudVb = {
         return tb 
      }, 
      liberaMenu:function(){
-        var tb = Phx.vista.SolicitudVb.superclass.liberaMenu.call(this);
+        var tb = Phx.vista.SolicitudApro.superclass.liberaMenu.call(this);
         if(tb){
-            this.getBoton('sig_estado').disable();
+            this.getBoton('ini_proc').disable();
             this.getBoton('ini_estado').disable();
             this.getBoton('ant_estado').disable();
            

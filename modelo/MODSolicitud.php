@@ -69,6 +69,7 @@ class MODSolicitud extends MODbase{
 		$this->captura('numero','varchar');
 		$this->captura('desc_funcionario_rpc','text');
 		$this->captura('obs','text');
+		$this->captura('instruc_rpc','varchar');
 		
 		
 		

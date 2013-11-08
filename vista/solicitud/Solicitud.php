@@ -18,18 +18,17 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
 		Phx.vista.Solicitud.superclass.constructor.call(this,config);		
 		this.init();
 		
-
 		this.addButton('btnReporte',{
             text :'',
             iconCls : 'bpdf32',
             disabled: true,
             handler : this.onButtonSolicitud,
             tooltip : '<b>Reporte Solicitud de Compra</b><br/><b>Reporte Solicitud de Compra</b>'
-  });
+        });
   
-  this.addButton('diagrama_gantt',{text:'',iconCls: 'bgantt',disabled:true,handler:diagramGantt,tooltip: '<b>Diagrama Gantt de proceso macro</b>'});
+         this.addButton('diagrama_gantt',{text:'',iconCls: 'bgantt',disabled:true,handler:diagramGantt,tooltip: '<b>Diagrama Gantt de proceso macro</b>'});
   
-	 this.addButton('btnChequeoDocumentos',
+	    this.addButton('btnChequeoDocumentos',
             {
                 text: 'Chequear Documentos',
                 iconCls: 'bchecklist',
@@ -39,7 +38,7 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
             }
         );
         
-  function diagramGantt(){			
+       function diagramGantt(){			
 			var data=this.sm.getSelected().data.id_proceso_wf;
 			Phx.CP.loadingShow();
 			Ext.Ajax.request({
@@ -52,7 +51,7 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
 			});			
 		}
 				
-	},
+	 },
 			
 	Atributos:[
 		{
@@ -554,7 +553,7 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
 		'desc_proceso_macro',
 		'desc_categoria_compra',
 		'id_proceso_macro',
-		'obs'
+		'obs','instruc_rpc'
 		
 	],
 	
@@ -629,8 +628,8 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
     },
 
 	sortInfo:{
-		field: 'id_solicitud',
-		direction: 'ASC'
+		field: 'fecha_soli',
+		direction: 'DESC'
 	},
 	bdel:true,
 	bsave:false

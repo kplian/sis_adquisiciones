@@ -145,6 +145,33 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
 		},
         {
             config:{
+                name: 'numero',
+                fieldLabel: 'Numero Sol',
+                allowBlank: true,
+                anchor: '80%',
+                gwidth: 140,
+                renderer: function(value,p,record){
+                        if(record.data.estado=='anulado'){
+                             return String.format('<b><font color="red">{0}</font></b>', value);
+                         }
+                        else if(record.data.estado=='adjudicado'){
+                             return String.format('<b><font color="green">{0}</font></b>', value);
+                         
+                        
+                        }
+                        else{
+                            return String.format('{0}', value);
+                        }},
+                maxLength:4
+            },
+            type:'Field',
+            filters:{pfiltro:'sol.numero',type:'string'},
+            id_grupo:1,
+            grid:true,
+            form:false
+        },
+        {
+            config:{
                 name: 'numero_oc',
                 fieldLabel: 'Numero O.C.',
                 allowBlank: true,
@@ -164,8 +191,8 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
                         }},
                 maxLength:4
             },
-            type:'NumberField',
-            filters:{pfiltro:'cot.numero_oc',type:'numeric'},
+            type:'Field',
+            filters:{pfiltro:'cot.numero_oc',type:'string'},
             id_grupo:1,
             grid:true,
             form:false
@@ -440,7 +467,7 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
 		{name:'fecha_mod', type: 'date',dateFormat:'Y-m-d H:i:s.u'},
 		{name:'id_usuario_mod', type: 'numeric'},
 		{name:'usr_reg', type: 'string'},
-		{name:'usr_mod', type: 'string'},'email','desc_moneda','tipo_cambio_conv','id_estado_wf','id_proceso_wf'
+		{name:'usr_mod', type: 'string'},'email','desc_moneda','tipo_cambio_conv','id_estado_wf','id_proceso_wf','numero','num_tramite'
 		
 	],
 

@@ -24,8 +24,17 @@ class ACTSolicitud extends ACTbase{
         }
         
         if($this->objParam->getParametro('estado')!=''){
-            $this->objParam->addFiltro("sol.estado = ''".$this->objParam->getParametro('estado')."''");    
+                
+            
+            $this->objParam->addFiltro("sol.estado = ''".$this->objParam->getParametro('estado')."''");
+            
         }
+        
+         if($this->objParam->getParametro('filtro_aprobadas')==1){
+                 
+             $this->objParam->addFiltro("(sol.estado = ''aprobado'' or  sol.estado = ''proceso'')");
+            
+         }
 		
 		//var_dump($_SESSION["ss_id_funcionario"]);
 		

@@ -1,3 +1,5 @@
+--------------- SQL ---------------
+
 CREATE OR REPLACE FUNCTION adq.f_solicitud_sel (
   p_administrador integer,
   p_id_usuario integer,
@@ -124,7 +126,8 @@ BEGIN
                         sol.id_proceso_macro,
                         sol.numero,
                         funrpc.desc_funcionario1 as desc_funcionario_rpc,
-                        ew.obs
+                        ew.obs,
+                        sol.instruc_rpc
                         	
 						from adq.tsolicitud sol
 						inner join segu.tusuario usu1 on usu1.id_usuario = sol.id_usuario_reg
