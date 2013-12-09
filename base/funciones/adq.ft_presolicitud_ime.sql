@@ -351,7 +351,8 @@ BEGIN
            
            select
             s.estado,
-            s.id_depto
+            s.id_depto,
+            s.id_gestion
             into 
             v_registros 
             from adq.tsolicitud s
@@ -417,15 +418,20 @@ BEGIN
            FOR  v_registros in  execute(v_consulta) LOOP
            
               
-                  SELECT ps_id_partida, 
-                         ps_id_cuenta, 
-                         ps_id_auxiliar 
-                   into
-                         v_id_partida, 
-                         v_id_cuenta, 
-                         v_id_auxiliar       
-                  FROM pre.f_obtener_partida_cuenta_cig(v_registros.id_concepto_ingas, v_registros.id_centro_costo);
-                 
+                  
+           
+                  SELECT 
+                    ps_id_partida ,
+                    ps_id_cuenta,
+                    ps_id_auxiliar
+                  into 
+                    v_id_partida,
+                    v_id_cuenta, 
+                    v_id_auxiliar
+                FROM conta.f_get_config_relacion_contable('CUECOMP', v_registros.id_gestion, v_registros.id_concepto_ingas, v_registros.id_centro_costo);
+                
+        
+           
              
                  --Sentencia de la insercion
                   insert into adq.tsolicitud_det(
