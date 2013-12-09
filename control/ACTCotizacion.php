@@ -21,6 +21,9 @@ class ACTCotizacion extends ACTbase{
 		$this->objParam->defecto('ordenacion','id_cotizacion');
 
 		$this->objParam->defecto('dir_ordenacion','asc');
+		
+		$this->objParam->addParametro('id_funcionario_usu',$_SESSION["ss_id_funcionario"]); 
+		
 		if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
 			$this->objReporte = new Reporte($this->objParam,$this);
 			$this->res = $this->objReporte->generarReporteListado('MODCotizacion','listarCotizacion');
@@ -37,7 +40,10 @@ class ACTCotizacion extends ACTbase{
 
         $this->objParam->defecto('dir_ordenacion','asc');
         
-       $this->objParam->addParametro('id_funcionario_rpc',$_SESSION["ss_id_funcionario"]); 
+        $this->objParam->addParametro('id_funcionario_rpc',$_SESSION["ss_id_funcionario"]); 
+        
+        $this->objParam->addParametro('id_funcionario_usu',$_SESSION["ss_id_funcionario"]); 
+        
         
         if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
             $this->objReporte = new Reporte($this->objParam,$this);
@@ -281,6 +287,13 @@ class ACTCotizacion extends ACTbase{
     function solicitarAprobacion(){
         $this->objFunc=$this->create('MODCotizacion');  
         $this->res=$this->objFunc->solicitarAprobacion($this->objParam);
+        $this->res->imprimirRespuesta($this->res->generarJson());
+       
+    }
+    
+    function siguienteEstadoCotizacion(){
+        $this->objFunc=$this->create('MODCotizacion');  
+        $this->res=$this->objFunc->siguienteEstadoCotizacion($this->objParam);
         $this->res->imprimirRespuesta($this->res->generarJson());
        
     }

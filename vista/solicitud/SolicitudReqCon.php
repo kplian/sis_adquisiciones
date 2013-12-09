@@ -1,10 +1,12 @@
 <?php
 /**
 *@package pXP
-*@file gen-SistemaDist.php
-*@author  (fprudencio)
+*@file SolicitudReqCon.php
+*@author  (rarteaga)
 *@date 20-09-2011 10:22:05
-*@description Archivo con la interfaz de usuario que permite la ejecucion de todas las funcionalidades del sistema
+*@description Archivo con la interfaz de usuario que 
+*permite la consolicdacion de presolicitudes en una unica solicitud
+*
 */
 header("content-type: text/javascript; charset=UTF-8");
 ?>

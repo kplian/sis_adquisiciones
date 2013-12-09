@@ -238,12 +238,19 @@ Phx.vista.CotizacionAdq = {
         {                   
             var d= this.sm.getSelected().data;
            
+            this.DataSelected = d
+            
             Phx.CP.loadingShow();
             
             Ext.Ajax.request({
                 // form:this.form.getForm().getEl(),
-                url:'../../sis_adquisiciones/control/Cotizacion/solicitarAprobacion',
-                params:{id_cotizacion:d.id_cotizacion,operacion:'sol_apro'},
+                //url:'../../sis_adquisiciones/control/Cotizacion/solicitarAprobacion',
+                
+                url:'../../sis_adquisiciones/control/Cotizacion/siguienteEstadoCotizacion',
+                params:{id_cotizacion:d.id_cotizacion,
+                        operacion:'verificar'},
+                
+                //params:{id_cotizacion:d.id_cotizacion,operacion:'sol_apro'},
                 success:this.successSinc,
                 failure: this.conexionFailure,
                 timeout:this.timeout,
@@ -272,6 +279,44 @@ Phx.vista.CotizacionAdq = {
            
             var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
             if(!reg.ROOT.error){
+                
+                        if (reg.ROOT.datos.operacion=='preguntar_todo'){
+                            
+                            if(reg.ROOT.datos.num_estados==1 && reg.ROOT.datos.num_funcionarios==1){
+                               //directamente mandamos los datos
+                               Phx.CP.loadingShow();
+                               var d= this.sm.getSelected().data;
+                               Ext.Ajax.request({
+                                // form:this.form.getForm().getEl(),
+                                url:'../../sis_adquisiciones/control/Cotizacion/siguienteEstadoCotizacion',
+                                params:{id_cotizacion:d.id_cotizacion,
+                                    operacion:'cambiar',
+                                    id_tipo_estado:reg.ROOT.datos.id_tipo_estado,
+                                    id_funcionario:reg.ROOT.datos.id_funcionario_estado,
+                                    id_depto:reg.ROOT.datos.id_depto_estado,
+                                    id_solicitud:d.id_solicitud,
+                                    obs:'Se solicita  la revision de la Cotización de la solictud de compra '+ this.DataSelected.numero
+                                    },
+                                success:this.successSinc,
+                                failure: this.conexionFailure,
+                                timeout:this.timeout,
+                                scope:this
+                            }); 
+                         }
+                         else{
+                               
+                            alert('Estado siguiente mal parametrizado, solo se admite un funcionario, un estado, sin instrucciones adicionales')
+                            
+                               
+                         }
+                    
+                    
+                    
+                    
+                    
+                    
+                }
+                
                 this.wDEPTO.hide();
                 this.reload();
              }else{
@@ -367,9 +412,14 @@ Phx.vista.CotizacionAdq = {
                    else{
                       this.getBoton('btnAdjudicar').disable(); 
                       this.getBoton('btnSolApro').disable();
-                      this.getBoton('btnRepOC').enable();
+                     
                    }
-                  
+                   
+                   if(data['estado']=='adjudicado' || data['estado']=='pago_habilitado'|| data['estado']=='finalizada'){
+                       
+                    this.getBoton('btnRepOC').enable();
+                    
+                   }
                    this.getBoton('fin_registro').disable();
                    this.getBoton('edit').disable();
                    this.getBoton('new').disable();
@@ -420,6 +470,9 @@ Phx.vista.CotizacionAdq = {
             this.getBoton('btnReporte').disable();
             this.getBoton('btnSendMail').disable(); 
             this.getBoton('btnPreing').disable();
+            this.getBoton('btnRepOC').disable();
+            
+            
          }
        return tb
     },

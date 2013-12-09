@@ -1,3 +1,5 @@
+--------------- SQL ---------------
+
 CREATE OR REPLACE FUNCTION adq.f_cotizacion_ime (
   p_administrador integer,
   p_id_usuario integer,
@@ -102,6 +104,18 @@ DECLARE
      v_id_moneda_base integer;
      v_result varchar;
      v_dec_proveedor text;
+     
+     
+    
+      v_perdir_obs varchar;
+      v_num_estados integer;
+      v_num_funcionarios integer;
+      v_num_deptos integer;
+      v_id_funcionario_estado integer;
+      v_id_depto_estado integer;
+      v_codigo_estado_siguiente varchar;
+      v_obs varchar;
+      v_fecha_coti date;
      
 			    
 BEGIN
@@ -768,9 +782,11 @@ BEGIN
             return v_resp;
 
 		end; 
+    
+    
     /*********************************    
  	#TRANSACCION:  'ADQ_SOLAPRO_IME'
- 	#DESCRIPCION:	depues de adjudicar pasa al siguiente estado, de solicitud de aprobacion
+ 	#DESCRIPCION:	depues de (Recomendar)adjudicar pasa al siguiente estado, de solicitud de aprobacion
  	#AUTOR:	        Rensi Arteaga Copari	
  	#FECHA:		    7-05-2013 14:48:35
 	***********************************/
@@ -801,20 +817,21 @@ BEGIN
            inner join adq.tsolicitud sc on sc.id_solicitud = pc.id_solicitud 
            where c.id_cotizacion = v_parametros.id_cotizacion;
            
+           
            --validamos que la cotizacion por lo menos tenga un item adjudicado
-                    select 
-                    sum(cd.cantidad_adju)
-                    into
-                    v_total_adj
-                   from adq.tcotizacion_det cd
-                   where cd.id_cotizacion = v_parametros.id_cotizacion and cd.estado_reg='activo';
+           select 
+            sum(cd.cantidad_adju)
+            into
+            v_total_adj
+           from adq.tcotizacion_det cd
+           where cd.id_cotizacion = v_parametros.id_cotizacion and cd.estado_reg='activo';
                    
                    
-                   IF v_total_adj  <= 0  or v_total_adj is null THEN
+           IF v_total_adj  <= 0  or v_total_adj is null THEN
                    
-                     raise exception 'La cotización no tiene items adjudicados';
+             raise exception 'La cotización no tiene items adjudicados';
                    
-                   END IF;
+           END IF;
            
            
                       
@@ -849,7 +866,8 @@ BEGIN
             
             END IF;
 			
-           --pasamos la cotizacion al siguiente estado
+             
+             --  pasamos la cotizacion al siguiente estado
            
              v_id_estado_actual =  wf.f_registra_estado_wf(va_id_tipo_estado[1], 
                                                            v_id_funcionario_rpc, 
@@ -858,8 +876,8 @@ BEGIN
                                                            p_id_usuario,
                                                            v_id_depto,
                                                            'Se requiere la aprobacion de la solicitud '||v_num_sol,
-                                                           '../../../sis_adquisiciones/vista/cotizacion/CotizacionVb.php',
-                                                           'CotizacionVb');
+                                                           '../../../sis_adquisiciones/vista/cotizacion/CotizacionVbDin.php',
+                                                           'CotizacionVbDin');
             
             
              -- actualiza estado en la solicitud
@@ -880,6 +898,313 @@ BEGIN
             return v_resp;
 
 		end;
+    
+    
+     /*********************************    
+ 	#TRANSACCION:  'ADQ_SIGECOT_IME'
+ 	#DESCRIPCION:	funcion que controla el cambio al Siguiente esado de la solicitud, integrado con el WF
+ 	#AUTOR:		RAC	
+ 	#FECHA:		19-02-2013 12:12:51
+	***********************************/
+
+	elseif(p_transaccion='ADQ_SIGECOT_IME')then   
+        begin
+        
+        --obtenermos datos basicos
+          
+           select
+            c.numero_oc,
+            c.id_estado_wf,
+            c.id_proceso_wf,
+            pc.id_depto,
+            c.estado,
+            sc.id_funcionario_rpc,
+            sc.numero,
+            c.fecha_coti
+           into 
+            v_numero_oc,
+            v_id_estado_wf,
+            v_id_proceso_wf,
+            v_id_depto,
+            v_estado_cot,
+            v_id_funcionario_rpc,
+            v_num_sol,
+            v_fecha_coti
+            
+           from adq.tcotizacion c
+           inner join adq.tproceso_compra pc on pc.id_proceso_compra = c.id_proceso_compra
+           inner join adq.tsolicitud sc on sc.id_solicitud = pc.id_solicitud 
+           where c.id_cotizacion = v_parametros.id_cotizacion;
+          
+         
+           --obtiene datos de la configuracion del  estado
+           select 
+            ew.id_tipo_estado ,
+            te.pedir_obs
+           into 
+            v_id_tipo_estado,
+            v_perdir_obs
+          from wf.testado_wf ew
+          inner join wf.ttipo_estado te on te.id_tipo_estado = ew.id_tipo_estado
+          where ew.id_estado_wf = v_id_estado_wf;
+          
+          
+          --validamos de adjudicaciones
+          
+          IF v_estado_cot = 'cotizado' THEN
+               
+               --validamos que la cotizacion por lo menos tenga un item adjudicado
+               select 
+                sum(cd.cantidad_adju)
+                into
+                v_total_adj
+               from adq.tcotizacion_det cd
+               where cd.id_cotizacion = v_parametros.id_cotizacion and cd.estado_reg='activo';
+                       
+                       
+               IF v_total_adj  <= 0  or v_total_adj is null THEN
+                       
+                 raise exception 'La cotización no tiene items adjudicados';
+                       
+               END IF;
+               
+               
+                --si no existe un numero de oc obtenemos uno
+               IF  v_numero_oc is NULL THEN
+               
+                   
+                       
+                       /*
+                       -- determina la fecha del periodo
+                      
+                       select id_periodo into v_id_periodo from
+                                      param.tperiodo per 
+                                     where per.fecha_ini <= v_parametros.fecha_oc 
+                                       and per.fecha_fin >=  v_parametros.fecha_oc
+                                       limit 1 offset 0;
+                      
+                      
+                   
+                   
+                   
+                      --obtener correlativo
+                       v_numero_oc =   param.f_obtener_correlativo(
+                                'OC', 
+                                 v_id_periodo,-- par_id, 
+                                 NULL, --id_uo 
+                                 v_id_depto,    -- id_depto
+                                 p_id_usuario, 
+                                 'ADQ', 
+                                 NULL);
+                                 
+                                 
+                        update adq.tcotizacion set
+                        fecha_adju = v_parametros.fecha_oc,
+                        numero_oc = v_numero_oc
+                        where id_cotizacion = v_parametros.id_cotizacion;*/
+               
+               
+               END IF;
+               
+            
+          
+           --  si el numero de orden de compra se genera an solicitar aprobacion 
+        
+         END IF;
+          
+          
+          
+          
+        
+         --------------------------------------------- 
+         -- Verifica  los posibles estados sigueintes para que desde la interfza se tome la decision si es necesario
+         --------------------------------------------------
+          IF  v_parametros.operacion = 'verificar' THEN
+          
+                  --buscamos siguiente estado correpondiente al proceso del WF
+                 
+                  ----- variables de retorno------
+                  
+                  v_num_estados=0;
+                  v_num_funcionarios=0;
+                  v_num_deptos=0;
+                  
+                  --------------------------------- 
+                  
+                 --obtenemos el estado siguiente
+                 SELECT 
+                     *
+                  into
+                    va_id_tipo_estado,
+                    va_codigo_estado,
+                    va_disparador,
+                    va_regla,
+                    va_prioridad
+                
+                FROM wf.f_obtener_estado_wf(v_id_proceso_wf, v_id_estado_wf,NULL,'siguiente'); 
+                  
+                          
+                
+                v_num_estados= array_length(va_id_tipo_estado, 1);
+                
+                IF v_perdir_obs = 'no' THEN
+                
+                    IF v_num_estados = 1 then
+                          -- si solo hay un estado,  verificamos si tiene mas de un funcionario por este estado
+                         SELECT 
+                         *
+                          into
+                         v_num_funcionarios 
+                         FROM wf.f_funcionario_wf_sel(
+                             p_id_usuario, 
+                             va_id_tipo_estado[1], 
+                             v_fecha_coti, --OJO verificar si la fecha actul nos sir ve o utilizamos la fecha de la solcitud
+                             v_id_estado_wf,
+                             TRUE) AS (total bigint);
+                             
+                        IF v_num_funcionarios = 1 THEN
+                        -- si solo es un funcionario, recuperamos el funcionario correspondiente
+                             SELECT 
+                                 id_funcionario
+                                   into
+                                 v_id_funcionario_estado
+                             FROM wf.f_funcionario_wf_sel(
+                                 p_id_usuario, 
+                                 va_id_tipo_estado[1], 
+                                 v_fecha_coti, --OJO verificar si la fecha actul nos sir ve o utilizamos la fecha de la solcitud
+                                 v_id_estado_wf,
+                                 FALSE) 
+                                 AS (id_funcionario integer,
+                                   desc_funcionario text,
+                                   desc_funcionario_cargo text,
+                                   prioridad integer);
+                        END IF;    
+                             
+                      
+                      --verificamos el numero de deptos
+                      
+                        SELECT 
+                        *
+                        into
+                          v_num_deptos 
+                       FROM wf.f_depto_wf_sel(
+                           p_id_usuario, 
+                           va_id_tipo_estado[1], 
+                           v_fecha_coti, --OJO verificar si la fecha actul nos sir ve o utilizamos la fecha de la solcitud
+                           v_id_estado_wf,
+                           TRUE) AS (total bigint);
+                           
+                      IF v_num_deptos = 1 THEN
+                          -- si solo es un funcionario, recuperamos el funcionario correspondiente
+                               SELECT 
+                                   id_depto
+                                     into
+                                   v_id_depto_estado
+                              FROM wf.f_depto_wf_sel(
+                                   p_id_usuario, 
+                                   va_id_tipo_estado[1], 
+                                   v_fecha_coti, --OJO verificar si la fecha actul nos sir ve o utilizamos la fecha de la solcitud
+                                   v_id_estado_wf,
+                                   FALSE) 
+                                   AS (id_depto integer,
+                                     codigo_depto varchar,
+                                     nombre_corto_depto varchar,
+                                     nombre_depto varchar,
+                                     prioridad integer);
+                        END IF;
+                      
+                      
+                      
+                      
+                     
+                     END IF;
+               
+               END IF;
+                
+                -- si hay mas de un estado disponible  preguntamos al usuario
+                v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Verificacion para el siguiente estado)'); 
+                v_resp = pxp.f_agrega_clave(v_resp,'estados', array_to_string(va_id_tipo_estado, ','));
+                v_resp = pxp.f_agrega_clave(v_resp,'operacion','preguntar_todo');
+                v_resp = pxp.f_agrega_clave(v_resp,'num_estados',v_num_estados::varchar);
+                v_resp = pxp.f_agrega_clave(v_resp,'num_funcionarios',v_num_funcionarios::varchar);
+                v_resp = pxp.f_agrega_clave(v_resp,'num_deptos',v_num_deptos::varchar);
+                v_resp = pxp.f_agrega_clave(v_resp,'id_funcionario_estado',v_id_funcionario_estado::varchar);
+                v_resp = pxp.f_agrega_clave(v_resp,'id_depto_estado',v_id_depto_estado::varchar);
+                v_resp = pxp.f_agrega_clave(v_resp,'id_tipo_estado', va_id_tipo_estado[1]::varchar);
+            
+            
+           ----------------------------------------
+           --Se se solicita cambiar de estado a la solicitud
+           ------------------------------------------
+           ELSEIF  v_parametros.operacion = 'cambiar' THEN
+          
+          
+            
+                -- obtener datos tipo estado
+                
+                select
+                 te.codigo
+                into
+                 v_codigo_estado_siguiente
+                from wf.ttipo_estado te
+                where te.id_tipo_estado = v_parametros.id_tipo_estado;
+                
+                IF  pxp.f_existe_parametro('p_tabla','id_depto') THEN
+                 
+                 v_id_depto = v_parametros.id_depto;
+                
+                END IF;
+                
+                
+                v_obs=v_parametros.obs;
+                
+                 
+                --pasamos la cotizacion al siguiente estado
+           
+                 v_id_estado_actual =  wf.f_registra_estado_wf(v_parametros.id_tipo_estado, 
+                                                            v_parametros.id_funcionario, 
+                                                            v_id_estado_wf, 
+                                                            v_id_proceso_wf,
+                                                            p_id_usuario,
+                                                            v_id_depto,
+                                                           'Se requiere VB '||v_num_sol||' Obs:'||v_obs,
+                                                           '../../../sis_adquisiciones/vista/cotizacion/CotizacionVbDin.php',
+                                                           'CotizacionVbDin');              
+               
+                
+                                
+                
+                 -- actualiza estado en la solicitud
+                
+                 -- actualiza estado en la solicitud
+            
+                 update adq.tcotizacion  c set 
+                   id_estado_wf =  v_id_estado_actual,
+                   estado = v_codigo_estado_siguiente,
+                   id_usuario_mod=p_id_usuario,
+                   fecha_mod=now()
+                 where c.id_cotizacion  = v_parametros.id_cotizacion;
+                 
+                 
+                 
+                            
+              
+              
+               -- si hay mas de un estado disponible  preguntamos al usuario
+                v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Se realizo el cambio de estado)'); 
+                v_resp = pxp.f_agrega_clave(v_resp,'operacion','cambio_exitoso');
+          
+          
+          END IF;
+
+        
+          --Devuelve la respuesta
+            return v_resp;
+        
+        end;
+    
+    
+    
     
     /*********************************    
  	#TRANSACCION:  'ADQ_ANTEST_IME'

@@ -19,6 +19,10 @@ class MODCotizacion extends MODbase{
 		$this->transaccion='ADQ_COT_SEL';
 		$this->tipo_procedimiento='SEL';//tipo de transaccion
 				
+		
+		$this->setParametro('id_funcionario_usu','id_funcionario_usu','int4');
+        $this->setParametro('tipo_interfaz','tipo_interfaz','varchar');
+        
 		$this->setParametro('id_proceso_compra','id_proceso_compra','int4');
 		//Definicion de la lista del resultado del query
 		$this->captura('id_cotizacion','int4');
@@ -53,6 +57,8 @@ class MODCotizacion extends MODbase{
 		$this->captura('tipo_cambio_conv','numeric');
 		
 		$this->captura('email','varchar');
+		$this->captura('numero','varchar');
+		$this->captura('num_tramite','varchar');
 				
 		
 		//Ejecuta la instruccion
@@ -106,7 +112,11 @@ class MODCotizacion extends MODbase{
         $this->transaccion='ADQ_COTRPC_SEL';
         $this->tipo_procedimiento='SEL';//tipo de transaccion
                 
+        
+        $this->setParametro('id_funcionario_usu','id_funcionario_usu','int4');
+        $this->setParametro('tipo_interfaz','tipo_interfaz','varchar');
         $this->setParametro('id_funcionario_rpc','id_funcionario_rpc','int4');
+        
         //Definicion de la lista del resultado del query
         $this->captura('id_cotizacion','int4');
         $this->captura('estado_reg','varchar');
@@ -141,6 +151,8 @@ class MODCotizacion extends MODbase{
         
         $this->captura('id_solicitud','integer');
 		$this->captura('id_categoria_compra','integer');
+		$this->captura('numero','varchar');
+        $this->captura('num_tramite','varchar');
         
         
         //Ejecuta la instruccion
@@ -357,6 +369,30 @@ class MODCotizacion extends MODbase{
                 
         //Define los parametros para la funcion
         $this->setParametro('id_cotizacion','id_cotizacion','int4');
+       
+
+        //Ejecuta la instruccion
+        $this->armarConsulta();
+        $this->ejecutarConsulta();
+
+        //Devuelve la respuesta
+        return $this->respuesta;
+    }
+    
+    
+    function siguienteEstadoCotizacion(){
+        //Definicion de variables para ejecucion del procedimiento
+        $this->procedimiento='adq.f_cotizacion_ime';
+        $this->transaccion='ADQ_SIGECOT_IME';
+        $this->tipo_procedimiento='IME';
+                
+        //Define los parametros para la funcion
+        $this->setParametro('id_cotizacion','id_cotizacion','int4');
+        $this->setParametro('operacion','operacion','varchar');
+        
+        $this->setParametro('id_tipo_estado','id_tipo_estado','integer');
+        $this->setParametro('id_funcionario','id_funcionario','integer');
+        $this->setParametro('obs','obs','varchar');
        
 
         //Ejecuta la instruccion
