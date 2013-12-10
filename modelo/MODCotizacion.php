@@ -393,6 +393,7 @@ class MODCotizacion extends MODbase{
         $this->setParametro('id_tipo_estado','id_tipo_estado','integer');
         $this->setParametro('id_funcionario','id_funcionario','integer');
         $this->setParametro('obs','obs','varchar');
+        $this->setParametro('fecha_oc','fecha_oc','date');
        
 
         //Ejecuta la instruccion
