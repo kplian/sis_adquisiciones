@@ -66,6 +66,21 @@ Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
             grid:true,
             form:false
         },
+        {
+            config:{
+                name: 'usr_aux',
+                fieldLabel: 'Aux',
+                allowBlank: true,
+                anchor: '80%',
+                gwidth: 80,
+                maxLength:4
+            },
+            type:'NumberField',
+            filters:{pfiltro:'usua.cuenta',type:'string'},
+            id_grupo:1,
+            grid:true,
+            form:false
+        },
 		{
             config:{
                 name:'id_depto',
@@ -389,7 +404,7 @@ Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
 		{name:'usr_reg', type: 'string'},
 		{name:'usr_mod', type: 'string'},
 		'desc_moneda','desc_funcionario',
-		'desc_uo','desc_depto','desc_solicitud','instruc_rpc'
+		'desc_uo','desc_depto','desc_solicitud','instruc_rpc','usr_aux'
 		
 	],
 	

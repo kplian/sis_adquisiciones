@@ -225,3 +225,17 @@ ALTER TABLE adq.tsolicitud_det
 
 /***********************************F-SCP-RAC-ADQ-0-27/06/2013****************************************/
 
+
+/***********************************I-SCP-RAC-ADQ-0-06/12/2013****************************************/
+
+--------------- SQL ---------------
+
+ALTER TABLE adq.tproceso_compra
+  ADD COLUMN id_usuario_auxiliar INTEGER;
+
+COMMENT ON COLUMN adq.tproceso_compra.id_usuario_auxiliar
+IS 'este campo identifica el usuario que pueden trabajar en el proceso de compra, ser ecupera de la configuracion del depto_usuario';
+
+/***********************************F-SCP-RAC-ADQ-0-06/12/2013****************************************/
+
+

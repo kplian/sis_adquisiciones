@@ -43,14 +43,18 @@ Phx.vista.SolicitudApro = {
     	this.addButton('ini_estado',{  argument: {estado: 'inicio'},text:'Dev. a Borrador',iconCls: 'batras',disabled:true,handler:this.antEstado,tooltip: '<b>Retorna la Solcitud al estado borrador</b>'});
         this.addButton('ant_estado',{argument: {estado: 'anterior'},text:'Anterior',iconCls: 'batras',disabled:true,handler:this.antEstado,tooltip: '<b>Pasar al Anterior Estado</b>'});
         this.addButton('ini_proc',{text:'Ini Proc',iconCls: 'badelante',disabled:true,handler:this.initProceso,tooltip: '<b>Iniciar un nuevo Proceso</b>'});
+        this.addButton('asig_usu',{text:'Asig. Usu.',iconCls:'blist',disabled:true,handler:this.initAsigUsu,tooltip: '<b>Asigna un Usuario encargado del proceso de Compra</b>'});
         
         
-        this.init()
+        this.init();
         
         //formulario para preguntar sobre siguiente estado
         this.crearFormEstados(); 
         //formulario para crear nuevos procesos
         this.crearFormInitProceso();     
+      
+        //formulario de asignacion de usuarios
+        this.crearFormAsigUsu();
       
         this.bloquearOrdenamientoGrid();
         
@@ -397,6 +401,102 @@ Phx.vista.SolicitudApro = {
         
     },
     
+    
+    crearFormAsigUsu:function(){
+        
+        this.formAsigUsuario = new Ext.form.FormPanel({
+            baseCls: 'x-plain',
+            autoDestroy: true,
+           
+            border: false,
+            layout: 'form',
+            autoHeight: true,
+           
+    
+            items: [
+                   {
+                     xtype: 'textfield',
+                     labelSeparator:'',
+                     inputType:'hidden',
+                     name: 'id_solicitud',  
+                   },
+                   {
+                    xtype: 'combo',
+                    name: 'id_depto_usuario',
+                    hiddenName: 'id_depto_usuario',
+                    fieldLabel: 'Auxiliar',
+                    listWidth:280,
+                    allowBlank: false,
+                    store:new Ext.data.JsonStore(
+                    {
+                        url:    '../../sis_parametros/control/DeptoUsuario/listarDeptoUsuario',
+                        id: 'id_depto_usuario',
+                        root:'datos',
+                        sortInfo:{
+                            field:'id_depto_usuario',
+                            direction:'ASC'
+                        },
+                        totalProperty:'total',
+                        fields: ['id_depto_usuario','id_usuario','desc_usuario','cargo'],
+                        // turn on remote sorting
+                        remoteSort: true,
+                        baseParams:{par_filtro:'person.nombre_completo1'}
+                    }),
+                    valueField: 'id_depto_usuario',
+                    displayField: 'desc_usuario',
+                    forceSelection:true,
+                    typeAhead: false,
+                    triggerAction: 'all',
+                    lazyRender:true,
+                    mode:'remote',
+                    pageSize:50,
+                    queryDelay:500,
+                    width:210,
+                    gwidth:220,
+                    minChars:2,
+                    tpl: '<tpl for="."><div class="x-combo-list-item"><p>{desc_usuario}</p>Tarea: <strong>{cargo}</strong> </div></tpl>'
+                
+                }
+                ]
+        });
+        
+        
+         this.winAsigUsu = new Ext.Window({
+            title: 'Asignar Usuario al Proceso',
+            collapsible: true,
+            maximizable: true,
+             autoDestroy: true,
+            width: 430,
+            height: 150,
+            layout: 'fit',
+            plain: true,
+            bodyStyle: 'padding:5px;',
+            buttonAlign: 'center',
+            items: this.formAsigUsuario,
+            modal:true,
+             closeAction: 'hide',
+            buttons: [{
+                text: 'Guardar',
+                 handler:this.guardarAsigUsu,
+                scope:this
+                
+            },
+             {
+                text: 'Cancelar',
+                handler:function(){this.winAsigUsu.hide()},
+                scope:this
+            }]
+        });
+        
+        this.cmb_id_depto_usuario = this.formAsigUsuario.getForm().findField('id_depto_usuario');
+        this.cmb_id_solicitud = this.formAsigUsuario.getForm().findField('id_solicitud');
+       
+        
+         
+        
+    },
+    
+    
     initProceso:function(){
        
         var d= this.sm.getSelected().data;
@@ -408,6 +508,20 @@ Phx.vista.SolicitudApro = {
             this.cmbInstrucRPC.setValue(d.obs+' \n----- \n Intr:'+d.instruc_rpc)
             this.winProc.show(); 
             
+        }
+         
+        
+    },
+    
+    initAsigUsu:function(){
+       
+        var d= this.sm.getSelected().data;
+        if(d){
+            console.log(d)
+            this.cmb_id_depto_usuario.store.baseParams.id_depto = d.id_depto;
+            this.cmb_id_depto_usuario.modificado = true
+            this.cmb_id_solicitud.setValue(d.id_solicitud);
+            this.winAsigUsu.show(); 
         }
          
         
@@ -458,7 +572,27 @@ Phx.vista.SolicitudApro = {
             
                 
         }, 
-           
+     
+      /*asgina usuario a los procesos de la solcitud*/    
+    guardarAsigUsu :function() {                   
+            var d= this.sm.getSelected().data;
+            console.log('guardar usuario')
+            if (this.formAsigUsuario.getForm().isValid()){
+                 Phx.CP.loadingShow();
+                    Ext.Ajax.request({
+                        url:'../../sis_adquisiciones/control/ProcesoCompra/asignarUsuarioProceso',
+                        params:this.formAsigUsuario.getForm().getValues(),
+                        success:this.successSinc,
+                        failure: this.conexionFailure,
+                        timeout:this.timeout,
+                        scope:this
+                    }); 
+            }
+            
+                
+        },       
+  
+  
   
     validarFiltros:function(){
         if(this.cmbDeptoAdq.isValid()){
@@ -555,7 +689,10 @@ Phx.vista.SolicitudApro = {
               
                   this.reload();
                   this.wEstado.hide();
-                  this.winProc.hide()
+                  this.winProc.hide();
+                  this.winAsigUsu.hide()
+                  
+                  this.formAsigUsuario.getForm().reset();
              }
             else{
                 
@@ -574,17 +711,22 @@ Phx.vista.SolicitudApro = {
             this.getBoton('ant_estado').enable();
             this.getBoton('ini_proc').enable();
             this.getBoton('ini_estado').enable();
+            this.getBoton('asig_usu').disable();
         }
         if(data.estado =='proceso'){
             this.getBoton('ant_estado').disable();
             this.getBoton('ini_proc').disable();
             this.getBoton('ini_estado').disable();
+            this.getBoton('asig_usu').enable();
+            
+            
         }
         
         if(data.estado !='aprobado' && data.estado !='proceso' ){
             this.getBoton('ant_estado').disable();
             this.getBoton('ini_proc').disable();
             this.getBoton('ini_estado').disable();
+            this.getBoton('asig_usu').disable();
         }
        
        

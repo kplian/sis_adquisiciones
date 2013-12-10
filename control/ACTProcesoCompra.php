@@ -37,7 +37,13 @@ class ACTProcesoCompra extends ACTbase{
 		}
 		$this->res->imprimirRespuesta($this->res->generarJson());
 	}
-						
+	
+	function asignarUsuarioProceso(){
+        $this->objFunc=$this->create('MODProcesoCompra');   
+        $this->res=$this->objFunc->asignarUsuarioProceso($this->objParam);
+        $this->res->imprimirRespuesta($this->res->generarJson());
+    }
+	
 	function eliminarProcesoCompra(){
 	    $this->objFunc=$this->create('MODProcesoCompra');	
 		$this->res=$this->objFunc->eliminarProcesoCompra($this->objParam);
