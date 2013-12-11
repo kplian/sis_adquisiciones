@@ -54,16 +54,23 @@ BEGIN
         
            IF   p_administrador != 1 THEN
            
+             
+             
              select  
                  pxp.aggarray(depu.id_depto)
               into 
                  va_id_depto
              from param.tdepto_usuario depu 
-             where depu.id_usuario =  p_id_usuario; 
+             where depu.id_usuario =  p_id_usuario and depu.cargo = 'responsable'; 
         
-           v_filadd='(dep.id_depto  in ('|| COALESCE(array_to_string(va_id_depto,','),'0')||')) and';
+             
+             v_filadd='( (dep.id_depto  in ('|| COALESCE(array_to_string(va_id_depto,','),'0')||'))   or   id_usuario_auxiliar = '||p_id_usuario::varchar ||' ) and ';
           
-          END IF;
+         
+             
+        
+        
+         END IF;
         
         
     		--Sentencia de la consulta
@@ -91,7 +98,9 @@ BEGIN
                          sol.numero as desc_solicitud,
                          mon.codigo as desc_moneda,
                          sol.instruc_rpc,
-                         sol.id_categoria_compra
+                         sol.id_categoria_compra,
+                         usua.cuenta as usr_aux
+                         
                    from adq.tproceso_compra proc
                        inner join segu.tusuario usu1 on usu1.id_usuario = proc.id_usuario_reg
                        inner join param.tdepto dep on dep.id_depto = proc.id_depto 
@@ -99,12 +108,14 @@ BEGIN
                        inner join orga.vfuncionario fun on  fun.id_funcionario = sol.id_funcionario
                        inner join param.tmoneda mon on mon.id_moneda = sol.id_moneda
                        left join segu.tusuario usu2 on usu2.id_usuario = proc.id_usuario_mod
+                       left join segu.tusuario  usua on usua.id_usuario = proc.id_usuario_auxiliar
                        where  '||v_filadd||'  ';
 			
 			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;
 			v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
 
+            --raise exception 'sss';
 			--Devuelve la respuesta
 			return v_consulta;
             
@@ -128,12 +139,26 @@ BEGIN
         
            IF   p_administrador != 1 THEN
            
+             -- recupera los usuarios miembros del depto
              select  
                  pxp.aggarray(depu.id_depto)
               into 
                  va_id_depto
              from param.tdepto_usuario depu 
              where depu.id_usuario =  p_id_usuario; 
+        
+            
+            if va_id_depto is null then
+             
+               raise exception 'El suario no se encuetra asignado a nigun depto de adquisiciones';
+            
+            end if;
+            
+            
+            
+            --recupera el cargo del usuario 
+        
+        
         
            v_filadd='(dep.id_depto  in ('|| COALESCE(array_to_string(va_id_depto,','),'0')||')) and';
           
@@ -239,14 +264,17 @@ BEGIN
         
            IF   p_administrador != 1 THEN
           
-           select  
+        
+             --seleciona los departamentos donde el usuario es responsable
+              select  
                  pxp.aggarray(depu.id_depto)
               into 
                  va_id_depto
              from param.tdepto_usuario depu 
-             where depu.id_usuario =  p_id_usuario; 
+             where depu.id_usuario =  p_id_usuario and depu.cargo = 'responsable'; 
         
-           v_filadd='(dep.id_depto  in ('|| COALESCE(array_to_string(va_id_depto,','),'0')||')) and';
+             v_filadd='( (dep.id_depto  in ('|| COALESCE(array_to_string(va_id_depto,','),'0')||'))   or   id_usuario_auxiliar = '||p_id_usuario::varchar ||' ) and ';
+          
           
           END IF;
         
@@ -260,6 +288,7 @@ BEGIN
                        inner join orga.vfuncionario fun on  fun.id_funcionario = sol.id_funcionario
                        inner join param.tmoneda mon on mon.id_moneda = sol.id_moneda
                        left join segu.tusuario usu2 on usu2.id_usuario = proc.id_usuario_mod
+                       left join segu.tusuario usua on usua.id_usuario = proc.id_usuario_auxiliar
                        where  '||v_filadd||'  ';
 			
 			--Definicion de la respuesta		    

@@ -61,6 +61,7 @@ DECLARE
     v_id_usuario_reg integer;
     v_id_estado_wf_ant  integer;
     v_registros record;
+    v_id_usuario integer;
 			    
 BEGIN
 
@@ -248,6 +249,46 @@ BEGIN
             return v_resp;
 
 		end;
+        
+      
+     
+     
+     /*********************************    
+ 	#TRANSACCION:  'ADQ_ASIGPROC_IME'
+ 	#DESCRIPCION:	Asignacion de usuarios auxiliares responsables del proceso de compra
+ 	#AUTOR:		admin	
+ 	#FECHA:		19-03-2013 12:55:29
+	***********************************/
+
+	elsif(p_transaccion='ADQ_ASIGPROC_IME')then
+
+		begin
+			
+            
+            select 
+             id_usuario
+            into
+             v_id_usuario 
+            from param.tdepto_usuario d 
+            where d.id_depto_usuario =  v_parametros.id_depto_usuario;
+            
+            
+            --Sentencia de la modificacion
+			update adq.tproceso_compra set
+			id_usuario_auxiliar = v_id_usuario,
+            id_usuario_mod = p_id_usuario
+			where id_solicitud=v_parametros.id_solicitud;
+               
+			--Definicion de la respuesta
+            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Usuario asignado al proceso)'); 
+            v_resp = pxp.f_agrega_clave(v_resp,'id_solicitud',v_parametros.id_solicitud::varchar);
+               
+            --Devuelve la respuesta
+            return v_resp;
+            
+		end;  
+        
+        
 
 	/*********************************    
  	#TRANSACCION:  'ADQ_PROC_MOD'
@@ -615,7 +656,7 @@ BEGIN
              
               
             --Definicion de la respuesta
-            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Proceso de Compra y la solcitud fueron finalizados y el presupuesto revertido'); 
+            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Usuario asginado al procesortido'); 
             v_resp = pxp.f_agrega_clave(v_resp,'id_proceso_compra',v_parametros.id_proceso_compra::varchar);
               
             --Devuelve la respuesta

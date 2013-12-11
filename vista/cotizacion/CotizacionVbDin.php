@@ -36,7 +36,7 @@ Phx.vista.CotizacionVbDin = {
                     text :'Aprobar',
                     iconCls : 'bok',
                     disabled: true,
-                    handler : this.onGenOC,
+                    handler : this.AprobarSolicitud,
                     tooltip : '<b>Aprobar Adjudicación</b><br/><b> La Recomendación queda aprobada </b>'
           });
           
@@ -204,54 +204,7 @@ Phx.vista.CotizacionVbDin = {
         
         
         
-        //formulario de adjudicacion parcil
         
-        this.formOC = new Ext.form.FormPanel({
-            baseCls: 'x-plain',
-            autoDestroy: true,
-            layout: 'form',
-            items: [
-                   { 
-                    xtype: 'datefield',   
-                    name: 'fecha_oc',
-                    fieldLabel: 'Fecha OC',
-                    disabled:true,
-                    allowBlank: false
-                    
-                   }
-                  ]
-        });
-        
-        
-         this.cmpFechaOC =this.formOC.getForm().findField('fecha_oc');
-         
-         
-         
-         this.wOC= new Ext.Window({
-            title: 'Generar OC',
-            collapsible: true,
-            maximizable: true,
-             autoDestroy: true,
-            width: 350,
-            height: 170,
-            layout: 'fit',
-            plain: true,
-            bodyStyle: 'padding:5px;',
-            buttonAlign: 'center',
-            items: this.formOC,
-            modal:true,
-             closeAction: 'hide',
-            buttons: [{
-                text: 'Guardar',
-                 handler:this.onSubmitGenOC,
-                scope:this
-                
-            },{
-                text: 'Cancelar',
-                handler:function(){this.wOC.hide()},
-                scope:this
-            }]
-        });
         
         
         this.cmbTipoEstado =this.formEstado.getForm().findField('id_tipo_estado');
@@ -287,43 +240,30 @@ Phx.vista.CotizacionVbDin = {
         
     } ,
     ActList:'../../sis_adquisiciones/control/Cotizacion/listarCotizacionRPC',
+  
+  
+  AprobarSolicitud:function(){
     
-    onGenOC:function(){
+            var d = this.sm.getSelected().data;
+           
+            this.DataSelected = d
             
-          this.cmpFechaOC.setValue(new Date());
-          this.cmpFechaOC.disable();
-          this.wOC.show(); 
-            
-    },
-        
-    onSubmitGenOC:function(){
-            var data = this.getSelectedData();
             Phx.CP.loadingShow();
+            
             Ext.Ajax.request({
                 url:'../../sis_adquisiciones/control/Cotizacion/generarOC',
-                params:{id_cotizacion:data.id_cotizacion,fecha_oc: this.cmpFechaOC.getValue().dateFormat('d/m/Y')},
-                success:this.successSincAprobacion,
+                params:{id_cotizacion:d.id_cotizacion,
+                        operacion:'verificar'},
+                success:this.successSinc,
                 failure: this.conexionFailure,
                 timeout:this.timeout,
                 scope:this
-            });
-            
-            
-        },
+            });  
+      
+  },
+  
         
-        successSincAprobacion:function(resp){
-            Phx.CP.loadingHide();
-           
-            var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
-            if(!reg.ROOT.error){
-                this.wOC.hide(); 
-                this.reload();
-             }else{
-                alert('ocurrio un error durante el proceso')
-            }
-        },
-        
-        successSinc:function(resp){
+   successSinc:function(resp){
             
             Phx.CP.loadingHide();
             var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
@@ -384,11 +324,11 @@ Phx.vista.CotizacionVbDin = {
                
                 if (reg.ROOT.datos.operacion=='cambio_exitoso'){
                 
-                  this.reload();
+                 
                   this.wEstado.hide();
                 
                 }
-               
+                this.reload();
                 
             }else{
                 
@@ -488,13 +428,11 @@ Phx.vista.CotizacionVbDin = {
           
             if(data['estado']==  'recomendado'){
                  this.getBoton('btnGenOC').enable();
-                 this.getBoton('btnRepOC').disable(); 
                  this.getBoton('sig_estado').disable(); 
                  this.getBoton('btnCuadroComparativo').enable();
               }
             if(data['estado']==  'adjudicado'){
                  this.getBoton('btnGenOC').disable();
-                 this.getBoton('btnRepOC').enable();
                  this.getBoton('sig_estado').disable();
                  this.getBoton('btnCuadroComparativo').disable(); 
              }
@@ -507,6 +445,7 @@ Phx.vista.CotizacionVbDin = {
            
            this.getBoton('btnReporte').enable();  
            this.getBoton('ant_estado').enable();
+           this.getBoton('btnRepOC').enable(); 
            this.getBoton('btnChequeoDocumentos').enable(); 
          },
           

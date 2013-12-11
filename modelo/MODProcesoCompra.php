@@ -46,6 +46,7 @@ class MODProcesoCompra extends MODbase{
 		$this->captura('desc_moneda','varchar');
 		$this->captura('instruc_rpc','varchar');
 		$this->captura('id_categoria_compra','int4');
+		$this->captura('usr_aux','varchar');
 	 
 		
 		//Ejecuta la instruccion
@@ -107,6 +108,9 @@ function listarProcesoCompraPedido(){
 		$this->captura('desc_solicitud','varchar');
 		$this->captura('desc_moneda','varchar');
 		
+		
+		
+		
 		 
 		
 		//Ejecuta la instruccion
@@ -116,6 +120,30 @@ function listarProcesoCompraPedido(){
 		//Devuelve la respuesta
 		return $this->respuesta;
 	}
+	
+	
+	/*
+	Asignacion de usuarios al proceso de compra
+	
+	*/
+	function asignarUsuarioProceso(){
+        //Definicion de variables para ejecucion del procedimiento
+        $this->procedimiento='adq.f_proceso_compra_ime';
+        $this->transaccion='ADQ_ASIGPROC_IME';
+        $this->tipo_procedimiento='IME';
+                
+        //Define los parametros para la funcion
+        $this->setParametro('id_depto_usuario','id_depto_usuario','int4');
+        $this->setParametro('id_solicitud','id_solicitud','int4');
+        
+
+        //Ejecuta la instruccion
+        $this->armarConsulta();
+        $this->ejecutarConsulta();
+
+        //Devuelve la respuesta
+        return $this->respuesta;
+    }
 			
 	function insertarProcesoCompra(){
 		//Definicion de variables para ejecucion del procedimiento

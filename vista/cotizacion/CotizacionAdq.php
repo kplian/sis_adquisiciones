@@ -33,7 +33,12 @@ Phx.vista.CotizacionAdq = {
                     tooltip : '<b>Recomedar Todo</b><br/><b>Recomienda la adjudicación de todo lo disponible</b>'
           });
           
-           this.addButton('btnSolApro',{text:'Sol. Apro.',iconCls: 'bok',disabled:true,handler:this.onSolAprobacion,tooltip: '<b>Solictar Aprobación</b><p>Solictar Aprobación del RPC</p>'});
+           this.addButton('btnSolApro',{
+                         text:'Sol. Apro.',
+                         iconCls: 'bok',
+                         disabled:true,
+                         handler:this.onSolAprobacion,
+                         tooltip: '<b>Solictar Aprobación</b><p>Solictar Aprobación del RPC</p>'});
            
         
        
@@ -62,7 +67,8 @@ Phx.vista.CotizacionAdq = {
         this.init();
         this.iniciarEventos();
         
-        
+        //crea fomrlario para generar OC
+        this.crearFormularioFechaOC();
         
         //formulario de departamentos
         
@@ -143,6 +149,55 @@ Phx.vista.CotizacionAdq = {
         this.store.baseParams={id_proceso_compra:this.id_proceso_compra,tipo_interfaz:this.nombreVista}; 
         this.load({params:{start:0, limit:this.tam_pag}});
         
+        
+    },
+    
+    
+    crearFormularioFechaOC:function(){
+        
+            //formulario de adjudicacion parcil
+            this.formOC = new Ext.form.FormPanel({
+                baseCls: 'x-plain',
+                autoDestroy: true,
+                layout: 'form',
+                items: [
+                       { 
+                        xtype: 'datefield',   
+                        name: 'fecha_oc',
+                        fieldLabel: 'Fecha OC',
+                        allowBlank: false
+                       }
+                      ]
+            });
+            
+            
+            this.cmpFechaOC =this.formOC.getForm().findField('fecha_oc');
+             
+            this.wOC= new Ext.Window({
+                title: 'Generar OC',
+                collapsible: true,
+                maximizable: true,
+                 autoDestroy: true,
+                width: 350,
+                height: 170,
+                layout: 'fit',
+                plain: true,
+                bodyStyle: 'padding:5px;',
+                buttonAlign: 'center',
+                items: this.formOC,
+                modal:true,
+                 closeAction: 'hide',
+                buttons: [{
+                    text: 'Guardar',
+                     handler:this.onSubmitGenOC,
+                    scope:this
+                    
+                },{
+                    text: 'Cancelar',
+                    handler:function(){this.wOC.hide()},
+                    scope:this
+                }]
+            });  
         
     },
     
@@ -234,7 +289,17 @@ Phx.vista.CotizacionAdq = {
             });     
         },
         
-        onSolAprobacion:function()
+        
+        onSolAprobacion:function(){
+            
+            this.cmpFechaOC.setValue(new Date());
+            this.cmpFechaOC.setReadOnly(true);
+            this.wOC.show(); 
+            
+        },
+        
+        
+        onSubmitGenOC:function()
         {                   
             var d= this.sm.getSelected().data;
            
@@ -243,11 +308,9 @@ Phx.vista.CotizacionAdq = {
             Phx.CP.loadingShow();
             
             Ext.Ajax.request({
-                // form:this.form.getForm().getEl(),
-                //url:'../../sis_adquisiciones/control/Cotizacion/solicitarAprobacion',
-                
                 url:'../../sis_adquisiciones/control/Cotizacion/siguienteEstadoCotizacion',
                 params:{id_cotizacion:d.id_cotizacion,
+                        fecha_oc: this.cmpFechaOC.getValue().dateFormat('d/m/Y'),
                         operacion:'verificar'},
                 
                 //params:{id_cotizacion:d.id_cotizacion,operacion:'sol_apro'},
@@ -278,6 +341,8 @@ Phx.vista.CotizacionAdq = {
             Phx.CP.loadingHide();
            
             var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
+            console.log('depues de todo',reg)
+            
             if(!reg.ROOT.error){
                 
                         if (reg.ROOT.datos.operacion=='preguntar_todo'){
@@ -291,6 +356,7 @@ Phx.vista.CotizacionAdq = {
                                 url:'../../sis_adquisiciones/control/Cotizacion/siguienteEstadoCotizacion',
                                 params:{id_cotizacion:d.id_cotizacion,
                                     operacion:'cambiar',
+                                    fecha_oc: this.cmpFechaOC.getValue().dateFormat('d/m/Y'),
                                     id_tipo_estado:reg.ROOT.datos.id_tipo_estado,
                                     id_funcionario:reg.ROOT.datos.id_funcionario_estado,
                                     id_depto:reg.ROOT.datos.id_depto_estado,
@@ -301,27 +367,21 @@ Phx.vista.CotizacionAdq = {
                                 failure: this.conexionFailure,
                                 timeout:this.timeout,
                                 scope:this
-                            }); 
-                         }
-                         else{
-                               
-                            alert('Estado siguiente mal parametrizado, solo se admite un funcionario, un estado, sin instrucciones adicionales')
-                            
-                               
-                         }
-                    
-                    
-                    
-                    
-                    
-                    
-                }
+                               }); 
+                           }
+                           else{
+                                 
+                               alert('Estado siguiente mal parametrizado, solo se admite un funcionario, un estado, sin instrucciones adicionales')
+                           }
+                     }
                 
-                this.wDEPTO.hide();
-                this.reload();
-             }else{
-                alert('ocurrio un error durante el proceso')
-            }
+                    this.wDEPTO.hide();
+                    this.wOC.hide(),
+                    this.reload();
+                 }
+                 else{
+                    alert('ocurrio un error durante el proceso')
+                }
         },
         
        

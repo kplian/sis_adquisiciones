@@ -646,7 +646,10 @@ BEGIN
 	/*********************************    
  	#TRANSACCION:  'ADQ_GENOC_IME'
  	#DESCRIPCION:	Generar el numero secuencial de Orden de compra y pasa al siguiente estado la cotizacion
- 	#AUTOR:	        Rensi Arteaga Copari	
+ 	#AUTOR:	        Rensi Arteaga Copari
+    
+    ESTA TRANSACCION YA NOSE UTILIZA FUE REMPLAZADA PRO LA ADQ_SIGECOT_IME
+    	
  	#FECHA:		    1-04-2013 14:48:35
 	***********************************/
 
@@ -787,6 +790,11 @@ BEGIN
     /*********************************    
  	#TRANSACCION:  'ADQ_SOLAPRO_IME'
  	#DESCRIPCION:	depues de (Recomendar)adjudicar pasa al siguiente estado, de solicitud de aprobacion
+    
+    
+    --  NO SE TIENE QUE USAR MAS ESTA TRASACCION
+    
+    
  	#AUTOR:	        Rensi Arteaga Copari	
  	#FECHA:		    7-05-2013 14:48:35
 	***********************************/
@@ -869,16 +877,20 @@ BEGIN
              
              --  pasamos la cotizacion al siguiente estado
            
-             v_id_estado_actual =  wf.f_registra_estado_wf(va_id_tipo_estado[1], 
-                                                           v_id_funcionario_rpc, 
-                                                           v_id_estado_wf, 
-                                                           v_id_proceso_wf,
-                                                           p_id_usuario,
-                                                           v_id_depto,
-                                                           'Se requiere la aprobacion de la solicitud '||v_num_sol,
-                                                           '../../../sis_adquisiciones/vista/cotizacion/CotizacionVbDin.php',
-                                                           'CotizacionVbDin');
+           
+                 v_id_estado_actual =  wf.f_registra_estado_wf(va_id_tipo_estado[1], 
+                                                               v_id_funcionario_rpc, 
+                                                               v_id_estado_wf, 
+                                                               v_id_proceso_wf,
+                                                               p_id_usuario,
+                                                               v_id_depto,
+                                                               'Se requiere la aprobacion de la solicitud '||v_num_sol,
+                                                               '../../../sis_adquisiciones/vista/cotizacion/CotizacionVbDin.php',
+                                                               'CotizacionVbDin');
+                
+              
             
+             
             
              -- actualiza estado en la solicitud
             
@@ -966,44 +978,6 @@ BEGIN
                        
                  raise exception 'La cotización no tiene items adjudicados';
                        
-               END IF;
-               
-               
-                --si no existe un numero de oc obtenemos uno
-               IF  v_numero_oc is NULL THEN
-               
-                   
-                       
-                       /*
-                       -- determina la fecha del periodo
-                      
-                       select id_periodo into v_id_periodo from
-                                      param.tperiodo per 
-                                     where per.fecha_ini <= v_parametros.fecha_oc 
-                                       and per.fecha_fin >=  v_parametros.fecha_oc
-                                       limit 1 offset 0;
-                      
-                      
-                   
-                   
-                   
-                      --obtener correlativo
-                       v_numero_oc =   param.f_obtener_correlativo(
-                                'OC', 
-                                 v_id_periodo,-- par_id, 
-                                 NULL, --id_uo 
-                                 v_id_depto,    -- id_depto
-                                 p_id_usuario, 
-                                 'ADQ', 
-                                 NULL);
-                                 
-                                 
-                        update adq.tcotizacion set
-                        fecha_adju = v_parametros.fecha_oc,
-                        numero_oc = v_numero_oc
-                        where id_cotizacion = v_parametros.id_cotizacion;*/
-               
-               
                END IF;
                
             
@@ -1137,6 +1111,47 @@ BEGIN
            --Se se solicita cambiar de estado a la solicitud
            ------------------------------------------
            ELSEIF  v_parametros.operacion = 'cambiar' THEN
+          
+                -- si la cotizacion esta actualmente cotizada 
+                IF v_estado_cot = 'cotizado' THEN 
+                
+                       --si no existe un numero de oc obtenemos uno
+                     IF  v_numero_oc is NULL THEN
+                     
+                         
+                             
+                             
+                             -- determina la fecha del periodo
+                            
+                             select id_periodo into v_id_periodo from
+                                            param.tperiodo per 
+                                           where per.fecha_ini <= v_parametros.fecha_oc 
+                                             and per.fecha_fin >=  v_parametros.fecha_oc
+                                             limit 1 offset 0;
+                            
+                            
+                         
+                         
+                         
+                            --obtener correlativo
+                             v_numero_oc =   param.f_obtener_correlativo(
+                                      'OC', 
+                                       v_id_periodo,-- par_id, 
+                                       NULL, --id_uo 
+                                       v_id_depto,    -- id_depto
+                                       p_id_usuario, 
+                                       'ADQ', 
+                                       NULL);
+                                       
+                                       
+                              update adq.tcotizacion set
+                              fecha_adju = v_parametros.fecha_oc,
+                              numero_oc = v_numero_oc
+                              where id_cotizacion = v_parametros.id_cotizacion;
+                     
+                     
+                     END IF;
+                 END IF;
           
           
             
@@ -1337,7 +1352,7 @@ BEGIN
         
 	/*********************************    
  	#TRANSACCION:  'ADQ_FINREGC_IME'
- 	#DESCRIPCION:	Finaliza el registro de la cotizacion y pasa al siguiente este que es totizado
+ 	#DESCRIPCION:	Finaliza el registro de la cotizacion y pasa al siguiente este que es cotizado
                     donde estara listo para adjudicar
  	#AUTOR:	Rensi Arteaga Copari	
  	#FECHA:		21-03-2013 14:48:35
@@ -1646,7 +1661,7 @@ BEGIN
             
             END IF;
             
-             IF va_codigo_estado[1] is  null THEN
+            IF va_codigo_estado[1] is  null THEN
             
              raise exception 'El proceso de WF esta mal parametrizado, no se encuentra el estado siguiente ';
             
@@ -1692,6 +1707,8 @@ BEGIN
                        v_parametros.id_depto_tes,
                        '---',
                        'OBLI');
+                       
+                       
         
              update tes.tobligacion_pago  o set 
                id_estado_wf =  v_id_estado_wf,
