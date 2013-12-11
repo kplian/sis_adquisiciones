@@ -230,11 +230,20 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
                 fieldLabel: 'Instrucciones/Obs',
                 allowBlank: true,
                 anchor: '80%',
+                renderer:function (value, p, record){
+                    
+                    if(record.data['instruc_rpc'])
+                        return String.format('{1}, {0} ', record.data['desc_uo'],record.data['instruc_rpc']);
+                    else
+                        return String.format('{0} ', record.data['desc_uo']);
+                    
+                    
+                    },
                 gwidth: 150,
                 maxLength:4
             },
             type:'Field',
-            filters:{pfiltro:'ew.obs',type:'string'},
+            filters:{pfiltro:'ew.obs#instruc_rpc',type:'string'},
             id_grupo:1,
             grid:true,
             form:false

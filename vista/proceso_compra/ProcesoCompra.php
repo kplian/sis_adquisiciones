@@ -550,6 +550,13 @@ Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
             this.getBoton('btnCuadroComparativo').disable();
             this.getBoton('btnRevePres').disable();
             this.getBoton('btnFinPro').disable();
+            
+            if(data.estado=='finalizado'){
+                
+                this.getBoton('btnCuadroComparativo').enable();
+                this.getBoton('btnCotizacion').enable();
+                
+            }
              
             
         }

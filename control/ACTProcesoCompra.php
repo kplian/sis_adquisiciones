@@ -65,50 +65,68 @@ class ACTProcesoCompra extends ACTbase{
     
 	function cuadroComparativo(){
 			
-                $dataSource = new DataSource();
-				
-				$this->objParam->addParametroConsulta('ordenacion','id_proceso_compra');
-                $this->objParam->addParametroConsulta('dir_ordenacion','ASC');
-                $this->objParam->addParametroConsulta('cantidad',1000);
-                $this->objParam->addParametroConsulta('puntero',0);
-                $this->objFunc = $this->create('MODProcesoCompra');
-                $resultProcesoCompra = $this->objFunc->listarProcesoCompraPedido();
-                $datosProcesoCompra = $resultProcesoCompra->getDatos();
-            	$idSolicitud=$datosProcesoCompra[0]['id_solicitud'];
- 			//armamos el array parametros y metemos ahi los data sets de las otras tablas
-                $dataSource->putParameter('id_proceso_compra', $datosProcesoCompra[0]['id_proceso_compra']);
-				$dataSource->putParameter('codigo_proceso', $datosProcesoCompra[0]['codigo_proceso']);
-				$dataSource->putParameter('desc_solicitud', $datosProcesoCompra[0]['desc_solicitud']);
-				
-				$this->objParam->addParametroConsulta('ordenacion', 'id_solicitud_det');
-                $this->objParam->addParametroConsulta('cantidad', 1000);
-                $this->objParam->addParametroConsulta('puntero', 0);
-                $this->objParam->addParametro('id_solicitud', $idSolicitud);
-                
-                $modSolicitudDet = $this->create('MODSolicitudDet');
-                $resultSolicitudDet = $modSolicitudDet->listarSolicitudDet();        
-                $datosResultSolicitudDet = $resultSolicitudDet->getDatos();
-        //var_dump($datosResultSolicitudDet);
-				$solicitudDetDataSource = new DataSource();
-				$solicitudDetDataSource->setDataSet($datosResultSolicitudDet);
-    			$dataSource->putParameter('detalleSolicitudDataSource', $solicitudDetDataSource);
+            $dataSource = new DataSource();
+			
+			
+			$this->objParam->addParametroConsulta('ordenacion','id_proceso_compra');
+            $this->objParam->addParametroConsulta('dir_ordenacion','ASC');
+            $this->objParam->addParametroConsulta('cantidad',1);
+            $this->objParam->addParametroConsulta('puntero',0);
+            
+            
+            //recupera datos del proceso de compra
+            $this->objFunc = $this->create('MODProcesoCompra');
+            $resultProcesoCompra = $this->objFunc->listarProcesoCompraPedido();
+            $datosProcesoCompra = $resultProcesoCompra->getDatos();
+        	
+        	
+        	$idSolicitud=$datosProcesoCompra[0]['id_solicitud'];
+        	
+        	
+        	//armamos el array parametros y metemos ahi los data sets de las otras tablas
+            $dataSource->putParameter('id_proceso_compra', $datosProcesoCompra[0]['id_proceso_compra']);
+			$dataSource->putParameter('codigo_proceso', $datosProcesoCompra[0]['codigo_proceso']);
+			$dataSource->putParameter('desc_solicitud', $datosProcesoCompra[0]['desc_solicitud']);
+			
+			
+			
+			//recupera el detalle de la solicituf
+			$this->objParam->addParametroConsulta('ordenacion', 'id_solicitud_det');
+            $this->objParam->addParametroConsulta('cantidad', 1000);
+            $this->objParam->addParametroConsulta('puntero', 0);
+            $this->objParam->addParametro('id_solicitud', $idSolicitud);
+            
+            $modSolicitudDet = $this->create('MODSolicitudDet');
+            $resultSolicitudDet = $modSolicitudDet->listarSolicitudDet();        
+            $datosResultSolicitudDet = $resultSolicitudDet->getDatos();
+            
+            
+            //var_dump($datosResultSolicitudDet);
+			$solicitudDetDataSource = new DataSource();
+			$solicitudDetDataSource->setDataSet($datosResultSolicitudDet);
+			//registra el dataSoruce para los detalles de la solicitud de compra
+			$dataSource->putParameter('detalleSolicitudDataSource', $solicitudDetDataSource);
 								
-    //get detalle
-    //Reset all extra params:
-    				$this->objParam->addParametroConsulta('ordenacion', 'id_cotizacion');
-                $this->objParam->addParametroConsulta('cantidad', 1000);
-                 $this->objParam->addParametroConsulta('puntero', 0);
-                //$this->objParam->addParametro('id_analisis_mant', $idAnalisisMant);
-                        
-                $modCotizacion = $this->create('MODCotizacion');
-                $resultCotizacion = $modCotizacion->listarCotizacion();        
-                $datosResultCotizacion = $resultCotizacion->getDatos();
-                
-                for ($i=0; $i <count($datosResultCotizacion) ; $i++) {             
+                 
+                 
+             //recuepra las cotizaciones del proceso
+             //get detalle
+             //Reset all extra params:
+		    $this->objParam->addParametroConsulta('ordenacion', 'id_cotizacion');
+            $this->objParam->addParametroConsulta('cantidad', 1000);
+            $this->objParam->addParametroConsulta('puntero', 0);
+            
+                    
+            $modCotizacion = $this->create('MODCotizacion');
+            $resultCotizacion = $modCotizacion->listarCotizacion();        
+            $datosResultCotizacion = $resultCotizacion->getDatos();
+            
+             //recorre las cotizaciones y recupera los datos ofertados
+            for ($i=0; $i <count($datosResultCotizacion) ; $i++) {             
                 
                     $idCotizacion = $datosResultCotizacion[$i]['id_cotizacion'];
                     
-                    $this->objParam->addParametroConsulta('ordenacion', 'id_cotizacion_det');
+                    $this->objParam->addParametroConsulta('ordenacion', 'id_solicitud_det');
                     $this->objParam->addParametroConsulta('cantidad', 1000);
                     $this->objParam->addParametroConsulta('puntero', 0);
                     $this->objParam->addParametro('id_cotizacion', $idCotizacion);
@@ -117,34 +135,42 @@ class ACTProcesoCompra extends ACTbase{
                     $resultCotizacionDet = $modCotizacionDet->listarCotizacionDet(); 
                     
                     $datosResultCotizacionDet=$resultCotizacionDet->getDatos();
-                    
                     $resultCotizacionDet->setDatos($datosResultCotizacionDet);
                     
+                    //crea un data source para almacenar las cotizaciones
                     $cotizacionDetDataSource = new DataSource();
                     $cotizacionDetDataSource->setDataSet($resultCotizacionDet->getDatos());
-                        
+                    //recursivamente agregar el detalle de la cotizacion como un dataset
                     $datosResultCotizacion[$i]['dataset']=$cotizacionDetDataSource;
                                    
-                }
-           $resultCotizacion->setDatos($datosResultCotizacion);
-		   $cotizacionDataSource = new DataSource();        
-    	   $cotizacionDataSource->setDataSet($resultCotizacion->getDatos());
-    	   $dataSource->putParameter('cotizacionDataSource', $cotizacionDataSource);
+             }
+             
+             $resultCotizacion->setDatos($datosResultCotizacion);
+             
+		     $cotizacionDataSource = new DataSource();        
+    	     $cotizacionDataSource->setDataSet($resultCotizacion->getDatos());
+    	     
+    	     //alamcena en data source principal los datos de la cotizacion
+    	     $dataSource->putParameter('cotizacionDataSource', $cotizacionDataSource);
     				        
-            //build the report
-            $reporte = new RCuadroComparativo();
-            $reporte->setDataSource($dataSource);
-        				$nombreArchivo = 'CuadroComparativo.xls';
-        				
-            $reportWriter = new ReportWriter($reporte, dirname(__FILE__).'/../../reportes_generados/'.$nombreArchivo);
-            $reportWriter->writeReport('xls');
+             //build the report
+             $reporte = new RCuadroComparativo();
+             //configura el data set principal para armar el reporte
+             $reporte->setDataSource($dataSource);
+        	 $nombreArchivo = 'CuadroComparativo.xls';
+              
+             //almacena el archivo temporalmente 				
+             $reportWriter = new ReportWriter($reporte, dirname(__FILE__).'/../../reportes_generados/'.$nombreArchivo);
+             $reportWriter->writeReport('xls');
             
-            $mensajeExito = new Mensaje();
-            $mensajeExito->setMensaje('EXITO','Reporte.php','Reporte generado',
+              //retorna el nombre del archivo temporal al cliente
+             $mensajeExito = new Mensaje();
+             $mensajeExito->setMensaje('EXITO','Reporte.php','Reporte generado',
                                             'Se generó con éxito el reporte: '.$nombreArchivo,'control');
-            $mensajeExito->setArchivoGenerado($nombreArchivo);
-            $this->res = $mensajeExito;
-            $this->res->imprimirRespuesta($this->res->generarJson());
+             
+             $mensajeExito->setArchivoGenerado($nombreArchivo);
+             $this->res = $mensajeExito;
+             $this->res->imprimirRespuesta($this->res->generarJson());
 
   }
 }
