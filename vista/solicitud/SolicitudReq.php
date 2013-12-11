@@ -65,6 +65,7 @@ Phx.vista.SolicitudReq = {
                     queryDelay:500,
                     width:210,
                     gwidth:220,
+                    listWidth:'280',
                     minChars:2,
                     tpl: '<tpl for="."><div class="x-combo-list-item"><p>{desc_funcionario}</p>Prioridad: <strong>{prioridad}</strong> </div></tpl>'
                 
@@ -246,6 +247,7 @@ Phx.vista.SolicitudReq = {
             
             this.cmbRPC.store.baseParams.id_uo=d.id_uo;
             this.cmbRPC.store.baseParams.fecha=d.fecha_soli;
+            this.cmbRPC.store.baseParams.id_proceso_macro=d.id_proceso_macro;
             Ext.Ajax.request({
                 // form:this.form.getForm().getEl(),
                 url:'../../sis_adquisiciones/control/Solicitud/finalizarSolicitud',

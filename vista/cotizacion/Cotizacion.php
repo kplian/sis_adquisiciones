@@ -11,9 +11,10 @@ header("content-type: text/javascript; charset=UTF-8");
 ?>
 <script>
 Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
-
+    tam_pag:50,
 	constructor:function(config){
-		this.maestro=config.maestro;
+	    
+	    this.maestro=config;
 		//llama al constructor de la clase padre
     	Phx.vista.Cotizacion.superclass.constructor.call(this,config);
     	
@@ -41,10 +42,12 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
               handler:this.antEstado,
               tooltip: '<b>Pasar al Anterior Estado</b>'
           });
+          console.log(this.maestro)
+          this.Cmp.id_moneda.store.baseParams.id_moneda = this.maestro.id_moneda;
 								
 		 
     },
-	tam_pag:50,
+	
 			
 	Atributos:[
 		{

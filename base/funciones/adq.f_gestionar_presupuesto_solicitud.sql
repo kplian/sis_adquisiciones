@@ -48,6 +48,8 @@ DECLARE
   v_comprometido_ga     numeric;
   v_ejecutado     	    numeric;
   
+  v_men_presu			varchar;
+  
 
   
 BEGIN
@@ -147,7 +149,7 @@ BEGIN
        --revierte al revveertir la probacion de la solicitud
        
            v_i = 0;
-           
+           v_men_presu = '';
            FOR v_registros in ( 
                             SELECT
                               sd.id_solicitud_det,
@@ -175,7 +177,8 @@ BEGIN
                      
                      v_comprometido=0;
                      v_ejecutado=0;
-                             
+                     
+                          
                      
                      SELECT 
                            COALESCE(ps_comprometido,0), 
@@ -186,26 +189,34 @@ BEGIN
                      FROM pre.f_verificar_com_eje_pag(v_registros.id_partida_ejecucion, v_id_moneda_base);
                      
                      
+                     v_monto_a_revertir = COALESCE(v_comprometido,0) - COALESCE(v_ejecutado,0);  
                      
                      
-                      --armamos los array para enviar a presupuestos          
-                    IF v_comprometido != 0 THEN
+                    --armamos los array para enviar a presupuestos          
+                    IF v_monto_a_revertir != 0 THEN
                      
                        	v_i = v_i +1;                
                        
                         va_id_presupuesto[v_i] = v_registros.id_presupuesto;
                         va_id_partida[v_i]= v_registros.id_partida;
                         va_momento[v_i]	= 2; --el momento 2 con signo positivo es revertir
-                        va_monto[v_i]  = (v_comprometido)*-1;  -- considera la posibilidad de que a este item se le aya revertido algun monto
+                        va_monto[v_i]  = (v_monto_a_revertir)*-1;  -- considera la posibilidad de que a este item se le aya revertido algun monto
                         va_id_moneda[v_i]  = v_id_moneda_base;
                         va_id_partida_ejecucion[v_i]= v_registros.id_partida_ejecucion;
                         va_columna_relacion[v_i]= 'id_solicitud_compra';
                         va_fk_llave[v_i] = v_registros.id_solicitud;
                         va_id_solicitud_det[v_i]= v_registros.id_solicitud_det;
                         va_fecha[v_i]=now()::date;
+                        
                     END IF;
+                    
+                    
+                    v_men_presu = ' comprometido: '||COALESCE(v_comprometido,0)::varchar||'  ejecutado: '||COALESCE(v_ejecutado,0)::varchar||' \n'||v_men_presu;
+                    
              
              END LOOP;
+             
+               --raise exception '%', v_men_presu;
              
              --llamada a la funcion de para reversion
                IF v_i > 0 THEN 
@@ -226,9 +237,8 @@ BEGIN
                
            --1)  lista todos los detalle de las solcitudes
              
-             
-           
-             v_i = 0;
+            
+            v_i = 0;
             FOR v_registros in ( 
                           SELECT
                                       sd.id_solicitud_det,
@@ -310,6 +320,8 @@ BEGIN
                              
                              
                      END LOOP;
+                     
+                   
                      
                        IF v_i > 0 THEN                  
                      
