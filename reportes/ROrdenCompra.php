@@ -22,10 +22,13 @@ include_once dirname(__FILE__)."/../../lib/lib_reporte/lang.es_AR.php";
         $this->SetFont('','B');
 								$tipo=$this->getDataSource()->getParameter('tipo');
 								if($tipo=='Bien')
-									$tipo='Compra';
-								if($tipo=='Bien - Servicio')
-								 $tipo='Compra - Servicio';       
-        $this->Cell(145, $height, 'Orden de '.$tipo, 0, 0, 'C', false, '', 1, false, 'T', 'C');        
+								  $tipo='Compra';
+                                elseif($tipo=='Bien - Servicio')
+								  $tipo='Compra - Servicio'; 
+                                else
+                                  $tipo='Servicio';       
+                                
+                                $this->Cell(145, $height, 'Orden de '.$tipo, 0, 0, 'C', false, '', 1, false, 'T', 'C');        
         
 								$x=$this->getX();
 								$y=$this->getY();
@@ -55,7 +58,7 @@ include_once dirname(__FILE__)."/../../lib/lib_reporte/lang.es_AR.php";
 								$this->Ln();		
 								if($tipo=='adjudicado'){
 								  $this->SetFontSize(9);
-          $this->SetFont('','B');						
+                                $this->SetFont('','B');						
 										$this->Cell(30, $height, 'Numero de O.C. :', 0, 0, 'L', false, '', 1, false, 'T', 'C');
 										$this->SetFont('','');	
 										$this->Cell(30, $height, $this->getDataSource()->getParameter('numero_oc'), 0, 0, 'L', false, '', 1, false, 'T', 'C');
@@ -116,10 +119,10 @@ Class ROrdenCompra extends Report {
         $width3 = 35;
         $width4 = 75;
         
-								$white = array('LTRB' =>array('width' => 0.3, 'cap' => 'butt', 'join' => 'miter', 'dash' => 0, 'color' => array(255, 255, 255)));
-								$black = array('T' =>array('width' => 0.3, 'cap' => 'butt', 'join' => 'miter', 'dash' => 0, 'color' => array(0, 0, 0)));
-								$pdf->SetFontSize(7);
-								$pdf->SetFont('', 'B');
+		$white = array('LTRB' =>array('width' => 0.3, 'cap' => 'butt', 'join' => 'miter', 'dash' => 0, 'color' => array(255, 255, 255)));
+		$black = array('T' =>array('width' => 0.3, 'cap' => 'butt', 'join' => 'miter', 'dash' => 0, 'color' => array(0, 0, 0)));
+		$pdf->SetFontSize(7);
+		$pdf->SetFont('', 'B');
         $pdf->Cell($width1, $height, 'Señores:', 0, 0, 'L', false, '', 0, false, 'T', 'C');
         $pdf->SetFont('', '');
         $pdf->SetFillColor(192,192,192, true);
@@ -149,10 +152,10 @@ Class ROrdenCompra extends Report {
         $pdf->SetFillColor(192,192,192, true);
         $pdf->Cell($width4+$width3+$width2, $height, $this->getDataSource()->getParameter('lugar_entrega'), $white, 0, 'L', true, '', 0, false, 'T', 'C');
         $pdf->SetFont('', 'B');
-								$pdf->Cell(5, $height, '', 0, 0, 'L', false, '', 0, false, 'T', 'C');
+		$pdf->Cell(5, $height, '', 0, 0, 'L', false, '', 0, false, 'T', 'C');
         $pdf->Cell($width1, $height, 'Celular:', 0, 0, 'L', false, '', 0, false, 'T', 'C');
         $pdf->SetFont('', '');
-								$pdf->SetFillColor(192,192,192, true);
+		$pdf->SetFillColor(192,192,192, true);
         $pdf->Cell($width2, $height, $this->getDataSource()->getParameter('celular'), $white, 0, 'L', true, '', 0, false, 'T', 'C');
         $pdf->Ln();
         $pdf->SetFont('', 'B');
@@ -168,16 +171,22 @@ Class ROrdenCompra extends Report {
         $pdf->Cell($width2, $height, $this->getDataSource()->getParameter('fax'), $white, 0, 'L', true, '', 0, false, 'T', 'C');        
         $pdf->Ln();
         $pdf->Ln();
-								$pdf->SetFontSize(10);
-								$tipo=$this->getDataSource()->getParameter('tipo');
-								if($tipo=='Bien - Servicio')
-								  $tipo='Compra - Servicio'; 
-								if($tipo=='Bien')						
-										$pdf->MultiCell(0, $height, 'Agradeceremos entregarnos de acuerdo a su cotizacion, lo siguiente', 1,'L', false ,1);
-								$this->writeDetalles($this->getDataSource()->getParameter('detalleDataSource'), $pdf,$tipo);
-        
-								$pdf->SetFontSize(9);
-								$pdf->Ln();
+		$pdf->SetFontSize(10);
+		$tipo=$this->getDataSource()->getParameter('tipo');
+		
+		if($tipo=='Bien - Servicio')
+		  $tipo='Compra - Servicio'; 
+		
+		if($tipo=='Bien')						
+		    $pdf->MultiCell(0, $height, 'Agradeceremos entregarnos de acuerdo a su cotizacion, lo siguiente', 1,'L', false ,1);
+		
+		//escritura de los datalles de la cotizacion
+		$this->writeDetalles($this->getDataSource()->getParameter('detalleDataSource'), $pdf,$tipo, $this->getDataSource()->getParameter('codigo_moneda') );
+
+		$pdf->SetFontSize(9);
+		
+		
+		$pdf->Ln();
         $pdf->SetFont('', 'B');
         $pdf->Cell($width3, $height, 'Fecha de Entrega:', 0, 0, 'L', false, '', 0, false, 'T', 'C');
         $pdf->SetFont('', '');
@@ -218,9 +227,9 @@ Class ROrdenCompra extends Report {
         $pdf->Output($fileName, 'F');
     }
     
-    function writeDetalles (DataSource $dataSource, TCPDF $pdf,$tipo) {
+    function writeDetalles (DataSource $dataSource, TCPDF $pdf,$tipo, $tipo_moneda) {
     	
-    	   $blackAll = array('LTRB' =>array('width' => 0.3, 'cap' => 'butt', 'join' => 'miter', 'dash' => 0, 'color' => array(0, 0, 0)));
+    	$blackAll = array('LTRB' =>array('width' => 0.3, 'cap' => 'butt', 'join' => 'miter', 'dash' => 0, 'color' => array(0, 0, 0)));
         $widthMarginLeft = 1;
         $width1 = 20;
         $width2 = 130;
@@ -232,45 +241,53 @@ Class ROrdenCompra extends Report {
         $pdf->SetFillColor(255,255,255, true);
         $pdf->setTextColor(0,0,0); 
 
-								$pdf->Cell($width1-5, $height, 'Cantidad', $blackAll, 0, 'L', true, '', 1, false, 'T', 'C');
-								if($tipo=='Bien')        
+		$pdf->Cell($width1-5, $height, 'Cantidad', $blackAll, 0, 'L', true, '', 1, false, 'T', 'C');
+		if($tipo=='Bien')        
         	$pdf->Cell($width2, $height, 'Item', $blackAll, 0, 'l', true, '', 1, false, 'T', 'C');
-								else{
-									 if($tipo=='Bien - Servicio')
-											$pdf->Cell($width2, $height, 'Compra-Servicio', $blackAll, 0, 'l', true, '', 1, false, 'T', 'C');
-								  else
-											$pdf->Cell($width2, $height, 'Servicio', $blackAll, 0, 'l', true, '', 1, false, 'T', 'C');
-									}
-								$pdf->Cell($width1, $height, 'Precio Unitario', $blackAll, 0, 'C', true, '', 1, false, 'T', 'C');
-        $pdf->Cell($width1, $height, 'Total Bs.', $blackAll, 0, 'C', true, '', 1, false, 'T', 'C');
+		else{
+			if($tipo=='Bien - Servicio')
+				$pdf->Cell($width2, $height, 'Compra-Servicio', $blackAll, 0, 'l', true, '', 1, false, 'T', 'C');
+		    else
+				$pdf->Cell($width2, $height, 'Servicio', $blackAll, 0, 'l', true, '', 1, false, 'T', 'C');
+		}
+		
+		
+		$pdf->Cell($width1, $height, 'Precio Unitario', $blackAll, 0, 'C', true, '', 1, false, 'T', 'C');
+        $pdf->Cell($width1, $height, 'Total '.$tipo_moneda, $blackAll, 0, 'C', true, '', 1, false, 'T', 'C');
         $pdf->Ln();
         $pdf->SetFontSize(6.5);
-								$totalOrdenCompra=0.00;
+		$totalOrdenCompra=0.00;
+        
         foreach($dataSource->getDataset() as $row) {
-        				$pdf->SetFont('', '');												
-												$xAntesMultiCell = $pdf->getX();
-												$yAntesMultiCell = $pdf->getY();		
-            //$totalItem
-            $pdf->setX($pdf->getX()+$width1-5);
-												$pdf->MultiCell($width2, $height, $row['desc_solicitud_det']."\r\n".'  - '.$row['descripcion_sol'], 1,'L', false ,1);
-												$yDespuesMultiCell= $pdf->getY();
-												$height = $pdf->getY()-$yAntesMultiCell;
-												$pdf->setX($xAntesMultiCell);
-												$pdf->setY($yAntesMultiCell);
-												$pdf->Cell($width1-5, $height, $row['cantidad_adju'], 1, 0, 'L', false, '', 1, false, 'T', 'C');
-            $pdf->setX($xAntesMultiCell+$width2+$width1-5);
-            $pdf->Cell($width1, $height, number_format($row['precio_unitario'],2), 1, 0, 'R', false, '', 1, false, 'T', 'C');
-												$totalItem =$row['cantidad_adju']*$row['precio_unitario'];
-												$pdf->Cell($width1, $height, number_format($totalItem,2), 1, 0, 'R', false, '', 1, false, 'T', 'C');
-												$pdf->Ln();
-												$totalOrdenCompra=$totalOrdenCompra + $totalItem;																																														        
+        	     
+        	   //Solo se muestra si la cantidad adjudicada es mayor a cero    
+              if($row['cantidad_adju']>0){
+            	       
+            	$pdf->SetFont('', '');												
+    			$xAntesMultiCell = $pdf->getX();
+    			$yAntesMultiCell = $pdf->getY();		
+                //$totalItem
+                $pdf->setX($pdf->getX()+$width1-5);
+    			$pdf->MultiCell($width2, $height, $row['desc_solicitud_det']."\r\n".'  - '.$row['descripcion_sol'], 1,'L', false ,1);
+    			$yDespuesMultiCell= $pdf->getY();
+    			$height = $pdf->getY()-$yAntesMultiCell;
+    			$pdf->setX($xAntesMultiCell);
+    			$pdf->setY($yAntesMultiCell);
+    			$pdf->Cell($width1-5, $height, $row['cantidad_adju'], 1, 0, 'L', false, '', 1, false, 'T', 'C');
+                $pdf->setX($xAntesMultiCell+$width2+$width1-5);
+                $pdf->Cell($width1, $height, number_format($row['precio_unitario'],2), 1, 0, 'R', false, '', 1, false, 'T', 'C');
+    			$totalItem =$row['cantidad_adju']*$row['precio_unitario'];
+    			$pdf->Cell($width1, $height, number_format($totalItem,2), 1, 0, 'R', false, '', 1, false, 'T', 'C');
+    			$pdf->Ln();
+    			$totalOrdenCompra=$totalOrdenCompra + $totalItem;
+    		  }																																														        
         }
-								$height=5;		 								
-								$obj = new Numbers_Words_es_AR;
-								$numero=explode('.', number_format($totalOrdenCompra,2));
-								$pdf->Cell($width2+$width1+$width1/2+$width1/4, $height, 'SON: '. strtoupper(trim($obj->toWords(str_replace(',', '', $numero[0])))).' '.$numero[1].'/'.'100 '.strtoupper($this->getDataSource()->getParameter('moneda')), 1, 0, 'L', false, '', 1, false, 'T', 'C');
-								$pdf->Cell($width1, $height, number_format($totalOrdenCompra,2), 1, 0, 'R', false, '', 1, false, 'T', 'C');
-								$pdf->Ln();       									
+    	$height=5;		 								
+    	$obj = new Numbers_Words_es_AR;
+    	$numero=explode('.', number_format($totalOrdenCompra,2));
+    	$pdf->Cell($width2+$width1+$width1/2+$width1/4, $height, 'SON: '. strtoupper(trim($obj->toWords(str_replace(',', '', $numero[0])))).' '.$numero[1].'/'.'100 '.strtoupper($this->getDataSource()->getParameter('moneda')), 1, 0, 'L', false, '', 1, false, 'T', 'C');
+    	$pdf->Cell($width1, $height, number_format($totalOrdenCompra,2), 1, 0, 'R', false, '', 1, false, 'T', 'C');
+    	$pdf->Ln();       									
     }     
 }
 ?>

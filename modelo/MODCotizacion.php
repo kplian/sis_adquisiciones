@@ -452,6 +452,9 @@ class MODCotizacion extends MODbase{
 		$this->captura('tipo','varchar');
 		$this->captura('fecha_oc','date');
 		$this->captura('moneda','varchar');
+		$this->captura('codigo_moneda','varchar');
+		
+		
 		
 		$this->armarConsulta();
 		$this->ejecutarConsulta();

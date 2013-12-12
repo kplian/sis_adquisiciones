@@ -177,6 +177,7 @@ class ACTSolicitud extends ACTbase{
         $this->res->imprimirRespuesta($this->res->generarJson());
     }
     
+    
    function reporteSolicitud(){
     $dataSource = new DataSource();
     
@@ -214,6 +215,7 @@ class ACTSolicitud extends ACTbase{
     $dataSource->putParameter('comite_calificacion', $datosSolicitud[0]['comite_calificacion']);
     $dataSource->putParameter('posibles_proveedores', $datosSolicitud[0]['posibles_proveedores']);
     $dataSource->putParameter('desc_funcionario_rpc', $datosSolicitud[0]['desc_funcionario_rpc']);
+    $dataSource->putParameter('desc_funcionario_apro', $datosSolicitud[0]['desc_funcionario_apro']);
                 
     //get detalle
     //Reset all extra params:
@@ -280,10 +282,12 @@ class ACTSolicitud extends ACTbase{
 		if($removekeyTwo===false)
  		     return array("Clave \"$groupkeyTwo\" no existe");
  		     
+	 	
+	 	//crea los array para agrupar y para busquedas
 	 	$groupcriteria = array();
 	 	$arrayResp=array();
 	 	
-	 	//recorre el resultado de la consulta 
+	 	//recorre el resultado de la consulta de oslicitud detalle
 	 	foreach($array as $value)
 	 	{
 	 		//por cada registro almacena el valor correspondiente en $item     
@@ -299,42 +303,58 @@ class ACTSolicitud extends ACTbase{
 	 		if ($busca === false)
 	 		{
 	 		     //si el grupo no existe lo crea
-	 		    
+	 		    //en la siguiente posicicion de crupcriteria agrega el identificador del grupo
 	 			$groupcriteria[]=$value[$groupkey].$value[$groupkeyTwo];
-	 			$arrayResp[]=array($groupkey.$groupkeyTwo=>$value[$groupkey].$value[$groupkeyTwo],'groupeddata'=>array());
+	 			
+	 			//en la siguiente posivion cre ArrayResp cre un btupo con el identificaor nuevo  
+	 			//y un bubgrupo para acumular los detalle de semejaste caracteristicas
+	 			
+	 			$arrayResp[]=array($groupkey.$groupkeyTwo=>$value[$groupkey].$value[$groupkeyTwo],'groupeddata'=>array(),'presu_verificado'=>"false");
+	 			$arrayPresuVer[]=
 	 			//coloca el indice en la ultima posicion insertada
 	 			$busca=count($arrayResp)-1;
+	 			
+	 			
+	 			
 	 		}
 	 		
-	 		//inserta el registro en el grupo correspondiente
+	 		//inserta el registro en el subgrupo correspondiente
 	 		$arrayResp[$busca]['groupeddata'][]=$item;
-	 		$arrayResp[$busca]['presu_verificado']=false;
+	 		
 	 	}
 	 	
-	 	//TODO,  solo verificar si el estado es borrador o pendiente
+	 	//solo verificar si el estado es borrador o pendiente
 	 	//suma y verifica el presupuesto
 	 	
 	 	if ($estado_sol == 'borrador' || $estado_sol == 'pendiente'){
-    	 	foreach($arrayResp as $value)
+    	 	    $cont_grup = 0;
+    	 	foreach($arrayResp as $value2)
             {
                   
                   $total_pre = 0;
                   
-                 $busca = array_search($value[$groupkey].$value[$groupkeyTwo], $groupcriteria);
-                 foreach($value[groupeddata] as $value_det){
+                 $busca = array_search($value2[$groupkey].$value2[$groupkeyTwo], $groupcriteria);
+                 
+                 foreach($value2[groupeddata] as $value_det){
                        //sumamos el monto a comprometer   
                       $total_pre = $total_pre + $value_det["precio_ga"];
                  }
-                 $value_det = $value[groupeddata][0];
+                 
+                 $value_det = $value2[groupeddata][0];
+                 
                  $this->objParam = new CTParametro(null,null,null);
                  $this->objParam->addParametro('id_presupuesto',$value_det["id_presupuesto"]);
                  $this->objParam->addParametro('id_partida',$value_det["id_partida"]);
                  $this->objParam->addParametro('id_moneda',$id_moneda);
                  $this->objParam->addParametro('monto_total',$total_pre);
+                 
+                 
                  $this->objFunc = $this->create('sis_presupuestos/MODPresupuesto');
                  $resultSolicitud = $this->objFunc->verificarPresupuesto();
                  
-                 $arrayResp[$busca]["presu_verificado"]=$resultSolicitud->datos["presu_verificado"];
+                $arrayResp[$cont_grup]["presu_verificado"] = $resultSolicitud->datos["presu_verificado"];
+                 $cont_grup++;
+                 
                  
                  if($resultSolicitud->getTipo()=='ERROR'){
                               
@@ -342,7 +362,7 @@ class ACTSolicitud extends ACTbase{
                       exit;
                  }
                  
-                 // print_r( $resultSolicitud->getTipo()); 
+                 
                   
             }
             
