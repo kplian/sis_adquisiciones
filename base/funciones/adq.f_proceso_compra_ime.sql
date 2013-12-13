@@ -537,6 +537,8 @@ BEGIN
              END IF;
             
             
+            
+            
             -- si tiene cotizacion verificamos que todas estan anuladas o finalizadas
             IF v_estado = 'finalizado' THEN
               select 
@@ -643,6 +645,7 @@ BEGIN
                    id_usuario_mod=p_id_usuario,
                    fecha_mod=now()
                  where id_solicitud =v_id_solicitud;
+             
              
              ----------------------------------------------------
              -- REVIERTE EL PRESUPUESTO SOBRANTE DE LA SOLICITUD

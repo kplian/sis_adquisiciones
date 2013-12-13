@@ -116,6 +116,8 @@ DECLARE
       v_codigo_estado_siguiente varchar;
       v_obs varchar;
       v_fecha_coti date;
+      
+      v_instruc_rpc varchar;
      
 			    
 BEGIN
@@ -728,7 +730,7 @@ BEGIN
            
              IF  v_estado_cot != 'recomendado' THEN
              
-              raise exception 'Solo se admiten cotizaciones en estado cotizado';
+              raise exception 'Solo se admiten cotizaciones en estado recomendado';
              END IF;
              
              --obtenemos el estado siguiente
@@ -932,7 +934,8 @@ BEGIN
             c.estado,
             sc.id_funcionario_rpc,
             sc.numero,
-            c.fecha_coti
+            c.fecha_coti,
+            sc.instruc_rpc
            into 
             v_numero_oc,
             v_id_estado_wf,
@@ -941,7 +944,8 @@ BEGIN
             v_estado_cot,
             v_id_funcionario_rpc,
             v_num_sol,
-            v_fecha_coti
+            v_fecha_coti,
+            v_instruc_rpc
             
            from adq.tcotizacion c
            inner join adq.tproceso_compra pc on pc.id_proceso_compra = c.id_proceso_compra
@@ -1017,6 +1021,42 @@ BEGIN
                 
                 FROM wf.f_obtener_estado_wf(v_id_proceso_wf, v_id_estado_wf,NULL,'siguiente'); 
                   
+                
+                
+                
+                
+                --verificamos si es el estado recomendao
+                if va_codigo_estado[1] in ('recomendado') then
+                
+                
+                
+                    --si el estado es recomendado verificamos las intrucciones del RPC
+                    
+                     /* valores posbles para v_instruc_rpc
+                       - Iniciar Contrato
+                       - Orden de Bien/Servicio
+                       - Cotizar
+                       - Solicitar Pago
+                      */
+                       IF(v_instruc_rpc in ('Iniciar Contrato','Solicitar Pago') ) THEN
+                       
+                             --obtenemos el estado siguiente
+                             SELECT 
+                                 *
+                              into
+                                va_id_tipo_estado,
+                                va_codigo_estado,
+                                va_disparador,
+                                va_regla,
+                                va_prioridad
+                            
+                            FROM wf.f_obtener_estado_wf(v_id_proceso_wf, NULL,va_id_tipo_estado[1],'siguiente');
+                       
+                        END IF;
+                    
+                 END IF;
+                
+                
                           
                 
                 v_num_estados= array_length(va_id_tipo_estado, 1);
@@ -1038,6 +1078,7 @@ BEGIN
                              
                         IF v_num_funcionarios = 1 THEN
                         -- si solo es un funcionario, recuperamos el funcionario correspondiente
+                             
                              SELECT 
                                  id_funcionario
                                    into
@@ -1118,8 +1159,9 @@ BEGIN
                        --si no existe un numero de oc obtenemos uno
                      IF  v_numero_oc is NULL THEN
                      
-                         
-                             
+                              
+                           
+                            
                              
                              -- determina la fecha del periodo
                             
@@ -1142,8 +1184,18 @@ BEGIN
                                        p_id_usuario, 
                                        'ADQ', 
                                        NULL);
-                                       
-                                       
+                              
+                              
+                              --si tiebe contrato
+                              IF(v_instruc_rpc in ('Iniciar Contrato','Solicitar Pago') ) THEN  
+                              
+                              v_numero_oc = 'CNTR - '||v_numero_oc;
+                              
+                              END IF;     
+                                
+                             
+                             
+                                    
                               update adq.tcotizacion set
                               fecha_adju = v_parametros.fecha_oc,
                               numero_oc = v_numero_oc

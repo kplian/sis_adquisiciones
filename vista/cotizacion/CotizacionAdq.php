@@ -347,7 +347,7 @@ Phx.vista.CotizacionAdq = {
                 
                         if (reg.ROOT.datos.operacion=='preguntar_todo'){
                             
-                            if(reg.ROOT.datos.num_estados==1 && reg.ROOT.datos.num_funcionarios==1){
+                            if(reg.ROOT.datos.num_estados==1 && (reg.ROOT.datos.num_funcionarios==1 || reg.ROOT.datos.num_funcionarios==0)){
                                //directamente mandamos los datos
                                Phx.CP.loadingShow();
                                var d= this.sm.getSelected().data;
@@ -371,7 +371,7 @@ Phx.vista.CotizacionAdq = {
                            }
                            else{
                                  
-                               alert('Estado siguiente mal parametrizado, solo se admite un funcionario, un estado, sin instrucciones adicionales')
+                               alert('Estado siguiente esta mal parametrizado, solo se admite un funcionario, un estado, sin instrucciones adicionales')
                            }
                      }
                 

@@ -404,7 +404,8 @@ Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
 		{name:'usr_reg', type: 'string'},
 		{name:'usr_mod', type: 'string'},
 		'desc_moneda','desc_funcionario',
-		'desc_uo','desc_depto','desc_solicitud','instruc_rpc','usr_aux'
+		'desc_uo','desc_depto','desc_solicitud','instruc_rpc',
+		'usr_aux','id_moneda'
 		
 	],
 	
@@ -549,6 +550,13 @@ Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
             this.getBoton('btnCuadroComparativo').disable();
             this.getBoton('btnRevePres').disable();
             this.getBoton('btnFinPro').disable();
+            
+            if(data.estado=='finalizado'){
+                
+                this.getBoton('btnCuadroComparativo').enable();
+                this.getBoton('btnCotizacion').enable();
+                
+            }
              
             
         }

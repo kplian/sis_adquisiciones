@@ -99,7 +99,8 @@ BEGIN
                          mon.codigo as desc_moneda,
                          sol.instruc_rpc,
                          sol.id_categoria_compra,
-                         usua.cuenta as usr_aux
+                         usua.cuenta as usr_aux,
+                         sol.id_moneda
                          
                    from adq.tproceso_compra proc
                        inner join segu.tusuario usu1 on usu1.id_usuario = proc.id_usuario_reg
