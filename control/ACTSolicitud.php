@@ -126,10 +126,10 @@ class ACTSolicitud extends ACTbase{
 																		if(count($datosObligacionPagoCotizacion)!=0){
 																					for ($k=0 ; $k<count($datosObligacionPagoCotizacion); $k++) {																		
 																							 $dataSourcePago = new DataSource();
-																						  $this->objParam->addParametro('id_obligacion_pago', $datosObligacionPagoCotizacion[$k]['id_obligacion_pago']);
+																						     $this->objParam->addParametro('id_obligacion_pago', $datosObligacionPagoCotizacion[$k]['id_obligacion_pago']);
 																							 $this->objFunc = $this->create('sis_tesoreria/MODObligacionPago');
-																			     $resultPago = $this->objFunc->estadosPago();
-																			     $datosPago = $resultPago->getDatos();
+																			                 $resultPago = $this->objFunc->estadosPago();
+																			                 $datosPago = $resultPago->getDatos();
 																							 $dataSourcePago->setDataSet($datosPago);
 																							 $dataSourceCotizacion->putParameter('dataSourcePago',$dataSourcePago);
 																					}											 
@@ -152,8 +152,8 @@ class ACTSolicitud extends ACTbase{
 			  		//build the diagram
 			    $nombreArchivo='diagramaGantt.png';
 			    $diagramador = new DiagramadorGantt();
-							$diagramador->setDataSource($dataSource);
-							$diagramador->graficar($nombreArchivo);
+				$diagramador->setDataSource($dataSource);
+				$diagramador->graficar($nombreArchivo);
 							
 			    $mensajeExito = new Mensaje();
 			    $mensajeExito->setMensaje('EXITO','DiagramaGantt.php','Diagrama Gantt generado',
