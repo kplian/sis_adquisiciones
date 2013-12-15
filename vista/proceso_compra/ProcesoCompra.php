@@ -22,11 +22,27 @@ Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
         this.addButton('btnCuadroComparativo',{text :'Cuadro Comparativo',iconCls : 'bexcel',disabled: true,handler : this.onCuadroComparativo,tooltip : '<b>Cuadro Comparativo</b><br/><b>Cuadro Comparativo de Cotizaciones</b>'});
 	    this.addButton('btnRevePres',{text:'Rev. Pre.',iconCls: 'balert',disabled:true,handler:this.onBtnRevPres,tooltip: '<b>Revertir Presupeusto</b> Revierte todo el presupuesto no adjudicado para la solicitud.'});
         this.addButton('btnFinPro',{text:'Fin Proc.',iconCls: 'balert',disabled:true,handler:this.onBtnFinPro,tooltip: '<b>Finzalizar Proceso</b> Finaliza el proceso y la solicitud y revierte el presupeusto. No  puede deshacerse'});
+        this.addButton('diagrama_gantt',{text:'',iconCls: 'bgantt',disabled:true,handler:this.diagramGantt,tooltip: '<b>Diagrama Gantt de proceso macro</b>'});
+  
       
         this.load({params:{start:0, limit:this.tam_pag}});
 	    this.iniciarEventos();
 	
 	},
+	
+	diagramGantt:function(){           
+            var data=this.sm.getSelected().data.id_proceso_wf;
+            Phx.CP.loadingShow();
+            Ext.Ajax.request({
+                url:'../../sis_workflow/control/ProcesoWf/diagramaGanttTramite',
+                params:{'id_proceso_wf':data},
+                success:this.successExport,
+                failure: this.conexionFailure,
+                timeout:this.timeout,
+                scope:this
+            });         
+    },
+	
 	tam_pag:50,
 			
 	Atributos:[
@@ -543,6 +559,8 @@ Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
         
         Phx.vista.ProcesoCompra.superclass.preparaMenu.call(this,n);
         this.getBoton('btnChequeoDocumentos').enable();
+        this.getBoton('diagrama_gantt').enable();
+        
         if(data.estado=='anulado' || data.estado=='desierto'|| data.estado=='finalizado'){
             this.getBoton('edit').disable();
             this.getBoton('del').disable();
@@ -565,6 +583,7 @@ Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
             this.getBoton('btnCuadroComparativo').enable();
             this.getBoton('btnRevePres').enable();
             this.getBoton('btnFinPro').enable();
+           
         }
          return tb 
      },
@@ -574,7 +593,8 @@ Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
         if(tb){           
             this.getBoton('btnCotizacion').setDisabled(true);  
             this.getBoton('btnChequeoDocumentos').disable(); 
-            this.getBoton('btnCuadroComparativo').disable();        
+            this.getBoton('btnCuadroComparativo').disable();
+            this.getBoton('diagrama_gantt').disable();        
         }
        return tb
     },

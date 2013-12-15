@@ -22,6 +22,7 @@ class MODCotizacion extends MODbase{
 		
 		$this->setParametro('id_funcionario_usu','id_funcionario_usu','int4');
         $this->setParametro('tipo_interfaz','tipo_interfaz','varchar');
+        $this->setParametro('historico','historico','varchar');
         
 		$this->setParametro('id_proceso_compra','id_proceso_compra','int4');
 		//Definicion de la lista del resultado del query
@@ -117,6 +118,7 @@ class MODCotizacion extends MODbase{
         $this->setParametro('id_funcionario_usu','id_funcionario_usu','int4');
         $this->setParametro('tipo_interfaz','tipo_interfaz','varchar');
         $this->setParametro('id_funcionario_rpc','id_funcionario_rpc','int4');
+        $this->setParametro('historico','historico','varchar');
         
         //Definicion de la lista del resultado del query
         $this->captura('id_cotizacion','int4');

@@ -34,6 +34,27 @@ Phx.vista.SolicitudVb = {
         this.Atributos[this.getIndAtributo('id_uo')].form=false;
         this.Atributos[this.getIndAtributo('id_depto')].form=false;
         
+        //funcionalidad para listado de historicos
+        this.historico = 'no';
+        this.tbarItems = ['-',{
+            text: 'Histórico',
+            enableToggle: true,
+            pressed: false,
+            toggleHandler: function(btn, pressed) {
+               
+                if(pressed){
+                    this.historico = 'si';
+                     this.desBotoneshistorico();
+                }
+                else{
+                   this.historico = 'no' 
+                }
+                
+                this.store.baseParams.historico = this.historico;
+                this.reload();
+             },
+            scope: this
+           }];
         
     	Phx.vista.SolicitudVb.superclass.constructor.call(this,config);
     	this.addButton('ini_estado',{  argument: {estado: 'inicio'},text:'Dev. a Borrador',iconCls: 'batras',disabled:true,handler:this.antEstado,tooltip: '<b>Retorna la Solcitud al estado borrador</b>'});
@@ -226,6 +247,8 @@ Phx.vista.SolicitudVb = {
 	},
 	confSigEstado :function() {                   
             var d= this.sm.getSelected().data;
+            
+           
            
             if ( this.formEstado .getForm().isValid()){
                  Phx.CP.loadingShow();
@@ -252,6 +275,7 @@ Phx.vista.SolicitudVb = {
             var d= this.sm.getSelected().data;
            
             Phx.CP.loadingShow();
+             this.formEstado.getForm().reset();
             this.cmbTipoEstado.reset();
             this.cmbFuncionarioWf.reset();
             this.cmbFuncionarioWf.store.baseParams.id_estado_wf=d.id_estado_wf;
@@ -399,27 +423,43 @@ Phx.vista.SolicitudVb = {
             
         },
      
+  //deshabilitas botones para informacion historica
+  desBotoneshistorico:function(){
+      
+      this.getBoton('ant_estado').disable();
+      this.getBoton('sig_estado').disable();
+      this.getBoton('ini_estado').disable();
+      
+  },
   preparaMenu:function(n){
       var data = this.getSelectedData();
       var tb =this.tbar;
       Phx.vista.SolicitudVb.superclass.preparaMenu.call(this,n);  
+      
+      if(this.historico == 'no'){
+          if(data.estado =='aprobado' ){ 
+            this.getBoton('ant_estado').enable();
+            this.getBoton('sig_estado').disable();
+            this.getBoton('ini_estado').enable();
+            }
+            if(data.estado =='proceso'){
+                this.getBoton('ant_estado').disable();
+                this.getBoton('sig_estado').disable();
+                this.getBoton('ini_estado').disable();
+            }
+            
+            if(data.estado !='aprobado' && data.estado !='proceso' ){
+                this.getBoton('ant_estado').enable();
+                this.getBoton('sig_estado').enable();
+                this.getBoton('ini_estado').enable();
+            }
           
-        if(data.estado =='aprobado' ){ 
-            this.getBoton('ant_estado').enable();
-            this.getBoton('sig_estado').disable();
-            this.getBoton('ini_estado').enable();
-        }
-        if(data.estado =='proceso'){
-            this.getBoton('ant_estado').disable();
-            this.getBoton('sig_estado').disable();
-            this.getBoton('ini_estado').disable();
-        }
+      } 
+      else{
+          this.desBotoneshistorico();
+          
+      }   
         
-        if(data.estado !='aprobado' && data.estado !='proceso' ){
-            this.getBoton('ant_estado').enable();
-            this.getBoton('sig_estado').enable();
-            this.getBoton('ini_estado').enable();
-        }
        
        
        
