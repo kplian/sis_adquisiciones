@@ -113,14 +113,34 @@ Class RSolicitudCompra extends Report {
         $pdf->Cell(5, $height, '', 0, 0, 'L', false, '', 0, false, 'T', 'C');
         $pdf->Cell($width3, $height, 'Categoria de Compra:', 0, 0, 'L', false, '', 0, false, 'T', 'C');
         $pdf->SetFont('', '');
-                                $pdf->SetFillColor(192,192,192, true);
+        $pdf->SetFillColor(192,192,192, true);
         $pdf->Cell($width3+$width2, $height, $this->getDataSource()->getParameter('desc_categoria_compra'), $white, 0, 'L', true, '', 0, false, 'T', 'C');
+        
         $pdf->Ln();
+        
         $pdf->SetFont('', 'B');                             
-        $pdf->Cell($width3, $height, 'Unidad Organizacional:', 0, 0, 'L', false, '', 0, false, 'T', 'C');
+        $pdf->Cell($width3, $height, 'Supervisor:', 0, 0, 'L', false, '', 0, false, 'T', 'C');
+        $pdf->SetFont('', '');
+        $pdf->SetFillColor(192,192,192, true);
+        //$pdf->MultiCell($width3+$width2, $height, $this->getDataSource()->getParameter('desc_funcionario_apro'), 0,'L', true ,0);
+        $pdf->Cell($width3+$width2, $height, $this->getDataSource()->getParameter('desc_funcionario_apro'), $white, 0, 'L', true, '', 0, false, 'T', 'C');        
+        
+        $pdf->Cell(5, $height, '', 0, 0, 'L', false, '', 0, false, 'T', 'C');
+        $pdf->SetFont('', 'B');
+        $pdf->Cell($width3, $height, 'RPC:', 0, 0, 'L', false, '', 0, false, 'T', 'C');
+        $pdf->SetFont('', '');
+        $pdf->SetFillColor(192,192,192, true);
+        //$pdf->MultiCell($width3+$width2, $height, $this->getDataSource()->getParameter('desc_funcionario_rpc'), 1,'L', true ,1);
+        $pdf->Cell($width3+$width2, $height, $this->getDataSource()->getParameter('desc_funcionario_rpc'), $white, 0, 'L', true, '', 0, false, 'T', 'C');        
+        $pdf->Ln();
+        
+        
+        $pdf->SetFont('', 'B');                             
+        $pdf->Cell($width3, $height, 'Unidad Solicitante:', 0, 0, 'L', false, '', 0, false, 'T', 'C');
         $pdf->SetFont('', '');
         $pdf->SetFillColor(192,192,192, true);
         $pdf->MultiCell($width3+$width2, $height, $this->getDataSource()->getParameter('desc_uo'), 0,'L', true ,0);
+        
         //$pdf->Cell($width3+$width2, $height, $this->getDataSource()->getParameter('desc_uo'), $white, 0, 'L', true, '', 1, false, 'T', 'C');        
         $pdf->Cell(5, $height, '', 0, 0, 'L', false, '', 0, false, 'T', 'C');
         $pdf->SetFont('', 'B');
@@ -129,10 +149,13 @@ Class RSolicitudCompra extends Report {
         $pdf->SetFillColor(192,192,192, true);
         $pdf->MultiCell($width3+$width2, $height, $this->getDataSource()->getParameter('desc_funcionario'), 1,'L', true ,1);
         //$pdf->Cell($width3+$width2, $height, $this->getDataSource()->getParameter('desc_funcionario'), $white, 0, 'L', true, '', 0, false, 'T', 'C');        
+       
+        
         $pdf->Ln();
         
         
         //imprime el detalle de la solicitud
+        
         $this->writeDetalles($this->getDataSource()->getParameter('detalleDataSource'), $pdf);
         
         //imprime el pie del reporte
@@ -174,6 +197,7 @@ Class RSolicitudCompra extends Report {
     }
    
     function writeDetalles (DataSource $dataSource, TCPDF $pdf) {
+            
         $blackAll = array('LTRB' =>array('width' => 0.3, 'cap' => 'butt', 'join' => 'miter', 'dash' => 0, 'color' => array(0, 0, 0)));  
         $blackSide = array('LR' =>array('width' => 0.3, 'cap' => 'butt', 'join' => 'miter', 'dash' => 0, 'color' => array(0, 0, 0)));
         $blackBottom = array('B' =>array('width' => 0.3, 'cap' => 'butt', 'join' => 'miter', 'dash' => 0, 'color' => array(0, 0, 0)));
@@ -189,65 +213,84 @@ Class RSolicitudCompra extends Report {
 
         //recorres lso grupos del detalle 
         foreach($dataSource->getDataset() as $row) {
+                    
+                
+                    
+             /*CABECERA DESCRIPCION PARTIDA Y CC*/   
             $pdf->setFont('','B');
             $pdf->Cell($width2, $height, 'Código Partida', 0, 0, 'L', false, '', 0, false, 'T', 'C');
             $pdf->Cell($width2*2, $height, 'Nombre Partida', 0, 0, 'L', false, '', 0, false, 'T', 'C');
             $pdf->Cell($width2*2+10, $height, 'Centro de Costo', 0, 0, 'L', false, '', 0, false, 'T', 'C');
             $pdf->Cell($width2, $height, '', 0, 0, 'R', false, '', 0, false, 'T', 'C');
-            
-           // if($this->getDataSource()->getParameter('estado')=='borrador')
-                $pdf->Cell($width2, $height, 'Disponibilidad', 0, 0, 'R', false, '', 0, false, 'T', 'C');
+            $pdf->Cell($width2, $height, 'Disponibilidad', 0, 0, 'R', false, '', 0, false, 'T', 'C');
             
             $pdf->Ln();
             $pdf->setFont('','');
+            
+            /* DATOS ESPECIFICOS DEL GRUPO PARTIDA Y CC*/
+           
             $pdf->Cell($width2, $height, $row['groupeddata'][0]['codigo_partida'], 0, 0, 'L', false, '', 0, false, 'T', 'C');
             $yAntes=$pdf->getY();
             $xAntesCell = $pdf->getX();                                             
-            $pdf->MultiCell($width2*2, $height, $row['groupeddata'][0]['nombre_partida'], 1,'L', false ,1);
+            
+            $pdf->MultiCell($width2*2, $height, $row['groupeddata'][0]['nombre_partida'], 0,'L', false ,1);
+           
             $altura = $pdf->getY()- $yAntes;
             $pdf->setY($yAntes);
+            
             $pdf->setX($xAntesCell+$width2*2);
             //$pdf->Cell($width2, $height, $row['groupeddata'][0]['nombre_partida'], 0, 0, 'L', false, '', 1, false, 'T', 'C');
+            
             $pdf->Cell($width2*2+10, $height, $row['groupeddata'][0]['desc_centro_costo'], 0, 0, 'L', false, '', 1, false, 'T', 'C');
             $xRef=$pdf->getX();
             $yRef=$pdf->getY();
+            
             $pdf->Cell($width2, $height, $row['totalRef'], 0, 0, 'R', false, '', 0, false, 'T', 'C');
             
-                if($this->getDataSource()->getParameter('estado')=='borrador' || $this->getDataSource()->getParameter('estado')=='pendiente'){
-                    //verifica la disponibilidad de presupeusto para el  agrupador     
-                    if($row['presu_verificado']){
-                        $pdf->setTextColor(0,0,0);
-                        $pdf->Cell($width2, $height, 'DISPONIBLE', 0, 0, 'R', false, '', 0, false, 'T', 'C');
-                    }
-                    else{
-                        $pdf->setTextColor(255,0,0);
-                        $pdf->Cell($width2, $height, 'NO DISPONIBLE', 0, 0, 'R', false, '', 0, false, 'T', 'C');
-                    
-                    }
+            /*DETERMINA SI EL PRESUPUESTO ESTA DISPONIBLE O NO*/
+            
+            if($this->getDataSource()->getParameter('estado')=='borrador' || $this->getDataSource()->getParameter('estado')=='pendiente'){
+                //verifica la disponibilidad de presupeusto para el  agrupador     
+                if($row['presu_verificado']=="true"){
+                    $pdf->setTextColor(0,0,0);
+                    $pdf->Cell($width2, $height, 'DISPONIBLE', 0, 0, 'R', false, '', 0, false, 'T', 'C');
                 }
                 else{
-                        $pdf->setTextColor(0,0,0);
-                        $pdf->Cell($width2, $height, 'DISPONIBLE Y APROBADO', 0, 0, 'R', false, '', 0, false, 'T', 'C');
-                } 
+                    $pdf->setTextColor(255,0,0);
+                    $pdf->Cell($width2, $height, 'NO DISPONIBLE', 0, 0, 'R', false, '', 0, false, 'T', 'C');
+                
+                }
+            }
+            else{
                     $pdf->setTextColor(0,0,0);
-                // }
-                //$pdf->Cell($width2, $height, ($row['disponible']==true)?'DISPONIBLE':'NO DISPONIBLE', 0, 0, 'R', false, '', 0, false, 'T', 'C');
-                $pdf->Ln($altura);
-                $pdf->setFont('','B');
-                $pdf->Cell($width2+$width1, $height, 'Concepto Gasto', $blackAll, 0, 'L', false, '', 1, false, 'T', 'C');
-                $pdf->Cell($width2+25+$width3*2, $height, 'Descripcion', $blackAll, 0, 'L', false, '', 1, false, 'T', 'C');
-                $pdf->Cell($width1, $height, 'Cantidad', $blackAll, 0, 'L', false, '', 1, false, 'T', 'C');
-                $pdf->Cell($width3, $height, 'Precio Unitario', $blackAll, 0, 'R', false, '', 1, false, 'T', 'C');
-                $pdf->Cell($width3, $height, 'Precio Total', $blackAll, 0, 'R', false, '', 1, false, 'T', 'C');
+                    $pdf->Cell($width2, $height, 'DISPONIBLE Y APROBADO', 0, 0, 'R', false, '', 0, false, 'T', 'C');
+            } 
+            
+            $pdf->setTextColor(0,0,0);
+           
+            $pdf->Ln($altura);
+            
+            /*CABECERA DE LOS ITEMS ESPECIFICOS*/
+           
+            $pdf->setFont('','B');
+            $pdf->Cell($width2+$width1, $height, 'Concepto Gasto', $blackAll, 0, 'L', false, '', 1, false, 'T', 'C');
+            $pdf->Cell($width2+25+$width3*2, $height, 'Descripcion', $blackAll, 0, 'L', false, '', 1, false, 'T', 'C');
+            $pdf->Cell($width1, $height, 'Cantidad', $blackAll, 0, 'L', false, '', 1, false, 'T', 'C');
+            $pdf->Cell($width3, $height, 'Precio Unitario', $blackAll, 0, 'R', false, '', 1, false, 'T', 'C');
+            $pdf->Cell($width3, $height, 'Precio Total', $blackAll, 0, 'R', false, '', 1, false, 'T', 'C');
+            
+            
                 //$pdf->Cell($width3, $height, 'Precio Ges. Act.', $blackAll, 0, 'R', false, '', 1, false, 'T', 'C');
                 //$pdf->Cell($width3, $height, 'Precio Ges. Sig.', $blackAll, 0, 'R', false, '', 1, false, 'T', 'C');
-                $pdf->Ln();
-                $totalRef=0;
-                $totalGa=0;
-                $totalSg=0;
-                $xEnd=0;
-                $yEnd=0;
-                foreach ($row['groupeddata'] as $solicitudDetalle) {
+            $pdf->Ln();
+            $totalRef=0;
+            $totalGa=0;
+            $totalSg=0;
+            $xEnd=0;
+            $yEnd=0;
+            
+            foreach ($row['groupeddata'] as $solicitudDetalle) {
+                            
                         $pdf->setFont('','');
                         $xAntesMultiCell = $pdf->getX();
                         $yAntesMultiCell = $pdf->getY();
@@ -270,6 +313,7 @@ Class RSolicitudCompra extends Report {
                         $pdf->Ln();
                         $xEnd=$pdf->getX();
                         $yEnd=$pdf->getY();                                                                                                                 
+            
             }
             $height=5;
             //$pdf->setXY($xRef,$yRef);

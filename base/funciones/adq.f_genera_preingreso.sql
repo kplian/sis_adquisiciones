@@ -89,7 +89,7 @@ BEGIN
                   inner join param.tconcepto_ingas cin
                   on cin.id_concepto_ingas = sdet.id_concepto_ingas
                   where cdet.id_cotizacion = p_id_cotizacion
-                  and cin.tipo = 'Bien'and cin.almacenable = 'si') then
+                  and lower(cin.tipo) = 'bien'and lower(cin.almacenable) = 'si') then
         v_alm = 1;
     end if;
     
@@ -100,7 +100,7 @@ BEGIN
                   inner join param.tconcepto_ingas cin
                   on cin.id_concepto_ingas = sdet.id_concepto_ingas
                   where cdet.id_cotizacion = p_id_cotizacion
-                  and cin.tipo = 'Bien'and cin.activo_fijo = 'si' and cin.almacenable = 'no') then
+                  and lower(cin.tipo) = 'bien'and lower(cin.activo_fijo) = 'si' and lower(cin.almacenable) = 'no') then
         v_af = 1;
     end if;
     
@@ -146,7 +146,7 @@ BEGIN
         inner join param.tconcepto_ingas cin
         on cin.id_concepto_ingas = sdet.id_concepto_ingas
         where cdet.id_cotizacion = p_id_cotizacion
-        and cin.tipo = 'Bien'
+        and lower(cin.tipo) = 'bien'
         and cin.almacenable = 'si';
     end if;
     
@@ -174,9 +174,9 @@ BEGIN
         inner join param.tconcepto_ingas cin
         on cin.id_concepto_ingas = sdet.id_concepto_ingas
         where cdet.id_cotizacion = p_id_cotizacion
-        and cin.tipo = 'Bien'
-        and cin.activo_fijo = 'si'
-        and cin.almacenable = 'no';
+        and lower(cin.tipo) = 'bien'
+        and lower(cin.activo_fijo) = 'si'
+        and lower(cin.almacenable) = 'no';
     end if;
 
     ------------

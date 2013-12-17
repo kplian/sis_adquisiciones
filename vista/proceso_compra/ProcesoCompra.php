@@ -499,8 +499,8 @@ Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
             Phx.CP.loadWindows('../../../sis_adquisiciones/vista/cotizacion/CotizacionAdq.php',
                     'Cotizacion de solicitud de compra',
                     {
-                        width:900,
-                        height:600
+                        width:'98%',
+                        height:'98%'
                     },
                     rec.data,
                     this.idContenedor,
@@ -592,6 +592,6 @@ Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
          },
 	bdel:true,
 	bsave:false
-	}
-)
+    
+})
 </script>

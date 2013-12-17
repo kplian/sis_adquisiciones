@@ -81,7 +81,8 @@ BEGIN
                         cot.tipo_cambio_conv,
                         pro.email,
                         sol.numero,
-                        sol.num_tramite
+                        sol.num_tramite,
+                        cot.id_obligacion_pago
 						from adq.tcotizacion cot
                         inner join adq.tproceso_compra proc on proc.id_proceso_compra = cot.id_proceso_compra
                         inner join adq.tsolicitud sol on sol.id_solicitud = proc.id_solicitud
@@ -489,7 +490,8 @@ BEGIN
                     cot.id_proceso_compra,
                     sol.tipo,
                     cot.fecha_adju as fecha_oc,
-                    mon.moneda
+                    mon.moneda,
+                    mon.codigo as codigo_moneda
               from adq.tcotizacion cot 
               inner join param.vproveedor pv on pv.id_proveedor=cot.id_proveedor
               left join segu.tpersona per on per.id_persona=pv.id_persona
@@ -497,7 +499,7 @@ BEGIN
               inner join adq.tproceso_compra pc on pc.id_proceso_compra=cot.id_proceso_compra
 			  inner join adq.tsolicitud sol on sol.id_solicitud=pc.id_solicitud
 			  inner join param.tmoneda mon on mon.id_moneda=cot.id_moneda
-              where (cot.estado=''adjudicado'' or cot.estado=''pago_habilitado'' or cot.estado=''finalizado'') and cot.id_cotizacion='||v_parametros.id_cotizacion||' and ';
+              where cot.id_cotizacion='||v_parametros.id_cotizacion||' and ';
           
           --Definicion de la respuesta
           v_consulta:=v_consulta||v_parametros.filtro;
