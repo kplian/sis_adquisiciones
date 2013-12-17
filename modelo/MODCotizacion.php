@@ -59,6 +59,7 @@ class MODCotizacion extends MODbase{
 		$this->captura('email','varchar');
 		$this->captura('numero','varchar');
 		$this->captura('num_tramite','varchar');
+		$this->captura('id_obligacion_pago','int4');
 				
 		
 		//Ejecuta la instruccion

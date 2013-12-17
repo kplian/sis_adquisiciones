@@ -81,7 +81,8 @@ BEGIN
                         cot.tipo_cambio_conv,
                         pro.email,
                         sol.numero,
-                        sol.num_tramite
+                        sol.num_tramite,
+                        cot.id_obligacion_pago
 						from adq.tcotizacion cot
                         inner join adq.tproceso_compra proc on proc.id_proceso_compra = cot.id_proceso_compra
                         inner join adq.tsolicitud sol on sol.id_solicitud = proc.id_solicitud

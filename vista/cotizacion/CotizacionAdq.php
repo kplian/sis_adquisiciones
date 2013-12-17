@@ -61,6 +61,9 @@ Phx.vista.CotizacionAdq = {
                     handler : this.onPreing,
                     tooltip : '<b>Preingreso</b><br/><b>Generación del Preingreso</b>'
           });
+          
+		//RCM
+        this.addButton('btnObPag',{text :'Obligación Pago',iconCls:'bdocuments',disabled: true, handler : this.onButtonObPag,tooltip : '<b>Obligación de Pago</b><br/><b>Formulario para el registro de la Obligación de Pago</b>'});
            
         
         
@@ -448,6 +451,7 @@ Phx.vista.CotizacionAdq = {
           this.getBoton('btnReporte').enable();
 
           //this.getBoton('btnReporte').enable(); 
+          this.getBoton('btnObPag').disable();
               
               if(data['estado']==  'borrador'){
                  this.getBoton('fin_registro').enable();
@@ -509,6 +513,7 @@ Phx.vista.CotizacionAdq = {
                if (data['estado']=='pago_habilitado'){
                    this.getBoton('ant_estado').disable();
                    this.getBoton('btnPreing').enable();
+                   this.getBoton('btnObPag').enable();
                }
                
                if (data['estado']=='recomendado'){
@@ -531,6 +536,7 @@ Phx.vista.CotizacionAdq = {
             this.getBoton('btnSendMail').disable(); 
             this.getBoton('btnPreing').disable();
             this.getBoton('btnRepOC').disable();
+            this.getBoton('btnObPag').disable();
             
             
          }
@@ -566,7 +572,21 @@ Phx.vista.CotizacionAdq = {
              }else{
                 alert('ocurrio un error durante el proceso')
             }
-        }
+        },
+	
+	onButtonObPag:function() {
+	    var rec=this.sm.getSelected();
+	    Phx.CP.loadWindows('../../../sis_tesoreria/vista/obligacion_pago/ObligacionPago.php',
+            'Obligación de Pago',
+            {
+                width:'80%',
+                height:'70%'
+            },
+            rec.data,
+            this.idContenedor,
+            'ObligacionPago'
+		)
+    }
         
     
     
