@@ -21,6 +21,30 @@ Phx.vista.CotizacionVbDin = {
     
     constructor: function(config) {
         this.maestro=config.maestro;
+        
+        //funcionalidad para listado de historicos
+        this.historico = 'no';
+        this.tbarItems = ['-',{
+            text: 'Histórico',
+            enableToggle: true,
+            pressed: false,
+            toggleHandler: function(btn, pressed) {
+               
+                if(pressed){
+                    this.historico = 'si';
+                     this.desBotoneshistorico();
+                }
+                else{
+                   this.historico = 'no' 
+                }
+                
+                this.store.baseParams.historico = this.historico;
+                this.reload();
+             },
+            scope: this
+           }];
+        
+        
         Phx.vista.CotizacionVbDin.superclass.constructor.call(this,config);
         
         this.addButton('sig_estado',{
@@ -60,6 +84,9 @@ Phx.vista.CotizacionVbDin = {
 											 tooltip : '<b>Cuadro Comparativo</b><br/><b>Cuadro Comparativo de Cotizaciones</b>'
 	 						});         
           
+        this.addButton('diagrama_gantt',{text:'',iconCls: 'bgantt',disabled:true,handler:this.diagramGantt,tooltip: '<b>Diagrama Gantt de proceso macro</b>'});
+  
+        
         this.store.baseParams={tipo_interfaz:this.nombreVista}; 
         this.load({params:{start:0, limit:this.tam_pag}});
         
@@ -242,6 +269,8 @@ Phx.vista.CotizacionVbDin = {
     ActList:'../../sis_adquisiciones/control/Cotizacion/listarCotizacionRPC',
   
   
+  
+  
   AprobarSolicitud:function(){
     
             var d = this.sm.getSelected().data;
@@ -261,6 +290,19 @@ Phx.vista.CotizacionVbDin = {
             });  
       
   },
+  
+  diagramGantt:function(){           
+            var data=this.sm.getSelected().data.id_proceso_wf;
+            Phx.CP.loadingShow();
+            Ext.Ajax.request({
+                url:'../../sis_workflow/control/ProcesoWf/diagramaGanttTramite',
+                params:{'id_proceso_wf':data},
+                success:this.successExport,
+                failure: this.conexionFailure,
+                timeout:this.timeout,
+                scope:this
+            });         
+    },
   
         
    successSinc:function(resp){
@@ -421,36 +463,60 @@ Phx.vista.CotizacionVbDin = {
             });     
         },
 
+      //deshabilitas botones para informacion historica
+      desBotoneshistorico:function(){
+          
+          this.getBoton('sig_estado').disable();
+          this.getBoton('ant_estado').disable();
+          this.getBoton('btnGenOC').disable();
+          this.getBoton('btnCuadroComparativo').enable(); 
+          this.getBoton('btnChequeoDocumentos').enable(); 
+          this.getBoton('btnReporte').enable(); 
+          this.getBoton('btnRepOC').enable();
+          this.getBoton('diagrama_gantt').enable();
+         
+          
+      }, 
+           
        preparaMenu:function(n){
           var data = this.getSelectedData();
           var tb =this.tbar;
           Phx.vista.CotizacionVbDin.superclass.preparaMenu.call(this,n);
-          
-            if(data['estado']==  'recomendado'){
-                 this.getBoton('btnGenOC').enable();
-                 this.getBoton('sig_estado').disable(); 
-                 this.getBoton('btnCuadroComparativo').enable();
-              }
-            if(data['estado']==  'adjudicado'){
-                 this.getBoton('btnGenOC').disable();
-                 this.getBoton('sig_estado').disable();
-                 this.getBoton('btnCuadroComparativo').disable(); 
-             }
            
-           if(data['estado']!='adjudicado' && data['estado']!= 'recomendado'){
-                this.getBoton('sig_estado').enable();
-                this.getBoton('btnCuadroComparativo').enable(); 
-             }  
+          if(this.historico == 'no'){ 
+                 this.getBoton('diagrama_gantt').enable();
+                if(data['estado']==  'recomendado'){
+                     this.getBoton('btnGenOC').enable();
+                     this.getBoton('sig_estado').disable(); 
+                     this.getBoton('btnCuadroComparativo').enable();
+                  }
+                if(data['estado']==  'adjudicado'){
+                     this.getBoton('btnGenOC').disable();
+                     this.getBoton('sig_estado').disable();
+                     this.getBoton('btnCuadroComparativo').disable(); 
+                 }
+               
+               if(data['estado']!='adjudicado' && data['estado']!= 'recomendado'){
+                    this.getBoton('sig_estado').enable();
+                    this.getBoton('btnCuadroComparativo').enable(); 
+                 }  
+                  
+               
+               this.getBoton('btnReporte').enable();  
+               this.getBoton('ant_estado').enable();
+               this.getBoton('btnRepOC').enable(); 
+               this.getBoton('btnChequeoDocumentos').enable(); 
+             } 
+          else{
+              this.desBotoneshistorico();
               
-           
-           this.getBoton('btnReporte').enable();  
-           this.getBoton('ant_estado').enable();
-           this.getBoton('btnRepOC').enable(); 
-           this.getBoton('btnChequeoDocumentos').enable(); 
-         },
+          } 
+         
+         
+     },
           
             
-       liberaMenu:function(){
+  liberaMenu:function(){
         var tb = Phx.vista.CotizacionVbDin.superclass.liberaMenu.call(this);
         if(tb){
             this.getBoton('btnGenOC').disable();
@@ -458,6 +524,8 @@ Phx.vista.CotizacionVbDin = {
             this.getBoton('btnRepOC').disable(); 
             this.getBoton('btnReporte').disable();  
             this.getBoton('btnChequeoDocumentos').disable(); 
+            this.getBoton('diagrama_gantt').disable();
+            
             
             }
        return tb

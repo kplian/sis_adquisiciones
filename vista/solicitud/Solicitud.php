@@ -15,6 +15,10 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
 	constructor:function(config){
 		this.maestro=config.maestro;
     	//llama al constructor de la clase padre
+		
+		
+		
+		
 		Phx.vista.Solicitud.superclass.constructor.call(this,config);		
 		this.init();
 		
@@ -26,7 +30,7 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
             tooltip : '<b>Reporte Solicitud de Compra</b><br/><b>Reporte Solicitud de Compra</b>'
         });
   
-         this.addButton('diagrama_gantt',{text:'',iconCls: 'bgantt',disabled:true,handler:diagramGantt,tooltip: '<b>Diagrama Gantt de proceso macro</b>'});
+        this.addButton('diagrama_gantt',{text:'',iconCls: 'bgantt',disabled:true,handler:diagramGantt,tooltip: '<b>Diagrama Gantt de proceso macro</b>'});
   
 	    this.addButton('btnChequeoDocumentos',
             {
@@ -50,6 +54,10 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
 				scope:this
 			});			
 		}
+		
+		
+		
+		
 				
 	 },
 			

@@ -78,6 +78,8 @@ DECLARE
      
       v_uo_sol varchar;
       v_obs text;
+      
+      v_numero_sol varchar;
 			    
 BEGIN
 
@@ -338,7 +340,8 @@ BEGIN
                                                            v_id_estado_wf, 
                                                            v_id_proceso_wf,
                                                            p_id_usuario,
-                                                           v_id_depto);
+                                                           v_id_depto,
+                                                           'Eliminacion de la solicitud'::text);
             
             
                -- actualiza estado en la cotizacion
@@ -371,28 +374,28 @@ BEGIN
         
           IF  v_parametros.operacion = 'verificar' THEN
           
-              select sum( COALESCE( sd.precio_ga_mb,0)  + COALESCE(sd.precio_sg_mb,0)) into  v_total_soli
-              from adq.tsolicitud_det sd
-              where sd.id_solicitud = v_parametros.id_solicitud
-              and sd.estado_reg = 'activo';
-              
-              
-              IF  v_total_soli=0  THEN
-              	raise exception ' La Solicitud  tiene que ser por un valor mayor a 0';
-              END IF;
-            --  
-             IF exists ( select 1
-              from adq.tsolicitud_det sd
-              where sd.id_solicitud = v_parametros.id_solicitud
-              and sd.estado_reg = 'activo' and (COALESCE( sd.precio_ga_mb,0)  + COALESCE(sd.precio_sg_mb,0)=0)) THEN
-                
-                  raise exception 'Al menos uno del los items tiene un precio total de 0, verifique e intentelo nuevamente';
-              
-              END IF;
-              
-               --Definicion de la respuesta
-            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Verificacionde finalizacion)'); 
-            v_resp = pxp.f_agrega_clave(v_resp,'total',v_total_soli::varchar);
+                  select sum( COALESCE( sd.precio_ga_mb,0)  + COALESCE(sd.precio_sg_mb,0)) into  v_total_soli
+                  from adq.tsolicitud_det sd
+                  where sd.id_solicitud = v_parametros.id_solicitud
+                  and sd.estado_reg = 'activo';
+                  
+                  
+                  IF  v_total_soli=0  THEN
+                    raise exception ' La Solicitud  tiene que ser por un valor mayor a 0';
+                  END IF;
+                --  
+                 IF exists ( select 1
+                  from adq.tsolicitud_det sd
+                  where sd.id_solicitud = v_parametros.id_solicitud
+                  and sd.estado_reg = 'activo' and (COALESCE( sd.precio_ga_mb,0)  + COALESCE(sd.precio_sg_mb,0)=0)) THEN
+                    
+                      raise exception 'Al menos uno del los items tiene un precio total de 0, verifique e intentelo nuevamente';
+                  
+                  END IF;
+                  
+                   --Definicion de la respuesta
+                v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Verificacionde finalizacion)'); 
+                v_resp = pxp.f_agrega_clave(v_resp,'total',v_total_soli::varchar);
               
           
           ELSEIF  v_parametros.operacion = 'finalizar' THEN
@@ -403,13 +406,15 @@ BEGIN
             s.id_proceso_wf,
             s.id_estado_wf,
             s.estado,
-            s.id_funcionario_aprobador
+            s.id_funcionario_aprobador,
+            s.numero
           into 
           
             v_id_proceso_wf,
             v_id_estado_wf,
             v_codigo_estado,
-            v_id_funcionario_aprobador
+            v_id_funcionario_aprobador,
+            v_numero_sol
             
           from adq.tsolicitud s
           where s.id_solicitud=v_parametros.id_solicitud;
@@ -486,7 +491,7 @@ BEGIN
                                                          v_id_proceso_wf,
                                                          p_id_usuario,
                                                          NULL,
-                                                         'Solicitud a espera de aprobación',
+                                                         'Solicitud a espera de aprobación #'||COALESCE(v_numero_sol,'S/N'),
                                                          '../../../sis_adquisiciones/vista/solicitud/SolicitudVb.php',
                                                          'SolicitudVb');
                                                          
@@ -536,13 +541,15 @@ BEGIN
             s.id_proceso_wf,
             s.id_estado_wf,
             s.estado,
-            s.fecha_soli
+            s.fecha_soli,
+            s.numero
           into 
           
             v_id_proceso_wf,
             v_id_estado_wf,
             v_codigo_estado,
-            v_fecha_soli
+            v_fecha_soli,
+            v_numero_sol
             
           from adq.tsolicitud s
           where s.id_solicitud=v_parametros.id_solicitud;
@@ -564,122 +571,122 @@ BEGIN
          --------------------------------------------------
           IF  v_parametros.operacion = 'verificar' THEN
           
-              --buscamos siguiente estado correpondiente al proceso del WF
-             
-              ----- variables de retorno------
+                  --buscamos siguiente estado correpondiente al proceso del WF
+                 
+                  ----- variables de retorno------
+                  
+                  v_num_estados=0;
+                  v_num_funcionarios=0;
+                  v_num_deptos=0;
+                  
+                  --------------------------------- 
+                  
+                 SELECT  
+                     ps_id_tipo_estado,
+                     ps_codigo_estado,
+                     ps_disparador,
+                     ps_regla,
+                     ps_prioridad
+                  into
+                    va_id_tipo_estado,
+                    va_codigo_estado,
+                    va_disparador,
+                    va_regla,
+                    va_prioridad 
+                  FROM adq.f_obtener_sig_estado_sol_rec(v_parametros.id_solicitud, v_id_proceso_wf, v_id_tipo_estado); 
               
-              v_num_estados=0;
-              v_num_funcionarios=0;
-              v_num_deptos=0;
-              
-              --------------------------------- 
-              
-             SELECT  
-                 ps_id_tipo_estado,
-                 ps_codigo_estado,
-                 ps_disparador,
-                 ps_regla,
-                 ps_prioridad
-              into
-                va_id_tipo_estado,
-                va_codigo_estado,
-                va_disparador,
-                va_regla,
-                va_prioridad 
-              FROM adq.f_obtener_sig_estado_sol_rec(v_parametros.id_solicitud, v_id_proceso_wf, v_id_tipo_estado); 
-          
-            
-            v_num_estados= array_length(va_id_tipo_estado, 1);
-            
-             IF v_perdir_obs = 'no' THEN
-            
-                IF v_num_estados = 1 then
-                      -- si solo hay un estado,  verificamos si tiene mas de un funcionario por este estado
-                     SELECT 
-                     *
-                      into
-                     v_num_funcionarios 
-                     FROM wf.f_funcionario_wf_sel(
-                         p_id_usuario, 
-                         va_id_tipo_estado[1], 
-                         v_fecha_soli,
-                         v_id_estado_wf,
-                         TRUE) AS (total bigint);
-                         
-                    IF v_num_funcionarios = 1 THEN
-                    -- si solo es un funcionario, recuperamos el funcionario correspondiente
+                
+                v_num_estados= array_length(va_id_tipo_estado, 1);
+                
+                 IF v_perdir_obs = 'no' THEN
+                
+                    IF v_num_estados = 1 then
+                          -- si solo hay un estado,  verificamos si tiene mas de un funcionario por este estado
                          SELECT 
-                             id_funcionario
-                               into
-                             v_id_funcionario_estado
+                         *
+                          into
+                         v_num_funcionarios 
                          FROM wf.f_funcionario_wf_sel(
                              p_id_usuario, 
                              va_id_tipo_estado[1], 
                              v_fecha_soli,
                              v_id_estado_wf,
-                             FALSE) 
-                             AS (id_funcionario integer,
-                               desc_funcionario text,
-                               desc_funcionario_cargo text,
-                               prioridad integer);
-                    END IF;    
-                         
-                  
-                  --verificamos el numero de deptos
-                  
-                    SELECT 
-                    *
-                    into
-                      v_num_deptos 
-                   FROM wf.f_depto_wf_sel(
-                       p_id_usuario, 
-                       va_id_tipo_estado[1], 
-                       v_fecha_soli,
-                       v_id_estado_wf,
-                       TRUE) AS (total bigint);
-                       
-                  IF v_num_deptos = 1 THEN
-                      -- si solo es un funcionario, recuperamos el funcionario correspondiente
-                           SELECT 
-                               id_depto
-                                 into
-                               v_id_depto_estado
-                          FROM wf.f_depto_wf_sel(
-                               p_id_usuario, 
-                               va_id_tipo_estado[1], 
-                               v_fecha_soli,
-                               v_id_estado_wf,
-                               FALSE) 
-                               AS (id_depto integer,
-                                 codigo_depto varchar,
-                                 nombre_corto_depto varchar,
-                                 nombre_depto varchar,
-                                 prioridad integer);
-                    END IF;
-                  
-                  
-                  
-                  
-                 
-                 END IF;
-           
-           END IF;
-            
-            -- si hay mas de un estado disponible  preguntamos al usuario
-            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Verificacion para el siguiente estado)'); 
-            v_resp = pxp.f_agrega_clave(v_resp,'estados', array_to_string(va_id_tipo_estado, ','));
-            v_resp = pxp.f_agrega_clave(v_resp,'operacion','preguntar_todo');
-            v_resp = pxp.f_agrega_clave(v_resp,'num_estados',v_num_estados::varchar);
-            v_resp = pxp.f_agrega_clave(v_resp,'num_funcionarios',v_num_funcionarios::varchar);
-            v_resp = pxp.f_agrega_clave(v_resp,'num_deptos',v_num_deptos::varchar);
-            v_resp = pxp.f_agrega_clave(v_resp,'id_funcionario_estado',v_id_funcionario_estado::varchar);
-            v_resp = pxp.f_agrega_clave(v_resp,'id_depto_estado',v_id_depto_estado::varchar);
-            v_resp = pxp.f_agrega_clave(v_resp,'id_tipo_estado', va_id_tipo_estado[1]::varchar);
-            
-            
-           ----------------------------------------
-           --Se se solicita cambiar de estado a la solicitud
-           ------------------------------------------
+                             TRUE) AS (total bigint);
+                             
+                        IF v_num_funcionarios = 1 THEN
+                        -- si solo es un funcionario, recuperamos el funcionario correspondiente
+                             SELECT 
+                                 id_funcionario
+                                   into
+                                 v_id_funcionario_estado
+                             FROM wf.f_funcionario_wf_sel(
+                                 p_id_usuario, 
+                                 va_id_tipo_estado[1], 
+                                 v_fecha_soli,
+                                 v_id_estado_wf,
+                                 FALSE) 
+                                 AS (id_funcionario integer,
+                                   desc_funcionario text,
+                                   desc_funcionario_cargo text,
+                                   prioridad integer);
+                        END IF;    
+                             
+                      
+                      --verificamos el numero de deptos
+                      
+                        SELECT 
+                        *
+                        into
+                          v_num_deptos 
+                       FROM wf.f_depto_wf_sel(
+                           p_id_usuario, 
+                           va_id_tipo_estado[1], 
+                           v_fecha_soli,
+                           v_id_estado_wf,
+                           TRUE) AS (total bigint);
+                           
+                      IF v_num_deptos = 1 THEN
+                          -- si solo es un funcionario, recuperamos el funcionario correspondiente
+                               SELECT 
+                                   id_depto
+                                     into
+                                   v_id_depto_estado
+                              FROM wf.f_depto_wf_sel(
+                                   p_id_usuario, 
+                                   va_id_tipo_estado[1], 
+                                   v_fecha_soli,
+                                   v_id_estado_wf,
+                                   FALSE) 
+                                   AS (id_depto integer,
+                                     codigo_depto varchar,
+                                     nombre_corto_depto varchar,
+                                     nombre_depto varchar,
+                                     prioridad integer);
+                        END IF;
+                      
+                      
+                      
+                      
+                     
+                     END IF;
+               
+               END IF;
+                
+                -- si hay mas de un estado disponible  preguntamos al usuario
+                v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Verificacion para el siguiente estado)'); 
+                v_resp = pxp.f_agrega_clave(v_resp,'estados', array_to_string(va_id_tipo_estado, ','));
+                v_resp = pxp.f_agrega_clave(v_resp,'operacion','preguntar_todo');
+                v_resp = pxp.f_agrega_clave(v_resp,'num_estados',v_num_estados::varchar);
+                v_resp = pxp.f_agrega_clave(v_resp,'num_funcionarios',v_num_funcionarios::varchar);
+                v_resp = pxp.f_agrega_clave(v_resp,'num_deptos',v_num_deptos::varchar);
+                v_resp = pxp.f_agrega_clave(v_resp,'id_funcionario_estado',v_id_funcionario_estado::varchar);
+                v_resp = pxp.f_agrega_clave(v_resp,'id_depto_estado',v_id_depto_estado::varchar);
+                v_resp = pxp.f_agrega_clave(v_resp,'id_tipo_estado', va_id_tipo_estado[1]::varchar);
+                
+                
+               -------------------------------------------------
+               --Se se solicita cambiar de estado a la solicitud
+               --------------------------------------------------
            ELSEIF  v_parametros.operacion = 'cambiar' THEN
           
           
@@ -693,7 +700,7 @@ BEGIN
             from wf.ttipo_estado te
             where te.id_tipo_estado = v_parametros.id_tipo_estado;
             
-            IF  pxp.f_existe_parametro('p_tabla','id_depto') THEN
+            IF  pxp.f_existe_parametro(p_tabla,'id_depto') THEN
              
              v_id_depto = v_parametros.id_depto;
             
@@ -722,16 +729,24 @@ BEGIN
             
             END IF;
             
-           
+             
+             --v_acceso_directo = '../../../sis_adquisiciones/vista/solicitud/SolicitudVb.php';
+             --v_clases_acceso_directo = 'SolicitudVb';
             
-            -- hay que recuperar el supervidor que seria el estado inmediato,...
+           if v_obs ='' THEN
+           
+            v_obs = ' (Sin observaciones),  Cambio de estado';
+           
+           END IF;
+            
+            -- hay que recuperar el supervisor que seria el estado inmediato,...
              v_id_estado_actual =  wf.f_registra_estado_wf(v_parametros.id_tipo_estado, 
                                                            v_parametros.id_funcionario, 
                                                            v_id_estado_wf, 
                                                            v_id_proceso_wf,
                                                            p_id_usuario,
                                                            v_id_depto,
-                                                           v_obs);
+                                                           COALESCE(v_numero_sol,'S/N')||' -  '|| v_obs);
             
             
              -- actualiza estado en la solicitud
@@ -796,6 +811,13 @@ BEGIN
 	elseif(p_transaccion='ADQ_ANTESOL_IME')then   
         begin
         
+        select
+           s.numero
+          into 
+           v_numero_sol
+       from adq.tsolicitud s
+       where s.id_solicitud=v_parametros.id_solicitud;
+        
         --------------------------------------------------
         --REtrocede al estado inmediatamente anterior
         -------------------------------------------------
@@ -803,7 +825,10 @@ BEGIN
                
                raise notice 'es_estaado_wf %',v_parametros.id_estado_wf;
               
-                      --recuperaq estado anterior segun Log del WF
+                     
+               
+               
+                    --recuperaq estado anterior segun Log del WF
                         SELECT  
                            ps_id_tipo_estado,
                            ps_id_funcionario,
@@ -838,7 +863,7 @@ BEGIN
                           v_id_proceso_wf, 
                           p_id_usuario,
                           v_id_depto,
-                          v_parametros.obs);
+                          'RETRO: #'|| COALESCE(v_numero_sol,'S/N')||' - '||v_parametros.obs);
                       
                     
                       
@@ -946,7 +971,7 @@ BEGIN
                   v_id_proceso_wf, 
                   p_id_usuario,
                   v_id_depto,
-                  v_parametros.obs);
+                  'RETRO: #'|| COALESCE(v_numero_sol,'S/N')||' - '||v_parametros.obs);
                       
                     
                       

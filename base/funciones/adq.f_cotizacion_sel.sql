@@ -31,6 +31,11 @@ DECLARE
 	v_resp				varchar;
     v_add_filtro 		varchar;
     v_cotizaciones		record;
+      
+    v_historico        varchar;
+    v_inner            varchar;
+  
+    v_strg_cot			varchar;
 			    
 BEGIN
 
@@ -211,13 +216,41 @@ BEGIN
                   
                 END IF;
             
-            END IF;  
+            END IF; 
+            
+            
+            IF  pxp.f_existe_parametro(p_tabla,'historico') THEN
+             
+             v_historico =  v_parametros.historico;
+            
+            ELSE
+            
+            v_historico = 'no';
+            
+            END IF;
+            
+            IF v_historico =  'si' THEN
+            
+               v_inner =  'inner join wf.testado_wf ew on ew.id_proceso_wf = cot.id_proceso_wf';
+               v_strg_cot = 'DISTINCT(cot.id_cotizacion)'; 
+               v_add_filtro = ' (lower(cot.estado)!=''borrador'' ) and ';
+            
+            ELSE
+            
+               v_inner =  'inner join wf.testado_wf ew on ew.id_estado_wf = cot.id_estado_wf';
+               v_strg_cot = 'cot.id_cotizacion';
+               
+               
+             END IF;
+            
+            
+             
             
             raise notice 'tipo interface %',v_parametros.tipo_interfaz;
         
     		--Sentencia de la consulta
 			v_consulta:='select
-						cot.id_cotizacion,
+						'||v_strg_cot||',  
 						cot.estado_reg,
 						cot.estado,
 						cot.lugar_entrega,
@@ -258,7 +291,7 @@ BEGIN
 						left join segu.tusuario usu2 on usu2.id_usuario = cot.id_usuario_mod
 				        inner join param.tmoneda mon on mon.id_moneda = cot.id_moneda
                         inner join param.vproveedor pro on pro.id_proveedor = cot.id_proveedor
-                        inner join wf.testado_wf ew on ew.id_estado_wf = cot.id_estado_wf
+                        '||v_inner||'   
                         where  '|| v_add_filtro ||' ';
 			
 			--Definicion de la respuesta
@@ -310,6 +343,7 @@ BEGIN
             
             END IF;
             
+                        
             
             
             IF  lower(v_parametros.tipo_interfaz) = 'cotizacionvbdin' THEN
@@ -327,11 +361,36 @@ BEGIN
                   
                 END IF;
             
-            END IF;  
+            END IF;
+            
+            
+            IF  pxp.f_existe_parametro(p_tabla,'historico') THEN
+             
+             v_historico =  v_parametros.historico;
+            
+            ELSE
+            
+            v_historico = 'no';
+            
+            END IF;
+            
+            IF v_historico =  'si' THEN
+            
+               v_inner =  'inner join wf.testado_wf ew on ew.id_proceso_wf = cot.id_proceso_wf';
+               v_strg_cot = 'DISTINCT(cot.id_cotizacion)'; 
+               v_add_filtro = ' (lower(cot.estado)!=''borrador'' ) and ';
+            
+            ELSE
+            
+               v_inner =  'inner join wf.testado_wf ew on ew.id_estado_wf = cot.id_estado_wf';
+               v_strg_cot = 'cot.id_cotizacion';
+               
+               
+             END IF;  
         
         
 			--Sentencia de la consulta de conteo de registros
-			v_consulta:='select count(id_cotizacion)
+			v_consulta:='select count('||v_strg_cot||')
 					    from adq.tcotizacion cot
 						inner join segu.tusuario usu1 on usu1.id_usuario = cot.id_usuario_reg
                         inner join adq.tproceso_compra pc on pc.id_proceso_compra = cot.id_proceso_compra
