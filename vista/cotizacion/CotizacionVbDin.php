@@ -76,6 +76,14 @@ Phx.vista.CotizacionVbDin = {
             }
         );
         
+        this.addButton('btnReporte',{
+            text :'Sol Comp.',
+            iconCls : 'bpdf32',
+            disabled: true,
+            handler : this.onButtonSolicitud,
+            tooltip : '<b>Reporte Solicitud de Compra</b><br/><b>Reporte Solicitud de Compra</b>'
+        });
+        
         this.addButton('btnCuadroComparativo',{
 											 text :'Cuadro Comparativo',
 											 iconCls : 'bexcel',
@@ -291,6 +299,19 @@ Phx.vista.CotizacionVbDin = {
       
   },
   
+  onButtonSolicitud:function(){
+        var rec=this.sm.getSelected();
+        Ext.Ajax.request({
+            url:'../../sis_adquisiciones/control/Solicitud/reporteSolicitud',
+            params:{'id_solicitud':rec.data.id_solicitud,'estado':'en_proceso'},
+            success: this.successExport,
+            failure: this.conexionFailure,
+            timeout:this.timeout,
+            scope:this
+        });  
+    },
+  
+  
   diagramGantt:function(){           
             var data=this.sm.getSelected().data.id_proceso_wf;
             Phx.CP.loadingShow();
@@ -337,9 +358,6 @@ Phx.vista.CotizacionVbDin = {
                    else{
                      this.cmbTipoEstado.store.baseParams.estados= reg.ROOT.datos.estados;
                      this.cmbTipoEstado.modificado=true;
-                 
-                     console.log(resp)
-                      
                      this.cmpObs.setValue('');
                      this.cmbFuncionarioWf.disable();
                      this.wEstado.buttons[1].hide();
@@ -397,17 +415,16 @@ Phx.vista.CotizacionVbDin = {
     	},
     	
     	onCuadroComparativo: function(){
-							var rec=this.sm.getSelected();
-		         console.debug(rec);
-		         Ext.Ajax.request({
+			var rec=this.sm.getSelected();
+		    Ext.Ajax.request({
 		             url:'../../sis_adquisiciones/control/ProcesoCompra/cuadroComparativo',
 		             params:{'id_proceso_compra':rec.data.id_proceso_compra},
 		             success: this.successExport,
 		             failure: function() {
-		                 console.log("fail");
+		                 alert("fail");
 		             },
 		             timeout: function() {
-		                 console.log("timeout");
+		                 alert("timeout");
 		             },
 		             scope:this
 		         });

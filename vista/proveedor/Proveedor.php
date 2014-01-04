@@ -47,7 +47,6 @@ Phx.vista.Proveedor=Ext.extend(Phx.gridInterfaz,{
 	iniciarEventos : function () {
 		Phx.vista.Proveedor.superclass.iniciarEventos.call();
 		this.getComponente('id_persona').on('select',function(c,r,n){
-					console.log(r.data);				
 					this.blockGroup(1);
 					this.getComponente('ci').setValue(r.data.ci);
 					this.getComponente('nombre').setValue(r.data.nombre);
@@ -834,7 +833,6 @@ Phx.vista.Proveedor=Ext.extend(Phx.gridInterfaz,{
 	onButtonEdit:function(){
 		datos=this.sm.getSelected().data;
 		Phx.vista.Proveedor.superclass.onButtonEdit.call(this); //sobrecarga enable select
-		//console.log(datos);
 		if(datos.tipo=='persona'){
 			//this.ocultarComponente(this.getComponente('id_institucion'));
 			var cmbPer = this.getComponente('id_persona');

@@ -373,9 +373,7 @@ Phx.vista.SolicitudVb = {
                    else{
                      this.cmbTipoEstado.store.baseParams.estados= reg.ROOT.datos.estados;
                      this.cmbTipoEstado.modificado=true;
-                 
-                     console.log(resp)
-                      if(resp.argument.data.estado=='vbrpc'){
+                     if(resp.argument.data.estado=='vbrpc'){
                         this.cmbIntrucRPC.show();
                         this.cmbIntrucRPC.enable();
                      }

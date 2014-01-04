@@ -42,7 +42,6 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
               handler:this.antEstado,
               tooltip: '<b>Pasar al Anterior Estado</b>'
           });
-          console.log(this.maestro)
           this.Cmp.id_moneda.store.baseParams.id_moneda = this.maestro.id_moneda;
 								
 		 
@@ -481,17 +480,16 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
 	},
 	
 	onButtonRepOC: function(){
-                                    var rec=this.sm.getSelected();
-                console.debug(rec);
+                var rec=this.sm.getSelected();
                 Ext.Ajax.request({
                     url:'../../sis_adquisiciones/control/Cotizacion/reporteOC',
                     params:{'id_cotizacion':rec.data.id_cotizacion,'id_proveedor':rec.data.id_proveedor},
                     success: this.successExport,
                     failure: function() {
-                        console.log("fail");
+                        alert("fail");
                     },
                     timeout: function() {
-                        console.log("timeout");
+                        alert("timeout");
                     },
                     scope:this
                 });
@@ -504,10 +502,10 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
                     params:{'id_cotizacion':rec.data.id_cotizacion,'tipo':rec.data.estado},
                     success: this.successExport,
                     failure: function() {
-                        console.log("fail");
+                        alert("fail");
                     },
                     timeout: function() {
-                        console.log("timeout");
+                        alert("timeout");
                     },
                     scope:this
                 });  

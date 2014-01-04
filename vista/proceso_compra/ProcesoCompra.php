@@ -532,10 +532,10 @@ Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
              params:{'id_proceso_compra':rec.data.id_proceso_compra},
              success: this.successExport,
              failure: function() {
-                 console.log("fail");
+                 alert("fail");
              },
              timeout: function() {
-                 console.log("timeout");
+                 alert("timeout");
              },
              scope:this
          });

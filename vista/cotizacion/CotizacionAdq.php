@@ -344,8 +344,6 @@ Phx.vista.CotizacionAdq = {
             Phx.CP.loadingHide();
            
             var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
-            console.log('depues de todo',reg)
-            
             if(!reg.ROOT.error){
                 
                         if (reg.ROOT.datos.operacion=='preguntar_todo'){
