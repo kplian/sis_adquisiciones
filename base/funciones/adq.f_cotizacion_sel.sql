@@ -233,7 +233,9 @@ BEGIN
             
                v_inner =  'inner join wf.testado_wf ew on ew.id_proceso_wf = cot.id_proceso_wf';
                v_strg_cot = 'DISTINCT(cot.id_cotizacion)'; 
-               v_add_filtro = ' (lower(cot.estado)!=''borrador'' ) and ';
+               IF p_administrador =1 THEN
+               		v_add_filtro = ' (lower(cot.estado)!=''borrador'' ) and ';
+               END IF;
             
             ELSE
             
@@ -378,7 +380,11 @@ BEGIN
             
                v_inner =  'inner join wf.testado_wf ew on ew.id_proceso_wf = cot.id_proceso_wf';
                v_strg_cot = 'DISTINCT(cot.id_cotizacion)'; 
-               v_add_filtro = ' (lower(cot.estado)!=''borrador'' ) and ';
+              
+               
+               IF p_administrador =1 THEN
+               		v_add_filtro = ' (lower(cot.estado)!=''borrador'' ) and ';
+               END IF;
             
             ELSE
             

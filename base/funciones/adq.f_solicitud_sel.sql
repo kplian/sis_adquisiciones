@@ -104,7 +104,14 @@ BEGIN
                v_inner =  'inner join wf.testado_wf ew on ew.id_proceso_wf = sol.id_proceso_wf';
                v_strg_sol = 'DISTINCT(sol.id_solicitud)'; 
                v_strg_obs = '''---''::text';
-               v_filtro = ' (lower(sol.estado)!=''borrador'' ) and ';
+               
+               IF p_administrador =1 THEN
+              
+                  v_filtro = ' (lower(sol.estado)!=''borrador'' ) and ';
+              
+               END IF;
+               
+               
             
             ELSE
             
@@ -245,6 +252,12 @@ BEGIN
                v_inner =  'inner join wf.testado_wf ew on ew.id_proceso_wf = sol.id_proceso_wf';
                v_strg_sol = 'DISTINCT(sol.id_solicitud)'; 
                v_strg_obs = '---';
+               
+               IF p_administrador =1 THEN
+              
+                  v_filtro = ' (lower(sol.estado)!=''borrador'' ) and ';
+              
+               END IF;
             
             ELSE
             
