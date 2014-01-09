@@ -157,17 +157,16 @@ Phx.vista.CotizacionVb = {
     	},
     	
     	onCuadroComparativo: function(){
-							var rec=this.sm.getSelected();
-		         console.debug(rec);
-		         Ext.Ajax.request({
+			 var rec=this.sm.getSelected();
+		     Ext.Ajax.request({
 		             url:'../../sis_adquisiciones/control/ProcesoCompra/cuadroComparativo',
 		             params:{'id_proceso_compra':rec.data.id_proceso_compra},
 		             success: this.successExport,
 		             failure: function() {
-		                 console.log("fail");
+		                 alert("fail");
 		             },
 		             timeout: function() {
-		                 console.log("timeout");
+		                 Alert("timeout");
 		             },
 		             scope:this
 		         });

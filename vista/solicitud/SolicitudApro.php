@@ -501,7 +501,6 @@ Phx.vista.SolicitudApro = {
        
         var d= this.sm.getSelected().data;
         if(d){
-            console.log(d)
             this.cmbNumTramite.setValue(d.num_tramite);
             this.cmbIdSolicitud.setValue(d.id_solicitud);
             this.cmbIdDepto.setValue(this.cmbDeptoAdq.getValue());
@@ -517,7 +516,6 @@ Phx.vista.SolicitudApro = {
        
         var d= this.sm.getSelected().data;
         if(d){
-            console.log(d)
             this.cmb_id_depto_usuario.store.baseParams.id_depto = d.id_depto;
             this.cmb_id_depto_usuario.modificado = true
             this.cmb_id_solicitud.setValue(d.id_solicitud);
@@ -576,7 +574,6 @@ Phx.vista.SolicitudApro = {
       /*asgina usuario a los procesos de la solcitud*/    
     guardarAsigUsu :function() {                   
             var d= this.sm.getSelected().data;
-            console.log('guardar usuario')
             if (this.formAsigUsuario.getForm().isValid()){
                  Phx.CP.loadingShow();
                     Ext.Ajax.request({

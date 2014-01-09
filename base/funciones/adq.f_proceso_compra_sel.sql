@@ -138,22 +138,26 @@ BEGIN
         
         v_filadd='';
         
-           IF   p_administrador != 1 THEN
+           --TODO, RAC, me parece que el codigo comentado no es util,.... que fue solo una copia del proceso consulta para grilla
+           --si se habilitar evita que otros usuarios que no sean del depto de adquisiciones vean 
+           --el reporte de cuadro comparativo...
+        
+           /*IF   p_administrador != 1 THEN
            
-             -- recupera los usuarios miembros del depto
-             select  
-                 pxp.aggarray(depu.id_depto)
-              into 
-                 va_id_depto
-             from param.tdepto_usuario depu 
-             where depu.id_usuario =  p_id_usuario; 
+               -- recupera los usuarios miembros del depto
+               select  
+                   pxp.aggarray(depu.id_depto)
+                into 
+                   va_id_depto
+               from param.tdepto_usuario depu 
+               where depu.id_usuario =  p_id_usuario; 
         
             
-            if va_id_depto is null then
-             
-               raise exception 'El suario no se encuetra asignado a nigun depto de adquisiciones';
-            
-            end if;
+              if va_id_depto is null then
+               
+                 raise exception 'El usuario no se encuetra asignado a nigun depto de adquisiciones';
+              
+              end if;
             
             
             
@@ -161,9 +165,9 @@ BEGIN
         
         
         
-           v_filadd='(dep.id_depto  in ('|| COALESCE(array_to_string(va_id_depto,','),'0')||')) and';
+          	 v_filadd='(dep.id_depto  in ('|| COALESCE(array_to_string(va_id_depto,','),'0')||')) and';
           
-          END IF;
+          END IF;*/
         
         
     		--Sentencia de la consulta
