@@ -1,3 +1,5 @@
+--------------- SQL ---------------
+
 CREATE OR REPLACE FUNCTION adq.f_documento_sol_ime (
   p_administrador integer,
   p_id_usuario integer,
@@ -30,6 +32,8 @@ DECLARE
   v_nombre_funcion        text;
   v_mensaje_error         text;
   v_id_documento_sol  integer;
+  
+  v_id_proveedor integer;
           
 BEGIN
 
@@ -46,6 +50,15 @@ BEGIN
   if(p_transaccion='ADQ_DOCSOL_INS')then
           
         begin
+        
+        IF pxp.f_existe_parametro(p_tabla, 'id_proveedor') THEN
+          v_id_proveedor =  v_parametros.id_proveedor;
+        ELSE
+          v_id_proveedor =  NULL;
+        END IF;
+        
+        
+        
         	if (v_parametros.id_solicitud is not null)then
             	select id_categoria_compra
                 into v_parametros.id_categoria_compra
@@ -64,7 +77,8 @@ BEGIN
       id_usuario_reg,
       fecha_reg,
       id_usuario_mod,
-      fecha_mod
+      fecha_mod,
+      id_proveedor
             ) values(
       v_parametros.id_solicitud,
       v_parametros.id_categoria_compra,
@@ -76,7 +90,8 @@ BEGIN
       p_id_usuario,
       now(),
       null,
-      null
+      null,
+      v_id_proveedor
               
       )RETURNING id_documento_sol into v_id_documento_sol;
       
@@ -98,7 +113,14 @@ BEGIN
 
   elsif(p_transaccion='ADQ_DOCSOL_MOD')then
 
-    begin    	
+    begin  
+     IF pxp.f_existe_parametro(p_tabla, 'id_proveedor') THEN
+          v_id_proveedor =  v_parametros.id_proveedor;
+     ELSE
+          v_id_proveedor =  NULL;
+     END IF;
+    
+      	
       --Sentencia de la modificacion
       update adq.tdocumento_sol set
       id_solicitud = v_parametros.id_solicitud,
@@ -108,7 +130,8 @@ BEGIN
       nombre_tipo_doc = v_parametros.nombre_tipo_doc,
       chequeado = v_parametros.chequeado,
       id_usuario_mod = p_id_usuario,
-      fecha_mod = now()
+      fecha_mod = now(),
+      id_proveedor = v_id_proveedor
       where id_documento_sol=v_parametros.id_documento_sol;
                
       --Definicion de la respuesta

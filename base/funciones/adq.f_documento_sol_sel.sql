@@ -1,3 +1,5 @@
+--------------- SQL ---------------
+
 CREATE OR REPLACE FUNCTION adq.f_documento_sol_sel (
   p_administrador integer,
   p_id_usuario integer,
@@ -56,11 +58,12 @@ BEGIN
                                           docsol.id_usuario_mod,
                                           docsol.fecha_mod,
                                           usu1.cuenta as usr_reg,
-                                          usu2.cuenta as usr_mod                                        
+                                          usu2.cuenta as usr_mod                                      
                                           from adq.tdocumento_sol docsol
                                           inner join segu.tusuario usu1 on usu1.id_usuario = docsol.id_usuario_reg
                                           left join segu.tusuario usu2 on usu2.id_usuario = docsol.id_usuario_mod 
-             where  ';
+                                          
+                                          where  ';
       
       --Definicion de la respuesta
       v_consulta:=v_consulta||v_parametros.filtro;
@@ -98,11 +101,14 @@ BEGIN
                                           docsol.fecha_mod,
                                           usu1.cuenta as usr_reg,
                                           usu2.cuenta as usr_mod ,
-                                          cc.nombre as desc_categoria_compra                                       
+                                          cc.nombre as desc_categoria_compra,
+                                          pro.id_proveedor, 
+                                          pro.desc_proveedor                                         
                                           from adq.tdocumento_sol docsol
                                           inner join segu.tusuario usu1 on usu1.id_usuario = docsol.id_usuario_reg
                                           left join segu.tusuario usu2 on usu2.id_usuario = docsol.id_usuario_mod
-                                          left join adq.tcategoria_compra cc ON cc.id_categoria_compra = docsol.id_categoria_compra 
+                                          left join adq.tcategoria_compra cc ON cc.id_categoria_compra = docsol.id_categoria_compra
+                                          left join param.vproveedor pro on pro.id_proveedor = docsol.id_proveedor 
              where  ';
       
       --Definicion de la respuesta
@@ -126,10 +132,10 @@ BEGIN
     begin
       --Sentencia de la consulta de conteo de registros
       v_consulta:='select count(id_documento_sol)
-                                from adq.tdocumento_sol docsol
-                                inner join segu.tusuario usu1 on usu1.id_usuario = docsol.id_usuario_reg
-                                left join segu.tusuario usu2 on usu2.id_usuario = docsol.id_usuario_mod                       
-               where ';
+                    from adq.tdocumento_sol docsol
+                    inner join segu.tusuario usu1 on usu1.id_usuario = docsol.id_usuario_reg
+                    left join segu.tusuario usu2 on usu2.id_usuario = docsol.id_usuario_mod 
+                  where ';
       
       --Definicion de la respuesta        
       v_consulta:=v_consulta||v_parametros.filtro;
@@ -155,6 +161,8 @@ BEGIN
                                 inner join segu.tusuario usu1 on usu1.id_usuario = docsol.id_usuario_reg
                                 left join segu.tusuario usu2 on usu2.id_usuario = docsol.id_usuario_mod
                                 left join adq.tcategoria_compra cc ON cc.id_categoria_compra = docsol.id_categoria_compra                       
+                                left join param.vproveedor pro on pro.id_proveedor = docsol.id_proveedor 
+            
                where ';
       
       --Definicion de la respuesta        
