@@ -22,6 +22,7 @@ Phx.vista.ChequeoDocumentoSol=Ext.extend(Phx.gridInterfaz,{
             limit:50,
             id_solicitud: this.id_solicitud
             }});
+            
         this.addButton('btnUpload', {
                 text : 'Subir Documento',
                 iconCls : 'bupload1',
@@ -43,9 +44,12 @@ Phx.vista.ChequeoDocumentoSol=Ext.extend(Phx.gridInterfaz,{
         }
         
         this.iniciarEventos();
-        this.Atributos[1].valorInicial = this.id_solicitud;
-        this.Atributos[4].valorInicial = this.id_categoria_compra;        
-        this.Atributos[8].valorInicial = '';
+        
+        this.Atributos[this.getIndAtributo('id_solicitud')].valorInicial = this.id_solicitud;
+        this.Atributos[this.getIndAtributo('id_categoria_compra')].valorInicial = this.id_categoria_compra;        
+        //this.Atributos[this.getIndAtributo('extension')].valorInicial = ''; //8
+        
+        
     },
             
     Atributos:[
@@ -213,7 +217,25 @@ Phx.vista.ChequeoDocumentoSol=Ext.extend(Phx.gridInterfaz,{
             grid:true,
             form:false
         },
-        
+         {
+            config:{
+                name:'id_proveedor',
+                hiddenName: 'id_proveedor',
+                origen:'PROVEEDOR',
+                fieldLabel:'Proveedor',
+                allowBlank:true,
+                tinit:true,
+                gwidth:200,
+                valueField: 'id_proveedor',
+                gdisplayField: 'desc_proveedor',
+                renderer:function(value, p, record){return String.format('{0}', record.data['desc_proveedor']);}
+             },
+            type:'ComboRec',//ComboRec
+            id_grupo:0,
+            filters:{pfiltro:'pro.desc_proveedor',type:'string'},
+            grid:true,
+            form:true
+        },
         {
             config:{
                 name: 'estado_reg',
@@ -315,7 +337,9 @@ Phx.vista.ChequeoDocumentoSol=Ext.extend(Phx.gridInterfaz,{
         {name:'fecha_mod', type: 'date',dateFormat:'Y-m-d H:i:s.u'},
         {name:'usr_reg', type: 'string'},
         {name:'usr_mod', type: 'string'},
-        {name:'desc_categoria_compra', type: 'string'}    
+        {name:'desc_categoria_compra', type: 'string'} ,
+        'id_proveedor'  ,
+        'desc_proveedor'   
         
     ],
     sortInfo:{
@@ -347,13 +371,41 @@ Phx.vista.ChequeoDocumentoSol=Ext.extend(Phx.gridInterfaz,{
         this.getComponente('nombre_tipo_doc').store.setBaseParam('id_solicitud','');
         this.getComponente('nombre_tipo_doc').store.setBaseParam('nombre_arch_doc','');
         this.getComponente('nombre_tipo_doc').store.setBaseParam('chequeado','');
+        
+        
+        
+        
+        this.Cmp.nombre_tipo_doc.on('select',function(cmb,rec,i){
+            if(rec.data.nombre_tipo_doc == 'precotizacion'){
+                this.mostrarComponente(this.Cmp.id_proveedor);
+            }
+            else{
+                this.ocultarComponente(this.Cmp.id_proveedor);
+            }
+            
+            
+        },this)
+        
+        
+        
+        
     },
     onButtonEdit : function() {
-    	this.ocultarComponente(this.getComponente('nombre_tipo_doc'));
-    	Phx.vista.ChequeoDocumentoSol.superclass.onButtonEdit.call(this); 
+        this.ocultarComponente(this.getComponente('nombre_tipo_doc'));
+    	Phx.vista.ChequeoDocumentoSol.superclass.onButtonEdit.call(this);
+    	
+    	if(this.Cmp.nombre_tipo_doc.getValue() == 'precotizacion'){
+    	   this.mostrarComponente(this.Cmp.id_proveedor);
+        }
+        else{
+          this.ocultarComponente(this.Cmp.id_proveedor);
+        }
+            
+    	
+    	 
     },
     onButtonNew : function() {
-    	this.mostrarComponente(this.getComponente('nombre_tipo_doc'));
+        this.mostrarComponente(this.getComponente('nombre_tipo_doc'));
     	Phx.vista.ChequeoDocumentoSol.superclass.onButtonNew.call(this); 
     }
 }

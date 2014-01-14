@@ -239,3 +239,17 @@ IS 'este campo identifica el usuario que pueden trabajar en el proceso de compra
 /***********************************F-SCP-RAC-ADQ-0-06/12/2013****************************************/
 
 
+
+/***********************************I-SCP-RAC-ADQ-0-12/01/2014****************************************/
+
+ALTER TABLE adq.tdocumento_sol
+  ADD COLUMN id_proveedor INTEGER;
+  
+--------------- SQL ---------------
+
+COMMENT ON COLUMN adq.tdocumento_sol.id_proveedor
+IS 'cuando el tipo de documento sea del tipo precotiacion,  este campo senhala el proveedor correspondiente';  
+  
+/***********************************I-SCP-RAC-ADQ-0-12/01/2014****************************************/
+
+

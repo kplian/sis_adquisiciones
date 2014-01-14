@@ -70,6 +70,10 @@ class MODDocumentoSol extends MODbase{
         $this->captura('usr_reg','varchar');
         $this->captura('usr_mod','varchar'); 
         $this->captura('desc_categoria_compra','varchar');
+        
+        $this->captura('id_proveedor','int4');
+        $this->captura('desc_proveedor','varchar');
+               
                
         
         //Ejecuta la instruccion
@@ -94,6 +98,7 @@ class MODDocumentoSol extends MODbase{
         $this->setParametro('nombre_tipo_doc','nombre_tipo_doc','varchar');
         $this->setParametro('chequeado','chequeado','varchar');
         $this->setParametro('estado_reg','estado_reg','varchar');
+        $this->setParametro('id_proveedor','id_proveedor','int4');
 
         //Ejecuta la instruccion
         $this->armarConsulta();     
@@ -118,6 +123,7 @@ class MODDocumentoSol extends MODbase{
         $this->setParametro('nombre_tipo_doc','nombre_tipo_doc','varchar');
         $this->setParametro('chequeado','chequeado','bool');
         $this->setParametro('estado_reg','estado_reg','varchar');
+        $this->setParametro('id_proveedor','id_proveedor','int4');
 
         //Ejecuta la instruccion
         $this->armarConsulta();     

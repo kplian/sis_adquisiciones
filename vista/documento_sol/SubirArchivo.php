@@ -6,11 +6,11 @@
 *@date    22-03-2012
 *@description permites subir archivos a la tabla de documento_sol
 */
-
 header("content-type: text/javascript; charset=UTF-8");
 ?>
 <script>
 Phx.vista.SubirArchivo=Ext.extend(Phx.frmInterfaz,{
+    ActSave:'../../sis_adquisiciones/control/DocumentoSol/subirArchivo',
 
     constructor:function(config)
     {   
@@ -58,49 +58,8 @@ Phx.vista.SubirArchivo=Ext.extend(Phx.frmInterfaz,{
         },      
     ],
     title:'Subir Archivo',    
-    fileUpload:true,
+    fileUpload:true
     
-    guardar: function(o){
-        // arma json en cadena para enviar al servidor
-        Ext.apply(this.argumentSave, o.argument);
-        if (this.fileUpload) {
-            Ext.Ajax.request({
-                form: this.form.getForm().getEl(),
-                url: this.ActSave,
-                params: this.getValForm,
-                isUpload: this.fileUpload,
-                success: this.successSaveFileUpload,
-                argument: this.argumentSave,
-                failure: function(r)
-                {
-                    console.log('falla upload', r)
-                },
-                timeout: this.timeout,
-                scope: this
-            });
-        } else {
-            Ext.Ajax.request({
-            url: this.ActSave,
-            params: this.getValForm,
-            isUpload: this.fileUpload,
-            success: this.successSave,
-            argument: this.argumentSave,
-            failure: this.conexionFailure,
-            timeout: this.timeout,
-            scope: this
-            });
-        }          
-    },    
-    
-    onSubmit: function(o) {
-        if (this.form.getForm().isValid()) {
-            //Phx.CP.loadingShow();            
-            
-            this.ActSave='../../sis_adquisiciones/control/DocumentoSol/subirArchivo';
-            this.guardar(o);
-            
-        }
-    } 
 }
 )    
 </script>
