@@ -250,7 +250,7 @@ ALTER TABLE adq.tdocumento_sol
 COMMENT ON COLUMN adq.tdocumento_sol.id_proveedor
 IS 'cuando el tipo de documento sea del tipo precotiacion,  este campo senhala el proveedor correspondiente';  
   
-/***********************************I-SCP-RAC-ADQ-0-12/01/2014****************************************/
+/***********************************F-SCP-RAC-ADQ-0-12/01/2014****************************************/
 
 
 

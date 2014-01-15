@@ -41,7 +41,9 @@ DECLARE
     v_id_solicitud_det integer;
     v_aux varchar;
     v_registros_pre record;
+
     v_id_gestion integer;
+
 			    
 BEGIN
 
@@ -359,7 +361,9 @@ BEGIN
             from adq.tsolicitud s
             where s.id_solicitud = v_parametros.id_solicitud;
             
+
             v_id_gestion = v_registros.id_gestion;
+
             
             IF v_registros.estado != 'borrador' THEN
             
@@ -429,7 +433,9 @@ BEGIN
                     v_id_partida,
                     v_id_cuenta, 
                     v_id_auxiliar
+
                 FROM conta.f_get_config_relacion_contable('CUECOMP', v_id_gestion, v_registros.id_concepto_ingas, v_registros.id_centro_costo);
+
                 
         
            

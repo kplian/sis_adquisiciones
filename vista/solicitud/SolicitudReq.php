@@ -136,7 +136,7 @@ Phx.vista.SolicitudReq = {
         this.Cmp.id_funcionario.on('select',function(rec){ 
         	
         	//Aprobador  
-            this.cmpIdFuncionarioAprobador.store.baseParams.id_funcionario=this.Cmp.id_funcionario.getValue();
+            this.cmpIdFuncionarioAprobador.store.baseParams.id_funcionario_dependiente=this.Cmp.id_funcionario.getValue();
             this.cmpIdFuncionarioAprobador.store.baseParams.fecha = this.cmpFechaSoli.getValue().dateFormat(this.cmpFechaSoli.format);
             this.cmpIdFuncionarioAprobador.modificado=true;
             //Unidad
