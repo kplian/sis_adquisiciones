@@ -1,3 +1,5 @@
+--------------- SQL ---------------
+
 CREATE OR REPLACE FUNCTION adq.f_genera_preingreso (
   p_id_usuario integer,
   p_id_cotizacion integer
@@ -39,7 +41,7 @@ BEGIN
     ---------------------
 	--Cotización
     select cot.id_cotizacion,cot.id_proceso_wf, cot.id_estado_wf, cot.estado, cot.id_moneda,
-    cot.id_obligacion_pago, sol.justificacion
+    cot.id_obligacion_pago, sol.justificacion, cot.numero_oc
     into v_rec_cot
     from adq.tcotizacion cot
     inner join adq.tproceso_compra pro on pro.id_proceso_compra = cot.id_proceso_compra
@@ -114,8 +116,15 @@ BEGIN
     --Obtener el estado siguiente de la cotización para el Preingreso
     SELECT ps_id_proceso_wf, ps_id_estado_wf, ps_codigo_estado
     into v_id_proceso_wf, v_id_estado_wf, v_codigo_estado
-    FROM wf.f_registra_proceso_disparado_wf(p_id_usuario, v_rec_cot.id_estado_wf,
-    NULL, v_id_depto, '---','ALPRE');
+    FROM wf.f_registra_proceso_disparado_wf(
+       p_id_usuario, 
+       v_rec_cot.id_estado_wf,
+       NULL, 
+       v_id_depto, 
+       'Preingreso de almacenes',
+       'ALPRE',
+       'PIA-'||v_rec_cot.numero_oc
+       );
     
     --------------------------
     -- CREACIÓN DE PREINGRESO
@@ -123,13 +132,31 @@ BEGIN
     --Preingreso para almacenes
     if v_alm>0 then
         insert into alm.tpreingreso(
-        id_usuario_reg, fecha_reg, estado_reg, id_cotizacion,
-        id_depto, id_estado_wf, id_proceso_wf, estado, id_moneda,
-        tipo, descripcion, id_depto_conta
+           id_usuario_reg, 
+           fecha_reg, 
+           estado_reg, 
+           id_cotizacion,
+           id_depto, 
+           id_estado_wf, 
+           id_proceso_wf,  
+           estado, 
+           id_moneda,
+           tipo, 
+           descripcion, 
+           id_depto_conta
         ) values(
-        p_id_usuario, now(),'activo',p_id_cotizacion,
-        null, v_id_estado_wf, v_id_proceso_wf, v_codigo_estado, v_id_moneda,
-        'almacen', v_rec_cot.justificacion, v_id_depto_conta
+           p_id_usuario, 
+           now(),
+           'activo',
+           p_id_cotizacion,
+           null, 
+           v_id_estado_wf, 
+           v_id_proceso_wf, 
+           v_codigo_estado, 
+           v_id_moneda,
+           'almacen', 
+           v_rec_cot.justificacion, 
+           v_id_depto_conta
         ) returning id_preingreso into v_id_preingreso;
         
         --Generación del detalle del preingreso  de activo fijo

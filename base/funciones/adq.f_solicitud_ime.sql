@@ -160,6 +160,7 @@ BEGIN
              v_codigo_tipo_proceso, 
              v_parametros.id_funcionario,
              NULL,
+             'Solicitud de Compra '||v_num_sol,
              v_num_sol);
         
         -- obtiene el funcionario aprobador

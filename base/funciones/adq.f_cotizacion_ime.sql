@@ -238,7 +238,9 @@ BEGIN
                                v_id_estado_actual, 
                                NULL, 
                                v_id_depto, 
-                               v_dec_proveedor::varchar);
+                               'Cotización del proveedor: '||v_dec_proveedor::varchar,
+                               '',
+                               v_parametros.nro_contrato);
                   
           
            ELSEIF  v_estado_pro = 'proceso' THEN
@@ -258,7 +260,11 @@ BEGIN
                            v_id_estado_wf_pro, 
                            NULL, 
                            v_id_depto,
-                           v_dec_proveedor::varchar);
+                          'Cotización del proveedor: '||v_dec_proveedor::varchar,
+                          '',
+                          v_parametros.nro_contrato
+                          );
+                          
           ELSE
         
           
@@ -297,7 +303,8 @@ BEGIN
 			id_usuario_mod,
             id_estado_wf,
             id_proceso_wf,
-            tipo_cambio_conv
+            tipo_cambio_conv,
+            num_tramite
           	) values(
 			'activo',
 			v_codigo_estado,
@@ -322,8 +329,8 @@ BEGIN
 			null,
             v_id_estado_wf,
             v_id_proceso_wf,
-            v_parametros.tipo_cambio_conv
-							
+            v_parametros.tipo_cambio_conv,
+            v_num_tramite
 			)RETURNING id_cotizacion into v_id_cotizacion;
             
             
@@ -1194,12 +1201,16 @@ BEGIN
                               END IF;     
                                 
                              
-                             
-                                    
                               update adq.tcotizacion set
                               fecha_adju = v_parametros.fecha_oc,
                               numero_oc = v_numero_oc
                               where id_cotizacion = v_parametros.id_cotizacion;
+                              
+                              --actualiza el codigo de proceso wf, 
+                              --porque el numero de oc es mas apropiado para este estado del proceso
+                              update wf.tproceso_wf set
+                              codigo_proceso = v_numero_oc
+                              where id_proceso_wf = v_id_proceso_wf;
                      
                      
                      END IF;
@@ -1757,8 +1768,9 @@ BEGIN
                        v_id_estado_actual, 
                        NULL, 
                        v_parametros.id_depto_tes,
-                       '---',
-                       'OBLI');
+                       'Obligacion de pago para la OC'||v_numero_oc,
+                       'OBLI',
+                       'OP-'||v_numero_oc);
                        
                        
         

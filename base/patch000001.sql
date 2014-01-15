@@ -253,3 +253,14 @@ IS 'cuando el tipo de documento sea del tipo precotiacion,  este campo senhala e
 /***********************************I-SCP-RAC-ADQ-0-12/01/2014****************************************/
 
 
+
+/***********************************I-SCP-RAC-ADQ-0-17/01/2014****************************************/
+
+
+ALTER TABLE adq.tcotizacion
+  ADD COLUMN num_tramite VARCHAR(100);
+  
+
+
+/***********************************I-SCP-RAC-ADQ-0-17/01/2014****************************************/
+
