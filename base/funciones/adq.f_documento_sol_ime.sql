@@ -166,9 +166,9 @@ BEGIN
 
     end;
         
-    /*********************************    
-  #TRANSACCION:  'ADQ_DOCSOL_ELI'
-  #DESCRIPCION: Eliminacion de registros
+  /*********************************    
+  #TRANSACCION:  'ADQ_DOCSOLAR_MOD'
+  #DESCRIPCION: upload de archivo
   #AUTOR:   admin 
   #FECHA:   08-02-2013 19:01:00
   ***********************************/

@@ -602,26 +602,26 @@ BEGIN
                                  v_comprometido_ga=0;
                                  v_ejecutado=0;
                                                  
-                                 SELECT 
+                                /* SELECT 
                                        COALESCE(ps_comprometido,0), 
                                        COALESCE(ps_ejecutado,0)  
                                    into 
                                        v_comprometido_ga,    --esta en moneda base
                                        v_ejecutado
-                                 FROM pre.f_verificar_com_eje_pag(v_registros.id_partida_ejecucion, v_id_moneda_base);
+                                 FROM pre.f_verificar_com_eje_pag(v_registros.id_partida_ejecucion, v_id_moneda_base);*/
                                 
                                  --validamos que el total revertido no afecte la adjudicacion            
                                  --en caso contrario no se adjudicada nada
-                                IF  ((v_comprometido_ga + COALESCE(v_registros.precio_sg_mb,0)) - v_total_costo_mb)  >= (v_cantidad_adjudicada * v_registros.precio_unitario_mb_coti)   THEN
+                              --  IF  ((v_comprometido_ga + COALESCE(v_registros.precio_sg_mb,0)) - v_total_costo_mb)  >= (v_cantidad_adjudicada * v_registros.precio_unitario_mb_coti)   THEN
                                      
                                      update adq.tcotizacion_det set
                                      cantidad_adju = v_cantidad_adjudicada
                                      where id_cotizacion_det = v_registros.id_cotizacion_det;
                                
                                     v_sw  = TRUE;
-                                ELSE
-                                    v_sw2 = TRUE;
-                                END IF;
+                               -- ELSE
+                              --      v_sw2 = TRUE;
+                              --  END IF;
                                 
                           END IF;
                       

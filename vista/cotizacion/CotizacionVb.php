@@ -191,6 +191,7 @@ Phx.vista.CotizacionVb = {
            this.getBoton('btnReporte').enable();  
            this.getBoton('ant_estado').enable();
            this.getBoton('btnChequeoDocumentos').enable(); 
+           this.getBoton('btnChequeoDocumentosWf').enable();   
          },
           
             
@@ -202,6 +203,7 @@ Phx.vista.CotizacionVb = {
             this.getBoton('btnRepOC').disable(); 
             this.getBoton('btnReporte').disable();  
             this.getBoton('btnChequeoDocumentos').disable(); 
+            this.getBoton('btnChequeoDocumentosWf').disable();   
             
             }
        return tb

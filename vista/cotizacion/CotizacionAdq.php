@@ -518,7 +518,7 @@ Phx.vista.CotizacionAdq = {
                    this.getBoton('btnRepOC').disable();
                }
                
-               
+            this.getBoton('btnChequeoDocumentosWf').enable();   
             return tb 
      }, 
      
@@ -535,6 +535,7 @@ Phx.vista.CotizacionAdq = {
             this.getBoton('btnPreing').disable();
             this.getBoton('btnRepOC').disable();
             this.getBoton('btnObPag').disable();
+            this.getBoton('btnChequeoDocumentosWf').disable();
             
             
          }

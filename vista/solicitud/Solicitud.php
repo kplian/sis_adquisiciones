@@ -16,9 +16,6 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
 		this.maestro=config.maestro;
     	//llama al constructor de la clase padre
 		
-		
-		
-		
 		Phx.vista.Solicitud.superclass.constructor.call(this,config);		
 		this.init();
 		
@@ -41,6 +38,19 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
                 tooltip: '<b>Documentos de la Solicitud</b><br/>Subir los documetos requeridos en la solicitud seleccionada.'
             }
         );
+        
+        
+        this.addButton('btnChequeoDocumentosWf',
+            {
+                text: 'Chequear Documentos',
+                iconCls: 'bchecklist',
+                disabled: true,
+                handler: this.loadCheckDocumentosSolWf,
+                tooltip: '<b>Documentos de la Solicitud</b><br/>Subir los documetos requeridos en la solicitud seleccionada.'
+            }
+        );
+        
+        
         
        function diagramGantt(){			
 			var data=this.sm.getSelected().data.id_proceso_wf;
@@ -575,7 +585,7 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
 	],
 	
 	
-       loadCheckDocumentosSol:function() {
+   loadCheckDocumentosSol:function() {
             var rec=this.sm.getSelected();
             rec.data.nombreVista = this.nombreVista;
             Phx.CP.loadWindows('../../../sis_adquisiciones/vista/documento_sol/ChequeoDocumentoSol.php',
@@ -589,17 +599,35 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
                     'ChequeoDocumentoSol'
         )
     },
+    
+    loadCheckDocumentosSolWf:function() {
+            var rec=this.sm.getSelected();
+            rec.data.nombreVista = this.nombreVista;
+            Phx.CP.loadWindows('../../../sis_workflow/vista/documento_wf/DocumentoWf.php',
+                    'Chequear documento del WF',
+                    {
+                        width:700,
+                        height:450
+                    },
+                    rec.data,
+                    this.idContenedor,
+                    'DocumentoWf'
+        )
+    },
+    
     preparaMenu:function(n){
       var data = this.getSelectedData();
       var tb =this.tbar;
        
         
         this.getBoton('btnChequeoDocumentos').setDisabled(false);
+        this.getBoton('btnChequeoDocumentosWf').setDisabled(false);
+        
 
         Phx.vista.Solicitud.superclass.preparaMenu.call(this,n);
         this.getBoton('btnReporte').setDisabled(false); 
         this.getBoton('diagrama_gantt').enable();
-         return tb 
+        return tb 
      }, 
      liberaMenu:function(){
         var tb = Phx.vista.Solicitud.superclass.liberaMenu.call(this);
@@ -607,6 +635,7 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
            
             this.getBoton('btnReporte').setDisabled(true);
             this.getBoton('btnChequeoDocumentos').setDisabled(true);
+            this.getBoton('btnChequeoDocumentosWf').setDisabled(true);
             this.getBoton('diagrama_gantt').disable();           
         }
        return tb

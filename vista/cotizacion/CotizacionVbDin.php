@@ -523,7 +523,9 @@ Phx.vista.CotizacionVbDin = {
                this.getBoton('ant_estado').enable();
                this.getBoton('btnRepOC').enable(); 
                this.getBoton('btnChequeoDocumentos').enable(); 
-             } 
+               this.getBoton('btnChequeoDocumentosWf').enable(); 
+          
+          } 
           else{
               this.desBotoneshistorico();
               
@@ -542,6 +544,7 @@ Phx.vista.CotizacionVbDin = {
             this.getBoton('btnReporte').disable();  
             this.getBoton('btnChequeoDocumentos').disable(); 
             this.getBoton('diagrama_gantt').disable();
+            this.getBoton('btnChequeoDocumentosWf').disable(); 
             
             
             }

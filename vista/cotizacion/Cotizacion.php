@@ -42,6 +42,17 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
               handler:this.antEstado,
               tooltip: '<b>Pasar al Anterior Estado</b>'
           });
+          
+          this.addButton('btnChequeoDocumentosWf',
+            {
+                text: 'Chequear Documentos',
+                iconCls: 'bchecklist',
+                disabled: true,
+                handler: this.loadCheckDocumentosSolWf,
+                tooltip: '<b>Documentos de la Solicitud</b><br/>Subir los documetos requeridos en la solicitud seleccionada.'
+            }
+        );
+          
           this.Cmp.id_moneda.store.baseParams.id_moneda = this.maestro.id_moneda;
 								
 		 
@@ -540,6 +551,21 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
                 alert('ocurrio un error durante el proceso')
             }
         },
+	
+	 loadCheckDocumentosSolWf:function() {
+            var rec=this.sm.getSelected();
+            rec.data.nombreVista = this.nombreVista;
+            Phx.CP.loadWindows('../../../sis_workflow/vista/documento_wf/DocumentoWf.php',
+                    'Chequear documento del WF',
+                    {
+                        width:700,
+                        height:450
+                    },
+                    rec.data,
+                    this.idContenedor,
+                    'DocumentoWf'
+        )
+    },
 	
 	bdel:true,
 	bsave:false,
