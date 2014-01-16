@@ -264,3 +264,16 @@ ALTER TABLE adq.tcotizacion
 
 /***********************************F-SCP-RAC-ADQ-0-17/01/2014****************************************/
 
+
+/***********************************I-SCP-RAC-ADQ-0-26/01/2014****************************************/
+
+--------------- SQL ---------------
+
+ALTER TABLE adq.tsolicitud
+  ADD COLUMN id_proveedor INTEGER;
+
+COMMENT ON COLUMN adq.tsolicitud.id_proveedor
+IS 'almacena el proveedor de la precotizacion';
+
+/***********************************F-SCP-RAC-ADQ-0-26/01/2014****************************************/
+

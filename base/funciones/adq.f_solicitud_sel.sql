@@ -167,7 +167,9 @@ BEGIN
                         sol.numero,
                         funrpc.desc_funcionario1 as desc_funcionario_rpc,
                         '||v_strg_obs||', 
-                        sol.instruc_rpc
+                        sol.instruc_rpc,
+                        pro.desc_proveedor,
+                        sol.id_proveedor
                         	
 						from adq.tsolicitud sol
 						inner join segu.tusuario usu1 on usu1.id_usuario = sol.id_usuario_reg
@@ -184,6 +186,7 @@ BEGIN
                         inner join orga.vfuncionario funa on funa.id_funcionario = sol.id_funcionario_aprobador
                         
 						left join segu.tusuario usu2 on usu2.id_usuario = sol.id_usuario_mod
+                        left join param.vproveedor pro on pro.id_proveedor = sol.id_proveedor
                         '||v_inner||'   
                         where  '||v_filtro;
 			
@@ -285,6 +288,7 @@ BEGIN
                         inner join orga.vfuncionario funa on funa.id_funcionario = sol.id_funcionario_aprobador
                         
 						left join segu.tusuario usu2 on usu2.id_usuario = sol.id_usuario_mod
+                        left join param.vproveedor pro on pro.id_proveedor = sol.id_proveedor
 				       '||v_inner||'   
                         
 				        where  '||v_filtro;

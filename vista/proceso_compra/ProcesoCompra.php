@@ -452,15 +452,15 @@ Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
 	loadCheckDocumentosSol:function() {
             var rec=this.sm.getSelected();
             rec.data.nombreVista = this.nombreVista;
-            Phx.CP.loadWindows('../../../sis_adquisiciones/vista/documento_sol/ChequeoDocumentoSol.php',
-                    'Chequeo de documentos de la solicitud',
+            Phx.CP.loadWindows('../../../sis_workflow/vista/documento_wf/DocumentoWf.php',
+                    'Chequear documento del WF',
                     {
                         width:700,
                         height:450
                     },
                     rec.data,
                     this.idContenedor,
-                    'ChequeoDocumentoSol'
+                    'DocumentoWf'
         )
     },
 	

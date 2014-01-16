@@ -62,6 +62,10 @@ DECLARE
     v_id_estado_wf_ant  integer;
     v_registros record;
     v_id_usuario integer;
+    v_id_proveedor integer;
+    v_hstore_coti  public.hstore;
+    
+    v_id_moneda  integer;
 			    
 BEGIN
 
@@ -86,12 +90,16 @@ BEGIN
             s.id_estado_wf,
             s.id_proceso_wf,
             s.estado,
-            s.id_funcionario
+            s.id_funcionario,
+            s.id_proveedor,
+            s.id_moneda
           into
            v_id_estado_wf_sol,
            v_id_proceso_wf_sol,
            v_estado_sol,
-           v_id_funcionario
+           v_id_funcionario,
+           v_id_proveedor,
+           v_id_moneda
           from adq.tsolicitud s
           where s.id_solicitud = v_parametros.id_solicitud;
         
@@ -243,6 +251,38 @@ BEGIN
 			null
 							
 			)RETURNING id_proceso_compra into v_id_proceso_compra;
+            
+            
+            --chequear que si la solicitud de compra tiene proveedor 
+            
+            IF v_id_proveedor is not NULL THEN
+            
+              --si tienes proveedor registra una cotizacion
+            
+              v_hstore_coti =   hstore(ARRAY['id_proceso_compra',v_id_proceso_compra::varchar,
+                                             'id_proveedor', v_id_proveedor::varchar,
+                                             'nro_contrato',NULL::varchar,
+                                             'lugar_entrega',NULL::varchar,
+                                             'tipo_entrega',NULL::varchar,
+                                             'fecha_coti',NULL::varchar,
+                                             'fecha_entrega',NULL::varchar,
+                                             'id_moneda',v_id_moneda::varchar,
+                                             'fecha_venc',NULL::varchar,
+                                             'tipo_cambio_conv',NULL::varchar,
+                                             'obs','generado a partir de la precotización',
+                                             'fecha_adju',NULL::varchar,
+                                             'nro_contrato',NULL::varchar
+                                             ]);
+            
+           
+               v_resp = adq.f_inserta_cotizacion(p_administrador, p_id_usuario,v_hstore_coti);
+                
+               
+            
+            END IF;
+            
+            
+            
 			
 			--Definicion de la respuesta
 			v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Proceso de Compra almacenado(a) con exito (id_proceso_compra'||v_id_proceso_compra||')'); 
