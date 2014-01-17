@@ -100,10 +100,12 @@ BEGIN
                   inner join param.tconcepto_ingas cin
                   on cin.id_concepto_ingas = sdet.id_concepto_ingas
                   where cdet.id_cotizacion = p_id_cotizacion
-                  and lower(cin.tipo) = 'bien'and lower(cin.activo_fijo) = 'si' and lower(cin.almacenable) = 'no') then
+                  and lower(cin.tipo) = 'bien'
+                  and lower(cin.activo_fijo) = 'si' 
+                  and lower(cin.almacenable) = 'no') then
         v_af = 1;
     end if;
-    
+
     if v_alm + v_af = 0 then
     	raise exception 'La cotización no tiene ningún Bien Almacenable ni Activo Fijo. Nada que hacer.';
     end if;
@@ -138,7 +140,7 @@ BEGIN
         id_preingreso, id_cotizacion_det, cantidad_det, precio_compra
         )
         select
-         p_id_usuario, now(),'activo',
+        p_id_usuario, now(),'activo',
         v_id_preingreso,cdet.id_cotizacion_det, cdet.cantidad_adju, cdet.precio_unitario_mb
         from adq.tcotizacion_det cdet
         inner join adq.tsolicitud_det sdet
@@ -161,12 +163,14 @@ BEGIN
         null, v_id_estado_wf, v_id_proceso_wf, v_codigo_estado, v_id_moneda,
         'activo_fijo'
         ) returning id_preingreso into v_id_preingreso;
-        
+
         --Generación del detalle del preingreso de activo fijo
         insert into alm.tpreingreso_det(
+        id_usuario_reg, fecha_reg, estado_reg,
         id_preingreso, id_cotizacion_det, cantidad_det, precio_compra
         )
         select
+        p_id_usuario, now(),'activo',        
         v_id_preingreso,cdet.id_cotizacion_det, cdet.cantidad_adju, cdet.precio_unitario_mb
         from adq.tcotizacion_det cdet
         inner join adq.tsolicitud_det sdet
