@@ -66,6 +66,8 @@ DECLARE
     v_hstore_coti  public.hstore;
     
     v_id_moneda  integer;
+    
+    v_tipo_cambio  numeric;
 			    
 BEGIN
 
@@ -257,6 +259,17 @@ BEGIN
             
             IF v_id_proveedor is not NULL THEN
             
+            
+              --tipo de cambio
+              
+              v_tipo_cambio =  param.f_get_tipo_cambio(v_id_moneda, now()::date, 'O');
+              
+              IF  v_tipo_cambio is NULL  THEN
+              
+                raise exception 'No existe tipo de cambio para la fecha %',  now();
+              
+              END IF;
+            
               --si tienes proveedor registra una cotizacion
             
               v_hstore_coti =   hstore(ARRAY['id_proceso_compra',v_id_proceso_compra::varchar,
@@ -264,11 +277,11 @@ BEGIN
                                              'nro_contrato',NULL::varchar,
                                              'lugar_entrega',NULL::varchar,
                                              'tipo_entrega',NULL::varchar,
-                                             'fecha_coti',NULL::varchar,
+                                             'fecha_coti',(now()::date)::varchar,
                                              'fecha_entrega',NULL::varchar,
                                              'id_moneda',v_id_moneda::varchar,
                                              'fecha_venc',NULL::varchar,
-                                             'tipo_cambio_conv',NULL::varchar,
+                                             'tipo_cambio_conv',1::varchar,
                                              'obs','generado a partir de la precotización',
                                              'fecha_adju',NULL::varchar,
                                              'nro_contrato',NULL::varchar

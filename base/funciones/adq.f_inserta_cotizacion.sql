@@ -67,6 +67,9 @@ DECLARE
    v_id_documento_wf_co integer;
    v_id_documento_wf_pc integer;
    v_extension  varchar;
+   
+   v_tipo_cambio_conv numeric;
+   v_precio_unitario_mb_coti   numeric;
  
     
     
@@ -379,6 +382,9 @@ BEGIN
              
              END IF;
             
+           --recupera tipo de cambio 
+           v_tipo_cambio_conv = (p_hstore_cotizacion->'tipo_cambio_conv')::numeric;
+            
             
            FOR v_registros in  SELECT
                sd.id_solicitud_det,
@@ -390,11 +396,15 @@ BEGIN
                   IF v_sw_precoti THEN
                     v_cant_of = v_registros.cantidad;
                     v_prec_of = v_registros.precio_unitario;
+                    
+                    --  calcular el precio unitario en moneda base
+                    v_precio_unitario_mb_coti= v_registros.precio_unitario*v_tipo_cambio_conv;
                   
                   ELSE
                   
                     v_cant_of = 0;
                     v_prec_of = 0;
+                    v_precio_unitario_mb_coti = 0;
                   
                   END IF;
                   
@@ -410,7 +420,8 @@ BEGIN
                     id_solicitud_det,
                     precio_unitario,
                     cantidad_coti,
-                    cantidad_adju
+                    cantidad_adju,
+                    precio_unitario_mb
                    ) 
                   VALUES (
                     p_id_usuario,
@@ -420,7 +431,8 @@ BEGIN
                     v_registros.id_solicitud_det,-- :id_solicitud_det,
                     v_prec_of,--:precio_unitario,
                     v_cant_of,--:cantidad_coti,
-                    0   --cantidad_aduj
+                    0,   --cantidad_aduj
+                    v_precio_unitario_mb_coti
                     );
             
             END LOOP;
