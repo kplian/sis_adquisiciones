@@ -281,7 +281,7 @@ BEGIN
                                              'fecha_entrega',NULL::varchar,
                                              'id_moneda',v_id_moneda::varchar,
                                              'fecha_venc',NULL::varchar,
-                                             'tipo_cambio_conv',1::varchar,
+                                             'tipo_cambio_conv',v_tipo_cambio::varchar,
                                              'obs','generado a partir de la precotización',
                                              'fecha_adju',NULL::varchar,
                                              'nro_contrato',NULL::varchar

@@ -208,3 +208,5 @@ CREATE INDEX tsolicitud_idx2 ON adq.tsolicitud
 CREATE INDEX tsolicitud_idx3 ON adq.tsolicitud
   USING btree (id_uo);    
 /***********************************F-DEP-RAC-ADQ-0-26/01/2014****************************************/
+
+
