@@ -111,6 +111,7 @@ Phx.vista.Proveedor=Ext.extend(Phx.gridInterfaz,{
 	   				allowBlank:true,
 	   				origen:'PERSONA',
 	   				gdisplayField:'nombre_completo1',
+	   				baseParams:{no_es_proveedor:'si'},
 	   			    gwidth:200,	
 	   			    renderer:function (value, p, record){return String.format('{0}', record.data['nombre_completo1']);}
    			
@@ -130,6 +131,7 @@ Phx.vista.Proveedor=Ext.extend(Phx.gridInterfaz,{
 	   				origen:'INSTITUCION',
 	   				gdisplayField:'nombre',
 	   			    gwidth:200,	
+	   			    baseParams:{no_es_proveedor:'si'},
 	   			   	renderer:function (value, p, record){return String.format('{0}', record.data['nombre']);}
    			
 	   			  },
@@ -833,7 +835,7 @@ Phx.vista.Proveedor=Ext.extend(Phx.gridInterfaz,{
 	onButtonEdit:function(){
 		datos=this.sm.getSelected().data;
 		Phx.vista.Proveedor.superclass.onButtonEdit.call(this); //sobrecarga enable select
-		if(datos.tipo=='persona'){
+		if(datos.id_persona != '' && datos.id_persona != undefined){
 			//this.ocultarComponente(this.getComponente('id_institucion'));
 			var cmbPer = this.getComponente('id_persona');
 			cmbPer.enable();
