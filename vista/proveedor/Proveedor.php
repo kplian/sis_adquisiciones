@@ -47,6 +47,7 @@ Phx.vista.Proveedor=Ext.extend(Phx.gridInterfaz,{
 	iniciarEventos : function () {
 		Phx.vista.Proveedor.superclass.iniciarEventos.call();
 		this.getComponente('id_persona').on('select',function(c,r,n){
+			
 			if (this.register != 'update') {
 				this.blockGroup(1);
 				this.getComponente('nombre').setDisabled(false);
@@ -791,6 +792,10 @@ Phx.vista.Proveedor=Ext.extend(Phx.gridInterfaz,{
 		Phx.vista.Proveedor.superclass.onButtonNew.call(this);
 		this.getComponente('id_institucion').disable();
 		this.getComponente('id_persona').disable();
+		this.Cmp.id_persona.store.baseParams.no_es_proveedor = 'si';
+		this.Cmp.id_institucion.store.baseParams.no_es_proveedor = 'si';
+		this.Cmp.id_institucion.modificado = true;
+		this.Cmp.id_persona.modificado = true;
 		
 		this.ocultarGrupo(1);
 		this.ocultarGrupo(2);	
@@ -836,6 +841,10 @@ Phx.vista.Proveedor=Ext.extend(Phx.gridInterfaz,{
 	},
 	
 	onButtonEdit:function(){
+		this.Cmp.id_persona.store.baseParams.no_es_proveedor = '';
+		this.Cmp.id_institucion.store.baseParams.no_es_proveedor = '';
+		this.Cmp.id_persona.store.baseParams.query = '';
+		this.Cmp.id_institucion.store.baseParams.query = '';
 		this.register='update';
 		
 		datos=this.sm.getSelected().data;
@@ -863,6 +872,7 @@ Phx.vista.Proveedor=Ext.extend(Phx.gridInterfaz,{
 			this.mostrarGrupo(1);
 			this.ocultarGrupo(2);
 			this.unblockGroup(1);
+			
 			
 			//this.ocultarComponente(this.getComponente('tipo'));
 			//this.getComponente('tipo').setValue(datos.tipo);
