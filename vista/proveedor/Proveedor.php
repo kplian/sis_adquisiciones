@@ -62,6 +62,7 @@ Phx.vista.Proveedor=Ext.extend(Phx.gridInterfaz,{
 			this.getComponente('nombre').setValue(r.data.nombre);
 			this.getComponente('apellido_paterno').setValue(r.data.ap_paterno);
 			this.getComponente('fecha_nacimiento').setValue(r.data.fecha_nacimiento);
+			this.getComponente('direccion').setValue(r.data.direccion);
 			this.getComponente('genero').setValue(r.data.genero);
 			this.getComponente('apellido_materno').setValue(r.data.ap_materno);
 			this.getComponente('correo').setValue(r.data.correo);
