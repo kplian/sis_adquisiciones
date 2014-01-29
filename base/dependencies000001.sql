@@ -153,3 +153,60 @@ ALTER TABLE adq.tcategoria_compra
   
 /***********************************F-DEP-JRR-ADQ-104-04/04/2013****************************************/
 
+
+
+
+/***********************************I-DEP-RAC-ADQ-0-26/01/2014****************************************/
+
+--------------- SQL ---------------
+
+ALTER TABLE adq.tproceso_compra
+  ADD CONSTRAINT fk_tproceso_compra__id_estado_wf FOREIGN KEY (id_estado_wf)
+    REFERENCES wf.testado_wf(id_estado_wf)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+    NOT DEFERRABLE;
+
+
+--------------- SQL ---------------
+
+ALTER TABLE adq.tsolicitud
+  ADD CONSTRAINT fk_tsolicitud__id_proveedor FOREIGN KEY (id_proveedor)
+    REFERENCES param.tproveedor(id_proveedor)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+    NOT DEFERRABLE;
+
+--------------- SQL ---------------
+
+ALTER TABLE adq.tsolicitud
+  ADD CONSTRAINT fk_tsolicitud__id_uo FOREIGN KEY (id_uo)
+    REFERENCES orga.tuo(id_uo)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+    NOT DEFERRABLE;
+
+
+--------------- SQL ---------------
+
+CREATE INDEX tsolicitud_idx ON adq.tsolicitud
+  USING btree (id_funcionario);
+  
+  
+ --------------- SQL ---------------
+
+CREATE INDEX tsolicitud_idx1 ON adq.tsolicitud
+  USING btree (id_estado_wf);
+  
+ --------------- SQL ---------------
+
+CREATE INDEX tsolicitud_idx2 ON adq.tsolicitud
+  USING btree (id_proceso_wf);
+  
+--------------- SQL ---------------
+
+CREATE INDEX tsolicitud_idx3 ON adq.tsolicitud
+  USING btree (id_uo);    
+/***********************************F-DEP-RAC-ADQ-0-26/01/2014****************************************/
+
+

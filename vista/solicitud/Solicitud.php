@@ -6,7 +6,6 @@
 *@date 19-02-2013 12:12:51
 *@description Archivo con la interfaz de usuario que permite la ejecucion de todas las funcionalidades del sistema
 */
-
 header("content-type: text/javascript; charset=UTF-8");
 ?>
 <script>
@@ -29,17 +28,7 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
   
         this.addButton('diagrama_gantt',{text:'',iconCls: 'bgantt',disabled:true,handler:diagramGantt,tooltip: '<b>Diagrama Gantt de proceso macro</b>'});
   
-	    this.addButton('btnChequeoDocumentos',
-            {
-                text: 'Chequear Documentos',
-                iconCls: 'bchecklist',
-                disabled: true,
-                handler: this.loadCheckDocumentosSol,
-                tooltip: '<b>Documentos de la Solicitud</b><br/>Subir los documetos requeridos en la solicitud seleccionada.'
-            }
-        );
-        
-        
+	 
         this.addButton('btnChequeoDocumentosWf',
             {
                 text: 'Chequear Documentos',
@@ -91,6 +80,21 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
             },
             type:'Field',
             form:true 
+        },
+        {
+            config:{
+                name: 'num_tramite',
+                fieldLabel: 'Tramite',
+                allowBlank: true,
+                anchor: '80%',
+                gwidth: 150,
+                maxLength:200
+            },
+            type:'TextField',
+            filters:{pfiltro:'sol.num_tramite',type:'string'},
+            id_grupo:1,
+            grid:true,
+            form:false
         },{
 			config:{
 				name: 'estado',
@@ -425,21 +429,25 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
 			grid: true,
 			form: true
 		},
-		{
-			config:{
-				name: 'num_tramite',
-				fieldLabel: 'Tramite',
-				allowBlank: true,
-				anchor: '80%',
-				gwidth: 150,
-				maxLength:200
-			},
-			type:'TextField',
-			filters:{pfiltro:'sol.num_tramite',type:'string'},
-			id_grupo:1,
-			grid:true,
-			form:false
-		},
+         {
+            config:{
+                name:'id_proveedor',
+                hiddenName: 'id_proveedor',
+                origen:'PROVEEDOR',
+                fieldLabel:'Prov. Precoti.',
+                allowBlank:true,
+                tinit:false,
+                gwidth:200,
+                valueField: 'id_proveedor',
+                gdisplayField: 'desc_proveedor',
+                renderer:function(value, p, record){return String.format('{0}', record.data['desc_proveedor']);}
+             },
+            type:'ComboRec',//ComboRec
+            id_grupo:0,
+            filters:{pfiltro:'pro.desc_proveedor',type:'string'},
+            grid:true,
+            form:true
+        },
 		{
 			config:{
 				name: 'extendida',
@@ -580,25 +588,12 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
 		'desc_proceso_macro',
 		'desc_categoria_compra',
 		'id_proceso_macro',
-		'obs','instruc_rpc'
+		'obs','instruc_rpc','desc_proveedor','id_proveedor'
 		
 	],
 	
 	
-   loadCheckDocumentosSol:function() {
-            var rec=this.sm.getSelected();
-            rec.data.nombreVista = this.nombreVista;
-            Phx.CP.loadWindows('../../../sis_adquisiciones/vista/documento_sol/ChequeoDocumentoSol.php',
-                    'Chequeo de documentos de la solicitud',
-                    {
-                        width:700,
-                        height:450
-                    },
-                    rec.data,
-                    this.idContenedor,
-                    'ChequeoDocumentoSol'
-        )
-    },
+
     
     loadCheckDocumentosSolWf:function() {
             var rec=this.sm.getSelected();
@@ -620,7 +615,7 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
       var tb =this.tbar;
        
         
-        this.getBoton('btnChequeoDocumentos').setDisabled(false);
+        //this.getBoton('btnChequeoDocumentos').setDisabled(false);
         this.getBoton('btnChequeoDocumentosWf').setDisabled(false);
         
 
@@ -634,7 +629,7 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
         if(tb){
            
             this.getBoton('btnReporte').setDisabled(true);
-            this.getBoton('btnChequeoDocumentos').setDisabled(true);
+            //this.getBoton('btnChequeoDocumentos').setDisabled(true);
             this.getBoton('btnChequeoDocumentosWf').setDisabled(true);
             this.getBoton('diagrama_gantt').disable();           
         }
@@ -681,5 +676,4 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
 	bsave:false
 	}
 )
-</script>	
-		
+</script>

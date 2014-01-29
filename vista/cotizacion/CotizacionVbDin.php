@@ -65,16 +65,7 @@ Phx.vista.CotizacionVbDin = {
           });
           
           
-          
-          this.addButton('btnChequeoDocumentos',
-            {
-                text: 'Chequear Documentos',
-                iconCls: 'bchecklist',
-                disabled: true,
-                handler: this.loadCheckDocumentosSol,
-                tooltip: '<b>Documentos del Proceso</b><br/>Subir los documetos requeridos en el proceso seleccionada.'
-            }
-        );
+        
         
         this.addButton('btnReporte',{
             text :'Sol Comp.',
@@ -399,20 +390,7 @@ Phx.vista.CotizacionVbDin = {
         },
         
         
-        loadCheckDocumentosSol:function() {
-            var rec=this.sm.getSelected();
-            rec.data.nombreVista = this.nombreVista;
-            Phx.CP.loadWindows('../../../sis_adquisiciones/vista/documento_sol/ChequeoDocumentoSol.php',
-                    'Chequeo de documentos de la solicitud',
-                    {
-                        width:700,
-                        height:450
-                    },
-                    rec.data,
-                    this.idContenedor,
-                    'ChequeoDocumentoSol'
-        	)
-    	},
+       
     	
     	onCuadroComparativo: function(){
 			var rec=this.sm.getSelected();
@@ -487,7 +465,7 @@ Phx.vista.CotizacionVbDin = {
           this.getBoton('ant_estado').disable();
           this.getBoton('btnGenOC').disable();
           this.getBoton('btnCuadroComparativo').enable(); 
-          this.getBoton('btnChequeoDocumentos').enable(); 
+         
           this.getBoton('btnReporte').enable(); 
           this.getBoton('btnRepOC').enable();
           this.getBoton('diagrama_gantt').enable();
@@ -522,7 +500,7 @@ Phx.vista.CotizacionVbDin = {
                this.getBoton('btnReporte').enable();  
                this.getBoton('ant_estado').enable();
                this.getBoton('btnRepOC').enable(); 
-               this.getBoton('btnChequeoDocumentos').enable(); 
+              
                this.getBoton('btnChequeoDocumentosWf').enable(); 
           
           } 
@@ -542,7 +520,7 @@ Phx.vista.CotizacionVbDin = {
             this.getBoton('ant_estado').disable();
             this.getBoton('btnRepOC').disable(); 
             this.getBoton('btnReporte').disable();  
-            this.getBoton('btnChequeoDocumentos').disable(); 
+            
             this.getBoton('diagrama_gantt').disable();
             this.getBoton('btnChequeoDocumentosWf').disable(); 
             

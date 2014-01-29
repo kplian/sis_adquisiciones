@@ -47,19 +47,35 @@ Phx.vista.Proveedor=Ext.extend(Phx.gridInterfaz,{
 	iniciarEventos : function () {
 		Phx.vista.Proveedor.superclass.iniciarEventos.call();
 		this.getComponente('id_persona').on('select',function(c,r,n){
-					this.blockGroup(1);
-					this.getComponente('ci').setValue(r.data.ci);
-					this.getComponente('nombre').setValue(r.data.nombre);
-					this.getComponente('apellido_paterno').setValue(r.data.ap_paterno);
-					this.getComponente('apellido_materno').setValue(r.data.ap_materno);
-					this.getComponente('celular1').setValue(r.data.celular1);
-					this.getComponente('celular2').setValue(r.data.celular2);
-					this.getComponente('telefono1').setValue(r.data.telefono1);
-					this.getComponente('telefono2').setValue(r.data.telefono2);
-					this.register='before_registered';
+			if (this.register != 'update') {
+				this.blockGroup(1);
+				this.getComponente('nombre').setDisabled(false);
+				this.getComponente('apellido_paterno').setDisabled(false);
+				this.getComponente('apellido_materno').setDisabled(false);
+			} else {
+				this.getComponente('nombre').setDisabled(true);
+				this.getComponente('apellido_paterno').setDisabled(true);
+				this.getComponente('apellido_materno').setDisabled(true);
+			}
+			this.getComponente('ci').setValue(r.data.ci);
+			this.getComponente('nombre').setValue(r.data.nombre);
+			this.getComponente('apellido_paterno').setValue(r.data.ap_paterno);
+			this.getComponente('apellido_materno').setValue(r.data.ap_materno);
+			this.getComponente('correo').setValue(r.data.correo);
+			this.getComponente('celular1').setValue(r.data.celular1);
+			this.getComponente('celular2').setValue(r.data.celular2);
+			this.getComponente('telefono1').setValue(r.data.telefono1);
+			this.getComponente('telefono2').setValue(r.data.telefono2);
+			this.register='before_registered';
 			},this);
 		this.getComponente('id_institucion').on('select',function(c,r,n){
-			this.blockGroup(2);
+			if (this.register != 'update') {
+				this.blockGroup(2);
+				this.getComponente('nombre_institucion').setDisabled(false);
+			} else {
+				this.getComponente('nombre_institucion').setDisabled(true);
+			}
+			
 			this.getComponente('nombre_institucion').setValue(r.data.nombre);
 			this.getComponente('doc_id').setValue(r.data.doc_id);
 			this.getComponente('codigo_institucion').setValue(r.data.codigo);
@@ -107,7 +123,7 @@ Phx.vista.Proveedor=Ext.extend(Phx.gridInterfaz,{
 	   				name:'id_persona',
 	   				fieldLabel: 'Persona',
 	   				anchor: '100%',
-	   				tinit:true,
+	   				tinit:false,
 	   				allowBlank:true,
 	   				origen:'PERSONA',
 	   				gdisplayField:'nombre_completo1',
@@ -125,7 +141,7 @@ Phx.vista.Proveedor=Ext.extend(Phx.gridInterfaz,{
 	   				name:'id_institucion',
 	   				fieldLabel: 'Institucion',
 	   				anchor: '100%',
-	   				tinit:true,
+	   				tinit:false,
 	   				allowBlank:true,
 	   				origen:'INSTITUCION',
 	   				gdisplayField:'nombre',
@@ -147,7 +163,8 @@ Phx.vista.Proveedor=Ext.extend(Phx.gridInterfaz,{
 				allowBlank: true,
 				anchor: '100%',
 				gwidth: 100,
-				maxLength:50
+				maxLength:50,
+				disabled:true
 			},
 			type:'TextField',
 			filters:{pfiltro:'provee.codigo',type:'string'},
@@ -155,21 +172,7 @@ Phx.vista.Proveedor=Ext.extend(Phx.gridInterfaz,{
 			grid:true,
 			form:true
 		},
-		{
-			config:{
-				name: 'nit',
-				fieldLabel: 'NIT',
-				allowBlank: false,
-				anchor: '100%',
-				gwidth: 100,
-				maxLength:12
-			},
-			type:'NumberField',
-			filters:{pfiltro:'provee.nit',type:'string'},
-			id_grupo:0,
-			grid:true,
-			form:true
-		},
+		
 		{
 			config:{
 				name: 'numero_sigma',
@@ -831,12 +834,15 @@ Phx.vista.Proveedor=Ext.extend(Phx.gridInterfaz,{
 	},
 	
 	onButtonEdit:function(){
+		this.register='update';
+		
 		datos=this.sm.getSelected().data;
 		Phx.vista.Proveedor.superclass.onButtonEdit.call(this); //sobrecarga enable select
-		if(datos.tipo=='persona'){
+		
+		if(datos.id_persona !='' && datos.id_persona !=undefined){
 			//this.ocultarComponente(this.getComponente('id_institucion'));
 			var cmbPer = this.getComponente('id_persona');
-			cmbPer.enable();
+			//cmbPer.enable();
 			cmbPer.getStore().setBaseParam('id_persona',cmbPer.getValue());
 			cmbPer.getStore().load({ params : cmbPer.getParams() ,
 		       callback : function (r) {	       				
@@ -846,23 +852,23 @@ Phx.vista.Proveedor=Ext.extend(Phx.gridInterfaz,{
 	    			}     
 		    			    		
 		    	}, scope : this});
-			cmbPer.getStore().setBaseParam('id_persona','');
-			
+			cmbPer.getStore().setBaseParam('id_persona','');			
 			
 			//this.getComponente('id_institucion').allowBlank=true;
-			this.getComponente('id_institucion').reset();
-			this.getComponente('id_institucion').disable();
+			this.getComponente('id_institucion').reset();			
 			this.mostrarComponente(this.getComponente('id_persona'));
 			this.ocultarComponente(this.getComponente('id_institucion'));
 			this.mostrarGrupo(1);
 			this.ocultarGrupo(2);
+			this.unblockGroup(1);
+			
 			//this.ocultarComponente(this.getComponente('tipo'));
 			//this.getComponente('tipo').setValue(datos.tipo);
 		}else{
 			
 			//this.getComponente('id_persona').allowBlank=true;
 			var cmbIns = this.getComponente('id_institucion');
-			cmbIns.enable();
+			//cmbIns.enable();
 			cmbIns.getStore().setBaseParam('id_institucion',cmbIns.getValue());
 			cmbIns.getStore().load({ params : cmbIns.getParams() ,
 		       callback : function (r) {	       				
@@ -874,17 +880,18 @@ Phx.vista.Proveedor=Ext.extend(Phx.gridInterfaz,{
 		    	}, scope : this});
 			cmbIns.getStore().setBaseParam('id_institucion','');
 			this.getComponente('id_persona').reset();
-			this.getComponente('id_persona').disable();
 			this.ocultarComponente(this.getComponente('id_persona'));
 			this.mostrarComponente(this.getComponente('id_institucion'));
 			this.mostrarGrupo(2);
 			this.ocultarGrupo(1);
+			this.unblockGroup(2);
 			//this.ocultarComponente(this.getComponente('tipo'));
 			//this.getComponente('tipo').setValue(datos.tipo);
 		 
 			
 		}
-		
+		this.getComponente('id_persona').disable();
+		this.getComponente('id_institucion').disable();
 	},
 	
 	fheight: '95%',
