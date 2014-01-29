@@ -470,7 +470,7 @@ Phx.vista.SolicitudDet=Ext.extend(Phx.gridInterfaz,{
 		'nombre_auxiliar',
 		'desc_concepto_ingas',
         'desc_orden_trabajo',
-        'revertido_mb'
+        'revertido_mb','revertido_mo'
 		
 	],
 	sortInfo:{

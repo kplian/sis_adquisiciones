@@ -118,6 +118,8 @@ DECLARE
       v_fecha_coti date;
       
       v_instruc_rpc varchar;
+      
+      v_total_costo_mo numeric;
      
 			    
 BEGIN
@@ -332,25 +334,33 @@ BEGIN
                                    cd.cantidad_coti,
                                    cd.cantidad_adju,
                                    sd.precio_unitario_mb as precio_unitario_mb_sol,
-                                   cd.precio_unitario_mb as precio_unitario_mb_coti,
+                                   cd.precio_unitario as precio_unitario_coti,
+                                   sd.precio_unitario_mb as precio_unitario_mb_sol,
+                                   cd.precio_unitario as precio_unitario_coti,
                                    sd.revertido_mb,
                                    sd.precio_ga_mb,
                                    sd.precio_sg_mb,
-                                   sd.id_partida_ejecucion
+                                   sd.revertido_mo,
+                                   sd.precio_ga,
+                                   sd.precio_sg,
+                                   sd.id_partida_ejecucion,
+                                   s.id_moneda
                                  from adq.tcotizacion_det cd 
                                  inner join adq.tsolicitud_det sd on sd.id_solicitud_det = cd.id_solicitud_det and cd.estado_reg = 'activo'
+                                 inner join adq.tsolicitud s on s.id_solicitud = sd.id_solicitud
                                  where  cd.id_cotizacion = v_parametros.id_cotizacion and cd.estado_reg = 'activo') LOOP
                                  
             
-            
+               
                v_total_adj = adq.f_calcular_total_adj_cot_det(v_registros.id_cotizacion_det);
-               v_total_costo_mb= adq.f_calcular_total_costo_mb_adj_cot_det(v_registros.id_cotizacion_det);
+               -- RAC  29/01/2014, se aumenta el parametro tipo de moneda MO o MB
+               v_total_costo_mo= adq.f_calcular_total_costo_mb_adj_cot_det(v_registros.id_cotizacion_det, 'MO');
             
                --si ya tien item adjudicados no se los toca
                 IF v_registros.cantidad_adju = 0   THEN
                 
                       --si el precio oferta es menor que el precio referencial
-                      IF v_registros.precio_unitario_mb_sol >= v_registros.precio_unitario_mb_coti THEN
+                      IF v_registros.precio_unitario_sol >= v_registros.precio_unitario_coti THEN
                 
                           IF  (v_registros.cantidad - v_total_adj) <  v_registros.cantidad_coti THEN
                           
@@ -367,26 +377,26 @@ BEGIN
                                  v_comprometido_ga=0;
                                  v_ejecutado=0;
                                                  
-                                /* SELECT 
+                                 SELECT 
                                        COALESCE(ps_comprometido,0), 
                                        COALESCE(ps_ejecutado,0)  
                                    into 
                                        v_comprometido_ga,    --esta en moneda base
                                        v_ejecutado
-                                 FROM pre.f_verificar_com_eje_pag(v_registros.id_partida_ejecucion, v_id_moneda_base);*/
+                                 FROM pre.f_verificar_com_eje_pag(v_registros.id_partida_ejecucion, v_registros.id_moneda);
                                 
                                  --validamos que el total revertido no afecte la adjudicacion            
                                  --en caso contrario no se adjudicada nada
-                              --  IF  ((v_comprometido_ga + COALESCE(v_registros.precio_sg_mb,0)) - v_total_costo_mb)  >= (v_cantidad_adjudicada * v_registros.precio_unitario_mb_coti)   THEN
+                                IF  ((v_comprometido_ga + COALESCE(v_registros.precio_sg,0)) - v_total_costo_mo)  >= (v_cantidad_adjudicada * v_registros.precio_unitario_coti)   THEN
                                      
                                      update adq.tcotizacion_det set
                                      cantidad_adju = v_cantidad_adjudicada
                                      where id_cotizacion_det = v_registros.id_cotizacion_det;
                                
                                     v_sw  = TRUE;
-                               -- ELSE
-                              --      v_sw2 = TRUE;
-                              --  END IF;
+                                ELSE
+                                    v_sw2 = TRUE;
+                                END IF;
                                 
                           END IF;
                       

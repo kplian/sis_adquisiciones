@@ -9,7 +9,7 @@ RETURNS boolean AS
 $body$
 /**************************************************************************
  SISTEMA:		Sistema de Adquisiciones
- FUNCION: 		adq.f_gestionar_presupuesto_solicitud
+ FUNadq.f_gestionar_presupuesto_solicitud(p_id_solicitud_compra integer, p_id_usuario integer, p_operacion varchar)CION: 		adq.f_gestionar_presupuesto_solicitud
                 
  DESCRIPCION:   Esta funcion a partir del id SOlicitud de COmpra se encarga de gestion el presupuesto,
                 compromenter
@@ -49,6 +49,7 @@ DECLARE
   v_ejecutado     	    numeric;
   
   v_men_presu			varchar;
+  v_monto_a_revertir_mb  numeric;
   
 
   
@@ -74,7 +75,9 @@ BEGIN
                               sd.id_partida,
                               sd.precio_ga_mb,
                               p.id_presupuesto,
-                              s.presu_comprometido
+                              s.presu_comprometido,
+                              s.id_moneda,
+                              sd.precio_ga
                               
                               FROM  adq.tsolicitud s 
                               INNER JOIN adq.tsolicitud_det sd on s.id_solicitud = sd.id_solicitud
@@ -99,8 +102,8 @@ BEGIN
                     va_id_presupuesto[v_i] = v_registros.id_presupuesto;
                     va_id_partida[v_i]= v_registros.id_partida;
                     va_momento[v_i]	= 1; --el momento 1 es el comprometido
-                    va_monto[v_i]  = v_registros.precio_ga_mb;
-                    va_id_moneda[v_i]  = v_id_moneda_base;
+                    va_monto[v_i]  = v_registros.precio_ga; --RAC Cambio por moneda de la solicitud , v_registros.precio_ga_mb;
+                    va_id_moneda[v_i]  = v_registros.id_moneda;        --  RAC Cambio por moneda de la solicitud , v_id_moneda_base;
                   
                     va_columna_relacion[v_i]= 'id_solicitud_compra';
                     va_fk_llave[v_i] = v_registros.id_solicitud;
@@ -135,7 +138,8 @@ BEGIN
                          id_partida_ejecucion = va_resp_ges[v_cont],
                          fecha_mod = now(),
                          id_usuario_mod = p_id_usuario,
-                         revertido_mb = 0     -- inicializa el monto de reversion 
+                         revertido_mb = 0,     -- inicializa el monto de reversion
+                         revertido_mo = 0     -- inicializa el monto de reversion  
                       where s.id_solicitud_det =  va_id_solicitud_det[v_cont];
                    
                      
@@ -160,7 +164,10 @@ BEGIN
                               sd.precio_ga_mb,
                               p.id_presupuesto,
                               sd.id_partida_ejecucion,
-                              sd.revertido_mb
+                              sd.revertido_mb,
+                              sd.revertido_mo,
+                              s.id_moneda,
+                              sd.precio_ga
                               
                               FROM  adq.tsolicitud s 
                               INNER JOIN adq.tsolicitud_det sd on s.id_solicitud = sd.id_solicitud and sd.estado_reg = 'activo'
@@ -186,7 +193,7 @@ BEGIN
                        into 
                            v_comprometido,
                            v_ejecutado
-                     FROM pre.f_verificar_com_eje_pag(v_registros.id_partida_ejecucion, v_id_moneda_base);
+                     FROM pre.f_verificar_com_eje_pag(v_registros.id_partida_ejecucion,v_registros.id_moneda);   --  RAC,  v_id_moneda_base);
                      
                      
                      v_monto_a_revertir = COALESCE(v_comprometido,0) - COALESCE(v_ejecutado,0);  
@@ -201,7 +208,7 @@ BEGIN
                         va_id_partida[v_i]= v_registros.id_partida;
                         va_momento[v_i]	= 2; --el momento 2 con signo positivo es revertir
                         va_monto[v_i]  = (v_monto_a_revertir)*-1;  -- considera la posibilidad de que a este item se le aya revertido algun monto
-                        va_id_moneda[v_i]  = v_id_moneda_base;
+                        va_id_moneda[v_i]  = v_registros.id_moneda; -- RAC,  v_id_moneda_base;
                         va_id_partida_ejecucion[v_i]= v_registros.id_partida_ejecucion;
                         va_columna_relacion[v_i]= 'id_solicitud_compra';
                         va_fk_llave[v_i] = v_registros.id_solicitud;
@@ -249,8 +256,14 @@ BEGIN
                                       p.id_presupuesto,
                                       sd.id_partida_ejecucion,
                                       sd.revertido_mb,
+                                      sd.revertido_mo,
                                       sd.precio_ga_mb,
-                                      sd.precio_sg_mb
+                                      sd.precio_sg_mb,
+                                      sd.precio_ga,
+                                      sd.precio_sg,
+                                      s.id_moneda,
+                                      s.tipo,
+                                      s.fecha_soli
                                       
                                       FROM  adq.tsolicitud s 
                                       INNER JOIN adq.tsolicitud_det sd on s.id_solicitud = sd.id_solicitud
@@ -271,7 +284,7 @@ BEGIN
                              --  suma la adjdicaciones en diferentes solicitudes  (puede no tener ningna adjudicacion)
             
                                     
-                             select  sum (cd.cantidad_adju* cd.precio_unitario_mb) into v_total_adjudicado
+                             select  sum (cd.cantidad_adju* cd.precio_unitario) into v_total_adjudicado
                              from adq.tcotizacion_det cd
                              where cd.id_solicitud_det = v_registros.id_solicitud_det
                                    and cd.estado_reg = 'activo';
@@ -286,7 +299,7 @@ BEGIN
                                into 
                                    v_comprometido_ga,
                                    v_ejecutado
-                             FROM pre.f_verificar_com_eje_pag(v_registros.id_partida_ejecucion, v_id_moneda_base);
+                             FROM pre.f_verificar_com_eje_pag(v_registros.id_partida_ejecucion, v_registros.id_moneda);
                              
                              
                              v_monto_a_revertir =  v_comprometido_ga - COALESCE(v_total_adjudicado,0);
@@ -303,7 +316,7 @@ BEGIN
                                 va_id_partida[v_i]= v_registros.id_partida;
                                 va_momento[v_i]	= 2; --el momento 2 con signo positivo es revertir
                                 va_monto[v_i]  = (v_monto_a_revertir)*-1;
-                                va_id_moneda[v_i]  = v_id_moneda_base;
+                                va_id_moneda[v_i]  =  v_registros.id_moneda;
                                 va_id_partida_ejecucion[v_i]= v_registros.id_partida_ejecucion;
                                 va_columna_relacion[v_i]= 'id_solicitud_compra';
                                 va_fk_llave[v_i] = v_registros.id_solicitud;
@@ -311,9 +324,21 @@ BEGIN
                                 va_fecha[v_i]=now()::date;
                                 
                                  -- actualizamos  el total revertido
+                                 
+                                 v_monto_a_revertir_mb= param.f_convertir_moneda(
+                                          v_registros.id_moneda, 
+                                          NULL,   --por defecto moenda base
+                                          v_monto_a_revertir, 
+                                          v_registros.fecha_soli, 
+                                          'O',-- tipo oficial, venta, compra 
+                                          NULL);
+                                 
+                                 
+                                 
                                 
                                  UPDATE adq.tsolicitud_det sd set
-                                   revertido_mb = revertido_mb + v_monto_a_revertir
+                                   revertido_mb = revertido_mb + v_monto_a_revertir_mb,
+                                   revertido_mo = revertido_mo + v_monto_a_revertir
                                  WHERE  sd.id_solicitud_det = v_registros.id_solicitud_det;
                      
                              END IF; 

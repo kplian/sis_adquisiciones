@@ -27,6 +27,7 @@ DECLARE
 
 	v_nro_requerimiento    	integer;
 	v_parametros           	record;
+    v_registros 	        record;
 	v_id_requerimiento     	integer;
 	v_resp		            varchar;
 	v_nombre_funcion        text;
@@ -80,6 +81,10 @@ DECLARE
       v_obs text;
       
       v_numero_sol varchar;
+      v_id_subsistema integer;
+      v_id_uo  integer;
+      v_cont  integer;
+      v_mensaje_resp  varchar;
 			    
 BEGIN
 
@@ -378,7 +383,16 @@ BEGIN
         
           IF  v_parametros.operacion = 'verificar' THEN
           
-                  select sum( COALESCE( sd.precio_ga_mb,0)  + COALESCE(sd.precio_sg_mb,0)) into  v_total_soli
+          --  29/01/2014  RAC
+          --  Se quita la opcion de que el solcitante eescoja un RPC en un combo
+          --  en su lugar se configura por defecto el RPC de manea Unica, si deveulve mas de una opcion de RPC
+          --  bota un error
+          
+          
+                  select 
+                  sum( COALESCE( sd.precio_ga_mb,0)  + COALESCE(sd.precio_sg_mb,0)) 
+                  into  
+                  v_total_soli
                   from adq.tsolicitud_det sd
                   where sd.id_solicitud = v_parametros.id_solicitud
                   and sd.estado_reg = 'activo';
@@ -397,124 +411,96 @@ BEGIN
                   
                   END IF;
                   
-                   --Definicion de la respuesta
+                  
+                  --obtiene parametros para definir aprobador
+                  
+                   select 
+                      s.id_subsistema
+                    into 
+                      v_id_subsistema
+                    from segu.tsubsistema s
+                    where s.codigo = 'ADQ'
+                    and s.estado_reg = 'activo' 
+                    limit 1 offset 0; 
+                    
+                    --obener UO, id_proceso_macro y fecha de la solictud
+                    select 
+                     sol.fecha_soli,
+                     sol.id_proceso_macro,
+                     sol.id_uo
+                    INTO
+                     v_fecha_soli,
+                     v_id_proceso_macro,
+                     v_id_uo 
+                    from adq.tsolicitud sol
+                    where sol.id_solicitud = v_parametros.id_solicitud;
+                  
+                  
+                   v_cont = 0;
+                   v_mensaje_resp = '';
+                    --  obtener listado de RPC
+                   	FOR v_registros in (
+                            SELECT 
+                                  DISTINCT (
+                                  id_funcionario),
+                                  desc_funcionario,
+                                  prioridad
+                                  FROM param.f_obtener_listado_aprobadores(
+                                  v_id_uo, --id_uo
+                                  NULL,--p_id_ep,
+                                  NULL,--p_id_centro_costo, 
+                                  v_id_subsistema, --id_subsistema
+                                  v_fecha_soli, 
+                                  v_total_soli,
+                                  p_id_usuario,
+                                  v_id_proceso_macro)
+                                  AS ( id_aprobador integer,
+                                      id_funcionario integer,
+                                      fecha_ini date,
+                                      fecha_fin date,
+                                      desc_funcionario text,
+                                      monto_min numeric,
+                                      monto_max numeric,
+                                      prioridad integer)
+                                  ORDER BY prioridad asc )LOOP     
+                                  
+                     
+                       v_cont = v_cont +1;
+                      
+                       IF v_cont = 1 THEN
+                 
+                         v_resp =  adq.f_finalizar_reg_solicitud(p_administrador, p_id_usuario,v_registros.id_funcionario, v_parametros.id_solicitud);
+                  
+                       END IF;
+                       
+                       v_mensaje_resp = v_mensaje_resp||' - '||v_registros.desc_funcionario||' <br>';
+                   
+                   
+                   
+                   END LOOP;
+                  
+                  
+                  -- si existe mas de un posible aprobador lanzamos un error
+                  IF v_cont > 1 THEN
+                  
+                      raise exception 'Existe mas de un aprobador para el monto (%), revice la configuracion para los funcionarios: <br> %',v_total_soli,v_mensaje_resp;
+                  
+                  
+                  END IF;
+                  
+                  
+                 
+                  
+                --Definicion de la respuesta
                 v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Verificacionde finalizacion)'); 
                 v_resp = pxp.f_agrega_clave(v_resp,'total',v_total_soli::varchar);
               
           
           ELSEIF  v_parametros.operacion = 'finalizar' THEN
           
-          --obtenermos datos basicos
           
-          select
-            s.id_proceso_wf,
-            s.id_estado_wf,
-            s.estado,
-            s.id_funcionario_aprobador,
-            s.numero
-          into 
-          
-            v_id_proceso_wf,
-            v_id_estado_wf,
-            v_codigo_estado,
-            v_id_funcionario_aprobador,
-            v_numero_sol
-            
-          from adq.tsolicitud s
-          where s.id_solicitud=v_parametros.id_solicitud;
-          
-                 
-          
-          
-          --buscamos siguiente estado correpondiente al proceso del WF
-         
-          
-          
-        SELECT 
-             ps_id_tipo_estado,
-             ps_codigo_estado,
-             ps_disparador,
-             ps_regla,
-             ps_prioridad
-          into
-            va_id_tipo_estado,
-            va_codigo_estado,
-            va_disparador,
-            va_regla,
-            va_prioridad
         
-        FROM wf.f_obtener_estado_wf(v_id_proceso_wf, v_id_estado_wf,NULL,'siguiente');
-          
-          --cambiamos estado de la solicitud
-          
-          
-        --     raise exception '% /% /%  /% /%',va_id_tipo_estado[1],va_codigo_estado[1], va_disparador[1], va_regla[1],va_prioridad[1];
-          
-          
-          IF  va_id_tipo_estado[2] is not null  THEN
-           
-            raise exception 'El proceso se encuentra mal parametrizado dentro de Work Flow,  la finalizacion de solicitud solo admite un estado siguiente';
-          
-          END IF;
-          
-          IF  va_id_tipo_estado[1] is  null  THEN
-           
-            raise exception ' El proceso de Work Flow esta mal parametrizado, no tiene un estado siguiente para la finalizacion';
-          
-          END IF;
-          
-            
-          IF  va_disparador[1]='si'  THEN
-           
-            raise exception ' El proceso de Work Flow esta mal parametrizado, antes de iniciar el proceso de compra necesita comprometer el presupuesto';
-          
-          END IF;
-          
-          
-          --registra estado eactual en el WF
-          
-          
-          /*
-            p_id_tipo_estado_siguiente integer,
-            p_id_funcionario integer,
-            p_id_estado_wf_anterior integer,
-            p_id_proceso_wf integer,
-            p_id_usuario integer,
-            p_id_depto integer = NULL::integer,
-            p_obs text = ''::text,
-            p_acceso_directo varchar = ''::character varying,
-            p_clase varchar = NULL::character varying,
-            p_parametros varchar = '{}'::character varying,
-            p_tipo varchar = 'notificacion'::character varying,
-            p_titulo varchar = 'Visto Bueno'::character varying
-          */
-          
-           v_id_estado_actual =  wf.f_registra_estado_wf(va_id_tipo_estado[1], 
-                                                         v_id_funcionario_aprobador, 
-                                                         v_id_estado_wf, 
-                                                         v_id_proceso_wf,
-                                                         p_id_usuario,
-                                                         NULL,
-                                                         'Solicitud a espera de aprobación #'||COALESCE(v_numero_sol,'S/N'),
-                                                         '../../../sis_adquisiciones/vista/solicitud/SolicitudVb.php',
-                                                         'SolicitudVb');
-                                                         
-                                                         
-                                                         
-                                                         
-         
-        
-           -- actualiza estado en la solicitud
-          
-           update adq.tsolicitud  s set 
-             id_estado_wf =  v_id_estado_actual,
-             estado = va_codigo_estado[1],
-             id_funcionario_rpc=v_parametros.id_funcionario_rpc,
-             id_usuario_mod=p_id_usuario,
-             fecha_mod=now()
-           where id_solicitud = v_parametros.id_solicitud;
-        
-        
+             v_resp =  adq.f_finalizar_reg_solicitud(p_administrador, p_id_usuario, v_parametros.id_solicitud.v_parametros.id_funcionario_rpc, v_parametros.id_solicitud);
         
         
          ELSE

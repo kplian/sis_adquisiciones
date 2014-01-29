@@ -505,8 +505,9 @@ Phx.vista.CotizacionDet=Ext.extend(Phx.gridInterfaz,{
 		{name:'usr_mod', type: 'string'},
 		'desc_centro_costo',
         'cantidad_sol',
-        'precio_unitario_sol','revertido_mb',
-        'descripcion_sol','precio_unitario_mb_sol','precio_unitario_mb'],
+        'precio_unitario_sol','revertido_mb','revertido_mo',
+        'descripcion_sol',
+        'precio_unitario_mb_sol','precio_unitario_mb'],
 	sortInfo:{
 		field: 'id_cotizacion_det',
 		direction: 'ASC'

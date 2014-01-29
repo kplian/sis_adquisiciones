@@ -68,7 +68,8 @@ BEGIN
                         sold.descripcion as descripcion_sol,
                         ctd.precio_unitario_mb ,
                         sold.precio_unitario_mb as precio_unitario_mb_sol,
-                        sold.revertido_mb		
+                        sold.revertido_mb,
+                        sold.revertido_mo		
 						from adq.tcotizacion_det ctd
 						inner join segu.tusuario usu1 on usu1.id_usuario = ctd.id_usuario_reg
 						left join segu.tusuario usu2 on usu2.id_usuario = ctd.id_usuario_mod

@@ -63,6 +63,16 @@ DECLARE
      v_ejecutado       numeric;
      
      
+    
+    
+     v_precio_unitario_coti numeric;
+     v_revertido_mo numeric;
+     v_precio_sg numeric;
+     v_precio_ga numeric;
+     v_total_costo_mo numeric;
+     v_id_moneda numeric;
+     
+     
      
 			    
 BEGIN
@@ -321,10 +331,16 @@ BEGIN
                cd.cantidad_adju,
                sd.precio_unitario_mb,
                cd.precio_unitario_mb,
+               sd.precio_unitario,
+               cd.precio_unitario,
                sd.revertido_mb,
+               sd.revertido_mo,
                sd.id_partida_ejecucion,
                sd.precio_sg_mb,
-               sd.precio_ga_mb
+               sd.precio_ga_mb,
+               sd.precio_sg,
+               sd.precio_ga,
+               s.id_moneda
             into 
                v_id_solicitud_det,
                v_cantidad_sol,
@@ -332,18 +348,25 @@ BEGIN
                v_cantidad_adju,
                v_precio_unitario_mb_sol,
                v_precio_unitario_mb_coti,
+               v_precio_unitario_sol,
+               v_precio_unitario_coti,
                v_revertido_mb,
+               v_revertido_mo
                v_id_partida_ejecucion,
                v_precio_sg_mb,
-               v_precio_ga_mb
+               v_precio_ga_mb,
+               v_precio_sg,
+               v_precio_ga,
+               v_id_moneda
             from adq.tsolicitud_det sd
             inner join adq.tcotizacion_det cd on  cd.id_solicitud_det = sd.id_solicitud_det
+            inner join adq.tsolicitud s on s.id_solicitud = sd.id_solicitud
             where cd.id_cotizacion_det = v_parametros.id_cotizacion_det;
             
           --  raise exception 'xxx ,  %, %, %',v_revertido_mb,v_id_solicitud_det, v_parametros.id_cotizacion_det;
             
             
-            IF v_precio_unitario_mb_coti > v_precio_unitario_mb_sol THEN
+            IF v_precio_unitario_coti > v_precio_unitario_sol THEN
             
             
               raise exception  'El precio referencial es menor que el precio cotizado ';
@@ -356,7 +379,7 @@ BEGIN
 			--calcula el total adjudicado en otras cotizaciones
 			
              v_total_adj = adq.f_calcular_total_adj_cot_det(v_parametros.id_cotizacion_det);
-             v_total_costo_mb= adq.f_calcular_total_costo_mb_adj_cot_det(v_parametros.id_cotizacion_det);
+             v_total_costo_mo= adq.f_calcular_total_costo_mb_adj_cot_det(v_parametros.id_cotizacion_det,'MO');
              
              
             
@@ -373,10 +396,7 @@ BEGIN
             
                  IF  v_cantidad_coti >= v_parametros.cantidad_adjudicada THEN
             
-            
-                     
-                     --raise exception '(%*%)- % = %  >= %',v_cantidad_sol,v_precio_unitario_mb_sol,v_revertido_mb,((v_cantidad_sol*v_precio_unitario_mb_sol)- v_revertido_mb - v_total_costo_mb),(v_parametros.cantidad_adjudicada * v_precio_unitario_mb_coti);
-                               
+                      
                      --calcula el comprometido
                      v_comprometido_ga=0;
                      v_ejecutado=0;
@@ -387,10 +407,10 @@ BEGIN
                        into 
                            v_comprometido_ga,    --esta en moneda base
                            v_ejecutado
-                     FROM pre.f_verificar_com_eje_pag(v_id_partida_ejecucion, v_id_moneda_base);
+                     FROM pre.f_verificar_com_eje_pag(v_id_partida_ejecucion, v_id_moneda);
                     
                      --validamos que el total revertido no afecte la adjudicacion 
-                    IF  ((v_comprometido_ga+ COALESCE(v_precio_sg_mb,0)) - v_total_costo_mb)  >= (v_parametros.cantidad_adjudicada * v_precio_unitario_mb_coti)   THEN
+                    IF  ((v_comprometido_ga+ COALESCE(v_precio_sg,0)) - v_total_costo_mo)  >= (v_parametros.cantidad_adjudicada * v_precio_unitario_coti)   THEN
                        
                        update adq.tcotizacion_det set
                        cantidad_adju = v_parametros.cantidad_adjudicada
@@ -398,7 +418,7 @@ BEGIN
                     
                     ELSE
                       
-                       raise exception 'La reversiones realizadas sobre este item no permiten adjudicar a este precio, solo dispone de un total en moneda base de: %',((v_comprometido_ga+ COALESCE(v_precio_sg_mb,0)) - v_total_costo_mb) ;
+                       raise exception 'La reversiones realizadas sobre este item no permiten adjudicar a este precio, solo dispone de un total en moneda base de: %',((v_comprometido_ga+ COALESCE(v_precio_sg,0)) - v_total_costo_mo) ;
                     
                     END IF;
                  

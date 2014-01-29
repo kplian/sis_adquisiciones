@@ -58,6 +58,8 @@ class MODSolicitudDet extends MODbase{
         $this->captura('desc_orden_trabajo','varchar');
          
         $this->captura('revertido_mb','numeric');
+        $this->captura('revertido_mo','numeric');
+        
         $this->captura('id_presupuesto','integer');
 		
 		//Ejecuta la instruccion

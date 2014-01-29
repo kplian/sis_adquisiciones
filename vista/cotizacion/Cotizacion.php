@@ -18,22 +18,9 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
 		//llama al constructor de la clase padre
     	Phx.vista.Cotizacion.superclass.constructor.call(this,config);
     	
-    	 this.addButton('btnReporte',{
-                    text :'Cot.',
-                    iconCls : 'bpdf32',
-                    disabled: true,
-                    handler : this.onButtonReporte,
-                    tooltip : '<b>Reporte de Cotizacion</b><br/><b>Cotizacion de solicitud de Compra</b>'
-          });
-          
-          this.addButton('btnRepOC',{
-            text :'O.C.',
-            iconCls : 'bpdf32',
-            disabled: true,
-            handler : this.onButtonRepOC,
-            tooltip : '<b>Reporte de OC</b><br/><b>Orden de Compra</b>'
-                                 });
-       
+    	//RAC: Se agrega menú de reportes de adquisiciones
+        this.addBotones();
+    	
          this.addButton('ant_estado',{
               argument: {estado: 'anterior'},
               text:'Anterior',
@@ -45,7 +32,7 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
           
           this.addButton('btnChequeoDocumentosWf',
             {
-                text: 'Chequear Documentos',
+                text: 'Docs',
                 iconCls: 'bchecklist',
                 disabled: true,
                 handler: this.loadCheckDocumentosSolWf,
@@ -56,6 +43,35 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
           this.Cmp.id_moneda.store.baseParams.id_moneda = this.maestro.id_moneda;
 								
 		 
+    },
+    
+    addBotones: function() {
+        console.log('add botones','b-btnRepOC-' + this.idContenedor)
+        this.menuAdq = new Ext.Toolbar.SplitButton({
+            id: 'btn-adq-' + this.idContenedor,
+            text: 'Rep.',
+            disabled: true,
+            iconCls : 'bpdf32',
+            scope: this,
+            menu:{
+            items: [{
+                id:'b-btnReporte-' + this.idContenedor,
+                text: 'Cotización',
+                tooltip: '<b>Reporte de  Cotización</b>',
+                handler:this.onButtonReporte,
+                scope: this
+            }, {
+                id:'b-btnRepOC-' + this.idContenedor,
+                text: 'Cuadro Comparativo',
+                tooltip: '<b>Reporte de Orden de Compra</b>',
+                handler:this.onButtonRepOC,
+                scope: this
+            }
+        ]}
+        });
+        
+        //Adiciona el menú a la barra de herramientas
+        this.tbar.add(this.menuAdq);
     },
 	
 			

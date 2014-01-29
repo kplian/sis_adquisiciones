@@ -264,10 +264,17 @@ Phx.vista.SolicitudReq = {
             var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
             if(!reg.ROOT.error){
                
-               this.cmbRPC.store.baseParams.monto= reg.ROOT.datos.total;
-                this.cmbRPC.modificado=true;
-               this.wRPC.show();
-                
+               //RAC 29/1/2014
+               //comentado par ano msotrar el formualrio de RPC
+               //y que funcone la seleccion automtica
+               // si en un futuro es requerido regresar es solo descomentar
+                 /*
+                 this.cmbRPC.store.baseParams.monto= reg.ROOT.datos.total;
+                 this.cmbRPC.modificado=true;
+                 this.wRPC.show();
+                */
+               
+                 this.reload();
             }else{
                 
                 alert('ocurrio un error durante el proceso')

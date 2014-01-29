@@ -54,6 +54,9 @@ Phx.vista.CotizacionAdq = {
           
        this.addButton('btnSendMail',{text:'Sol Cotizacion',iconCls: 'bemail',disabled:true,handler:this.onSendMail,tooltip: '<b>Solictar Cotizacion</b><p>Solicta la cotizacion por correo al proveedor</p>'});
        
+       this.addButton('btnSolCon',{text:'Sol Cont.',iconCls: 'bemail',disabled:true,handler:this.onSolContrato,tooltip: '<b>Solictar Cotizacion</b><p>Solicta la cotizacion por correo al proveedor</p>'});
+       
+       
        this.addButton('btnPreing',{
                     text :'Preingreso',
                     iconCls : 'bchecklist',
@@ -438,7 +441,16 @@ Phx.vista.CotizacionAdq = {
             }
         },
         
-
+       onSolContrato:function(){                   
+            var rec=this.sm.getSelected();
+            Phx.CP.loadWindows('../../../sis_adquisiciones/vista/cotizacion/SolContrato.php',
+                'Solicitar Contrato',
+                {
+                    modal:true,
+                    width:700,
+                    height:500
+                },rec.data,this.idContenedor,'SolContrato')
+        },
        
        
         
@@ -454,6 +466,8 @@ Phx.vista.CotizacionAdq = {
               if(data['estado']==  'borrador'){
                  this.getBoton('fin_registro').enable();
                  this.getBoton('btnAdjudicar').disable();
+                 this.getBoton('btnSolCon').disable();
+                 
                  this.getBoton('btnSolApro').disable();
                  this.getBoton('ant_estado').disable();
                  this.getBoton('btnRepOC').disable();
@@ -468,11 +482,13 @@ Phx.vista.CotizacionAdq = {
                    
                    if(data['estado']=='cotizado'){
                      this.getBoton('btnAdjudicar').enable();
+                     this.getBoton('btnSolCon').enable();
                      this.getBoton('btnSolApro').enable();
                      this.getBoton('btnRepOC').disable();   
                    }
                    else{
-                      this.getBoton('btnAdjudicar').disable(); 
+                      this.getBoton('btnAdjudicar').disable();
+                      this.getBoton('btnSolCon').disable(); 
                       this.getBoton('btnSolApro').disable();
                      
                    }
@@ -518,7 +534,9 @@ Phx.vista.CotizacionAdq = {
                    this.getBoton('btnRepOC').disable();
                }
                
-            this.getBoton('btnChequeoDocumentosWf').enable();   
+            this.getBoton('btnChequeoDocumentosWf').enable(); 
+            this.menuAdq.enable();
+              
             return tb 
      }, 
      
@@ -529,6 +547,7 @@ Phx.vista.CotizacionAdq = {
         if(tb){
             this.getBoton('fin_registro').disable();
             this.getBoton('btnAdjudicar').disable();
+            this.getBoton('btnSolCon').disable();
             this.getBoton('ant_estado').disable();
             this.getBoton('btnReporte').disable();
             this.getBoton('btnSendMail').disable(); 
@@ -539,6 +558,8 @@ Phx.vista.CotizacionAdq = {
             
             
          }
+       
+       this.menuAdq.disable();
        return tb
     },
     
@@ -547,17 +568,17 @@ Phx.vista.CotizacionAdq = {
        Phx.CP.loadingShow();
         
         var rec=this.sm.getSelected();
-                Ext.Ajax.request({
-                    url:'../../sis_adquisiciones/control/Cotizacion/sendMailCotizacion',
-                    params:{id_cotizacion:rec.data.id_cotizacion,
-                            id_proceso_compra:rec.data.id_proceso_compra,
-                            total:'unitario',
-                            tipo:rec.data.estado,
-                            email:rec.data.email},
-                    success: this.successMail,
-                    failure: this.conexionFailure,
-                    scope:this
-                }); 
+        Ext.Ajax.request({
+            url:'../../sis_adquisiciones/control/Cotizacion/sendMailCotizacion',
+            params:{id_cotizacion:rec.data.id_cotizacion,
+                    id_proceso_compra:rec.data.id_proceso_compra,
+                    total:'unitario',
+                    tipo:rec.data.estado,
+                    email:rec.data.email},
+            success: this.successMail,
+            failure: this.conexionFailure,
+            scope:this
+        }); 
         
         
     },

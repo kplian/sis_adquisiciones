@@ -45,6 +45,7 @@ class MODCotizacionDet extends MODbase{
         $this->captura('precio_unitario_mb','numeric');
         $this->captura('precio_unitario_mb_sol','numeric');
         $this->captura('revertido_mb','numeric');
+        $this->captura('revertido_mo','numeric');
 		
 	
 		

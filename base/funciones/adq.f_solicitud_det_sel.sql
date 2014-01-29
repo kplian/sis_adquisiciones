@@ -82,7 +82,9 @@ BEGIN
                         cig.desc_ingas as desc_concepto_ingas,
                         ot.desc_orden as desc_orden_trabajo,
                         sold.revertido_mb,
+                        sold.revertido_mo,
                         pre.id_presupuesto
+                       
                          
 						from adq.tsolicitud_det sold
                         inner join param.tconcepto_ingas cig on cig.id_concepto_ingas = sold.id_concepto_ingas
