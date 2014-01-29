@@ -127,6 +127,7 @@ Phx.vista.Proveedor=Ext.extend(Phx.gridInterfaz,{
 	   				allowBlank:true,
 	   				origen:'PERSONA',
 	   				gdisplayField:'nombre_completo1',
+	   				baseParams:{no_es_proveedor:'si'},
 	   			    gwidth:200,	
 	   			    renderer:function (value, p, record){return String.format('{0}', record.data['nombre_completo1']);}
    			
@@ -136,7 +137,7 @@ Phx.vista.Proveedor=Ext.extend(Phx.gridInterfaz,{
    			filters:{pfiltro:'person.nombre_completo1',type:'string'},
    		 grid:false,
    			form:true
-	   	},{
+	   },{ 
 	   		config:{
 	   				name:'id_institucion',
 	   				fieldLabel: 'Institucion',
@@ -145,7 +146,8 @@ Phx.vista.Proveedor=Ext.extend(Phx.gridInterfaz,{
 	   				allowBlank:true,
 	   				origen:'INSTITUCION',
 	   				gdisplayField:'nombre',
-	   			    gwidth:200,	
+	   			    gwidth:200,
+	   			    baseParams:{no_es_proveedor:'si'},
 	   			   	renderer:function (value, p, record){return String.format('{0}', record.data['nombre']);}
    			
 	   			  },
