@@ -443,13 +443,17 @@ Phx.vista.CotizacionAdq = {
         
        onSolContrato:function(){                   
             var rec=this.sm.getSelected();
+            
+            var data = {id_funcionario:this.id_funcionario}
+            Ext.apply(data,rec.data)
+            
             Phx.CP.loadWindows('../../../sis_adquisiciones/vista/cotizacion/SolContrato.php',
                 'Solicitar Contrato',
                 {
                     modal:true,
                     width:700,
                     height:500
-                },rec.data,this.idContenedor,'SolContrato')
+                },data ,this.idContenedor,'SolContrato')
         },
        
        

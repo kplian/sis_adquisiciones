@@ -297,6 +297,12 @@ class ACTCotizacion extends ACTbase{
         //destinatario
         $email = $this->objParam->getParametro('email');
         $correo->addDestinatario($email);
+        
+        $email_cc = $this->objParam->getParametro('email_cc');
+        $correo->addCC($email_cc);
+        
+        
+        
         //asunto
         $asunto = $this->objParam->getParametro('asunto');
         $correo->setAsunto($asunto);

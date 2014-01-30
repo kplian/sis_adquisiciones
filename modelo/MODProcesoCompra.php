@@ -48,6 +48,7 @@ class MODProcesoCompra extends MODbase{
 		$this->captura('id_categoria_compra','int4');
 		$this->captura('usr_aux','varchar');
 		$this->captura('id_moneda','integer');
+		$this->captura('id_funcionario','integer');
 	 
 		
 		//Ejecuta la instruccion

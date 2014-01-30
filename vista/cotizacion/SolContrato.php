@@ -17,8 +17,39 @@ Phx.vista.SolContrato=Ext.extend(Phx.frmInterfaz,{
         Phx.vista.SolContrato.superclass.constructor.call(this,config);
         this.init();    
         this.loadValoresIniciales();
+        this.obtenerCorreo();
+        
         
     },
+    
+    obtenerCorreo:function(){
+       Phx.CP.loadingShow();
+       Ext.Ajax.request({
+                // form:this.form.getForm().getEl(),
+                url:'../../sis_organigrama/control/Funcionario/getEmailEmpresa',
+                params:{id_funcionario: this.id_funcionario},
+                success:this.successSinc,
+                failure: this.conexionFailure,
+                timeout:this.timeout,
+                scope:this
+         }); 
+        
+        
+    },
+    
+    
+    successSinc:function(resp){
+            Phx.CP.loadingHide();
+            var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
+            if(reg.ROOT.datos.resultado!='falla'){
+                console.log(reg)
+                
+                this.getComponente('email_cc').setValue(reg.ROOT.datos.email_empresa);
+               
+             }else{
+                alert(reg.ROOT.datos.mensaje)
+            }
+     },
     
     loadValoresIniciales:function() 
     {        
@@ -68,12 +99,26 @@ Phx.vista.SolContrato=Ext.extend(Phx.frmInterfaz,{
         {
             config:{
                 name: 'email',
-                fieldLabel: 'Email Remitente',
+                fieldLabel: 'Destino',
                 allowBlank: true,
                 anchor: '90%',
                 gwidth: 100,
                 maxLength: 100,
                 value:'rensi@kplian.com',
+                readOnly :true
+            },
+            type:'TextField',
+            id_grupo:1,
+            form:true
+        },
+        {
+            config:{
+                name: 'email_cc',
+                fieldLabel: 'CC',
+                allowBlank: true,
+                anchor: '90%',
+                gwidth: 100,
+                maxLength: 100,
                 readOnly :true
             },
             type:'TextField',
