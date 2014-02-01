@@ -208,11 +208,11 @@ Phx.vista.CotizacionAdq = {
     },
     
     EnableSelect:function(n){
-         Phx.vista.Cotizacion.superclass.EnableSelect.call(this,n,{desc_moneda_sol:this.desc_moneda});
+         Phx.vista.CotizacionAdq.superclass.EnableSelect.call(this,n,{desc_moneda_sol:this.desc_moneda});
     },
     
     onButtonNew:function(){         
-            Phx.vista.Cotizacion.superclass.onButtonNew.call(this);
+            Phx.vista.CotizacionAdq.superclass.onButtonNew.call(this);
             
             this.cmbMoneda.disable();
             this.cmpTipoCambioConv.disable();
@@ -457,7 +457,8 @@ Phx.vista.CotizacionAdq = {
         preparaMenu:function(n){
           var data = this.getSelectedData();
           var tb =this.tbar;
-          Phx.vista.Cotizacion.superclass.preparaMenu.call(this,n); 
+          Phx.vista.CotizacionAdq.superclass.preparaMenu.call(this,n);
+          this.menuAdq.enable();
           this.getBoton('btnReporte').enable();
 
           //this.getBoton('btnReporte').enable(); 
@@ -535,7 +536,7 @@ Phx.vista.CotizacionAdq = {
                }
                
             this.getBoton('btnChequeoDocumentosWf').enable(); 
-            this.menuAdq.enable();
+           
               
             return tb 
      }, 
@@ -543,7 +544,7 @@ Phx.vista.CotizacionAdq = {
     
      
      liberaMenu:function(){
-        var tb = Phx.vista.Cotizacion.superclass.liberaMenu.call(this);
+        var tb = Phx.vista.CotizacionAdq.superclass.liberaMenu.call(this);
         if(tb){
             this.getBoton('fin_registro').disable();
             this.getBoton('btnAdjudicar').disable();
@@ -555,11 +556,12 @@ Phx.vista.CotizacionAdq = {
             this.getBoton('btnRepOC').disable();
            
             this.getBoton('btnChequeoDocumentosWf').disable();
+            this.menuAdq.disable();
             
             
          }
        
-       this.menuAdq.disable();
+      
        return tb
     },
     

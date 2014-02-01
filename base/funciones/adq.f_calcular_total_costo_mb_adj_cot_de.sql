@@ -1,7 +1,7 @@
 --------------- SQL ---------------
 
  -- object recreation
-DROP FUNCTION adq.f_calcular_total_costo_mb_adj_cot_det(p_id_cotizacion_det numeric);
+--DROP FUNCTION adq.f_calcular_total_costo_mb_adj_cot_det(p_id_cotizacion_det numeric);
 
 
 CREATE OR REPLACE FUNCTION adq.f_calcular_total_costo_mb_adj_cot_det (

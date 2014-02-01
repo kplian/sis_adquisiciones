@@ -16,7 +16,7 @@ class ACTProcesoCompra extends ACTbase{
 	function listarProcesoCompra(){
 		$this->objParam->defecto('ordenacion','id_proceso_compra');
 
-		$this->objParam->defecto('dir_ordenacion','asc');
+		$this->objParam->defecto('proc.fecha_reg','desc');
 		if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
 			$this->objReporte = new Reporte($this->objParam,$this);
 			$this->res = $this->objReporte->generarReporteListado('MODProcesoCompra','listarProcesoCompra');
@@ -78,6 +78,13 @@ class ACTProcesoCompra extends ACTbase{
             $this->objFunc = $this->create('MODProcesoCompra');
             $resultProcesoCompra = $this->objFunc->listarProcesoCompraPedido();
             $datosProcesoCompra = $resultProcesoCompra->getDatos();
+           
+            
+            if($resultProcesoCompra->getTipo()=='ERROR'){
+                              
+                      $resultProcesoCompra->imprimirRespuesta($resultProcesoCompra-> generarMensajeJson());
+                      exit;
+            }
         	
         	
         	$idSolicitud=$datosProcesoCompra[0]['id_solicitud'];
@@ -99,7 +106,11 @@ class ACTProcesoCompra extends ACTbase{
             $modSolicitudDet = $this->create('MODSolicitudDet');
             $resultSolicitudDet = $modSolicitudDet->listarSolicitudDet();        
             $datosResultSolicitudDet = $resultSolicitudDet->getDatos();
-            
+            if($resultSolicitudDet->getTipo()=='ERROR'){
+                              
+                      $resultSolicitudDet->imprimirRespuesta($resultSolicitudDet-> generarMensajeJson());
+                      exit;
+            }
             
             //var_dump($datosResultSolicitudDet);
 			$solicitudDetDataSource = new DataSource();
@@ -120,6 +131,12 @@ class ACTProcesoCompra extends ACTbase{
             $modCotizacion = $this->create('MODCotizacion');
             $resultCotizacion = $modCotizacion->listarCotizacion();        
             $datosResultCotizacion = $resultCotizacion->getDatos();
+            
+            if($resultCotizacion->getTipo()=='ERROR'){
+                              
+                      $resultCotizacion->imprimirRespuesta($resultCotizacion-> generarMensajeJson());
+                      exit;
+            }
             
              //recorre las cotizaciones y recupera los datos ofertados
             for ($i=0; $i <count($datosResultCotizacion) ; $i++) {             
