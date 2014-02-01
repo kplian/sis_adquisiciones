@@ -54,8 +54,7 @@ Phx.vista.CotizacionVbDin = {
                 handler:this.sigEstado,
                 tooltip: '<b>Pasar al Siguiente Estado</b>'});
         
-         
-         
+        
          this.addButton('btnGenOC',{
                     text :'Aprobar',
                     iconCls : 'bok',
@@ -63,11 +62,8 @@ Phx.vista.CotizacionVbDin = {
                     handler : this.AprobarSolicitud,
                     tooltip : '<b>Aprobar Adjudicación</b><br/><b> La Recomendación queda aprobada </b>'
           });
-          
-          
-        
-        
-        this.addButton('btnReporte',{
+         
+        this.addButton('btnSolCom',{
             text :'Sol Comp.',
             iconCls : 'bpdf32',
             disabled: true,
@@ -479,29 +475,43 @@ Phx.vista.CotizacionVbDin = {
           Phx.vista.CotizacionVbDin.superclass.preparaMenu.call(this,n);
           this.menuAdq.enable();
           if(this.historico == 'no'){ 
-                 this.getBoton('diagrama_gantt').enable();
+                //cuadno es recomendado se habilita la aprobacion (btnGenOC) 
+                //de deshabilita elpaso al siguiente estado
+                //se habilita el paso al anterior estado
+                
                 if(data['estado']==  'recomendado'){
                      this.getBoton('btnGenOC').enable();
                      this.getBoton('sig_estado').disable(); 
-                     this.getBoton('btnCuadroComparativo').enable();
-                  }
-                if(data['estado']==  'adjudicado'){
+                     this.getBoton('ant_estado').enable();
+                }
+                else{
+                      this.getBoton('btnGenOC').disable();
+                }
+                  
+                if(data['estado']=='adjudicado'){
                      this.getBoton('btnGenOC').disable();
                      this.getBoton('sig_estado').disable();
-                     this.getBoton('btnCuadroComparativo').disable(); 
+                     this.getBoton('ant_estado').enable();
                  }
                
-               if(data['estado']!='adjudicado' && data['estado']!= 'recomendado'){
+               //el paso a siguiente solo se habilita para otros estados deiferentes de adjudicado y recomendado
+               //y finalidaso
+               if(data['estado']!='adjudicado' && data['estado']!= 'recomendado'&& data['estado']!= 'finalizada'){
                     this.getBoton('sig_estado').enable();
-                    this.getBoton('btnCuadroComparativo').enable(); 
-                 }  
-                  
-               
-               this.getBoton('btnReporte').enable();  
-               this.getBoton('ant_estado').enable();
+                    this.getBoton('ant_estado').enable();
+               }
+                //cuando esta finalizada nose peude mover mas   
+               if(data['estado']=='finalizada'){
+                   this.getBoton('sig_estado').disable();
+                   this.getBoton('ant_estado').disable();
+                   this.getBoton('btnGenOC').disable();
+               }   
+               //reportes
+               this.getBoton('btnSolCom').enable();  
                this.getBoton('btnRepOC').enable(); 
-              
-               this.getBoton('btnChequeoDocumentosWf').enable(); 
+               this.getBoton('diagrama_gantt').enable();
+               this.getBoton('btnChequeoDocumentosWf').enable();
+               this.getBoton('btnCuadroComparativo').enable(); 
           
           } 
           else{
@@ -519,7 +529,7 @@ Phx.vista.CotizacionVbDin = {
             this.getBoton('btnGenOC').disable();
             this.getBoton('ant_estado').disable();
             this.getBoton('btnRepOC').disable(); 
-            this.getBoton('btnReporte').disable();  
+            this.getBoton('btnSolCom').disable();  
             
             this.getBoton('diagrama_gantt').disable();
             this.getBoton('btnChequeoDocumentosWf').disable(); 

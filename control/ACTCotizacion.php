@@ -158,7 +158,7 @@ class ACTCotizacion extends ACTbase{
 
         }
 
-      function reporteOC(){
+      function reporteOC($create_file=false){
                 $dataSource = new DataSource();
                 $this->objParam->addParametroConsulta('ordenacion','id_cotizacion');
                 $this->objParam->addParametroConsulta('dir_ordenacion','ASC');
@@ -226,12 +226,20 @@ class ACTCotizacion extends ACTbase{
                 $reportWriter = new ReportWriter($reporte, dirname(__FILE__).'/../../reportes_generados/'.$nombreArchivo);
                 $reportWriter->writeReport(ReportWriter::PDF);
 
+                
+            if(!$create_file){
                 $mensajeExito = new Mensaje();
                 $mensajeExito->setMensaje('EXITO','Reporte.php','Reporte generado',
                 'Se generó con éxito el reporte: '.$nombreArchivo,'control');
                 $mensajeExito->setArchivoGenerado($nombreArchivo);
                 $this->res = $mensajeExito;
                 $this->res->imprimirRespuesta($this->res->generarJson());
+            }
+            else{
+                        
+                 return dirname(__FILE__).'/../../reportes_generados/'.$nombreArchivo;  
+                
+            }
 
      }
      
@@ -261,8 +269,62 @@ class ACTCotizacion extends ACTbase{
         else{
               //echo $resp;      
               echo "{\"ROOT\":{\"error\":true,\"detalle\":{\"mensaje\":\" Error al enviar correo\"}}}";  
-              exit;
+              
         }  
+        
+        unlink($file);
+        exit;
+           
+       
+   }
+   
+   function SolicitarContrato(){
+         
+        //hacer el contrato exigible  
+        
+        $this->objFunc=$this->create('MODCotizacion' );
+        $this->res=$this->objFunc->SolicitarContrato($this->objParam);
+        $this->res->imprimirRespuesta($this->res->generarJson()); 
+        
+        if($this->res->getTipo()=='ERROR'){
+           $this->res->imprimirRespuesta($this->res->generarMensajeJson());
+           exit;
+        }
+                      
+        //genera archivo adjunto
+        $file = $this->reporteOC(true);
+        $correo=new CorreoExterno();
+        //destinatario
+        $email = $this->objParam->getParametro('email');
+        $correo->addDestinatario($email);
+        //asunto
+        $asunto = $this->objParam->getParametro('asunto');
+        $correo->setAsunto($asunto);
+        //cuerpo mensaje
+        $body = $this->objParam->getParametro('body');
+        $correo->setMensaje($body);
+        $correo->setTitulo('Solicitud de contrato');
+        $correo->addAdjunto($file);
+        
+        $correo->setDefaultPlantilla();
+        $resp=$correo->enviarCorreo();           
+        
+        if($resp=='OK'){
+                $mensajeExito = new Mensaje();
+                $mensajeExito->setMensaje('EXITO','Cotizacion.php','Correo enviado',
+                'Se mando el correo con exito: OK','control' );
+                $this->res = $mensajeExito;
+                $this->res->imprimirRespuesta($this->res->generarJson());
+            
+        }  
+        else{
+              //echo $resp;      
+              echo "{\"ROOT\":{\"error\":true,\"detalle\":{\"mensaje\":\" Error al enviar correo\"}}}";  
+              
+        }  
+        
+        unlink($file);
+        exit;
            
        
    }
@@ -328,7 +390,7 @@ class ACTCotizacion extends ACTbase{
         $this->datos=array();
         $this->datos=$this->res->getDatos();
         
-       $uos=$this->res->datos['uos'];
+        $uos=$this->res->datos['uos'];
         $eps=$this->res->datos['eps'];
    
         

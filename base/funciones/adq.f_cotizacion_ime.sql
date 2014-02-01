@@ -1626,7 +1626,26 @@ BEGIN
 
 		end;
         
-    
+    /*********************************    
+ 	#TRANSACCION:  'ADQ_SOLCON_IME'
+ 	#DESCRIPCION:	Cambia el mmento de los contrato y los hace exigibles
+ 	#AUTOR:	        RCM
+ 	#FECHA:		    02/10/2013
+	***********************************/
+
+	elsif(p_transaccion='ADQ_SOLCON_IME')then
+
+		begin
+
+             v_sw =  wf.f_modificar_momento_documento_wf(p_id_usuario, v_parametros.id_proceso_wf, 'exigir', 'contrato');
+        
+             --Definicion de la respuesta
+             v_resp = pxp.f_agrega_clave(v_resp,'cambio a momento exigible para el contrato correspondiente a la cotizacion',v_result); 
+              
+            --Devuelve la respuesta
+            return v_resp;
+
+		end; 
     
     else
      
