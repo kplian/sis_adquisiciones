@@ -59,6 +59,21 @@ Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
 		},
         {
             config:{
+                name: 'num_tramite',
+                fieldLabel: 'N# Tramite',
+                allowBlank: true,
+                anchor: '80%',
+                gwidth: 150,
+                maxLength:200
+            },
+            type:'TextField',
+            filters:{pfiltro:'proc.num_tramite',type:'string'},
+            id_grupo:1,
+            grid:true,
+            form:true
+        },
+        {
+            config:{
                 name: 'estado',
                 fieldLabel: 'Estado',
                 allowBlank: true,
@@ -188,21 +203,6 @@ Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
             id_grupo:1,
             grid:true,
             form:false
-        },
-        {
-            config:{
-                name: 'num_tramite',
-                fieldLabel: 'N# Tramite',
-                allowBlank: true,
-                anchor: '80%',
-                gwidth: 130,
-                maxLength:200
-            },
-            type:'TextField',
-            filters:{pfiltro:'proc.num_tramite',type:'string'},
-            id_grupo:1,
-            grid:true,
-            form:true
         },
         {
             config:{
@@ -600,8 +600,8 @@ Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
     },
     
 	sortInfo:{
-		field: 'id_proceso_compra',
-		direction: 'ASC'
+		field: 'proc.fecha_reg',
+		direction: 'DESC'
 	},
 	south:
           { 

@@ -81,6 +81,7 @@ function listarProcesoCompraPedido(){
 		$this->procedimiento='adq.f_proceso_compra_sel';
 		$this->transaccion='ADQ_PROCPED_SEL';
 		$this->tipo_procedimiento='SEL';//tipo de transaccion
+		$this->setCount(false);
 				
 		$this->setParametro('id_proceso_compra','id_proceso_compra','int4');
 		//Definicion de la lista del resultado del query

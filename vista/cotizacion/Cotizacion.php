@@ -46,9 +46,8 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
     },
     
     addBotones: function() {
-        console.log('add botones','b-btnRepOC-' + this.idContenedor)
         this.menuAdq = new Ext.Toolbar.SplitButton({
-            id: 'btn-adq-' + this.idContenedor,
+            id: 'btn-adqrep-' + this.idContenedor,
             text: 'Rep.',
             disabled: true,
             iconCls : 'bpdf32',
@@ -62,7 +61,7 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
                 scope: this
             }, {
                 id:'b-btnRepOC-' + this.idContenedor,
-                text: 'Cuadro Comparativo',
+                text: 'Orden de Compra',
                 tooltip: '<b>Reporte de Orden de Compra</b>',
                 handler:this.onButtonRepOC,
                 scope: this
@@ -94,6 +93,21 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
             },
             type:'Field',
             form:true 
+        },
+        {
+            config:{
+                name: 'num_tramite',
+                fieldLabel: 'N# Tramite',
+                allowBlank: true,
+                anchor: '80%',
+                gwidth: 150,
+                maxLength:200
+            },
+            type:'TextField',
+            filters:{pfiltro:'sol.num_tramite',type:'string'},
+            id_grupo:1,
+            grid:true,
+            form:false
         },
         {
             config:{
@@ -496,7 +510,8 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
 		{name:'fecha_mod', type: 'date',dateFormat:'Y-m-d H:i:s.u'},
 		{name:'id_usuario_mod', type: 'numeric'},
 		{name:'usr_reg', type: 'string'},
-		{name:'usr_mod', type: 'string'},'email','desc_moneda','tipo_cambio_conv','id_estado_wf','id_proceso_wf','numero','num_tramite',
+		{name:'usr_mod', type: 'string'},'email','desc_moneda','tipo_cambio_conv','id_estado_wf','id_proceso_wf','numero',
+		'num_tramite',
 		{name:'id_obligacion_pago', type: 'numeric'}
 		
 	],

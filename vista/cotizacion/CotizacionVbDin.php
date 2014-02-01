@@ -477,7 +477,7 @@ Phx.vista.CotizacionVbDin = {
           var data = this.getSelectedData();
           var tb =this.tbar;
           Phx.vista.CotizacionVbDin.superclass.preparaMenu.call(this,n);
-           
+          this.menuAdq.enable();
           if(this.historico == 'no'){ 
                  this.getBoton('diagrama_gantt').enable();
                 if(data['estado']==  'recomendado'){
@@ -523,6 +523,7 @@ Phx.vista.CotizacionVbDin = {
             
             this.getBoton('diagrama_gantt').disable();
             this.getBoton('btnChequeoDocumentosWf').disable(); 
+             this.menuAdq.disable();
             
             
             }
