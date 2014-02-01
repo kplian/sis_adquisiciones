@@ -18,14 +18,30 @@ Phx.vista.SolContrato=Ext.extend(Phx.frmInterfaz,{
         this.init();    
         this.loadValoresIniciales();
         
-        console.log(config)
+        console.log(Phx.CP.config_ini)
+       
         
     },
     
-    loadValoresIniciales:function()
+    loadValoresIniciales:function() 
     {        
+        
+         var CuerpoCorreo = " Solicitud de Contrato para el Proveedor <br><b>" ;
+         CuerpoCorreo+=this.desc_proveedor+'<br></b>';
+         CuerpoCorreo+='Email proveedor: '+this.email+'</br>';
+         CuerpoCorreo+='Tramite: '+ this.num_tramite+'<br>';
+         CuerpoCorreo+='OC: '+this.numero_oc+'</BR>';
+         CuerpoCorreo+='<br>Solitiado por: <br> '+Phx.CP.config_ini.nombre_usuario;
+         
+         
+        
         Phx.vista.SolContrato.superclass.loadValoresIniciales.call(this);
         this.getComponente('id_cotizacion').setValue(this.id_cotizacion); 
+        this.getComponente('asunto').setValue('ADQ: Solicitud de contrato proveedor: '+this.desc_proveedor); 
+        
+        this.getComponente('body').setValue(CuerpoCorreo); 
+        
+        
         
         
         
@@ -63,7 +79,6 @@ Phx.vista.SolContrato=Ext.extend(Phx.frmInterfaz,{
                 readOnly :true
             },
             type:'TextField',
-            filters:{pfiltro:'plcr.remitente_email',type:'string'},
             id_grupo:1,
             form:true
         },      
@@ -77,7 +92,6 @@ Phx.vista.SolContrato=Ext.extend(Phx.frmInterfaz,{
                 maxLength: 100
             },
             type:'TextField',
-            filters:{pfiltro:'plcr.asunto',type:'string'},
             id_grupo:1,
             form:true
         },
@@ -88,12 +102,11 @@ Phx.vista.SolContrato=Ext.extend(Phx.frmInterfaz,{
                 anchor: '90%'
             },
             type:'HtmlEditor',
-            filters:{pfiltro:'plcr.body',type:'string'},
-            id_grupo:1,
+             id_grupo:1,
             form:true
         },      
     ],
-    title:'SOlicitud de Contrato'
+    title:'Solicitud de Contrato'
     
 }
 )    

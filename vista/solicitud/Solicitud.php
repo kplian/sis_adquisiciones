@@ -669,7 +669,7 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
     },
 
 	sortInfo:{
-		field: 'fecha_soli',
+		field: 'fecha_reg',
 		direction: 'DESC'
 	},
 	bdel:true,
