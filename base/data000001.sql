@@ -340,7 +340,7 @@ select wf.f_insert_testructura_estado ('pendiente', 'APLAP', 'pagado', 'APLAP', 
 --COPY LINES TO data.sql FILE  
 ---------------------------------
 
-select pxp.f_insert_tgui ('Visto Bueno Cotizacion', 'Visto Bueno Cotizacion', 'VBCOT', 'si', 7, 'sis_adquisiciones/vista/cosis_adquisiciones/vista/cotizacion/CotizacionVbDin.php', 2, '', 'CotizacionVbDin', 'ADQ');
+select pxp.f_insert_tgui ('Visto Bueno Cotizacion', 'Visto Bueno Cotizacion', 'VBCOT', 'si', 7, 'sis_adquisiciones/vista/cotizacion/CotizacionVbDin.php', 2, '', 'CotizacionVbDin', 'ADQ');
 select pxp.f_insert_tgui ('Chequear documento del WF', 'Chequear documento del WF', 'ADQ.3.2', 'no', 0, 'sis_workflow/vista/documento_wf/DocumentoWf.php', 3, '', 'DocumentoWf', 'ADQ');
 select pxp.f_insert_tgui ('Proveedor', 'Proveedor', 'ADQ.3.3', 'no', 0, 'sis_parametros/vista/proveedor/Proveedor.php', 3, '', 'proveedor', 'ADQ');
 select pxp.f_insert_tgui ('Subir Archivo', 'Subir Archivo', 'ADQ.3.2.1', 'no', 0, 'sis_workflow/vista/documento_wf/SubirArchivoWf.php', 4, '', 'SubirArchivoWf', 'ADQ');
