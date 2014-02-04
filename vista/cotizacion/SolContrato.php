@@ -18,9 +18,6 @@ Phx.vista.SolContrato=Ext.extend(Phx.frmInterfaz,{
         this.init();    
         this.loadValoresIniciales();
         
-        console.log(Phx.CP.config_ini)
-       
-        
     },
     
     loadValoresIniciales:function() 
@@ -33,22 +30,12 @@ Phx.vista.SolContrato=Ext.extend(Phx.frmInterfaz,{
         CuerpoCorreo+='OC: '+this.numero_oc+'</BR>';
         CuerpoCorreo+='<br>Solitiado por: <br> '+Phx.CP.config_ini.nombre_usuario;
          
-         
-        
         Phx.vista.SolContrato.superclass.loadValoresIniciales.call(this);
         this.getComponente('id_cotizacion').setValue(this.id_cotizacion); 
         this.getComponente('id_proceso_wf').setValue(this.id_proceso_wf);
-        
-        
         this.getComponente('asunto').setValue('ADQ: Solicitud de contrato proveedor: '+this.desc_proveedor); 
         this.getComponente('body').setValue(CuerpoCorreo); 
         
-        
-        
-        
-        
-        
-            
     },
     
     successSave:function(resp)
