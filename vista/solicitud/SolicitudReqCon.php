@@ -18,8 +18,8 @@ Phx.vista.SolicitudReqCon = {
 	nombreVista: 'solicitudReq',
 	defRegion:'west',
 	constructor: function(config) {
-    		Phx.vista.SolicitudReqCon.superclass.constructor.call(this,config);
-    		this.addButton('fin_requerimiento',{text:'Finalizar',iconCls: 'badelante',disabled:true,handler:this.fin_requerimiento,tooltip: '<b>Finalizar</b>'});
+            Phx.vista.SolicitudReqCon.superclass.constructor.call(this,config);
+            this.addButton('fin_requerimiento',{text:'Finalizar',iconCls: 'badelante',disabled:true,handler:this.fin_requerimiento,tooltip: '<b>Finalizar</b>'});
             
             this.iniciarEventos();
             
@@ -67,6 +67,7 @@ Phx.vista.SolicitudReqCon = {
                     queryDelay:500,
                     width:210,
                     gwidth:220,
+                    listWidth:'280',
                     minChars:2,
                     tpl: '<tpl for="."><div class="x-combo-list-item"><p>{desc_funcionario}</p>Prioridad: <strong>{prioridad}</strong> </div></tpl>'
                 
@@ -106,13 +107,13 @@ Phx.vista.SolicitudReqCon = {
             }]
         });
             
-		
-		
-		this.store.baseParams={tipo_interfaz:this.nombreVista};
-		this.load({params:{start:0, limit:this.tam_pag}});
-		
-		
-	},
+        
+        
+        this.store.baseParams={tipo_interfaz:this.nombreVista};
+        this.load({params:{start:0, limit:this.tam_pag}});
+        
+        
+    },
     
     iniciarEventos:function(){
         
@@ -124,7 +125,7 @@ Phx.vista.SolicitudReqCon = {
         
         //inicio de eventos 
         this.cmpFechaSoli.on('change',function(f){
-        	
+            
              this.obtenerGestion(this.cmpFechaSoli);
              this.cmpIdUo.reset();
              this.cmpIdFuncionarioAprobador.reset();
@@ -135,22 +136,22 @@ Phx.vista.SolicitudReqCon = {
              },this);
         
         this.Cmp.id_funcionario.on('select',function(rec){ 
-        	
-        	//Aprobador  
-            this.cmpIdFuncionarioAprobador.store.baseParams.id_funcionario=this.Cmp.id_funcionario.getValue();
+            
+            //Aprobador  
+            this.cmpIdFuncionarioAprobador.store.baseParams.id_funcionario_dependiente=this.Cmp.id_funcionario.getValue();
             this.cmpIdFuncionarioAprobador.store.baseParams.fecha = this.cmpFechaSoli.getValue().dateFormat(this.cmpFechaSoli.format);
             this.cmpIdFuncionarioAprobador.modificado=true;
             //Unidad
             this.Cmp.id_uo.store.baseParams.id_funcionario_uo_presupuesta=this.Cmp.id_funcionario.getValue();
             this.Cmp.id_uo.store.baseParams.fecha = this.cmpFechaSoli.getValue().dateFormat(this.cmpFechaSoli.format);
             this.Cmp.id_uo.store.load({params:{start:0,limit:this.tam_pag}, 
-		       callback : function (r) {	       				
-		    		if (r.length > 0 ) {	       				
-	    				this.Cmp.id_uo.setValue(r[0].data.id_uo);
-	    			}     
-		    			    		
-		    	}, scope : this
-		    });
+               callback : function (r) {                        
+                    if (r.length > 0 ) {                        
+                        this.Cmp.id_uo.setValue(r[0].data.id_uo);
+                    }     
+                                    
+                }, scope : this
+            });
             
             this.cmpIdUo.enable();
             this.cmpIdFuncionarioAprobador.reset();
@@ -174,24 +175,24 @@ Phx.vista.SolicitudReqCon = {
        
        
        this.Cmp.id_categoria_compra.store.load({params:{start:0,limit:this.tam_pag}, 
-	       callback : function (r) {
-	       		if (r.length > 0 ) {	       				
-	    			this.Cmp.id_categoria_compra.setValue(r[0].data.id_categoria_compra);
-	    		}    
-	    			    		
-	    	}, scope : this
-	    });
-	    
-	    this.Cmp.id_funcionario.store.load({params:{start:0,limit:this.tam_pag}, 
-	       callback : function (r) {
-	       		if (r.length == 1 ) {	       				
-	    			this.Cmp.id_funcionario.setValue(r[0].data.id_funcionario);
-	    			this.Cmp.id_funcionario.fireEvent('select', r[0]);
-	    		}    
-	    			    		
-	    	}, scope : this
-	    });
-		
+           callback : function (r) {
+                if (r.length > 0 ) {                        
+                    this.Cmp.id_categoria_compra.setValue(r[0].data.id_categoria_compra);
+                }    
+                                
+            }, scope : this
+        });
+        
+        this.Cmp.id_funcionario.store.load({params:{start:0,limit:this.tam_pag}, 
+           callback : function (r) {
+                if (r.length == 1 ) {                       
+                    this.Cmp.id_funcionario.setValue(r[0].data.id_funcionario);
+                    this.Cmp.id_funcionario.fireEvent('select', r[0]);
+                }    
+                                
+            }, scope : this
+        });
+        
            
     },
     onButtonEdit:function(){
@@ -248,6 +249,7 @@ Phx.vista.SolicitudReqCon = {
             
             this.cmbRPC.store.baseParams.id_uo=d.id_uo;
             this.cmbRPC.store.baseParams.fecha=d.fecha_soli;
+            this.cmbRPC.store.baseParams.id_proceso_macro=d.id_proceso_macro;
             Ext.Ajax.request({
                 // form:this.form.getForm().getEl(),
                 url:'../../sis_adquisiciones/control/Solicitud/finalizarSolicitud',
@@ -264,10 +266,17 @@ Phx.vista.SolicitudReqCon = {
             var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
             if(!reg.ROOT.error){
                
-               this.cmbRPC.store.baseParams.monto= reg.ROOT.datos.total;
-                this.cmbRPC.modificado=true;
-               this.wRPC.show();
-                
+               //RAC 29/1/2014
+               //comentado par ano msotrar el formualrio de RPC
+               //y que funcone la seleccion automtica
+               // si en un futuro es requerido regresar es solo descomentar
+                 /*
+                 this.cmbRPC.store.baseParams.monto= reg.ROOT.datos.total;
+                 this.cmbRPC.modificado=true;
+                 this.wRPC.show();
+                */
+               
+                 this.reload();
             }else{
                 
                 alert('ocurrio un error durante el proceso')
@@ -306,7 +315,7 @@ Phx.vista.SolicitudReqCon = {
     
   
     
-	 preparaMenu:function(n){
+     preparaMenu:function(n){
       var data = this.getSelectedData();
       var tb =this.tbar;
       Phx.vista.SolicitudReqCon.superclass.preparaMenu.call(this,n);  
@@ -336,6 +345,7 @@ Phx.vista.SolicitudReqCon = {
         
        return tb
     },    
+          
    
     xeast:{
           url:'../../../sis_adquisiciones/vista/presolicitud/PresolicitudCon.php',
