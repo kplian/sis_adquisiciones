@@ -32,7 +32,7 @@ DECLARE
 
 BEGIN
 
-	v_nombre_funcion='adq.f_genera_pre_ingreso';
+	v_nombre_funcion='adq.f_genera_preingreso';
     v_af = 0;
     v_alm = 0;
 
@@ -124,7 +124,7 @@ BEGIN
        NULL, 
        v_id_depto, 
        'Preingreso de almacenes',
-       'ALPRE',
+       'ALPRE,ALPREIND',
        'PIA-'||v_rec_cot.numero_oc
        );
     
