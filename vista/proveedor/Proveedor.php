@@ -48,16 +48,13 @@ Phx.vista.Proveedor=Ext.extend(Phx.gridInterfaz,{
 		Phx.vista.Proveedor.superclass.iniciarEventos.call();
 		this.getComponente('id_persona').on('select',function(c,r,n){
 			
-			if (this.register != 'update') {
-				this.blockGroup(1);
-				this.getComponente('nombre').setDisabled(false);
-				this.getComponente('apellido_paterno').setDisabled(false);
-				this.getComponente('apellido_materno').setDisabled(false);
-			} else {
-				this.getComponente('nombre').setDisabled(true);
-				this.getComponente('apellido_paterno').setDisabled(true);
-				this.getComponente('apellido_materno').setDisabled(true);
+			if (this.register != 'update') {				
+				this.getComponente('rotulo_comercial').setValue(r.data.nombre_completo1);
 			}
+			
+			this.getComponente('nombre').setDisabled(true);
+			this.getComponente('apellido_paterno').setDisabled(true);
+			this.getComponente('apellido_materno').setDisabled(true);
 			this.getComponente('ci').setValue(r.data.ci);
 			this.getComponente('nombre').setValue(r.data.nombre);
 			this.getComponente('apellido_paterno').setValue(r.data.ap_paterno);
@@ -73,13 +70,11 @@ Phx.vista.Proveedor=Ext.extend(Phx.gridInterfaz,{
 			this.register='before_registered';
 			},this);
 		this.getComponente('id_institucion').on('select',function(c,r,n){
-			if (this.register != 'update') {
-				this.blockGroup(2);
-				this.getComponente('nombre_institucion').setDisabled(false);
-			} else {
-				this.getComponente('nombre_institucion').setDisabled(true);
+			if (this.register != 'update') {				
+				this.getComponente('rotulo_comercial').setValue(r.data.nombre);
 			}
 			
+			this.getComponente('nombre_institucion').setDisabled(true);		
 			this.getComponente('nombre_institucion').setValue(r.data.nombre);
 			this.getComponente('doc_id').setValue(r.data.doc_id);
 			this.getComponente('codigo_institucion').setValue(r.data.codigo);
@@ -190,6 +185,21 @@ Phx.vista.Proveedor=Ext.extend(Phx.gridInterfaz,{
 			},
 			type:'TextField',
 			filters:{pfiltro:'provee.numero_sigma',type:'string'},
+			id_grupo:0,
+			grid:true,
+			form:true
+		},
+		{
+			config:{
+				name: 'rotulo_comercial',
+				fieldLabel: 'Rótulo Comercial',
+				allowBlank: false,
+				anchor: '100%',
+				gwidth: 100,
+				maxLength:50
+			},
+			type:'TextField',
+			filters:{pfiltro:'provee.rotulo_comercial',type:'string'},
 			id_grupo:0,
 			grid:true,
 			form:true
@@ -502,7 +512,7 @@ Phx.vista.Proveedor=Ext.extend(Phx.gridInterfaz,{
 				allowBlank: true,
 				anchor: '100%',
 				gwidth: 100,
-				maxLength:50
+				maxLength:200
 			},
 			type:'TextField',
 			filters:{pfiltro:'per.direccion',type:'string'},
@@ -545,7 +555,7 @@ Phx.vista.Proveedor=Ext.extend(Phx.gridInterfaz,{
 				allowBlank: true,
 				anchor: '100%',
 				gwidth: 100,
-				maxLength:50
+				maxLength:200
 			},
 			type:'TextField',
 			id_grupo:2,
@@ -766,6 +776,7 @@ Phx.vista.Proveedor=Ext.extend(Phx.gridInterfaz,{
 		{name:'id_lugar', type: 'string'},
 		{name:'lugar', type: 'string'},
 		{name:'pais', type: 'string'},
+		{name:'rotulo_comercial', type: 'string'},
 		{name:'nombre_proveedor', type: 'string'}
 	],
 	
