@@ -781,6 +781,8 @@ BEGIN
          --------------------------------------------------
           IF  v_parametros.operacion = 'verificar' THEN
           
+          
+         
                   --buscamos siguiente estado correpondiente al proceso del WF
                  
                   ----- variables de retorno------
@@ -805,7 +807,7 @@ BEGIN
                   
                 
                 
-                
+               
                 
                 --verificamos si es el estado recomendao
                 if va_codigo_estado[1] in ('recomendado') then
@@ -845,6 +847,8 @@ BEGIN
                 
                 IF v_perdir_obs = 'no' THEN
                 
+              
+                
                     IF v_num_estados = 1 then
                           -- si solo hay un estado,  verificamos si tiene mas de un funcionario por este estado
                          SELECT 
@@ -857,6 +861,8 @@ BEGIN
                              v_fecha_coti, --OJO verificar si la fecha actul nos sir ve o utilizamos la fecha de la solcitud
                              v_id_estado_wf,
                              TRUE) AS (total bigint);
+                             
+                                
                              
                         IF v_num_funcionarios = 1 THEN
                         -- si solo es un funcionario, recuperamos el funcionario correspondiente
@@ -876,7 +882,9 @@ BEGIN
                                    desc_funcionario_cargo text,
                                    prioridad integer);
                         END IF;    
-                             
+                          
+                        
+                         
                       
                       --verificamos el numero de deptos
                       
@@ -929,6 +937,8 @@ BEGIN
                 v_resp = pxp.f_agrega_clave(v_resp,'id_depto_estado',v_id_depto_estado::varchar);
                 v_resp = pxp.f_agrega_clave(v_resp,'id_tipo_estado', va_id_tipo_estado[1]::varchar);
             
+          
+           
             
            ----------------------------------------
            --Se se solicita cambiar de estado a la solicitud
@@ -1544,7 +1554,7 @@ BEGIN
                        NULL, 
                        v_parametros.id_depto_tes,
                        'Obligacion de pago para la OC'||v_numero_oc,
-                       'OBLI',
+                       'OBLI,OBLIND,OBLINR,OBLIINTPD,OBLIINTR',     -->  si se agregan flujos se tiene que regsitras mas codigos de obligacion (sin espacio, solo divididos por comas)
                        'OP-'||v_numero_oc);
                        
                        
