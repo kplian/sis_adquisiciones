@@ -633,12 +633,6 @@ ALTER TABLE adq.tpresolicitud_det
 
 
 
-ALTER TABLE adq.tpresolicitud_det
-  ADD CONSTRAINT tpresolicitud_det__id_solicitud_det FOREIGN KEY (id_solicitud_det)
-    REFERENCES adq.tsolicitud_det(id_solicitud_det)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION
-    NOT DEFERRABLE;
 
 --------------- SQL ---------------
 

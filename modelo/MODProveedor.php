@@ -42,6 +42,7 @@ class MODProveedor extends MODbase{
 		$this->captura('nombre','varchar');	
 		$this->captura('lugar','varchar');
 		$this->captura('nombre_proveedor','varchar');
+		$this->captura('rotulo_comercial','varchar');
 				
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -97,6 +98,7 @@ class MODProveedor extends MODbase{
 		$this->setParametro('genero','genero','varchar');
 		$this->setParametro('fecha_nacimiento','fecha_nacimiento','date');
 		$this->setParametro('direccion','direccion','varchar');
+		$this->setParametro('rotulo_comercial','rotulo_comercial','varchar');
 		//Ejecuta la instruccion
 		$this->armarConsulta();
 		$this->ejecutarConsulta();
@@ -150,6 +152,7 @@ class MODProveedor extends MODbase{
 		$this->setParametro('genero','genero','varchar');
 		$this->setParametro('fecha_nacimiento','fecha_nacimiento','date');
 		$this->setParametro('direccion','direccion','varchar');
+		$this->setParametro('rotulo_comercial','rotulo_comercial','varchar');
 		
 
 		//Ejecuta la instruccion

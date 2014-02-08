@@ -69,7 +69,7 @@ BEGIN
                         v_parametros.nombre || ''',''' ||  v_parametros.apellido_paterno || ''',''' ||  v_parametros.apellido_materno || ''','||  
                         coalesce (v_parametros.ci::text, 'NULL') || ',''' ||  v_parametros.correo || ''',' ||  coalesce (v_parametros.celular1::text, 'NULL') || ',' ||  coalesce (v_parametros.celular2::text, 'NULL') || ',' ||  
                         coalesce (v_parametros.telefono1::text, 'NULL') || ',' || coalesce (v_parametros.telefono2::text, 'NULL') || ',''' ||  v_parametros.genero || ''',' ||  coalesce ('''' || v_parametros.fecha_nacimiento::text || '''', 'NULL') || ',''' || 
-                        v_parametros.direccion || ''')',TRUE)AS t1(resp varchar)
+                        v_parametros.direccion || ''',''' || v_parametros.rotulo_comercial || ''')',TRUE)AS t1(resp varchar)
             			into v_resp;
                  
                  
@@ -84,7 +84,7 @@ BEGIN
                     (id_usuario_reg, 				fecha_reg,					estado_reg,
                      id_institucion,				id_persona,					tipo,
                      numero_sigma,					codigo,						nit,
-                     id_lugar)
+                     id_lugar,						rotulo_comercial)
                     values 
                     (p_id_usuario,					now(),						'activo',
                     v_parametros.id_institucion,	v_parametros.id_persona,	case when v_parametros.id_persona is NULL THEN
@@ -93,7 +93,7 @@ BEGIN
                                                                                     'persona'
                                                                                 end,
                     v_parametros.numero_sigma,		v_parametros.codigo,		v_parametros.nit,
-                    v_parametros.id_lugar)RETURNING id_proveedor into v_id_proveedor;
+                    v_parametros.id_lugar,			v_parametros.rotulo_comercial)RETURNING id_proveedor into v_id_proveedor;
                 else
                     if (v_parametros.tipo = 'persona')then
                         insert into segu.tpersona (
@@ -180,7 +180,7 @@ BEGIN
                         (id_usuario_reg, 				fecha_reg,					estado_reg,
                          id_institucion,				id_persona,					tipo,
                          numero_sigma,					codigo,						nit,
-                         id_lugar)
+                         id_lugar,						rotulo_comercial)
                         values 
                         (p_id_usuario,					now(),						'activo',
                         v_id_institucion,				v_id_persona,				case when v_id_persona is NULL THEN
@@ -189,7 +189,7 @@ BEGIN
                                                                                         'persona'
                                                                                     end,
                         v_parametros.numero_sigma,		v_parametros.codigo,		v_parametros.nit,
-                        v_parametros.id_lugar)RETURNING id_proveedor into v_id_proveedor;
+                        v_parametros.id_lugar,			v_parametros.rotulo_comercial)RETURNING id_proveedor into v_id_proveedor;
                 end if;
             end if;
             
@@ -241,7 +241,7 @@ BEGIN
                         v_parametros.nombre || ''',''' ||  v_parametros.apellido_paterno || ''',''' ||  v_parametros.apellido_materno || ''','||  
                         coalesce (v_parametros.ci::text, 'NULL') || ',''' ||  v_parametros.correo || ''',' ||  coalesce (v_parametros.celular1::text, 'NULL') || ',' ||  coalesce (v_parametros.celular2::text, 'NULL') || ',' ||  
                         coalesce (v_parametros.telefono1::text, 'NULL') || ',' || coalesce (v_parametros.telefono2::text, 'NULL') || ',''' ||  v_parametros.genero || ''',' ||  coalesce ('''' || v_parametros.fecha_nacimiento::text || '''', 'NULL') || ',''' || 
-                        v_parametros.direccion || ''')',TRUE)AS t1(resp varchar)
+                        v_parametros.direccion || ''',''' || v_parametros.rotulo_comercial || ''')',TRUE)AS t1(resp varchar)
             			into v_resp;                 
                  
                  select * FROM dblink(migra.f_obtener_cadena_conexion(),
@@ -258,7 +258,8 @@ BEGIN
                 nit = v_parametros.nit,
                 codigo = v_parametros.codigo,
 				id_usuario_mod = p_id_usuario,
-				fecha_mod = now()
+				fecha_mod = now(),
+                rotulo_comercial = v_parametros.rotulo_comercial
 				where id_proveedor=v_parametros.id_proveedor;
             end if;
                
@@ -294,7 +295,7 @@ BEGIN
                     NULL, NULL, NULL, NULL, NULL,
                     NULL, NULL, NULL, NULL, NULL,
                     NULL, NULL, NULL, NULL, NULL, NULL, NULL
-                    ,NULL, NULL)',TRUE)AS t1(resp varchar)
+                    ,NULL, NULL,NULL)',TRUE)AS t1(resp varchar)
             	into v_resp;  
                  
                  

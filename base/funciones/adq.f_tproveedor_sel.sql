@@ -72,7 +72,8 @@ BEGIN
                         	instit.nombre
                         else
                         	person.nombre_completo1
-                        end):: varchar as nombre_proveedor
+                        end):: varchar as nombre_proveedor,
+                        provee.rotulo_comercial
 						from param.tproveedor provee
 						inner join segu.tusuario usu1 on usu1.id_usuario = provee.id_usuario_reg
 						left join segu.tusuario usu2 on usu2.id_usuario = provee.id_usuario_mod   
