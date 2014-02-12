@@ -401,6 +401,7 @@ Phx.vista.Proveedor=Ext.extend(Phx.gridInterfaz,{
 				fieldLabel: 'Correo',
 				allowBlank: true,
 				anchor: '100%',
+				vtype:'email',	
 				gwidth: 100,
 				maxLength:50
 			},
@@ -652,6 +653,7 @@ Phx.vista.Proveedor=Ext.extend(Phx.gridInterfaz,{
 				fieldLabel: 'Email 1',
 				allowBlank: true,
 				anchor: '100%',
+				vtype:'email',	
 				gwidth: 100,
 				maxLength:50
 			},
@@ -666,6 +668,7 @@ Phx.vista.Proveedor=Ext.extend(Phx.gridInterfaz,{
 				fieldLabel: 'Email 2',
 				allowBlank: true,
 				anchor: '100%',
+				vtype:'email',	
 				gwidth: 100,
 				maxLength:50
 			},
@@ -849,7 +852,10 @@ Phx.vista.Proveedor=Ext.extend(Phx.gridInterfaz,{
 				}
 				
 		//},this);
-		
+		//jrr:provisionalmente se ocultan estos campos
+		this.ocultarComponente(this.getComponente('codigo_institucion'));
+		this.ocultarComponente(this.getComponente('codigo_banco'));
+		//
 		
 		
 	},
@@ -859,6 +865,7 @@ Phx.vista.Proveedor=Ext.extend(Phx.gridInterfaz,{
 		this.Cmp.id_institucion.store.baseParams.no_es_proveedor = '';
 		this.Cmp.id_persona.store.baseParams.query = '';
 		this.Cmp.id_institucion.store.baseParams.query = '';
+		
 		this.register='update';
 		
 		datos=this.sm.getSelected().data;
@@ -918,6 +925,10 @@ Phx.vista.Proveedor=Ext.extend(Phx.gridInterfaz,{
 		}
 		this.getComponente('id_persona').disable();
 		this.getComponente('id_institucion').disable();
+		//jrr:provisionalmente se ocultan estos campos
+		this.ocultarComponente(this.getComponente('codigo_institucion'));
+		this.ocultarComponente(this.getComponente('codigo_banco'));
+		//
 	},
 	
 	fheight: '95%',
