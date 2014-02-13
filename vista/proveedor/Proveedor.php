@@ -74,7 +74,7 @@ Phx.vista.Proveedor=Ext.extend(Phx.gridInterfaz,{
 				this.getComponente('rotulo_comercial').setValue(r.data.nombre);
 			}
 			
-			this.getComponente('nombre_institucion').setDisabled(true);		
+			this.getComponente('nombre_institucion').setDisabled(true);	
 			this.getComponente('nombre_institucion').setValue(r.data.nombre);
 			this.getComponente('doc_id').setValue(r.data.doc_id);
 			this.getComponente('codigo_institucion').setValue(r.data.codigo);
@@ -353,7 +353,7 @@ Phx.vista.Proveedor=Ext.extend(Phx.gridInterfaz,{
 		{
 			config:{
 				name: 'apellido_paterno',
-				fieldLabel: 'Apellido Paterno',
+				fieldLabel: 'Primer Apellido',
 				allowBlank: true,
 				anchor: '100%',
 				gwidth: 100,
@@ -368,7 +368,7 @@ Phx.vista.Proveedor=Ext.extend(Phx.gridInterfaz,{
 		{
 			config:{
 				name: 'apellido_materno',
-				fieldLabel: 'Apellido Materno',
+				fieldLabel: 'Segundo Apellido',
 				allowBlank: true,
 				anchor: '100%',
 				gwidth: 100,
@@ -829,7 +829,9 @@ Phx.vista.Proveedor=Ext.extend(Phx.gridInterfaz,{
 					this.unblockGroup(1);
 					this.mostrarGrupo(1);
 					this.ocultarGrupo(2);
-					
+					this.getComponente('nombre_institucion').allowBlank = true;	
+					this.getComponente('nombre').allowBlank = false;	
+					this.getComponente('apellido_paterno').allowBlank = false;
 					//this.getComponente('id_institucion').allowBlank=true;
 					//this.getComponente('id_persons').allowBlank=false;
 					this.getComponente('id_institucion').reset();
@@ -844,7 +846,9 @@ Phx.vista.Proveedor=Ext.extend(Phx.gridInterfaz,{
 					this.unblockGroup(2);
 					this.mostrarGrupo(2);
 					this.ocultarGrupo(1);
-					//
+					this.getComponente('nombre_institucion').allowBlank = false;	
+					this.getComponente('nombre').allowBlank = true;	
+					this.getComponente('apellido_paterno').allowBlank = true;
 					//this.getComponente('id_persona').allowBlank=true;
 					this.getComponente('id_persona').reset();
 					this.getComponente('id_persona').disable();
@@ -893,6 +897,9 @@ Phx.vista.Proveedor=Ext.extend(Phx.gridInterfaz,{
 			this.mostrarGrupo(1);
 			this.ocultarGrupo(2);
 			this.unblockGroup(1);
+			this.getComponente('nombre_institucion').allowBlank = true;	
+			this.getComponente('nombre').allowBlank = false;	
+			this.getComponente('apellido_paterno').allowBlank = false;
 			
 			
 			//this.ocultarComponente(this.getComponente('tipo'));
@@ -918,6 +925,9 @@ Phx.vista.Proveedor=Ext.extend(Phx.gridInterfaz,{
 			this.mostrarGrupo(2);
 			this.ocultarGrupo(1);
 			this.unblockGroup(2);
+			this.getComponente('nombre_institucion').allowBlank = false;	
+			this.getComponente('nombre').allowBlank = true;	
+			this.getComponente('apellido_paterno').allowBlank = true;
 			//this.ocultarComponente(this.getComponente('tipo'));
 			//this.getComponente('tipo').setValue(datos.tipo);
 		 
