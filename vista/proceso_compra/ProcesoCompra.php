@@ -455,8 +455,8 @@ Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
             Phx.CP.loadWindows('../../../sis_workflow/vista/documento_wf/DocumentoWf.php',
                     'Chequear documento del WF',
                     {
-                        width:700,
-                        height:450
+                        width:'90%',
+                        height:500
                     },
                     rec.data,
                     this.idContenedor,
