@@ -57,7 +57,7 @@ class RCuadroComparativo extends Report{
                     ),
                   ),
                 );
-                
+                //ESTILO PARA EL PRECIO TOTAL
                 $styleArrayPriceTotal = array(
                 'font'  => array(
                     'bold'  => true,
@@ -81,6 +81,31 @@ class RCuadroComparativo extends Report{
                    )
                 
                 );
+                //ESTILO PARA CANTIDAD ADJUDICADA MAYOR A CERO
+                $styleArrayCantAdjudicada = array(
+                'font'  => array(
+                    'bold'  => true,
+                    'color' => array('rgb' => '32CD32'),
+                    'size'  => 10,
+                    'name'  => 'Verdana'
+                ),
+                'borders' => array(
+                    'left' => array(
+                      'style' => PHPExcel_Style_Border::BORDER_THIN,
+                    ),
+                    'right' => array(
+                      'style' => PHPExcel_Style_Border::BORDER_THIN,
+                    ),
+                    'bottom' => array(
+                      'style' => PHPExcel_Style_Border::BORDER_THIN,
+                    ),
+                    'top' => array(
+                      'style' => PHPExcel_Style_Border::BORDER_THIN,
+                    )
+                   )
+                
+                );
+                
                 
                 
 				$objectActiveSheet->getColumnDimension('B')->setWidth(20);
@@ -120,6 +145,9 @@ class RCuadroComparativo extends Report{
 				//recorre las cotizaciones
 				
 				foreach ($datasetCotizaciones as $provider) {
+					                   
+					         //dibuja los header de la tabla      
+					           
 					              
 					        $precio_total_adj = 0;  
 					        $objectActiveSheet->mergeCellsByColumnAndRow($column,$file,$column+4,$file);
@@ -156,7 +184,7 @@ class RCuadroComparativo extends Report{
 							
 							$itemsCotizadosPorProveedor = $provider['dataset']->getDataset();
 							
-							//INTRODUCE LOS VALORES DE LACOTIZACION PARA QUE DETALLE DE LA SOLCITUD
+							//INTRODUCE LOS VALORES DE LACOTIZACION PARA CADA DETALLE DE LA SOLCITUD
 							//prepara los valores de la cotizacion en la siguiete fila para cada item cotizado
 							
 							$fileItemCotizado=$file+2;
@@ -185,21 +213,28 @@ class RCuadroComparativo extends Report{
                                                  }
     							        }
 							    
+											//TODO CAMBIAR COLOR SI CANTIDAD ADJUDICADA ES MAYOR A CERO
+											
+											if($cantidad_adjudicada > 0){
+											    $tmpArray =   $styleArrayCantAdjudicada;
+											}else{
+											    $tmpArray = $styleArrayCell;
+											}
 											
 								 			$objectActiveSheet->setCellValueByColumnAndRow($column, $fileItemCotizado, $cantidad_coti);
-											$objectActiveSheet->getStyleByColumnAndRow($column,$fileItemCotizado)->applyFromArray($styleArrayCell);	
+											$objectActiveSheet->getStyleByColumnAndRow($column,$fileItemCotizado)->applyFromArray($tmpArray);	
 																								
 											$objectActiveSheet->setCellValueByColumnAndRow($column+1, $fileItemCotizado, $precio_unitario);
-											$objectActiveSheet->getStyleByColumnAndRow($column+1,$fileItemCotizado)->applyFromArray($styleArrayCell);
+											$objectActiveSheet->getStyleByColumnAndRow($column+1,$fileItemCotizado)->applyFromArray($tmpArray);
 											
 											$objectActiveSheet->setCellValueByColumnAndRow($column+2, $fileItemCotizado,$precio_total );
-											$objectActiveSheet->getStyleByColumnAndRow($column+2,$fileItemCotizado)->applyFromArray($styleArrayCell);
+											$objectActiveSheet->getStyleByColumnAndRow($column+2,$fileItemCotizado)->applyFromArray($tmpArray);
 									
                                             $objectActiveSheet->setCellValueByColumnAndRow($column+3, $fileItemCotizado,$cantidad_adjudicada );
-                                            $objectActiveSheet->getStyleByColumnAndRow($column+3,$fileItemCotizado)->applyFromArray($styleArrayCell);
+                                            $objectActiveSheet->getStyleByColumnAndRow($column+3,$fileItemCotizado)->applyFromArray($tmpArray);
                                     
                                             $objectActiveSheet->setCellValueByColumnAndRow($column+4, $fileItemCotizado,$precio_adjudicado );
-                                            $objectActiveSheet->getStyleByColumnAndRow($column+4,$fileItemCotizado)->applyFromArray($styleArrayCell);
+                                            $objectActiveSheet->getStyleByColumnAndRow($column+4,$fileItemCotizado)->applyFromArray($tmpArray);
                                     
                                            
 											$fileItemCotizado=$fileItemCotizado+1;

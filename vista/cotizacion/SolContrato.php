@@ -59,7 +59,7 @@ Phx.vista.SolContrato=Ext.extend(Phx.frmInterfaz,{
         CuerpoCorreo+='Email proveedor: '+this.email+'</br>';
         CuerpoCorreo+='Tramite: '+ this.num_tramite+'<br>';
         CuerpoCorreo+='OC: '+this.numero_oc+'</BR>';
-        CuerpoCorreo+='<br>Solitiado por: <br> '+Phx.CP.config_ini.nombre_usuario;
+        CuerpoCorreo+='<br>Solicitado por: <br> '+Phx.CP.config_ini.nombre_usuario;
          
         Phx.vista.SolContrato.superclass.loadValoresIniciales.call(this);
         this.getComponente('id_cotizacion').setValue(this.id_cotizacion); 
