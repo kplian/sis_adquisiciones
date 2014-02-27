@@ -18,7 +18,7 @@ Phx.vista.CotizacionAdq = {
     constructor: function(config) {
         
         
-          Phx.vista.CotizacionAdq.superclass.constructor.call(this,config);
+         Phx.vista.CotizacionAdq.superclass.constructor.call(this,config);
           
          
         
@@ -446,6 +446,8 @@ Phx.vista.CotizacionAdq = {
             
             var data = {id_funcionario:this.id_funcionario}
             Ext.apply(data,rec.data)
+            
+            //pop pup confirmacion contrato
             
             Phx.CP.loadWindows('../../../sis_adquisiciones/vista/cotizacion/SolContrato.php',
                 'Solicitar Contrato',

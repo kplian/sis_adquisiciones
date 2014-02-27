@@ -303,19 +303,23 @@ BEGIN
 		begin
           
           
-          --obtenemos datos bascios
+          --obtenemos datos basicos
             select 
             	s.id_estado_wf,
             	s.id_proceso_wf,
             	s.estado,
             	s.id_depto,
-                s.id_solicitud
+                s.id_solicitud,
+                s.numero,
+                s.num_tramite
             into
             	v_id_estado_wf,
                 v_id_proceso_wf,
                 v_codigo_estado,
                 v_id_depto,
-                v_id_solicitud
+                v_id_solicitud,
+                v_numero_sol,
+                v_num_tramite
             
             from adq.tsolicitud s 
             where s.id_solicitud = v_parametros.id_solicitud;
@@ -329,7 +333,7 @@ BEGIN
         
         
         
-			-- si todas las cotizaciones estan anuladas anulamos el proceso
+			-- obtenemos el tipo del estado anulado
             
              select 
               te.id_tipo_estado
@@ -341,8 +345,14 @@ BEGIN
              where pw.id_proceso_wf = v_id_proceso_wf;
                
               
-              
-               -- pasamos la cotizacion al siguiente estado
+             IF v_id_tipo_estado is NULL  THEN
+             
+                raise exception 'No se parametrizo es estado "anulado" para la solicitud de compra';
+             
+             END IF;
+             
+                          
+               -- pasamos la solicitud  al siguiente anulado
            
                v_id_estado_actual =  wf.f_registra_estado_wf(v_id_tipo_estado, 
                                                            NULL, 
@@ -350,10 +360,10 @@ BEGIN
                                                            v_id_proceso_wf,
                                                            p_id_usuario,
                                                            v_id_depto,
-                                                           'Eliminacion de la solicitud'::text);
+                                                           'Eliminacion de la solicitud '|| COALESCE(v_numero_sol,'SN')::text);
             
             
-               -- actualiza estado en la cotizacion
+               -- actualiza estado en la solicitud
               
                update adq.tsolicitud  set 
                  id_estado_wf =  v_id_estado_actual,
@@ -363,7 +373,7 @@ BEGIN
                where id_solicitud  = v_parametros.id_solicitud;
                
             --Definicion de la respuesta
-            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Solicitud de Compras anulada'); 
+            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Solicitud de Compras anulada' ||COALESCE(v_numero_sol,'SN')); 
             v_resp = pxp.f_agrega_clave(v_resp,'id_solicitud',v_parametros.id_solicitud::varchar);
               
             --Devuelve la respuesta
@@ -725,7 +735,12 @@ BEGIN
             
            if v_obs ='' THEN
            
-            v_obs = ' (Sin observaciones),  Cambio de estado';
+              v_obs = ' Cambio de estado de la solicitud '||COALESCE(v_numero_sol,'S/N')||'  de  la uo '||COALESCE(v_uo_sol,'-');
+           
+           ELSE
+           
+              v_obs = 'Solicitud  de compra '||COALESCE(v_numero_sol,'S/N')||'  para  la uo OBS:'||COALESCE(v_uo_sol,'-')||' ('|| COALESCE(v_obs,'S/O')||')';
+           
            
            END IF;
             
@@ -736,7 +751,7 @@ BEGIN
                                                            v_id_proceso_wf,
                                                            p_id_usuario,
                                                            v_id_depto,
-                                                           COALESCE(v_numero_sol,'S/N')||' -  '|| v_obs);
+                                                           v_obs);
             
             
              -- actualiza estado en la solicitud

@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION adq.f_cotizacion_ime (
   p_administrador integer,
   p_id_usuario integer,
@@ -1554,7 +1552,7 @@ BEGIN
                        NULL, 
                        v_parametros.id_depto_tes,
                        'Obligacion de pago para la OC'||v_numero_oc,
-                       'OBLI,OBLIND,OBLINR,OBLIINTPD,OBLIINTR',     -->  si se agregan flujos se tiene que regsitras mas codigos de obligacion (sin espacio, solo divididos por comas)
+                       'OBLI,OBLIND,OBLINR,OBLIINTPD,OBLIINTPR',     -->  si se agregan flujos se tiene que regsitras mas codigos de obligacion (sin espacio, solo divididos por comas)
                        'OP-'||v_numero_oc);
                        
                        
