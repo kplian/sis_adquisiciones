@@ -284,8 +284,7 @@ class ACTCotizacion extends ACTbase{
         
         $this->objFunc=$this->create('MODCotizacion' );
         $this->res=$this->objFunc->SolicitarContrato($this->objParam);
-        $this->res->imprimirRespuesta($this->res->generarJson()); 
-        
+       
         if($this->res->getTipo()=='ERROR'){
            $this->res->imprimirRespuesta($this->res->generarMensajeJson());
            exit;
