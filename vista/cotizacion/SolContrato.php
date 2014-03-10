@@ -42,9 +42,13 @@ Phx.vista.SolContrato=Ext.extend(Phx.frmInterfaz,{
             Phx.CP.loadingHide();
             var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
             if(reg.ROOT.datos.resultado!='falla'){
-                console.log(reg)
+                 if(!reg.ROOT.datos.email_notificaciones_1){
+                     
+                     alert('Confgure el EMAIL de notificaciones 1, en el archivo de datos generales');
+                 }
                 
-                this.getComponente('email_cc').setValue(reg.ROOT.datos.email_empresa);
+                 this.getComponente('email').setValue(reg.ROOT.datos.email_notificaciones_1);
+                 this.getComponente('email_cc').setValue(reg.ROOT.datos.email_empresa);
                
              }else{
                 alert(reg.ROOT.datos.mensaje)

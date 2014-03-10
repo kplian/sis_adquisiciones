@@ -533,12 +533,16 @@ Phx.vista.CotizacionVbDin = {
             
             this.getBoton('diagrama_gantt').disable();
             this.getBoton('btnChequeoDocumentosWf').disable(); 
-             this.menuAdq.disable();
+            this.menuAdq.disable();
             
             
             }
        return tb
-      }
+  },
+    sortInfo:{
+        field: 'cot.fecha_reg',
+        direction: 'DESC'
+    },
         
     
     
