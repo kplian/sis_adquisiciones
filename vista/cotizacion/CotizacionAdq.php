@@ -449,13 +449,18 @@ Phx.vista.CotizacionAdq = {
             
             //pop pup confirmacion contrato
             
-            Phx.CP.loadWindows('../../../sis_adquisiciones/vista/cotizacion/SolContrato.php',
-                'Solicitar Contrato',
-                {
-                    modal:true,
-                    width:700,
-                    height:500
-                },data ,this.idContenedor,'SolContrato')
+            if(confirm('Intrucciones RPC: ' + this.instruc_rpc + '\nDesea Continuar?' )){
+                 Phx.CP.loadWindows('../../../sis_adquisiciones/vista/cotizacion/SolContrato.php',
+                    'Solicitar Contrato',
+                    {
+                        modal:true,
+                        width:700,
+                        height:500
+                    },data ,this.idContenedor,'SolContrato')
+                 
+             } 
+            
+            
         },
        
        
