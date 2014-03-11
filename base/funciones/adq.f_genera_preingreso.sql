@@ -124,7 +124,7 @@ BEGIN
        NULL, 
        v_id_depto, 
        'Preingreso de almacenes',
-       'ALPRE,ALPREIND,ALPREND',
+       'ALPRE,ALPREIND,ALPREND,ALPRENR',
        'PIA-'||v_rec_cot.numero_oc
        );
     
