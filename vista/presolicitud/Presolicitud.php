@@ -109,7 +109,7 @@ Phx.vista.Presolicitud=Ext.extend(Phx.gridInterfaz,{
                     fields: ['id_grupo','nombre','obs'],
                     // turn on remote sorting
                     remoteSort: true,
-                    baseParams:{par_filtro:'PERSON.nombre_completo2#cuenta'}
+                    baseParams:{par_filtro:'nombre#obs'}
                 }),
                 valueField: 'id_grupo',
                 displayField: 'nombre',

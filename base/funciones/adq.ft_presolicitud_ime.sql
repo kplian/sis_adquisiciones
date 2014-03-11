@@ -43,6 +43,7 @@ DECLARE
     v_registros_pre record;
 
     v_id_gestion integer;
+    v_count_det  integer;
 
 			    
 BEGIN
@@ -187,12 +188,36 @@ BEGIN
             
             END IF;
             
+            --validar que tenga items en la solicitud
+            
+            
+            select 
+              count(pd.id_presolicitud_det)
+            into
+              v_count_det
+            from adq.tpresolicitud_det pd
+            where pd.id_presolicitud = v_parametros.id_presolicitud 
+                  and pd.estado_reg = 'activo';
+            
+            
+            IF  v_count_det = 0  THEN
+            
+               raise exception 'La presolictud tiene elementos...';
+            
+            END IF;
+            
+            
             update adq.tpresolicitud 
             set
             estado = 'pendiente',
             id_usuario_mod = p_id_usuario,
             fecha_mod = now()
             where id_presolicitud = v_parametros.id_presolicitud;
+            
+            
+            
+            
+            
             
                
             --Definicion de la respuesta

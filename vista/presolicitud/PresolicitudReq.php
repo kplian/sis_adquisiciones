@@ -45,8 +45,14 @@ Phx.vista.PresolicitudReq = {
         
         this.Cmp.id_funcionario.on('select',function(rec){ 
             
-            //Aprobador  
+            /*//Aprobador  
             this.cmpIdFuncionarioSupervisor.store.baseParams.id_funcionario=this.Cmp.id_funcionario.getValue();
+            this.cmpIdFuncionarioSupervisor.store.baseParams.fecha = this.cmpFechaSoli.getValue().dateFormat(this.cmpFechaSoli.format);
+            this.cmpIdFuncionarioSupervisor.modificado=true;*/
+           
+           
+           //Aprobador  
+            this.cmpIdFuncionarioSupervisor.store.baseParams.id_funcionario_dependiente=this.Cmp.id_funcionario.getValue();
             this.cmpIdFuncionarioSupervisor.store.baseParams.fecha = this.cmpFechaSoli.getValue().dateFormat(this.cmpFechaSoli.format);
             this.cmpIdFuncionarioSupervisor.modificado=true;
             
