@@ -10,6 +10,14 @@ $body$
 Autor: RCM
 Fecha: 01/10/2013
 Descripción: Generar el Preingreso a Almacén o a Activos Fijos
+
+----------------------------------
+
+Autor: 			RAC
+Fecha:   		14/03/2014
+Descripcion:  	Se generan id_proceso_wf independientes para almances y activos fijos
+
+
 */
 
 DECLARE
@@ -58,9 +66,12 @@ BEGIN
 	if v_rec_cot.id_cotizacion is null then
     	raise exception 'Cotización no encontrada';
     end if;
+    
     if v_rec_cot.id_obligacion_pago is null then
     	raise exception 'La Cotización aún no ha sido habilitada para Pago';
     end if;
+    
+    --TODO ................  QUE PASA SI TIENE MAS DE UN PREINGESO
     
     --Verifica que no haya generado ya un Preingreso
     if exists(select 1
@@ -91,7 +102,8 @@ BEGIN
                   inner join param.tconcepto_ingas cin
                   on cin.id_concepto_ingas = sdet.id_concepto_ingas
                   where cdet.id_cotizacion = p_id_cotizacion
-                  and lower(cin.tipo) = 'bien'and lower(cin.almacenable) = 'si') then
+                  and lower(cin.tipo) = 'bien' 
+                  and lower(cin.almacenable) = 'si') then
         v_alm = 1;
     end if;
     
@@ -112,102 +124,125 @@ BEGIN
     	raise exception 'La cotización no tiene ningún Bien Almacenable ni Activo Fijo. Nada que hacer.';
     end if;
 
-	---------------------
-    --OBTENCION DATOS WF
-    ---------------------
-    --Obtener el estado siguiente de la cotización para el Preingreso
-    SELECT ps_id_proceso_wf, ps_id_estado_wf, ps_codigo_estado
-    into v_id_proceso_wf, v_id_estado_wf, v_codigo_estado
-    FROM wf.f_registra_proceso_disparado_wf(
-       p_id_usuario, 
-       v_rec_cot.id_estado_wf,
-       NULL, 
-       v_id_depto, 
-       'Preingreso de almacenes',
-       'ALPRE,ALPREIND,ALPREND,ALPRENR',
-       'PIA-'||v_rec_cot.numero_oc
-       );
-    
+	
     --------------------------
     -- CREACIÓN DE PREINGRESO
     --------------------------
     --Preingreso para almacenes
     if v_alm>0 then
-        insert into alm.tpreingreso(
-           id_usuario_reg, 
-           fecha_reg, 
-           estado_reg, 
-           id_cotizacion,
-           id_depto, 
-           id_estado_wf, 
-           id_proceso_wf,  
-           estado, 
-           id_moneda,
-           tipo, 
-           descripcion, 
-           id_depto_conta
-        ) values(
-           p_id_usuario, 
-           now(),
-           'activo',
-           p_id_cotizacion,
-           null, 
-           v_id_estado_wf, 
-           v_id_proceso_wf, 
-           v_codigo_estado, 
-           v_id_moneda,
-           'almacen', 
-           v_rec_cot.justificacion, 
-           v_id_depto_conta
-        ) returning id_preingreso into v_id_preingreso;
+    
+    
+      -- REgistra el proceso siguiente de la cotización para el Preingreso de almacenes
+            
+            SELECT ps_id_proceso_wf, ps_id_estado_wf, ps_codigo_estado
+            into v_id_proceso_wf, v_id_estado_wf, v_codigo_estado
+            FROM wf.f_registra_proceso_disparado_wf(
+               p_id_usuario, 
+               v_rec_cot.id_estado_wf,
+               NULL, 
+               v_id_depto, 
+               'Preingreso de almacenes',
+               'ALPRE,ALPREIND,ALPREND,ALPRENR',  --no tiene que tenes espacios
+               'PAL-'||v_rec_cot.numero_oc
+               );
         
-        --Generación del detalle del preingreso  de activo fijo
-        insert into alm.tpreingreso_det(
-        id_usuario_reg, fecha_reg, estado_reg,
-        id_preingreso, id_cotizacion_det, cantidad_det, precio_compra
-        )
-        select
-        p_id_usuario, now(),'activo',
-        v_id_preingreso,cdet.id_cotizacion_det, cdet.cantidad_adju, cdet.precio_unitario_mb
-        from adq.tcotizacion_det cdet
-        inner join adq.tsolicitud_det sdet
-        on sdet.id_solicitud_det = cdet.id_solicitud_det
-        inner join param.tconcepto_ingas cin
-        on cin.id_concepto_ingas = sdet.id_concepto_ingas
-        where cdet.id_cotizacion = p_id_cotizacion
-        and lower(cin.tipo) = 'bien'
-        and cin.almacenable = 'si';
+        
+          insert into alm.tpreingreso(
+               id_usuario_reg, 
+               fecha_reg, 
+               estado_reg, 
+               id_cotizacion,
+               id_depto, 
+               id_estado_wf, 
+               id_proceso_wf,  
+               estado, 
+               id_moneda,
+               tipo, 
+               descripcion, 
+               id_depto_conta
+            ) values(
+               p_id_usuario, 
+               now(),
+               'activo',
+               p_id_cotizacion,
+               null, 
+               v_id_estado_wf, 
+               v_id_proceso_wf, 
+               v_codigo_estado, 
+               v_id_moneda,
+               'almacen', 
+               v_rec_cot.justificacion, 
+               v_id_depto_conta
+            ) returning id_preingreso into v_id_preingreso;
+            
+            --Generación del detalle del preingreso  de activo fijo
+            insert into alm.tpreingreso_det(
+            id_usuario_reg, fecha_reg, estado_reg,
+            id_preingreso, id_cotizacion_det, cantidad_det, precio_compra
+            )
+            select
+            p_id_usuario, now(),'activo',
+            v_id_preingreso,cdet.id_cotizacion_det, cdet.cantidad_adju, cdet.precio_unitario_mb
+            from adq.tcotizacion_det cdet
+            inner join adq.tsolicitud_det sdet
+            on sdet.id_solicitud_det = cdet.id_solicitud_det
+            inner join param.tconcepto_ingas cin
+            on cin.id_concepto_ingas = sdet.id_concepto_ingas
+            where cdet.id_cotizacion = p_id_cotizacion
+            and lower(cin.tipo) = 'bien'
+            and cin.almacenable = 'si';
+            
     end if;
     
     --Preingreso para Activos Fijos
     if v_af>0 then
-        insert into alm.tpreingreso(
-        id_usuario_reg, fecha_reg, estado_reg, id_cotizacion,
-        id_depto, id_estado_wf, id_proceso_wf, estado, id_moneda,
-        tipo
-        ) values(
-        p_id_usuario, now(),'activo',p_id_cotizacion,
-        null, v_id_estado_wf, v_id_proceso_wf, v_codigo_estado, v_id_moneda,
-        'activo_fijo'
-        ) returning id_preingreso into v_id_preingreso;
+    
+    
+           -- REgistra el proceso siguiente de la cotización para el Preingreso de Aactivo Fijos
+            
+            SELECT ps_id_proceso_wf, ps_id_estado_wf, ps_codigo_estado
+            into v_id_proceso_wf, v_id_estado_wf, v_codigo_estado
+            FROM wf.f_registra_proceso_disparado_wf(
+               p_id_usuario, 
+               v_rec_cot.id_estado_wf,
+               NULL, 
+               v_id_depto, 
+               'Preingreso de activos fijos',
+               'ALPRE,ALPREIND,ALPREND,ALPRENR',  --no tiene que tenes espacios
+               'PAF-'||v_rec_cot.numero_oc
+               );
+    
+    
+    
+    
+    
+            insert into alm.tpreingreso(
+            id_usuario_reg, fecha_reg, estado_reg, id_cotizacion,
+            id_depto, id_estado_wf, id_proceso_wf, estado, id_moneda,
+            tipo
+            ) values(
+            p_id_usuario, now(),'activo',p_id_cotizacion,
+            null, v_id_estado_wf, v_id_proceso_wf, v_codigo_estado, v_id_moneda,
+            'activo_fijo'
+            ) returning id_preingreso into v_id_preingreso;
 
-        --Generación del detalle del preingreso de activo fijo
-        insert into alm.tpreingreso_det(
-        id_usuario_reg, fecha_reg, estado_reg,
-        id_preingreso, id_cotizacion_det, cantidad_det, precio_compra
-        )
-        select
-        p_id_usuario, now(),'activo',        
-        v_id_preingreso,cdet.id_cotizacion_det, cdet.cantidad_adju, cdet.precio_unitario_mb
-        from adq.tcotizacion_det cdet
-        inner join adq.tsolicitud_det sdet
-        on sdet.id_solicitud_det = cdet.id_solicitud_det
-        inner join param.tconcepto_ingas cin
-        on cin.id_concepto_ingas = sdet.id_concepto_ingas
-        where cdet.id_cotizacion = p_id_cotizacion
-        and lower(cin.tipo) = 'bien'
-        and lower(cin.activo_fijo) = 'si'
-        and lower(cin.almacenable) = 'no';
+            --Generación del detalle del preingreso de activo fijo
+            insert into alm.tpreingreso_det(
+            id_usuario_reg, fecha_reg, estado_reg,
+            id_preingreso, id_cotizacion_det, cantidad_det, precio_compra
+            )
+            select
+            p_id_usuario, now(),'activo',        
+            v_id_preingreso,cdet.id_cotizacion_det, cdet.cantidad_adju, cdet.precio_unitario_mb
+            from adq.tcotizacion_det cdet
+            inner join adq.tsolicitud_det sdet
+            on sdet.id_solicitud_det = cdet.id_solicitud_det
+            inner join param.tconcepto_ingas cin
+            on cin.id_concepto_ingas = sdet.id_concepto_ingas
+            where cdet.id_cotizacion = p_id_cotizacion
+            and lower(cin.tipo) = 'bien'
+            and lower(cin.activo_fijo) = 'si'
+            and lower(cin.almacenable) = 'no';
     end if;
 
     ------------
