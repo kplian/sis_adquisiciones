@@ -276,7 +276,7 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
                 name:'id_funcionario_aprobador',
                 hiddenName: 'id_funcionario_aprobador',
                 origen:'FUNCIONARIOCAR',
-                fieldLabel:'Supervisor',
+                fieldLabel:'Gerencia Arpob',
                 allowBlank:false,
                 disabled:true,
                 gwidth:200,
@@ -286,6 +286,26 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
              },
             type:'ComboRec',//ComboRec
             filters:{pfiltro:'funa.desc_funcionario1',type:'string'},
+            id_grupo:0,
+            grid:true,
+            form:true
+         },
+          
+         {
+            config:{
+                name:'id_funcionario_supervisor',
+                hiddenName: 'id_funcionario_supervisor',
+                origen:'FUNCIONARIOCAR',
+                fieldLabel:'Supervisor',
+                allowBlank:true,
+                disabled:true,
+                gwidth:200,
+                valueField: 'id_funcionario',
+                gdisplayField: 'desc_funcionario_supervisor',
+                renderer:function(value, p, record){return String.format('{0}', record.data['desc_funcionario_supervisor']);}
+             },
+            type:'ComboRec',//ComboRec
+            filters:{pfiltro:'funs.desc_funcionario1',type:'string'},
             id_grupo:0,
             grid:true,
             form:true
@@ -580,6 +600,7 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
 		{name:'id_uo', type: 'string'},
 		'desc_funcionario',
 		'desc_funcionario_apro',
+		'desc_funcionario_supervisor','id_funcionario_supervisor',
 		'desc_funcionario_rpc',
 		'desc_uo',
 		'desc_gestion',

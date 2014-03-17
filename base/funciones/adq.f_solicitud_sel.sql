@@ -1,13 +1,3 @@
---------------- SQL ---------------
-
-CREATE OR REPLACE FUNCTION adq.f_solicitud_sel (
-  p_administrador integer,
-  p_id_usuario integer,
-  p_tabla varchar,
-  p_transaccion varchar
-)
-RETURNS varchar AS
-$body$
 /**************************************************************************
  SISTEMA:		Adquisiciones
  FUNCION: 		adq.f_solicitud_sel
@@ -169,7 +159,9 @@ BEGIN
                         '||v_strg_obs||', 
                         sol.instruc_rpc,
                         pro.desc_proveedor,
-                        sol.id_proveedor
+                        sol.id_proveedor,
+                        sol.id_funcionario_supervisor,
+                        funs.desc_funcionario1 as desc_funcionario_supervisor
                         	
 						from adq.tsolicitud sol
 						inner join segu.tusuario usu1 on usu1.id_usuario = sol.id_usuario_reg
@@ -184,6 +176,7 @@ BEGIN
                         
                         left join orga.vfuncionario funrpc on funrpc.id_funcionario = sol.id_funcionario_rpc
                         inner join orga.vfuncionario funa on funa.id_funcionario = sol.id_funcionario_aprobador
+                        left join orga.vfuncionario funs on funs.id_funcionario = sol.id_funcionario_supervisor
                         
 						left join segu.tusuario usu2 on usu2.id_usuario = sol.id_usuario_mod
                         left join param.vproveedor pro on pro.id_proveedor = sol.id_proveedor
@@ -286,6 +279,7 @@ BEGIN
                         
                         left join orga.vfuncionario funrpc on funrpc.id_funcionario = sol.id_funcionario_rpc
                         inner join orga.vfuncionario funa on funa.id_funcionario = sol.id_funcionario_aprobador
+                        left join orga.vfuncionario funs on funs.id_funcionario = sol.id_funcionario_supervisor
                         
 						left join segu.tusuario usu2 on usu2.id_usuario = sol.id_usuario_mod
                         left join param.vproveedor pro on pro.id_proveedor = sol.id_proveedor
@@ -503,9 +497,3 @@ EXCEPTION
 			v_resp = pxp.f_agrega_clave(v_resp,'procedimientos',v_nombre_funcion);
 			raise exception '%',v_resp;
 END;
-$body$
-LANGUAGE 'plpgsql'
-VOLATILE
-CALLED ON NULL INPUT
-SECURITY INVOKER
-COST 100;

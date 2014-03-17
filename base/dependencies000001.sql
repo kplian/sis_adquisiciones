@@ -657,3 +657,14 @@ ALTER TABLE adq.tpresolicitud_det
 /***********************************F-DEP-RAC-ADQ-0-04/02/2014****************************************/
 
 
+/***********************************I-DEP-RAC-ADQ-0-17/03/2014****************************************/
+--------------- SQL ---------------
+
+ALTER TABLE adq.tsolicitud
+  ADD CONSTRAINT fk_tsolicitud__id_funcionarrio_supervisor FOREIGN KEY (id_funcionario_supervisor)
+    REFERENCES orga.tfuncionario(id_funcionario)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+    NOT DEFERRABLE;
+    
+/***********************************F-DEP-RAC-ADQ-0-17/03/2014****************************************/

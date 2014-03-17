@@ -200,7 +200,8 @@ BEGIN
 			id_usuario_mod,
             id_uo,
             id_proceso_macro,
-            id_proveedor
+            id_proveedor,
+            id_funcionario_supervisor
           	) values(
 			'activo',
 			--v_parametros.id_solicitud_ext,
@@ -230,7 +231,8 @@ BEGIN
 			null,
             v_parametros.id_uo,
             v_id_proceso_macro,
-            v_parametros.id_proveedor
+            v_parametros.id_proveedor,
+            v_parametros.id_funcionario_supervisor
 							
 			)RETURNING id_solicitud into v_id_solicitud;
 			
@@ -279,7 +281,8 @@ BEGIN
 			id_usuario_mod = p_id_usuario,
             id_uo = v_parametros.id_uo,
             id_proceso_macro=id_proceso_macro,
-            id_proveedor=v_parametros.id_proveedor
+            id_proveedor=v_parametros.id_proveedor,
+            id_funcionario_supervisor= v_parametros.id_funcionario_supervisor
 			where id_solicitud=v_parametros.id_solicitud;
                
 			--Definicion de la respuesta

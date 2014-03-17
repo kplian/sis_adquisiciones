@@ -127,6 +127,7 @@ Phx.vista.SolicitudReq = {
              this.obtenerGestion(this.cmpFechaSoli);
              this.cmpIdUo.reset();
              this.cmpIdFuncionarioAprobador.reset();
+             this.Cmp.id_funcionario_supervisor.reset();
              this.cmpIdUo.enable();
              this.Cmp.id_funcionario.enable();             
              this.Cmp.id_funcionario.store.baseParams.fecha = this.cmpFechaSoli.getValue().dateFormat(this.cmpFechaSoli.format);
@@ -137,8 +138,19 @@ Phx.vista.SolicitudReq = {
         	
         	//Aprobador  
             this.cmpIdFuncionarioAprobador.store.baseParams.id_funcionario_dependiente=this.Cmp.id_funcionario.getValue();
+            this.cmpIdFuncionarioAprobador.store.baseParams.gerencia='si';
             this.cmpIdFuncionarioAprobador.store.baseParams.fecha = this.cmpFechaSoli.getValue().dateFormat(this.cmpFechaSoli.format);
             this.cmpIdFuncionarioAprobador.modificado=true;
+            
+            //Supervisor  
+            this.Cmp.id_funcionario_supervisor.store.baseParams.id_funcionario_dependiente=this.Cmp.id_funcionario.getValue();
+            this.Cmp.id_funcionario_supervisor.store.baseParams.presupuesto='todos';
+            this.Cmp.id_funcionario_supervisor.store.baseParams.gerencia='no';
+            this.Cmp.id_funcionario_supervisor.store.baseParams.fecha = this.cmpFechaSoli.getValue().dateFormat(this.cmpFechaSoli.format);
+            this.Cmp.id_funcionario_supervisor.modificado=true;
+            
+            
+            
             //Unidad
             this.Cmp.id_uo.store.baseParams.id_funcionario_uo_presupuesta=this.Cmp.id_funcionario.getValue();
             this.Cmp.id_uo.store.baseParams.fecha = this.cmpFechaSoli.getValue().dateFormat(this.cmpFechaSoli.format);
@@ -154,6 +166,8 @@ Phx.vista.SolicitudReq = {
             this.cmpIdUo.enable();
             this.cmpIdFuncionarioAprobador.reset();
             this.cmpIdFuncionarioAprobador.enable();
+            this.Cmp.id_funcionario_supervisor.reset();
+            this.Cmp.id_funcionario_supervisor.enable();
             
            },this);
       
@@ -166,6 +180,9 @@ Phx.vista.SolicitudReq = {
          
        this.Cmp.id_categoria_compra.enable();
        this.cmpIdFuncionarioAprobador.disable();
+       this.Cmp.id_funcionario_supervisor.disable();
+       
+       
        this.cmpIdUo.disable();
        this.Cmp.id_funcionario.disable();
        this.Cmp.fecha_soli.setValue(new Date());
@@ -197,7 +214,8 @@ Phx.vista.SolicitudReq = {
        this.cmpFechaSoli.disable();
        this.cmpIdDepto.disable();        
        this.Cmp.id_categoria_compra.disable();
-       this.cmpIdFuncionarioAprobador.disable();       
+       this.cmpIdFuncionarioAprobador.disable();
+       this.Cmp.id_funcionario_supervisor.disable();      
        this.cmpIdUo.disable();
        Phx.vista.SolicitudReq.superclass.onButtonEdit.call(this);
        this.Cmp.id_funcionario.store.baseParams.fecha = this.cmpFechaSoli.getValue().dateFormat(this.cmpFechaSoli.format);

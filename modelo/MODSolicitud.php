@@ -76,6 +76,10 @@ class MODSolicitud extends MODbase{
 		
 		$this->captura('desc_proveedor','varchar');
 		$this->captura('id_proveedor','integer');
+		$this->captura('id_funcionario_supervisor','integer');
+		$this->captura('desc_funcionario_supervisor','text');
+		
+		
 		
 		
 		
@@ -128,6 +132,8 @@ class MODSolicitud extends MODbase{
 		$this->setParametro('id_proceso_macro','id_proceso_macro','int4');
 		
 		$this->setParametro('id_proveedor','id_proveedor','int4');
+		$this->setParametro('id_funcionario_supervisor','id_funcionario_supervisor','int4');
+        
 		
 
 		//Ejecuta la instruccion
@@ -172,6 +178,8 @@ class MODSolicitud extends MODbase{
 		$this->setParametro('id_uo','id_uo','int4');
 		$this->setParametro('id_proceso_macro','id_proceso_macro','int4');
 		$this->setParametro('id_proveedor','id_proveedor','int4');
+		$this->setParametro('id_funcionario_supervisor','id_funcionario_supervisor','int4');
+        
 		
 
 		//Ejecuta la instruccion
