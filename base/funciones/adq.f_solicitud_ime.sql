@@ -771,7 +771,7 @@ BEGIN
              
              
              -- TO DO comprometer presupuesto cuando el estado anterior es el pendiente)
-             IF v_codigo_estado =  'pendiente' THEN 
+             IF v_codigo_estado =  'vbgerencia' THEN 
               
                -- Comprometer Presupuesto
               
@@ -887,7 +887,7 @@ BEGIN
                       
                       
                         -- cuando el estado al que regresa es pendiente revierte presusupesto comprometido
-                         IF v_codigo_estado = 'pendiente'  THEN
+                         IF v_codigo_estado = 'vbgerencia'  THEN
                          
                                                     
                          

@@ -44,6 +44,7 @@ DECLARE
     va_disparador varchar [];
     va_regla varchar [];
     va_prioridad integer [];
+    v_id_funcionario_supervisor integer;
     
     
    
@@ -71,6 +72,7 @@ p_hstore->'id_solicitud'
             s.id_estado_wf,
             s.estado,
             s.id_funcionario_aprobador,
+            s.id_funcionario_supervisor,
             s.numero
           into 
           
@@ -78,18 +80,13 @@ p_hstore->'id_solicitud'
             v_id_estado_wf,
             v_codigo_estado,
             v_id_funcionario_aprobador,
+            v_id_funcionario_supervisor,
             v_numero_sol
             
           from adq.tsolicitud s
           where s.id_solicitud=p_id_solicitud;
           
-                 
-          
-          
-          --buscamos siguiente estado correpondiente al proceso del WF
-         
-          
-          
+        --buscamos siguiente estado correpondiente al proceso del WF 
         SELECT 
              ps_id_tipo_estado,
              ps_codigo_estado,
@@ -103,12 +100,48 @@ p_hstore->'id_solicitud'
             va_regla,
             va_prioridad
         
-        FROM wf.f_obtener_estado_wf(v_id_proceso_wf, v_id_estado_wf,NULL,'siguiente');
+        FROM wf.f_obtener_estado_wf(v_id_proceso_wf, v_id_estado_wf,NULL,'siguiente');  
+          
+                 
+        --verifica si tiene un supervisor
+        IF v_id_funcionario_supervisor is NULL then
+        
+        
+           
+        
+            --si no tiene supervisor pasamos directo al siguiente estado (deberia ser el visto bueno de gerencia) 
+            SELECT 
+                 ps_id_tipo_estado,
+                 ps_codigo_estado,
+                 ps_disparador,
+                 ps_regla,
+                 ps_prioridad
+              into
+                va_id_tipo_estado,
+                va_codigo_estado,
+                va_disparador,
+                va_regla,
+                va_prioridad
+            
+            FROM wf.f_obtener_estado_wf(v_id_proceso_wf, NULL,va_id_tipo_estado[1],'siguiente');
+            
+            
+            
+            IF va_id_tipo_estado[1] is NULL THEN
+           
+              raise exception 'No se encontro el estado de visto bueno gerencia';
+           
+            END IF;
+        
+            
+      
+        END IF;
+        
+       
           
           --cambiamos estado de la solicitud
           
-          
-        --     raise exception '% /% /%  /% /%',va_id_tipo_estado[1],va_codigo_estado[1], va_disparador[1], va_regla[1],va_prioridad[1];
+           
           
           
           IF  va_id_tipo_estado[2] is not null  THEN
@@ -177,7 +210,7 @@ p_hstore->'id_solicitud'
       --Definicion de la respuesta
           v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Solicitud de compra finalizada'); 
         
-         
+        
 
          return v_resp;
 
