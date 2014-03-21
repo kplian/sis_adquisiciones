@@ -65,7 +65,7 @@ BEGIN
                          coalesce (v_parametros.celular1_institucion::text, 'NULL') || ',' ||   coalesce (v_parametros.celular2_institucion::text, 'NULL') || ',' ||   coalesce (v_parametros.fax::text, 'NULL') || ',''' ||  
                         v_parametros.email1_institucion || ''',''' ||  v_parametros.email2_institucion || ''',''' ||  v_parametros.pag_web || ''',''' ||  
                         v_parametros.observaciones || ''',''' ||  v_parametros.codigo_banco || ''',''' ||  v_parametros.codigo_institucion || ''', 
-                        NULL,' ||  coalesce (v_parametros.id_lugar::text, 'NULL')|| ',''' ||  v_parametros.register || ''',''' ||  
+                        ''' ||  coalesce (v_parametros.nit::text, 'NULL') ||''',' ||  coalesce (v_parametros.id_lugar::text, 'NULL')|| ',''' ||  v_parametros.register || ''',''' ||  
                         v_parametros.nombre || ''',''' ||  v_parametros.apellido_paterno || ''',''' ||  v_parametros.apellido_materno || ''','||  
                         coalesce (v_parametros.ci::text, 'NULL') || ',''' ||  v_parametros.correo || ''',' ||  coalesce (v_parametros.celular1::text, 'NULL') || ',' ||  coalesce (v_parametros.celular2::text, 'NULL') || ',' ||  
                         coalesce (v_parametros.telefono1::text, 'NULL') || ',' || coalesce (v_parametros.telefono2::text, 'NULL') || ',''' ||  v_parametros.genero || ''',' ||  coalesce ('''' || v_parametros.fecha_nacimiento::text || '''', 'NULL') || ',''' || 
@@ -237,7 +237,7 @@ BEGIN
                          coalesce (v_parametros.celular1_institucion::text, 'NULL') || ',' ||   coalesce (v_parametros.celular2_institucion::text, 'NULL') || ',' ||   coalesce (v_parametros.fax::text, 'NULL') || ',''' ||  
                         v_parametros.email1_institucion || ''',''' ||  v_parametros.email2_institucion || ''',''' ||  v_parametros.pag_web || ''',''' ||  
                         v_parametros.observaciones || ''',''' ||  v_parametros.codigo_banco || ''',''' ||  v_parametros.codigo_institucion || ''',  
-                        NULL,' ||  coalesce (v_parametros.id_lugar::text, 'NULL')|| ',''' ||  v_parametros.register || ''',''' ||  
+                         ''' ||  coalesce (v_parametros.nit::text, 'NULL') ||''','  ||  coalesce (v_parametros.id_lugar::text, 'NULL')|| ',''' ||  v_parametros.register || ''',''' ||  
                         v_parametros.nombre || ''',''' ||  v_parametros.apellido_paterno || ''',''' ||  v_parametros.apellido_materno || ''','||  
                         coalesce (v_parametros.ci::text, 'NULL') || ',''' ||  v_parametros.correo || ''',' ||  coalesce (v_parametros.celular1::text, 'NULL') || ',' ||  coalesce (v_parametros.celular2::text, 'NULL') || ',' ||  
                         coalesce (v_parametros.telefono1::text, 'NULL') || ',' || coalesce (v_parametros.telefono2::text, 'NULL') || ',''' ||  v_parametros.genero || ''',' ||  coalesce ('''' || v_parametros.fecha_nacimiento::text || '''', 'NULL') || ',''' || 

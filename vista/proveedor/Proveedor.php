@@ -191,6 +191,21 @@ Phx.vista.Proveedor=Ext.extend(Phx.gridInterfaz,{
 		},
 		{
 			config:{
+				name: 'nit',
+				fieldLabel: 'NIT',
+				allowBlank: true,
+				anchor: '100%',
+				gwidth: 100,
+				maxLength:50
+			},
+			type:'TextField',
+			filters:{pfiltro:'provee.nit',type:'string'},
+			id_grupo:0,
+			grid:true,
+			form:true
+		},
+		{
+			config:{
 				name: 'rotulo_comercial',
 				fieldLabel: 'Rótulo Comercial',
 				allowBlank: false,
