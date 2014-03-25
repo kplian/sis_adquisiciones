@@ -46,6 +46,8 @@ DECLARE
     va_prioridad integer [];
     v_id_funcionario_supervisor integer;
     
+    v_id_funcionario_estado_sig   integer;
+    
     
    
 			    
@@ -101,7 +103,9 @@ p_hstore->'id_solicitud'
             va_prioridad
         
         FROM wf.f_obtener_estado_wf(v_id_proceso_wf, v_id_estado_wf,NULL,'siguiente');  
-          
+         
+        
+        v_id_funcionario_estado_sig = v_id_funcionario_supervisor;
                  
         --verifica si tiene un supervisor
         IF v_id_funcionario_supervisor is NULL then
@@ -132,6 +136,8 @@ p_hstore->'id_solicitud'
               raise exception 'No se encontro el estado de visto bueno gerencia';
            
             END IF;
+            
+             v_id_funcionario_estado_sig = v_id_funcionario_aprobador;
         
             
       
@@ -183,7 +189,7 @@ p_hstore->'id_solicitud'
           */
           
            v_id_estado_actual =  wf.f_registra_estado_wf(va_id_tipo_estado[1], 
-                                                         v_id_funcionario_aprobador, 
+                                                         v_id_funcionario_estado_sig, 
                                                          v_id_estado_wf, 
                                                          v_id_proceso_wf,
                                                          p_id_usuario,
