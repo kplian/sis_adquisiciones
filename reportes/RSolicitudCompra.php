@@ -119,7 +119,7 @@ Class RSolicitudCompra extends Report {
         $pdf->Ln();
         
         $pdf->SetFont('', 'B');                             
-        $pdf->Cell($width3, $height, 'Supervisor:', 0, 0, 'L', false, '', 0, false, 'T', 'C');
+        $pdf->Cell($width3, $height, 'Gerente:', 0, 0, 'L', false, '', 0, false, 'T', 'C');
         $pdf->SetFont('', '');
         $pdf->SetFillColor(192,192,192, true);
         //$pdf->MultiCell($width3+$width2, $height, $this->getDataSource()->getParameter('desc_funcionario_apro'), 0,'L', true ,0);
