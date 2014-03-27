@@ -328,7 +328,7 @@ Phx.vista.Proveedor=Ext.extend(Phx.gridInterfaz,{
 					fields: ['id_lugar','id_lugar_fk','codigo','nombre','tipo','sw_municipio','sw_impuesto','codigo_largo'],
 					// turn on remote sorting
 					remoteSort: true,
-					baseParams:{par_filtro:'nombre'}
+					baseParams:{tipos:"''departamento'',''pais''",par_filtro:'nombre'}
 				}),
 				valueField: 'id_lugar',
 				displayField: 'nombre',
@@ -463,7 +463,7 @@ Phx.vista.Proveedor=Ext.extend(Phx.gridInterfaz,{
 				allowBlank: true,
 				anchor: '100%',
 				gwidth: 100,
-				maxLength:12
+				maxLength:15
 			},
 			type:'NumberField',
 			filters:{pfiltro:'per.telefono1',type:'string'},
@@ -478,7 +478,7 @@ Phx.vista.Proveedor=Ext.extend(Phx.gridInterfaz,{
 				allowBlank: true,
 				anchor: '100%',
 				gwidth: 100,
-				maxLength:12
+				maxLength:15
 			},
 			type:'NumberField',
 			filters:{pfiltro:'per.telefono2',type:'string'},
@@ -599,7 +599,7 @@ Phx.vista.Proveedor=Ext.extend(Phx.gridInterfaz,{
 				allowBlank: true,
 				anchor: '100%',
 				gwidth: 100,
-				maxLength:12
+				maxLength:15
 			},
 			type:'NumberField',
 			id_grupo:2,
@@ -613,7 +613,7 @@ Phx.vista.Proveedor=Ext.extend(Phx.gridInterfaz,{
 				allowBlank: true,
 				anchor: '100%',
 				gwidth: 100,
-				maxLength:12
+				maxLength:15
 			},
 			type:'NumberField',
 			id_grupo:2,
@@ -627,7 +627,7 @@ Phx.vista.Proveedor=Ext.extend(Phx.gridInterfaz,{
 				allowBlank: true,
 				anchor: '100%',
 				gwidth: 100,
-				maxLength:12
+				maxLength:15
 			},
 			type:'NumberField',
 			id_grupo:2,
@@ -641,7 +641,7 @@ Phx.vista.Proveedor=Ext.extend(Phx.gridInterfaz,{
 				allowBlank: true,
 				anchor: '100%',
 				gwidth: 100,
-				maxLength:12
+				maxLength:15
 			},
 			type:'NumberField',
 			id_grupo:2,
@@ -655,7 +655,7 @@ Phx.vista.Proveedor=Ext.extend(Phx.gridInterfaz,{
 				allowBlank: true,
 				anchor: '100%',
 				gwidth: 100,
-				maxLength:12
+				maxLength:15
 			},
 			type:'NumberField',
 			id_grupo:2,
