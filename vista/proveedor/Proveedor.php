@@ -557,7 +557,7 @@ Phx.vista.Proveedor=Ext.extend(Phx.gridInterfaz,{
 				allowBlank: true,
 				anchor: '100%',
 				gwidth: 100,
-				maxLength:50
+				maxLength:100
 			},
 			type:'TextField',
 			id_grupo:2,
