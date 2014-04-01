@@ -12,10 +12,10 @@ Fecha: 01/10/2013
 Descripción: Generar el Preingreso a Almacén o a Activos Fijos
 
 ----------------------------------
-
 Autor: 			RAC
 Fecha:   		14/03/2014
 Descripcion:  	Se generan id_proceso_wf independientes para almances y activos fijos
+
 
 
 */
@@ -142,7 +142,7 @@ BEGIN
                NULL, 
                v_id_depto, 
                'Preingreso de almacenes',
-               'ALPRE,ALPREIND,ALPREND,ALPRENR',  --no tiene que tenes espacios
+               'ALPRE,ALPREIND,ALPREND,ALPRENR,ALPREINPR',  --no tiene que tenes espacios
                'PAL-'||v_rec_cot.numero_oc
                );
         
@@ -208,7 +208,7 @@ BEGIN
                NULL, 
                v_id_depto, 
                'Preingreso de activos fijos',
-               'ALPRE,ALPREIND,ALPREND,ALPRENR',  --no tiene que tenes espacios
+               'ALPRE,ALPREIND,ALPREND,ALPRENR,ALPREINPR',  --no tiene que tenes espacios
                'PAF-'||v_rec_cot.numero_oc
                );
     
