@@ -160,7 +160,7 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
                 name: 'fecha_soli',
                 fieldLabel: 'Fecha Sol.',
                 allowBlank: false,
-                disabled: true,
+                disabled: false,
                 gwidth: 100,
                         format: 'd/m/Y', 
                         renderer:function (value,p,record){return value?value.dateFormat('d/m/Y'):''}
