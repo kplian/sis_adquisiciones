@@ -53,12 +53,7 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
 				scope:this
 			});			
 		}
-		
-		
-		
-		
-				
-	 },
+	},
 			
 	Atributos:[
 		{
@@ -669,7 +664,6 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
         });  
 	},
 	obtenerSolicitud:function(){
-	    
 	    var d= this.sm.getSelected();
 	    if(d&&d.data){
     	    if(d.data.estado == 'borrador'){
@@ -685,7 +679,7 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
 	},
 	actualizarSolicitudDet:function(){
       
-     Phx.CP.getPagina(this.idContenedor+'-south').reload();  
+       Phx.CP.getPagina(this.idContenedor+'-south').reload();  
         
     },
 

@@ -84,7 +84,6 @@ Class RSolicitudCompra extends Report {
         $pdf->SetFontSize(8.5);
         $pdf->SetFont('', 'B');
         $pdf->setTextColor(0,0,0);
-       
         $pdf->Cell($width3, $height, 'Número de Solicitud', 0, 0, 'L', false, '', 0, false, 'T', 'C');
         $pdf->Cell($width3, $height, 'Fecha de Solicitud', 0, 0, 'C', false, '', 0, false, 'T', 'C');
         $pdf->Cell($width3, $height, 'Fecha de Aprobacion', 0, 0, 'C', false, '', 0, false, 'T', 'C');
@@ -92,7 +91,7 @@ Class RSolicitudCompra extends Report {
         $pdf->Cell($width2+5, $height, 'Moneda', 0, 0, 'C', false, '', 0, false, 'T', 'C');
         $pdf->Cell($width2+5, $height, 'Gestion', 0, 0, 'C', false, '', 0, false, 'T', 'C');
         $pdf->Ln();
-      
+        
         $pdf->SetFont('', '');        
         $pdf->Cell($width3, $height, $this->getDataSource()->getParameter('numero'), 0, 0, 'C', false, '', 0, false, 'T', 'C');        
         $pdf->Cell($width3, $height, $this->getDataSource()->getParameter('fecha_soli'), 0, 0, 'C', false, '', 0, false, 'T', 'C');
@@ -106,18 +105,12 @@ Class RSolicitudCompra extends Report {
         $white = array('LTRB' =>array('width' => 0.3, 'cap' => 'butt', 'join' => 'miter', 'dash' => 0, 'color' => array(255, 255, 255)));
         $black = array('T' =>array('width' => 0.3, 'cap' => 'butt', 'join' => 'miter', 'dash' => 0, 'color' => array(0, 0, 0)));
         //$pdf->setLineStyle($white);
-        
-        
         $pdf->SetFontSize(7);
         $pdf->SetFont('', 'B');
         $pdf->Cell($width3, $height, 'Proceso:', 0, 0, 'L', false, '', 0, false, 'T', 'C');
         $pdf->SetFont('', '');
         $pdf->SetFillColor(192,192,192, true);
-        
-        //est alinea cambia el color de la lienas
         $pdf->Cell($width3+$width2, $height, $this->getDataSource()->getParameter('desc_proceso_macro'), $white, 0, 'L', true, '', 0, false, 'T', 'C');
-        
-        
         $pdf->SetFont('', 'B');
         
         $pdf->Cell(5, $height, '', 0, 0, 'L', false, '', 0, false, 'T', 'C');
@@ -127,7 +120,7 @@ Class RSolicitudCompra extends Report {
         $pdf->Cell($width3+$width2, $height, $this->getDataSource()->getParameter('desc_categoria_compra'), $white, 0, 'L', true, '', 0, false, 'T', 'C');
         
         $pdf->Ln();
-       
+        
         $pdf->SetFont('', 'B');                             
         $pdf->Cell($width3, $height, 'Gerente:', 0, 0, 'L', false, '', 0, false, 'T', 'C');
         $pdf->SetFont('', '');
@@ -160,7 +153,7 @@ Class RSolicitudCompra extends Report {
         $pdf->MultiCell($width3+$width2, $height, $this->getDataSource()->getParameter('desc_funcionario'), 1,'L', true ,1);
         //$pdf->Cell($width3+$width2, $height, $this->getDataSource()->getParameter('desc_funcionario'), $white, 0, 'L', true, '', 0, false, 'T', 'C');        
        
-       
+        
         $pdf->Ln();
         
         
@@ -208,189 +201,136 @@ Class RSolicitudCompra extends Report {
    
     function writeDetalles (DataSource $dataSource, TCPDF $pdf) {
             
-         $pdf->setTextColor(0,0,0);
-         $pdf->setFont('','B');
-         $pdf->setFont('','');
+        $blackAll = array('LTRB' =>array('width' => 0.3, 'cap' => 'butt', 'join' => 'miter', 'dash' => 0, 'color' => array(0, 0, 0)));  
+        $blackSide = array('LR' =>array('width' => 0.3, 'cap' => 'butt', 'join' => 'miter', 'dash' => 0, 'color' => array(0, 0, 0)));
+        $blackBottom = array('B' =>array('width' => 0.3, 'cap' => 'butt', 'join' => 'miter', 'dash' => 0, 'color' => array(0, 0, 0)));
+        $blackTop = array('T' =>array('width' => 0.3, 'cap' => 'butt', 'join' => 'miter', 'dash' => 0, 'color' => array(0, 0, 0)));
         
-        //cambia el color de lienas
-        $pdf->SetDrawColor    (  0,-1,-1,-1,false,'');   
-        
-         
-         //$pdf->Cell($width3+$width2, $height, $this->getDataSource()->getParameter('desc_proceso_macro'), $white, 0, 'L', true, '', 0, false, 'T', 'C');
-        
-                    
-        //$blackAll = array('LTRB' =>array('width' => 0.3, 'cap' => 'butt', 'join' => 'miter', 'dash' => 0, 'color' => array(0, 0, 0)));  
-        //$blackSide = array('LR' =>array('width' => 0.3, 'cap' => 'butt', 'join' => 'miter', 'dash' => 0, 'color' => array(0, 0, 0)));
-        //$blackBottom = array('B' =>array('width' => 0.3, 'cap' => 'butt', 'join' => 'miter', 'dash' => 0, 'color' => array(0, 0, 0)));
-        //$blackTop = array('T' =>array('width' => 0.3, 'cap' => 'butt', 'join' => 'miter', 'dash' => 0, 'color' => array(0, 0, 0)));
-        //$widthMarginLeft = 1;
-        
+        $widthMarginLeft = 1;
         $width1 = 15;
         $width2 = 25;
         $width3 = 20;
-        
-        //$pdf->SetFontSize(7.5);
-        //$pdf->SetFont('', 'B');
+        $pdf->SetFontSize(7.5);
+        $pdf->SetFont('', 'B');
         $height = 5;
-        $pdf->Ln();       
-            
-                    
-                
-        $conf_par_tablewidths=array($width2,$width2*2,$width2*2+10,$width2+$width2);
-        $conf_par_tablealigns=array('L','L','L','R','R');
-        $conf_par_tablenumbers=array(0,0,0,0,0);
-        $conf_tableborders=array();
-        
-        $conf_det_tablewidths=array($width2+$width1,$width2+25+$width3*2,$width1,$width3,$width3);
-        $conf_det_tablealigns=array('L','L','L','R','R');
-        $conf_det_tablenumbers=array(0,0,0,0,0);
-        
-        
-        $conf_det2_tablewidths=array($width2+$width1,$width2+25+$width3*2,$width1,$width3,$width3);
-        $conf_det2_tablealigns=array('L','L','L','R','R');
-        $conf_det2_tablenumbers=array(0,0,0,1,1);
-        
-        
-        $conf_tp_tablewidths=array($width2+$width1+$width2+25+($width3*2)+$width1+$width3,$width3);
-        $conf_tp_tablealigns=array('R','R');
-        $conf_tp_tablenumbers=array(0,1);
-        $conf_tp_tableborders=array(0,1);
-        
-        $total_solicitud = 0;
-        $count_partidas = 0;
-        
+        $pdf->Ln();
+
+        //recorres lso grupos del detalle 
         foreach($dataSource->getDataset() as $row) {
                     
                 
-            $pdf->tablewidths=$conf_par_tablewidths;
-            $pdf->tablealigns=$conf_par_tablealigns;
-            $pdf->tablenumbers=$conf_par_tablenumbers;
-            $pdf->tableborders=$conf_tableborders;
                     
-            $RowArray = array(
-                        'codigo_partida'  =>  'Código Partida',
-                        'nombre_partida'  => 'Nombre Partida',
-                        'desc_centro_costo'    => 'Centro de Costo',
-                        //'totalRef' => '',
-                        'ejecutado' => 'Disponibilidad'
-                    );     
-                         
-             $pdf-> MultiRow($RowArray,false,0); 
+             /*CABECERA DESCRIPCION PARTIDA Y CC*/   
+            $pdf->setFont('','B');
+            $pdf->Cell($width2, $height, 'Código Partida', 0, 0, 'L', false, '', 0, false, 'T', 'C');
+            $pdf->Cell($width2*2, $height, 'Nombre Partida', 0, 0, 'L', false, '', 0, false, 'T', 'C');
+            $pdf->Cell($width2*2+10, $height, 'Centro de Costo', 0, 0, 'L', false, '', 0, false, 'T', 'C');
+            $pdf->Cell($width2, $height, '', 0, 0, 'R', false, '', 0, false, 'T', 'C');
+            $pdf->Cell($width2, $height, 'Disponibilidad', 0, 0, 'R', false, '', 0, false, 'T', 'C');
             
-            //chequear disponibilidad
+            $pdf->Ln();
+            $pdf->setFont('','');
+            
+            /* DATOS ESPECIFICOS DEL GRUPO PARTIDA Y CC*/
+           
+            $pdf->Cell($width2, $height, $row['groupeddata'][0]['codigo_partida'], 0, 0, 'L', false, '', 0, false, 'T', 'C');
+            $yAntes=$pdf->getY();
+            $xAntesCell = $pdf->getX();                                             
+            
+            $pdf->MultiCell($width2*2, $height, $row['groupeddata'][0]['nombre_partida'], 0,'L', false ,1);
+           
+            $altura = $pdf->getY()- $yAntes;
+            $pdf->setY($yAntes);
+            
+            $pdf->setX($xAntesCell+$width2*2);
+            //$pdf->Cell($width2, $height, $row['groupeddata'][0]['nombre_partida'], 0, 0, 'L', false, '', 1, false, 'T', 'C');
+            
+            $pdf->Cell($width2*2+10, $height, $row['groupeddata'][0]['desc_centro_costo'], 0, 0, 'L', false, '', 1, false, 'T', 'C');
+            $xRef=$pdf->getX();
+            $yRef=$pdf->getY();
+            
+            $pdf->Cell($width2, $height, $row['totalRef'], 0, 0, 'R', false, '', 0, false, 'T', 'C');
+            
+            /*DETERMINA SI EL PRESUPUESTO ESTA DISPONIBLE O NO*/
             
             if($this->getDataSource()->getParameter('estado')=='borrador' || $this->getDataSource()->getParameter('estado')=='pendiente'|| $this->getDataSource()->getParameter('estado')=='pendiente' || $this->getDataSource()->getParameter('estado')=='vbgerencia'   ){
                 //verifica la disponibilidad de presupeusto para el  agrupador     
                 if($row['presu_verificado']=="true"){
-                    $disponibilida = 'DISPONIBLE';
+                    $pdf->setTextColor(0,0,0);
+                    $pdf->Cell($width2, $height, 'DISPONIBLE', 0, 0, 'R', false, '', 0, false, 'T', 'C');
                 }
                 else{
-                   $disponibilida ='NO DISPONIBLE';
+                    $pdf->setTextColor(255,0,0);
+                    $pdf->Cell($width2, $height, 'NO DISPONIBLE', 0, 0, 'R', false, '', 0, false, 'T', 'C');
+                
                 }
             }
             else{
-               $disponibilida ='DISPONIBLE Y APROBADO';
+                    $pdf->setTextColor(0,0,0);
+                    $pdf->Cell($width2, $height, 'DISPONIBLE Y APROBADO', 0, 0, 'R', false, '', 0, false, 'T', 'C');
             } 
             
-            // din chequeo disponibilidad
-            $RowArray = array(
-                        'codigo_partida'  => $row['groupeddata'][0]['codigo_partida'],
-                        'nombre_partida'  => $row['groupeddata'][0]['nombre_partida'],
-                        'desc_centro_costo'    => $row['groupeddata'][0]['desc_centro_costo'],
-                       // 'totalRef' => $row['totalRef'],
-                        'ejecutado' =>  $disponibilida
-                    );     
-                         
-            $pdf-> MultiRow($RowArray,false,0); 
+            $pdf->setTextColor(0,0,0);
+           
+            $pdf->Ln($altura);
             
-            /////////////////////////////////      
-            //agregar detalle de la solicitud
-            //////////////////////////////////
+            /*CABECERA DE LOS ITEMS ESPECIFICOS*/
+           
+            $pdf->setFont('','B');
+            $pdf->Cell($width2+$width1, $height, 'Concepto Gasto', $blackAll, 0, 'L', false, '', 1, false, 'T', 'C');
+            $pdf->Cell($width2+25+$width3*2, $height, 'Descripcion', $blackAll, 0, 'L', false, '', 1, false, 'T', 'C');
+            $pdf->Cell($width1, $height, 'Cantidad', $blackAll, 0, 'L', false, '', 1, false, 'T', 'C');
+            $pdf->Cell($width3, $height, 'Precio Unitario', $blackAll, 0, 'R', false, '', 1, false, 'T', 'C');
+            $pdf->Cell($width3, $height, 'Precio Total', $blackAll, 0, 'R', false, '', 1, false, 'T', 'C');
             
-            $pdf->tablewidths=$conf_det_tablewidths;
-            $pdf->tablealigns=$conf_det_tablealigns;
-            $pdf->tablenumbers=$conf_det_tablenumbers;
-            $pdf->tableborders=$conf_tableborders;
             
-            $RowArray = array(
-                        'descripcion'  => 'Descripcion' ,
-                        'desc_concepto_ingas'  => 'Concepto Gasto',
-                        'cantidad'    => 'Cantidad',
-                        'precio_unitario' => 'Precio Unitario',
-                        'precio_total' => 'Precio Total'
-                    );     
-                         
-            $pdf-> MultiRow($RowArray,false,1); 
-            
-            //$pdf->Ln();
+                //$pdf->Cell($width3, $height, 'Precio Ges. Act.', $blackAll, 0, 'R', false, '', 1, false, 'T', 'C');
+                //$pdf->Cell($width3, $height, 'Precio Ges. Sig.', $blackAll, 0, 'R', false, '', 1, false, 'T', 'C');
+            $pdf->Ln();
             $totalRef=0;
             $totalGa=0;
             $totalSg=0;
             $xEnd=0;
             $yEnd=0;
             
-            $pdf->tablewidths=$conf_det2_tablewidths;
-            $pdf->tablealigns=$conf_det2_tablealigns;
-            $pdf->tablenumbers=$conf_det2_tablenumbers;
-            $pdf->tableborders=$conf_tableborders;
-            
             foreach ($row['groupeddata'] as $solicitudDetalle) {
-                    
-                $RowArray = array(
-                        'desc_concepto_ingas'  => $solicitudDetalle['desc_concepto_ingas'],
-                        'descripcion'  =>  $solicitudDetalle['descripcion'],
-                        'cantidad'    => $solicitudDetalle['cantidad'],
-                        'precio_unitario' => $solicitudDetalle['precio_unitario'],
-                        'precio_total' => $solicitudDetalle['precio_total']
-                    );     
-                         
-                $pdf-> MultiRow($RowArray,false,1) ; 
-                
-                $totalRef=$totalRef+$solicitudDetalle['precio_total'];
-                $totalGa=$totalGa+$solicitudDetalle['precio_ga'];
-                $totalSg=$totalSg+$solicitudDetalle['precio_sg'];
-            
+                            
+                        $pdf->setFont('','');
+                        $xAntesMultiCell = $pdf->getX();
+                        $yAntesMultiCell = $pdf->getY();
+                        $pdf->setX($xAntesMultiCell+$width2+$width1);
+                        $pdf->MultiCell($width2+25+$width3*2, $height, $solicitudDetalle['descripcion'], 1,'L', false ,1);
+                        $height = $pdf->getY() - $yAntesMultiCell;
+                        $pdf->setX($xAntesMultiCell);
+                        $pdf->setY($yAntesMultiCell);
+                        $pdf->Cell($width2+$width1, $height, $solicitudDetalle['desc_concepto_ingas'], $blackAll, 0, 'L', false, '', 1, false, 'T', 'C');
+                        $pdf->setX($xAntesMultiCell+$width2*2+25+$width3*2+$width1);
+                        //$pdf->Cell($width2+25+$width3*2, $height, $solicitudDetalle['descripcion'], $blackSide, 0, 'L', false, '', 1, false, 'T', 'C');
+                        $pdf->Cell($width1, $height, $solicitudDetalle['cantidad'], $blackAll, 0, 'R', false, '', 1, false, 'T', 'C');
+                        $pdf->Cell($width3, $height, number_format($solicitudDetalle['precio_unitario'],2), $blackAll, 0, 'R', false, '', 1, false, 'T', 'C');
+                        $pdf->Cell($width3, $height, number_format($solicitudDetalle['precio_total'],2), $blackAll, 0, 'R', false, '', 1, false, 'T', 'C');
+                        //$pdf->Cell($width3, $height, number_format($solicitudDetalle['precio_ga'],2), $blackSide, 0, 'R', false, '', 1, false, 'T', 'C');
+                        //$pdf->Cell($width3, $height, number_format($solicitudDetalle['precio_sg'],2), $blackSide, 0, 'R', false, '', 1, false, 'T', 'C');
+                        $totalRef=$totalRef+$solicitudDetalle['precio_total'];
+                        $totalGa=$totalGa+$solicitudDetalle['precio_ga'];
+                        $totalSg=$totalSg+$solicitudDetalle['precio_sg'];
+                        $pdf->Ln();
+                        $xEnd=$pdf->getX();
+                        $yEnd=$pdf->getY();                                                                                                                 
             
             }
-           //coloca el total de la partida 
-           $pdf->tablewidths=$conf_tp_tablewidths;
-           $pdf->tablealigns=$conf_tp_tablealigns;
-           $pdf->tablenumbers=$conf_tp_tablenumbers;
-           $pdf->tableborders=$conf_tp_tableborders;
-            
-           $RowArray = array(
-                        'precio_unitario' => '',
-                        'precio_total' => $totalRef
-                    );     
-                         
-           $pdf-> MultiRow($RowArray,false,1); 
-            
-           
-           $total_solicitud = $total_solicitud + $totalRef;
-           $count_partidas = $count_partidas + 1;
-           $pdf->Ln();
-           
-        } 
-        
-        //coloca el gran total de la solicitu 
-               
-        if($count_partidas > 1){
-           $pdf->tablewidths=$conf_tp_tablewidths;
-           $pdf->tablealigns=$conf_tp_tablealigns;
-           $pdf->tablenumbers=$conf_tp_tablenumbers;
-           $pdf->tableborders=array(0,0);
-            
-           $RowArray = array(
-                        'precio_unitario' => 'Total Solicitud',
-                        'precio_total' => $total_solicitud
-                    );     
-                         
-           $pdf-> MultiRow($RowArray,false,1); 
-           $pdf->Ln();
-           $pdf->Ln();  
-                
-        }
-        
+            $height=5;
+            //$pdf->setXY($xRef,$yRef);
+            //$pdf->Cell($width2, $height, $totalRef, 0, 0, 'R', false, '', 0, false, 'T', 'C');
+            $pdf->setXY($xEnd,$yEnd);
+            $pdf->Cell(185, $height, '', $blackTop, 1, 'L', false, '', 0, false, 'T', 'C');
+            $pdf->setXY($xEnd,$yEnd);
+            $pdf->Cell($width1*2+$width2*2+$width3*3+25,$height,'','0', 0, 'R', false, '', 1, false, 'T', 'C');
+            $pdf->Cell($width3,$height,number_format($totalRef,2),$blackAll, 0, 'R', false, '', 1, false, 'T', 'C');
+            //$pdf->Cell($width3,$height,number_format($totalGa,2),$blackAll, 0, 'R', false, '', 1, false, 'T', 'C');
+            //$pdf->Cell($width3,$height,number_format($totalSg,2),$blackAll, 0, 'R', false, '', 1, false, 'T', 'C');
+            $pdf->Ln($height*2);
+        }                                               
     }      
 }
 ?>
