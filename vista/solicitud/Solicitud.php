@@ -41,7 +41,7 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
         
         
         
-        this.addButton('btnSolpre',{text:'Sol Cont.',iconCls: 'bemail',disabled:false,handler:this.onSolModPresupuesto,tooltip: '<b>Solictar Cotizacion</b><p>Solicta la cotizacion por correo al proveedor</p>'});
+        this.addButton('btnSolpre',{text:'Sol Cont.',iconCls: 'bemail',disabled:true,handler:this.onSolModPresupuesto,tooltip: '<b>Solictar Cotizacion</b><p>Solicta la cotizacion por correo al proveedor</p>'});
        
         
         
@@ -637,11 +637,17 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
         
         //this.getBoton('btnChequeoDocumentos').setDisabled(false);
         this.getBoton('btnChequeoDocumentosWf').setDisabled(false);
-        
-
         Phx.vista.Solicitud.superclass.preparaMenu.call(this,n);
         this.getBoton('btnReporte').setDisabled(false); 
         this.getBoton('diagrama_gantt').enable();
+        
+        if(data.estado =='borrador' || data.estado =='pendiente' ||data.estado =='vbgerencia'){ 
+          this.getBoton('btnSolpre').enable(); 
+        }
+        else{
+           this.getBoton('btnSolpre').disable();     
+        }
+        
         return tb 
      }, 
      liberaMenu:function(){
@@ -651,7 +657,9 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
             this.getBoton('btnReporte').setDisabled(true);
             //this.getBoton('btnChequeoDocumentos').setDisabled(true);
             this.getBoton('btnChequeoDocumentosWf').setDisabled(true);
-            this.getBoton('diagrama_gantt').disable();           
+            this.getBoton('diagrama_gantt').disable();  
+            this.getBoton('btnSolpre').disable();   
+                    
         }
        return tb
     },    
