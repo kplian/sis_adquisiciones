@@ -41,6 +41,10 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
         
         
         
+        this.addButton('btnSolpre',{text:'Sol Cont.',iconCls: 'bemail',disabled:false,handler:this.onSolModPresupuesto,tooltip: '<b>Solictar Cotizacion</b><p>Solicta la cotizacion por correo al proveedor</p>'});
+       
+        
+        
        function diagramGantt(){			
 			var data=this.sm.getSelected().data.id_proceso_wf;
 			Phx.CP.loadingShow();
@@ -682,6 +686,30 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
        Phx.CP.getPagina(this.idContenedor+'-south').reload();  
         
     },
+    
+    
+     onSolModPresupuesto:function(){                   
+            var rec=this.sm.getSelected();
+            
+            var data = {id_funcionario:this.id_funcionario}
+            Ext.apply(data,rec.data)
+            
+            //pop pup confirmacion contrato
+            
+            
+                 Phx.CP.loadWindows('../../../sis_adquisiciones/vista/solicitud/SolModPresupuesto.php',
+                    'Solicitar Contrato',
+                    {
+                        modal:true,
+                        width:700,
+                        height:500
+                    },data ,this.idContenedor,'SolModPresupuesto')
+                 
+             
+            
+            
+        },
+    
 
 	sortInfo:{
 		field: 'fecha_reg',

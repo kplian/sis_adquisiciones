@@ -12,6 +12,11 @@ require_once(dirname(__FILE__).'/../reportes/RSolicitudCompra.php');
 require_once(dirname(__FILE__).'/../reportes/DiagramadorGantt.php');
 require_once(dirname(__FILE__).'/../../pxp/pxpReport/DataSource.php');
 
+include_once(dirname(__FILE__).'/../../lib/PHPMailer/class.phpmailer.php');
+include_once(dirname(__FILE__).'/../../lib/PHPMailer/class.smtp.php');
+include_once(dirname(__FILE__).'/../../lib/lib_general/cls_correo_externo.php');
+
+
 class ACTSolicitud extends ACTbase{    
 			
 	function listarSolicitud(){
@@ -178,7 +183,7 @@ class ACTSolicitud extends ACTbase{
     }
     
     
-   function reporteSolicitud(){
+   function reporteSolicitud($create_file=false){
     $dataSource = new DataSource();
     
     $idSolicitud = $this->objParam->getParametro('id_solicitud');
@@ -247,14 +252,90 @@ class ACTSolicitud extends ACTbase{
     $reportWriter = new ReportWriter($reporte, dirname(__FILE__).'/../../reportes_generados/'.$nombreArchivo);
     $reportWriter->writeReport(ReportWriter::PDF);
     
-    $mensajeExito = new Mensaje();
-    $mensajeExito->setMensaje('EXITO','Reporte.php','Reporte generado',
-                                    'Se generó con éxito el reporte: '.$nombreArchivo,'control');
-    $mensajeExito->setArchivoGenerado($nombreArchivo);
-    $this->res = $mensajeExito;
-    $this->res->imprimirRespuesta($this->res->generarJson());
+    
+	
+		if(!$create_file){
+	                $mensajeExito = new Mensaje();
+				    $mensajeExito->setMensaje('EXITO','Reporte.php','Reporte generado',
+				                                    'Se generó con éxito el reporte: '.$nombreArchivo,'control');
+				    $mensajeExito->setArchivoGenerado($nombreArchivo);
+				    $this->res = $mensajeExito;
+				    $this->res->imprimirRespuesta($this->res->generarJson());
+					//exit;
+	
+        }
+        else{
+                    
+            return dirname(__FILE__).'/../../reportes_generados/'.$nombreArchivo;  
+            
+        }
+	
+	
 
     } 
+
+
+
+function SolicitarPresupuesto(){
+         
+        //acer el contrato exigible  
+      
+                    
+       
+		//exit;  
+        
+	    
+        $correo=new CorreoExterno();
+        //destinatario
+        $email = $this->objParam->getParametro('email');
+        $correo->addDestinatario($email);
+        
+        $email_cc = $this->objParam->getParametro('email_cc');
+        $correo->addCC($email_cc);
+        
+        
+        
+        //asunto
+        $asunto = $this->objParam->getParametro('asunto');
+        $correo->setAsunto($asunto);
+        //cuerpo mensaje
+        $body = $this->objParam->getParametro('body');
+        $correo->setMensaje($body);
+        $correo->setTitulo('Solicitud de contrato');
+		
+		 //genera archivo adjunto
+        $file = $this->reporteSolicitud(true);
+        $correo->addAdjunto($file);
+        
+        $correo->setDefaultPlantilla();
+        $resp=$correo->enviarCorreo();           
+        
+        if($resp=='OK'){
+                $mensajeExito = new Mensaje();
+                $mensajeExito->setMensaje('EXITO','Solicitud.php','Correo enviado',
+                'Se mando el correo con exito: OK','control' );
+                $this->res = $mensajeExito;
+                $this->res->imprimirRespuesta($this->res->generarJson());
+            
+        }  
+        else{
+              //echo $resp;      
+              echo "{\"ROOT\":{\"error\":true,\"detalle\":{\"mensaje\":\" Error al enviar correo\"}}}";  
+              
+        }  
+        
+		
+        
+		//echo $file; 
+		
+       // unlink($file);
+        exit;
+           
+       
+   }
+
+
+
     
     /*
     

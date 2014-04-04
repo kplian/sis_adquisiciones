@@ -237,13 +237,20 @@ Class RSolicitudCompra extends Report {
                     
                 
         $conf_par_tablewidths=array($width2,$width2*2,$width2*2+10,$width2+$width2);
-        $conf_par_tablealigns=array('L','L','L','R','R');
-        $conf_par_tablenumbers=array(0,0,0,0,0);
+        $conf_par_tablealigns=array('L','L','L','R');
+        $conf_par_tablenumbers=array(0,0,0,0);
         $conf_tableborders=array();
+        $conf_tabletextcolor=array();
+        
+        $conf_par_tabletextcolor_rojo=array(array(0,0,0),array(0,0,0),array(0,0,0),array(255,0,0));
+        $conf_par_tabletextcolor_verde=array(array(0,0,0),array(0,0,0),array(0,0,0),array(35,142,35));
+        
+        
         
         $conf_det_tablewidths=array($width2+$width1,$width2+25+$width3*2,$width1,$width3,$width3);
         $conf_det_tablealigns=array('L','L','L','R','R');
         $conf_det_tablenumbers=array(0,0,0,0,0);
+        
         
         
         $conf_det2_tablewidths=array($width2+$width1,$width2+25+$width3*2,$width1,$width3,$width3);
@@ -266,6 +273,10 @@ Class RSolicitudCompra extends Report {
             $pdf->tablealigns=$conf_par_tablealigns;
             $pdf->tablenumbers=$conf_par_tablenumbers;
             $pdf->tableborders=$conf_tableborders;
+            $pdf->tabletextcolor=$conf_tabletextcolor;
+            
+           
+        
                     
             $RowArray = array(
                         'codigo_partida'  =>  'Código Partida',
@@ -283,13 +294,16 @@ Class RSolicitudCompra extends Report {
                 //verifica la disponibilidad de presupeusto para el  agrupador     
                 if($row['presu_verificado']=="true"){
                     $disponibilida = 'DISPONIBLE';
+                    $pdf->tabletextcolor=$conf_tabletextcolor;
                 }
                 else{
                    $disponibilida ='NO DISPONIBLE';
+                   $pdf->tabletextcolor=$conf_par_tabletextcolor_rojo;
                 }
             }
             else{
                $disponibilida ='DISPONIBLE Y APROBADO';
+               $pdf->tabletextcolor=$conf_par_tabletextcolor_verde;
             } 
             
             // din chequeo disponibilidad
@@ -311,6 +325,7 @@ Class RSolicitudCompra extends Report {
             $pdf->tablealigns=$conf_det_tablealigns;
             $pdf->tablenumbers=$conf_det_tablenumbers;
             $pdf->tableborders=$conf_tableborders;
+            $pdf->tabletextcolor=$conf_tabletextcolor;
             
             $RowArray = array(
                         'descripcion'  => 'Descripcion' ,
