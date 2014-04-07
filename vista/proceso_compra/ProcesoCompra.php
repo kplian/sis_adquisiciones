@@ -17,6 +17,13 @@ Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
     	//llama al constructor de la clase padre
 		Phx.vista.ProcesoCompra.superclass.constructor.call(this,config);
 		this.init();
+		this.addButton('btnReporte',{
+            text :'SC',
+            iconCls : 'bpdf32',
+            disabled: true,
+            handler : this.onButtonSolicitud,
+            tooltip : '<b> Solicitud</b><br/><b>Reporte de Solicitud de Compra</b>'
+        });
 		this.addButton('btnCotizacion',{text :'Cotizacion',iconCls:'bdocuments',disabled: true, handler : this.onButtonCotizacion,tooltip : '<b>Cotizacion de solicitud de Compra</b><br/><b>Cotizacion de solicitud de Compra</b>'});
   		this.addButton('btnChequeoDocumentos',{text: 'Documentos',iconCls: 'bchecklist',disabled: true,handler: this.loadCheckDocumentosSol,tooltip: '<b>Documentos del Proceso</b><br/>Subir los documetos requeridos en el proceso seleccionada.'});
         this.addButton('btnCuadroComparativo',{text :'Cuadro Comparativo',iconCls : 'bexcel',disabled: true,handler : this.onCuadroComparativo,tooltip : '<b>Cuadro Comparativo</b><br/><b>Cuadro Comparativo de Cotizaciones</b>'});
@@ -41,6 +48,18 @@ Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
                 timeout:this.timeout,
                 scope:this
             });         
+    },
+    
+    onButtonSolicitud:function(){
+        var rec=this.sm.getSelected();
+        Ext.Ajax.request({
+            url:'../../sis_adquisiciones/control/Solicitud/reporteSolicitud',
+            params:{'id_solicitud':rec.data.id_solicitud,'estado':rec.data.estado},
+            success: this.successExport,
+            failure: this.conexionFailure,
+            timeout:this.timeout,
+            scope:this
+        });  
     },
 	
 	tam_pag:50,
@@ -568,11 +587,14 @@ Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
             this.getBoton('btnCuadroComparativo').disable();
             this.getBoton('btnRevePres').disable();
             this.getBoton('btnFinPro').disable();
+            this.getBoton('btnReporte').disable();
             
             if(data.estado=='finalizado'){
                 
                 this.getBoton('btnCuadroComparativo').enable();
                 this.getBoton('btnCotizacion').enable();
+                this.getBoton('btnReporte').enable();
+                
                 
             }
              
@@ -583,6 +605,7 @@ Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
             this.getBoton('btnCuadroComparativo').enable();
             this.getBoton('btnRevePres').enable();
             this.getBoton('btnFinPro').enable();
+            this.getBoton('btnReporte').enable();
            
         }
          return tb 
@@ -594,7 +617,8 @@ Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
             this.getBoton('btnCotizacion').setDisabled(true);  
             this.getBoton('btnChequeoDocumentos').disable(); 
             this.getBoton('btnCuadroComparativo').disable();
-            this.getBoton('diagrama_gantt').disable();        
+            this.getBoton('diagrama_gantt').disable(); 
+            this.getBoton('btnReporte').disable();       
         }
        return tb
     },
