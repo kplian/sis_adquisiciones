@@ -463,11 +463,7 @@ Phx.vista.SolicitudVb = {
           this.desBotoneshistorico();
           
       }   
-        
-       
-       
-       
-        return tb 
+      return tb 
      }, 
      liberaMenu:function(){
         var tb = Phx.vista.SolicitudVb.superclass.liberaMenu.call(this);

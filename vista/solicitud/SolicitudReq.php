@@ -191,7 +191,7 @@ Phx.vista.SolicitudReq = {
        
        this.Cmp.id_categoria_compra.store.load({params:{start:0,limit:this.tam_pag}, 
 	       callback : function (r) {
-	       		if (r.length > 0 ) {	       				
+	       		if (r.length == 1 ) {	       				
 	    			this.Cmp.id_categoria_compra.setValue(r[0].data.id_categoria_compra);
 	    		}    
 	    			    		
