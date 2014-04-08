@@ -66,7 +66,7 @@ class MODProveedor extends MODbase{
 		$this->setParametro('tipo','tipo','varchar');
 		//$this->setParametro('estado_reg','estado_reg','varchar');
 		$this->setParametro('id_institucion','id_institucion','int4');
-		$this->setParametro('doc_id','doc_id','int4');
+		$this->setParametro('doc_id','doc_id','bigint');
 		$this->setParametro('nombre_institucion','nombre_institucion','varchar');
 		$this->setParametro('direccion_institucion','direccion_institucion','varchar');
 		$this->setParametro('casilla','casilla','bigint');
