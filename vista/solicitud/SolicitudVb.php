@@ -451,11 +451,11 @@ Phx.vista.SolicitudVb = {
                 this.getBoton('sig_estado').enable();
                 this.getBoton('ini_estado').enable();
             }
-            if(data.estado !='aprobado' && data.estado !='proceso' ){
+            /*if(data.estado !='aprobado' && data.estado !='proceso' ){
                 this.getBoton('ant_estado').disable();
                 this.getBoton('sig_estado').disable();
                 this.getBoton('ini_estado').disable();
-            }
+            }*/
             
           
       } 

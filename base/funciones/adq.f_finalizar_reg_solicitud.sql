@@ -199,7 +199,29 @@ p_hstore->'id_solicitud'
                                                          'SolicitudVb');
                                                          
                                                          
-                                                         
+            
+            IF va_codigo_estado[1] =  'vbgerencia' THEN 
+              
+               -- Comprometer Presupuesto
+              
+              
+                 IF not adq.f_gestionar_presupuesto_solicitud(p_id_solicitud, p_id_usuario, 'comprometer')  THEN
+                 
+                   raise exception 'Error al comprometer el presupeusto';
+                 
+                 END IF;
+              
+              
+              --modifca bandera de comprometido  
+           
+                   update adq.tsolicitud  s set 
+                     presu_comprometido =  'si',
+                     fecha_apro = now()
+                   where id_solicitud = p_id_solicitud;
+            
+            
+            END IF; 
+                                                        
                                                          
          
         

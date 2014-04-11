@@ -290,7 +290,7 @@ Class RSolicitudCompra extends Report {
             
             //chequear disponibilidad
             
-            if($this->getDataSource()->getParameter('estado')=='borrador' || $this->getDataSource()->getParameter('estado')=='pendiente'|| $this->getDataSource()->getParameter('estado')=='pendiente' || $this->getDataSource()->getParameter('estado')=='vbgerencia'   ){
+            if($this->getDataSource()->getParameter('estado')=='borrador' || $this->getDataSource()->getParameter('estado')=='pendiente'|| $this->getDataSource()->getParameter('estado')=='pendiente'   ){
                 //verifica la disponibilidad de presupeusto para el  agrupador     
                 if($row['presu_verificado']=="true"){
                     $disponibilida = 'DISPONIBLE';
