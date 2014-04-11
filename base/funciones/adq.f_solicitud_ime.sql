@@ -85,6 +85,9 @@ DECLARE
       v_id_uo  integer;
       v_cont  integer;
       v_mensaje_resp  varchar;
+      
+      
+      v_estado_actual   varchar;
 			    
 BEGIN
 
@@ -771,6 +774,9 @@ BEGIN
              
              
              -- TO DO comprometer presupuesto cuando el estado anterior es el pendiente)
+             
+            -- raise exception '%',v_codigo_estado;
+             
              IF v_codigo_estado =  'vbgerencia' THEN 
               
                -- Comprometer Presupuesto
@@ -820,9 +826,13 @@ BEGIN
         begin
         
         select
-           s.numero
-          into 
-           v_numero_sol
+           s.numero,
+           s.estado,
+           s.presu_comprometido
+        into
+          v_numero_sol,
+          v_estado_actual,
+          v_presu_comprometido
        from adq.tsolicitud s
        where s.id_solicitud=v_parametros.id_solicitud;
         
@@ -886,27 +896,29 @@ BEGIN
                          
                       
                       
-                        -- cuando el estado al que regresa es pendiente revierte presusupesto comprometido
-                         IF v_codigo_estado = 'vbgerencia'  THEN
+                        -- cuando el estado desde el que retrocedemos es  v_estado_actual
+                        --   y el presupuesto esta comprometido ...  revertimos
+                        
+                         IF v_estado_actual = 'vbgerencia'  and v_presu_comprometido = 'si' THEN
                          
                                                     
                          
-                           --  llamar a funciond erevertir presupuesto
+                               --  llamar a funciond erevertir presupuesto
+                               
+                                 IF not adq.f_gestionar_presupuesto_solicitud(v_parametros.id_solicitud, p_id_usuario, 'revertir')  THEN
+                     
+                                             raise exception 'Error al revertir  el presupeusto';
+                     
+                                 END IF;
                            
-                             IF not adq.f_gestionar_presupuesto_solicitud(v_parametros.id_solicitud, p_id_usuario, 'revertir')  THEN
-                 
-                     					 raise exception 'Error al revertir  el presupeusto';
-                 
-                          	 END IF;
                            
-                           
-                           --  modifica bandera de presupuesto comprometido
-                            
-                           --modifca bandera de comprometido  
-                             update adq.tsolicitud   set 
-                               presu_comprometido =  'no',
-                               fecha_apro = NULL
-                             where id_solicitud = v_parametros.id_solicitud;
+                               --  modifica bandera de presupuesto comprometido
+                                
+                               --modifca bandera de comprometido  
+                                 update adq.tsolicitud   set 
+                                   presu_comprometido =  'no',
+                                   fecha_apro = NULL
+                                 where id_solicitud = v_parametros.id_solicitud;
                            
                          
                          END IF;
