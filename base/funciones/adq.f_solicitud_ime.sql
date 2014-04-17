@@ -85,6 +85,12 @@ DECLARE
       v_id_uo  integer;
       v_cont  integer;
       v_mensaje_resp  varchar;
+      
+       v_acceso_directo  	varchar;
+    v_clase   			varchar;
+    v_parametros_ad   		varchar;
+    v_tipo_noti  			varchar;
+    v_titulo   			varchar;
 			    
 BEGIN
 
@@ -568,7 +574,7 @@ BEGIN
           where ew.id_estado_wf = v_id_estado_wf;
           
           
-        
+       
          --------------------------------------------- 
          -- Verifica  los posibles estados sigueintes para que desde la interfza se tome la decision si es necesario
          --------------------------------------------------
@@ -713,23 +719,21 @@ BEGIN
             v_obs=v_parametros.obs;
             
             IF v_codigo_estado_siguiente =  'aprobado' THEN
-            --si el siguient estado es aprobado obtenemos el depto que le correponde de la solictud de compra
-            
-              select 
-                 s.id_depto,
-                 s.numero,
-                 uo.nombre_unidad 
-              into 
-                 v_id_depto,
-                 v_num_sol,
-                 v_uo_sol
-              from  adq.tsolicitud s
-              inner join orga.tuo uo on uo.id_uo = s.id_uo 
-              where s.id_solicitud = v_parametros.id_solicitud;
-              
-              v_obs =  'La solicitud '||v_num_sol||' fue aprobada para la uo '||v_uo_sol||' ('||v_parametros.obs||')';
-              
-            
+                --si el siguient estado es aprobado obtenemos el depto que le correponde de la solictud de compra
+                
+                  select 
+                     s.id_depto,
+                     s.numero,
+                     uo.nombre_unidad 
+                  into 
+                     v_id_depto,
+                     v_num_sol,
+                     v_uo_sol
+                  from  adq.tsolicitud s
+                  inner join orga.tuo uo on uo.id_uo = s.id_uo 
+                  where s.id_solicitud = v_parametros.id_solicitud;
+                  
+                  v_obs =  'La solicitud '||v_num_sol||' fue aprobada para la uo '||v_uo_sol||' ('||v_parametros.obs||')';
             END IF;
             
              
@@ -746,16 +750,47 @@ BEGIN
            
            
            END IF;
+           
+           
+           
+           --configurar acceso directo para la alarma   
+           v_acceso_directo = '';
+           v_clase = '';
+           v_parametros_ad = '';
+           v_tipo_noti = 'notificacion';
+           v_titulo  = 'Visto Bueno';
+                       
+                     
+           IF  v_codigo_estado_siguiente not in('borrador','aprobado','en_proceso','finalizado','anulado')   THEN
+               v_acceso_directo = '../../../sis_adquisiciones/vista/solicitud/SolicitudVb.php';
+               v_clase = 'SolicitudVb';
+               v_parametros_ad = '{filtro_directo:{campo:"sol.id_proceso_wf",valor:"'||v_id_proceso_wf::varchar||'"}}';
+               v_tipo_noti = 'notificacion';
+               v_titulo  = 'Visto Bueno';
+                       
+            END IF;
             
-            -- hay que recuperar el supervisor que seria el estado inmediato,...
-             v_id_estado_actual =  wf.f_registra_estado_wf(v_parametros.id_tipo_estado, 
+            
+            
+           
+           -- registra nuevo estado
+           v_id_estado_actual =  wf.f_registra_estado_wf(v_parametros.id_tipo_estado, 
                                                            v_parametros.id_funcionario, 
                                                            v_id_estado_wf, 
                                                            v_id_proceso_wf,
                                                            p_id_usuario,
                                                            v_id_depto,
-                                                           v_obs);
+                                                           v_obs,
+                                                           v_acceso_directo ,
+                                                           v_clase,
+                                                           v_parametros_ad,
+                                                           v_tipo_noti,
+                                                           v_titulo);
             
+            
+            
+            
+             
             
              -- actualiza estado en la solicitud
             
@@ -769,9 +804,8 @@ BEGIN
              where id_solicitud = v_parametros.id_solicitud;
              
              
-             
-             -- TO DO comprometer presupuesto cuando el estado anterior es el pendiente)
-             IF v_codigo_estado =  'vbgerencia' THEN 
+             -- comprometer presupuesto cuando el estado anterior es el vbgerencia)
+             IF v_codigo_estado =  'borrador' THEN 
               
                -- Comprometer Presupuesto
               
@@ -819,13 +853,32 @@ BEGIN
 	elseif(p_transaccion='ADQ_ANTESOL_IME')then   
         begin
         
-        select
-           s.numero
-          into 
-           v_numero_sol
-       from adq.tsolicitud s
-       where s.id_solicitud=v_parametros.id_solicitud;
-        
+        SELECT
+            sol.id_estado_wf,
+            sol.presu_comprometido,
+            pw.id_tipo_proceso,
+           	pw.id_proceso_wf,
+            sol.numero
+           into
+            v_id_estado_wf,
+            v_presu_comprometido,
+            v_id_tipo_proceso,
+            v_id_proceso_wf,
+            v_numero_sol
+             
+       FROM adq.tsolicitud sol
+       inner join wf.tproceso_wf pw on pw.id_proceso_wf = sol.id_proceso_wf
+       WHERE  sol.id_solicitud = v_parametros.id_solicitud;
+       
+       --configurar acceso directo para la alarma   
+       v_acceso_directo = '';
+       v_clase = '';
+       v_parametros_ad = '';
+       v_tipo_noti = 'notificacion';
+       v_titulo  = 'Visto Bueno'; 
+       
+       
+       
         --------------------------------------------------
         --REtrocede al estado inmediatamente anterior
         -------------------------------------------------
@@ -833,10 +886,7 @@ BEGIN
                
                raise notice 'es_estaado_wf %',v_parametros.id_estado_wf;
               
-                     
-               
-               
-                    --recuperaq estado anterior segun Log del WF
+                      --recuperaq estado anterior segun Log del WF
                         SELECT  
                            ps_id_tipo_estado,
                            ps_id_funcionario,
@@ -862,7 +912,31 @@ BEGIN
                       from wf.testado_wf ew
                       where ew.id_estado_wf= v_id_estado_wf_ant;
                       
-                      -- registra nuevo estado
+                      
+                       
+                     
+                       IF  v_codigo_estado not in('borrador','aprobado','en_proceso','finalizado','anulado')   THEN
+                           v_acceso_directo = '../../../sis_adquisiciones/vista/solicitud/SolicitudVb.php';
+                           v_clase = 'SolicitudVb';
+                           v_parametros_ad = '{filtro_directo:{campo:"sol.id_proceso_wf",valor:"'||v_id_proceso_wf::varchar||'"}}';
+                           v_tipo_noti = 'notificacion';
+                           v_titulo  = 'Visto Bueno';
+                       
+                        END IF;
+                        
+                        IF v_codigo_estado  in('borrador')   THEN
+                           v_acceso_directo = '../../../sis_adquisiciones/vista/solicitud/SolicitudReq.php';
+                           v_clase = 'SolicitudReq';
+                           v_parametros_ad = '{filtro_directo:{campo:"sol.id_proceso_wf",valor:"'||v_id_proceso_wf::varchar||'"}}';
+                           v_tipo_noti = 'notificacion';
+                           v_titulo  = 'Solicitud de Compra';
+                       
+                        END IF;
+                        
+                        
+                        
+                      
+                       -- registra nuevo estado
                       
                       v_id_estado_actual = wf.f_registra_estado_wf(
                           v_id_tipo_estado, 
@@ -871,7 +945,12 @@ BEGIN
                           v_id_proceso_wf, 
                           p_id_usuario,
                           v_id_depto,
-                          'RETRO: #'|| COALESCE(v_numero_sol,'S/N')||' - '||v_parametros.obs);
+                          '[RETROCEDE]: #'|| COALESCE(v_numero_sol,'S/N')||' - '||v_parametros.obs,
+                           v_acceso_directo ,
+                           v_clase,
+                           v_parametros_ad,
+                           v_tipo_noti,
+                           v_titulo);
                       
                     
                       
@@ -887,12 +966,10 @@ BEGIN
                       
                       
                         -- cuando el estado al que regresa es pendiente revierte presusupesto comprometido
-                         IF v_codigo_estado = 'vbgerencia'  THEN
+                         IF v_codigo_estado = 'borrador' and v_presu_comprometido ='si' THEN
                          
-                                                    
-                         
-                           --  llamar a funciond erevertir presupuesto
-                           
+                             --  llamar a funciond erevertir presupuesto
+                            
                              IF not adq.f_gestionar_presupuesto_solicitud(v_parametros.id_solicitud, p_id_usuario, 'revertir')  THEN
                  
                      					 raise exception 'Error al revertir  el presupeusto';
@@ -901,14 +978,11 @@ BEGIN
                            
                            
                            --  modifica bandera de presupuesto comprometido
-                            
-                           --modifca bandera de comprometido  
-                             update adq.tsolicitud   set 
+                            update adq.tsolicitud   set 
                                presu_comprometido =  'no',
                                fecha_apro = NULL
                              where id_solicitud = v_parametros.id_solicitud;
                            
-                         
                          END IF;
                          
                          
@@ -925,26 +999,7 @@ BEGIN
            ---------------------------------------------------------------------
            ELSEIF  v_parametros.operacion = 'inicio' THEN
              
-           SELECT
-            sol.id_estado_wf,
-            sol.presu_comprometido,
-            pw.id_tipo_proceso,
-           	pw.id_proceso_wf
-           into
-            v_id_estado_wf,
-            v_presu_comprometido,
-            v_id_tipo_proceso,
-            v_id_proceso_wf
-             
-           FROM adq.tsolicitud sol
-           inner join wf.tproceso_wf pw on pw.id_proceso_wf = sol.id_proceso_wf
-           WHERE  sol.id_solicitud = v_parametros.id_solicitud;
-           
-           
-           
-             raise notice 'BUSCAMOS EL INICIO PARA %',v_id_tipo_proceso;
-             
-            -- recuperamos el estado inicial segun tipo_proceso
+             -- recuperamos el estado inicial segun tipo_proceso
              
              SELECT  
                ps_id_tipo_estado,
@@ -970,6 +1025,17 @@ BEGIN
              FROM wf.f_obtener_estado_segun_log_wf(v_id_estado_wf, v_id_tipo_estado);
             
               raise notice 'CODIGO ESTADO ENCONTRADO %',v_codigo_estado ;
+              
+              
+              IF   v_codigo_estado  = 'borrador'  THEN
+                           v_acceso_directo = '../../../sis_adquisiciones/vista/solicitud/SolicitudReq.php';
+                           v_clase = 'SolicitudReq';
+                           v_parametros_ad = '{filtro_directo:{campo:"sol.id_proceso_wf",valor:"'||v_id_proceso_wf::varchar||'"}}';
+                           v_tipo_noti = 'notificacion';
+                           v_titulo  = 'Visto Bueno';
+                       
+              END IF;
+              
              
              --registra estado borrador
               v_id_estado_actual = wf.f_registra_estado_wf(
@@ -979,7 +1045,12 @@ BEGIN
                   v_id_proceso_wf, 
                   p_id_usuario,
                   v_id_depto,
-                  'RETRO: #'|| COALESCE(v_numero_sol,'S/N')||' - '||v_parametros.obs);
+                  'RETRO: #'|| COALESCE(v_numero_sol,'S/N')||' - '||v_parametros.obs,
+                  v_acceso_directo ,
+                  v_clase,
+                  v_parametros_ad,
+                  v_tipo_noti,
+                  v_titulo);
                       
                     
                       

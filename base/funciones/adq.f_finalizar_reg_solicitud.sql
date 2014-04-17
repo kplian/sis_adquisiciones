@@ -48,6 +48,12 @@ DECLARE
     
     v_id_funcionario_estado_sig   integer;
     
+    v_acceso_directo  	varchar;
+    v_clase   			varchar;
+    v_parametros_ad   		varchar;
+    v_tipo_noti  			varchar;
+    v_titulo   			varchar;
+    
     
    
 			    
@@ -172,21 +178,24 @@ p_hstore->'id_solicitud'
           
           --registra estado eactual en el WF
           
-          
-          /*
-            p_id_tipo_estado_siguiente integer,
-            p_id_funcionario integer,
-            p_id_estado_wf_anterior integer,
-            p_id_proceso_wf integer,
-            p_id_usuario integer,
-            p_id_depto integer = NULL::integer,
-            p_obs text = ''::text,
-            p_acceso_directo varchar = ''::character varying,
-            p_clase varchar = NULL::character varying,
-            p_parametros varchar = '{}'::character varying,
-            p_tipo varchar = 'notificacion'::character varying,
-            p_titulo varchar = 'Visto Bueno'::character varying
-          */
+           --configurar acceso directo para la alarma   
+           v_acceso_directo = '';
+           v_clase = '';
+           v_parametros_ad = '';
+           v_tipo_noti = 'notificacion';
+           v_titulo  = 'Visto Bueno';
+                       
+                     
+           IF  va_codigo_estado[1] not in('borrador','aprobado','en_proceso','finalizado','anulado')   THEN
+               v_acceso_directo = '../../../sis_adquisiciones/vista/solicitud/SolicitudVb.php';
+               v_clase = 'SolicitudVb';
+               v_parametros_ad = '{filtro_directo:{campo:"sol.id_proceso_wf",valor:"'||v_id_proceso_wf::varchar||'"}}';
+               v_tipo_noti = 'notificacion';
+               v_titulo  = 'Visto Bueno';
+                       
+            END IF;
+           
+           -- registra nuevo estado
           
            v_id_estado_actual =  wf.f_registra_estado_wf(va_id_tipo_estado[1], 
                                                          v_id_funcionario_estado_sig, 
@@ -195,14 +204,39 @@ p_hstore->'id_solicitud'
                                                          p_id_usuario,
                                                          NULL,
                                                          'Solicitud a espera de aprobación #'||COALESCE(v_numero_sol,'S/N'),
-                                                         '../../../sis_adquisiciones/vista/solicitud/SolicitudVb.php',
-                                                         'SolicitudVb');
+                                                         v_acceso_directo ,
+                                                         v_clase,
+                                                         v_parametros_ad,
+                                                         v_tipo_noti,
+                                                         v_titulo);
                                                          
                                                          
-                                                         
-                                                         
-         
+           --si el estado  anteriro es borrador  comprometemos                                            
+           IF v_codigo_estado =  'borrador' THEN 
+              
+               -- Comprometer Presupuesto
+              
+              IF not adq.f_gestionar_presupuesto_solicitud(p_id_solicitud, p_id_usuario, 'comprometer')  THEN
+                 
+                   raise exception 'Error al comprometer el presupeusto';
+                 
+              END IF;
+              
+              
+              --modifca bandera de comprometido  
+           
+                   update adq.tsolicitud  s set 
+                     presu_comprometido =  'si',
+                     fecha_apro = now()
+                   where id_solicitud = p_id_solicitud;
+            
+            
+            END IF;
         
+          
+          
+          
+          
            -- actualiza estado en la solicitud
           
            update adq.tsolicitud  s set 

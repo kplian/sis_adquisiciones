@@ -211,6 +211,12 @@ Phx.vista.SolicitudVb = {
         
         
         this.store.baseParams={tipo_interfaz:this.nombreVista};
+        //coloca filtros para acceso directo si existen
+        if(config.filtro_directo){
+           this.store.baseParams.filtro_valor = config.filtro_directo.valor;
+           this.store.baseParams.filtro_campo = config.filtro_directo.campo;
+        }
+        //carga inicial de la pagina
         this.load({params:{start:0, limit:this.tam_pag}}); 
         
         this.cmbTipoEstado =this.formEstado.getForm().findField('id_tipo_estado');
@@ -451,11 +457,11 @@ Phx.vista.SolicitudVb = {
                 this.getBoton('sig_estado').enable();
                 this.getBoton('ini_estado').enable();
             }
-            if(data.estado !='aprobado' && data.estado !='proceso' ){
+            /*if(data.estado !='aprobado' && data.estado !='proceso' ){
                 this.getBoton('ant_estado').disable();
                 this.getBoton('sig_estado').disable();
                 this.getBoton('ini_estado').disable();
-            }
+            }*/
             
           
       } 

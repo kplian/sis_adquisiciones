@@ -110,6 +110,7 @@ Phx.vista.SolicitudReqCon = {
         
         
         this.store.baseParams={tipo_interfaz:this.nombreVista};
+        
         this.load({params:{start:0, limit:this.tam_pag}});
         
         

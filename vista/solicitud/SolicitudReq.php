@@ -108,6 +108,10 @@ Phx.vista.SolicitudReq = {
 		
 		
 		this.store.baseParams={tipo_interfaz:this.nombreVista};
+		if(config.filtro_directo){
+           this.store.baseParams.filtro_valor = config.filtro_directo.valor;
+           this.store.baseParams.filtro_campo = config.filtro_directo.campo;
+        }
 		this.load({params:{start:0, limit:this.tam_pag}});
 		
 		
@@ -185,6 +189,7 @@ Phx.vista.SolicitudReq = {
        
        this.cmpIdUo.disable();
        this.Cmp.id_funcionario.disable();
+       this.Cmp.fecha_soli.enable();
        this.Cmp.fecha_soli.setValue(new Date());
        this.Cmp.fecha_soli.fireEvent('change');
        
@@ -198,6 +203,17 @@ Phx.vista.SolicitudReq = {
 	    	}, scope : this
 	    });
 	    
+	    
+	    this.Cmp.id_depto.store.load({params:{start:0,limit:this.tam_pag}, 
+           callback : function (r) {
+                if (r.length == 1 ) {                       
+                    this.Cmp.id_depto.setValue(r[0].data.id_depto);
+                }    
+                                
+            }, scope : this
+        });
+	    
+	    
 	    this.Cmp.id_funcionario.store.load({params:{start:0,limit:this.tam_pag}, 
 	       callback : function (r) {
 	       		if (r.length == 1 ) {	       				
@@ -207,6 +223,8 @@ Phx.vista.SolicitudReq = {
 	    			    		
 	    	}, scope : this
 	    });
+	    
+	    
 		
            
     },

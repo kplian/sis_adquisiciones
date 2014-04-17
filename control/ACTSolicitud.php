@@ -40,8 +40,12 @@ class ACTSolicitud extends ACTbase{
              $this->objParam->addFiltro("(sol.estado = ''aprobado'' or  sol.estado = ''proceso'')");
             
          }
+         
+         if($this->objParam->getParametro('filtro_campo')!=''){
+            $this->objParam->addFiltro($this->objParam->getParametro('filtro_campo')." = ".$this->objParam->getParametro('filtro_valor'));  
+         }
 		
-		//var_dump($_SESSION["ss_id_funcionario"]);
+		 //var_dump($_SESSION["ss_id_funcionario"]);
 		
 		 $this->objParam->addParametro('id_funcionario_usu',$_SESSION["ss_id_funcionario"]); 
 		
@@ -407,7 +411,7 @@ function SolicitarPresupuesto(){
 	 	//solo verificar si el estado es borrador o pendiente o vbgerente
 	 	//suma y verifica el presupuesto
 	 	
-	 	if ($estado_sol == 'borrador' || $estado_sol == 'pendiente'|| $estado_sol == 'vbgerente'){
+	 	if ($estado_sol == 'borrador'){
     	 	    $cont_grup = 0;
     	 	foreach($arrayResp as $value2)
             {
