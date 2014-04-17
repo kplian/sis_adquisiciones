@@ -210,6 +210,7 @@ p_hstore->'id_solicitud'
                                                          v_tipo_noti,
                                                          v_titulo);
                                                          
+
                                                          
            --si el estado  anteriro es borrador  comprometemos                                            
            IF v_codigo_estado =  'borrador' THEN 
@@ -221,6 +222,7 @@ p_hstore->'id_solicitud'
                    raise exception 'Error al comprometer el presupeusto';
                  
               END IF;
+
               
               
               --modifca bandera de comprometido  
@@ -231,7 +233,9 @@ p_hstore->'id_solicitud'
                    where id_solicitud = p_id_solicitud;
             
             
+
             END IF;
+
         
           
           

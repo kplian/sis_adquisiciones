@@ -290,7 +290,9 @@ Class RSolicitudCompra extends Report {
             
             //chequear disponibilidad
             
+
             if($this->getDataSource()->getParameter('estado')=='borrador'){
+
                 //verifica la disponibilidad de presupeusto para el  agrupador     
                 if($row['presu_verificado']=="true"){
                     $disponibilida = 'DISPONIBLE';

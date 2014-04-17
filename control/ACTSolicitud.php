@@ -408,10 +408,12 @@ function SolicitarPresupuesto(){
 	 		
 	 	}
 	 	
-	 	//solo verificar si el estado es borrador o pendiente o vbgerente
+	 	//solo verificar si el estado es borrador o pendiente 
 	 	//suma y verifica el presupuesto
 	 	
+
 	 	if ($estado_sol == 'borrador'){
+
     	 	    $cont_grup = 0;
     	 	foreach($arrayResp as $value2)
             {

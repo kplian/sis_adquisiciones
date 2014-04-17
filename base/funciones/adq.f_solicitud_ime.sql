@@ -86,11 +86,14 @@ DECLARE
       v_cont  integer;
       v_mensaje_resp  varchar;
       
+
        v_acceso_directo  	varchar;
-    v_clase   			varchar;
-    v_parametros_ad   		varchar;
-    v_tipo_noti  			varchar;
-    v_titulo   			varchar;
+       v_clase   			varchar;
+       v_parametros_ad   		varchar;
+       v_tipo_noti  			varchar;
+       v_titulo   			varchar;
+       v_estado_actual   varchar;
+
 			    
 BEGIN
 
@@ -804,8 +807,10 @@ BEGIN
              where id_solicitud = v_parametros.id_solicitud;
              
              
+
              -- comprometer presupuesto cuando el estado anterior es el vbgerencia)
              IF v_codigo_estado =  'borrador' THEN 
+
               
                -- Comprometer Presupuesto
               
@@ -853,6 +858,7 @@ BEGIN
 	elseif(p_transaccion='ADQ_ANTESOL_IME')then   
         begin
         
+
         SELECT
             sol.id_estado_wf,
             sol.presu_comprometido,
@@ -879,6 +885,7 @@ BEGIN
        
        
        
+
         --------------------------------------------------
         --REtrocede al estado inmediatamente anterior
         -------------------------------------------------
@@ -962,9 +969,7 @@ BEGIN
                            fecha_mod=now()
                          where id_solicitud = v_parametros.id_solicitud;
                          
-                         
-                      
-                      
+
                         -- cuando el estado al que regresa es pendiente revierte presusupesto comprometido
                          IF v_codigo_estado = 'borrador' and v_presu_comprometido ='si' THEN
                          
@@ -982,6 +987,7 @@ BEGIN
                                presu_comprometido =  'no',
                                fecha_apro = NULL
                              where id_solicitud = v_parametros.id_solicitud;
+
                            
                          END IF;
                          
