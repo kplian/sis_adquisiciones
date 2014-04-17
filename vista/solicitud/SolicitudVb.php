@@ -452,7 +452,13 @@ Phx.vista.SolicitudVb = {
                 this.getBoton('ini_estado').disable();
             }
             
-            if(data.estado !='aprobado' && data.estado !='proceso' ){
+            if(data.estado =='anulado' || data.estado =='finalizado'){
+                this.getBoton('ant_estado').disable();
+                this.getBoton('sig_estado').disable();
+                this.getBoton('ini_estado').disable();
+            }
+            
+            if(data.estado !='aprobado' && data.estado !='proceso' &&data.estado !='anulado' && data.estado !='finalizado' ){
                 this.getBoton('ant_estado').enable();
                 this.getBoton('sig_estado').enable();
                 this.getBoton('ini_estado').enable();
