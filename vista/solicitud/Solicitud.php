@@ -295,7 +295,7 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
                 name:'id_funcionario_aprobador',
                 hiddenName: 'id_funcionario_aprobador',
                 origen:'FUNCIONARIOCAR',
-                fieldLabel:'Gerencia Arpob',
+                fieldLabel:'Gerencia Aprob',
                 allowBlank:false,
                 disabled:true,
                 gwidth:200,
@@ -712,11 +712,7 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
                         width:700,
                         height:500
                     },data ,this.idContenedor,'SolModPresupuesto')
-                 
-             
-            
-            
-        },
+         },
     
 
 	sortInfo:{
