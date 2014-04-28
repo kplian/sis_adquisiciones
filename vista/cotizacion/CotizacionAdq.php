@@ -50,6 +50,8 @@ Phx.vista.CotizacionAdq = {
                     handler : this.onHabPag,
                     tooltip : '<b>Habilitar Pago</b><br/><b> Permite solicitar pagos en el modulo de cuentar por pagar</b>'
           });
+        
+       this.addButton('sig_estado',{text:'Siguiente',iconCls: 'badelante',disabled:false,handler:this.sigEstado,tooltip: '<b>Pasar al Siguiente Estado</b>'});
           
           
        this.addButton('btnSendMail',{text:'Sol Cotizacion',iconCls: 'bemail',disabled:true,handler:this.onSendMail,tooltip: '<b>Solictar Cotizacion</b><p>Solicta la cotizacion por correo al proveedor</p>'});
@@ -609,7 +611,64 @@ Phx.vista.CotizacionAdq = {
              }else{
                 alert('ocurrio un error durante el proceso')
             }
-        } 
+        } ,
+    //WIZARD
+    sigEstado:function(){                   
+            var rec=this.sm.getSelected();
+            Phx.CP.loadWindows('../../../sis_workflow/vista/estado_wf/FormEstadoWf.php',
+            'Estado de Wf',
+            {
+                modal:true,
+                width:700,
+                height:450
+            }, {data:{
+                   id_estado_wf:rec.data.id_estado_wf,
+                   id_proceso_wf:rec.data.id_proceso_wf,
+                   fecha_ini:rec.data.fecha_tentativa,
+                   //url_verificacion:'../../sis_tesoreria/control/PlanPago/siguienteEstadoPlanPago'
+                   
+                   
+                
+                }}, this.idContenedor,'FormEstadoWf',
+            {
+                config:[{
+                          event:'beforesave',
+                          delegate: this.onSaveWizard,
+                          
+                        }],
+                
+                scope:this
+             })
+               
+     },
+     
+    
+     onSaveWizard:function(wizard,resp){
+        Phx.CP.loadingShow();
+         
+        Ext.Ajax.request({
+            url:'../../sis_tesoreria/control/PlanPago/siguienteEstadoPlanPago',
+            params:{
+                id_proceso_wf_act:  resp.id_proceso_wf_act,
+                id_tipo_estado:     resp.id_tipo_estado,
+                id_funcionario_wf:  resp.id_funcionario_wf,
+                id_depto_wf:        resp.id_depto_wf,
+                obs:                resp.obs,
+                json_procesos:      Ext.util.JSON.encode(resp.procesos)
+                },
+            success:this.successWizard,
+            failure: this.conexionFailure,
+            argument:{wizard:wizard},
+            timeout:this.timeout,
+            scope:this
+        });
+    },
+     
+    successWizard:function(resp){
+        Phx.CP.loadingHide();
+        resp.argument.wizard.panel.destroy()
+        this.reload();
+     },
     
     
 };
