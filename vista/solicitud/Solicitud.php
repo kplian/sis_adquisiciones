@@ -41,7 +41,7 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
         
         
         
-        this.addButton('btnSolpre',{text:'Sol Cont.',iconCls: 'bemail',disabled:true,handler:this.onSolModPresupuesto,tooltip: '<b>Solictar Cotizacion</b><p>Solicta la cotizacion por correo al proveedor</p>'});
+        this.addButton('btnSolpre',{text:'Sol Pre.',iconCls: 'bemail',disabled:true,handler:this.onSolModPresupuesto,tooltip: '<b>Solicitar Presuuesto</b><p>Emite un correo para solicitar traspaso presupuestario</p>'});
        
         
         
@@ -706,7 +706,7 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
             
             
                  Phx.CP.loadWindows('../../../sis_adquisiciones/vista/solicitud/SolModPresupuesto.php',
-                    'Solicitar Contrato',
+                    'Solicitar Traspaso presupuestario',
                     {
                         modal:true,
                         width:700,

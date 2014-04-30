@@ -15,8 +15,14 @@ Descripción: Generar el Preingreso a Almacén o a Activos Fijos
 Autor: 			RAC
 Fecha:   		14/03/2014
 Descripcion:  	Se generan id_proceso_wf independientes para almances y activos fijos
-
-
+----------------------------------
+Autor: 			RAC
+Fecha:   		30/04/2014
+Descripcion:  	 Se cambi ala logica de esta funcion,...  
+                 1) revisa si no tiene preingresos activos
+                 2) porlo menos dee tener un preingreso anulado para recuperar el codigo de proveso
+                     la unica de forma de crear nuevos preingresos es con la funcion de habilitar pago
+                 3)  genera preignreso de almacens  y activos fijos 
 
 */
 
@@ -37,6 +43,18 @@ DECLARE
     v_af integer;
     v_alm integer;
     v_id_depto_conta integer;
+    v_almacenable varchar;
+    v_activo_fijo varchar;
+    v_sw_al boolean;
+    v_id_tipo_proceso_pi_al  integer;
+    v_codigo_proceso_pi_al  varchar;
+    v_id_fun_proceso_pi_al integer;
+    v_id_dep_proceso_pi_al integer;
+    v_sw_af boolean;
+    v_id_tipo_proceso_pi_af  integer;
+    v_codigo_proceso_pi_af varchar;
+    v_id_fun_proceso_pi_af integer;
+    v_id_dep_proceso_pi_af integer;
 
 BEGIN
 
@@ -44,13 +62,21 @@ BEGIN
     v_af = 0;
     v_alm = 0;
 
-	---------------------
+	 ---------------------
     --OBTENCION DE DATOS
     ---------------------
 	--Cotización
-    select cot.id_cotizacion,cot.id_proceso_wf, cot.id_estado_wf, cot.estado, cot.id_moneda,
-    cot.id_obligacion_pago, sol.justificacion, cot.numero_oc
-    into v_rec_cot
+    select 
+       cot.id_cotizacion,
+       cot.id_proceso_wf, 
+       cot.id_estado_wf, 
+       cot.estado, 
+       cot.id_moneda,
+       cot.id_obligacion_pago, 
+       sol.justificacion, 
+       cot.numero_oc
+    into 
+       v_rec_cot
     from adq.tcotizacion cot
     inner join adq.tproceso_compra pro on pro.id_proceso_compra = cot.id_proceso_compra
     inner join adq.tsolicitud sol on sol.id_solicitud = pro.id_solicitud
@@ -58,6 +84,7 @@ BEGIN
     
     --Moneda Base
     v_id_moneda = param.f_get_moneda_base();
+    
     
     ---------------
     --VALIDACIONES
@@ -71,179 +98,323 @@ BEGIN
     	raise exception 'La Cotización aún no ha sido habilitada para Pago';
     end if;
     
-    --TODO ................  QUE PASA SI TIENE MAS DE UN PREINGESO
     
-    --Verifica que no haya generado ya un Preingreso
+    
+    ---------------------------
+    --  PREINGRESO DE ALMACENES
+    -------------------------------
+    
+    
+    -- obtener los preingresos de AL  cancelado, y verificar que no se tenga activos (borrador o finalizado)
+    
+    v_sw_al = false;
+    
     if exists(select 1
-              from alm.tpreingreso
-              where id_cotizacion = p_id_cotizacion
+                from alm.tpreingreso  pi
+                inner join wf.tproceso_wf  pw on pw.id_proceso_wf = pi.id_proceso_wf
+                inner join wf.ttipo_proceso tp on tp.id_tipo_proceso = pw.id_tipo_proceso
+                where pi.id_cotizacion = p_id_cotizacion 
+                   and tp.codigo_llave = 'preingreso_almacen'
+                    and estado in ('cancelado')) then
+    	
+        
+        v_sw_al = true ;  
+    
+    end if;
+    
+    
+    if exists(select 1
+              from alm.tpreingreso  pi
+              inner join wf.tproceso_wf  pw on pw.id_proceso_wf = pi.id_proceso_wf
+                inner join wf.ttipo_proceso tp on tp.id_tipo_proceso = pw.id_tipo_proceso
+              where pi.id_cotizacion = p_id_cotizacion 
+               and tp.codigo_llave = 'preingreso_almacen'
               and estado in ('borrador','finalizado')) then
-    	raise exception 'El Preingreso ya fue generado anteriormente.';
+    	
+         v_sw_al = false;   
+    
     end if;
-	
-    --Verifica que la primera cuota haya sido al menos devengada
-    select od.estado_reg, op.id_depto
-    into v_estado_cuota, v_id_depto_conta
-    from tes.tobligacion_pago op
-    inner join tes.tobligacion_det od
-    on od.id_obligacion_pago = op.id_obligacion_pago
-    where op.id_obligacion_pago = v_rec_cot.id_obligacion_pago
-    order by od.id_obligacion_det asc limit 1;
     
-    /*if v_estado_cuota != 'devengado' then
-    	raise exception 'La cotización aún no ha sido Devengada';
-    end if;*/
+    -- obtener preingresos de AF cancelado, y verificar que no se tenga activos (borrador o finalizado)
     
-    --Verifica que en el detalle de la cotización existan almacenables
+    
+    --IF si existe un Preingreso de almacens,cancelado  y no se tiene estado borrador ni finalizado
+     IF  v_sw_al  THEN
+            -- obtenemos el id_tipo_proceso, y el id_estado_wf anterior
+             select 
+               tp.id_tipo_proceso,
+               tp.codigo,
+               ewf.id_funcionario,
+               ewf.id_depto
+            into
+               v_id_tipo_proceso_pi_al,
+               v_codigo_proceso_pi_al,
+               v_id_fun_proceso_pi_al,
+               v_id_dep_proceso_pi_al
+            from alm.tpreingreso  pi
+            inner join wf.tproceso_wf  pw on pw.id_proceso_wf = pi.id_proceso_wf
+            inner join wf.ttipo_proceso tp on tp.id_tipo_proceso = pw.id_tipo_proceso
+            inner join wf.testado_wf ewf on ewf.id_proceso_wf = pw.id_proceso_wf 
+            inner join wf.ttipo_estado tew on tew.id_tipo_estado = ewf.id_tipo_estado  and tew.codigo = 'borrador'
+            where pi.id_cotizacion = p_id_cotizacion 
+             and  tp.codigo_llave = 'preingreso_almacen'
+            and estado in ('cancelado')
+            offset  0 limit 1;
+            
+            --Verifica que en el detalle de la cotización existan almacenables
+            if exists(select 1
+                          from adq.tcotizacion_det cdet
+                          inner join adq.tsolicitud_det sdet
+                              on sdet.id_solicitud_det = cdet.id_solicitud_det
+                          inner join param.tconcepto_ingas cin
+                              on cin.id_concepto_ingas = sdet.id_concepto_ingas
+                          where cdet.id_cotizacion = p_id_cotizacion
+                            and cdet.estado_reg = 'activo'
+                            and cdet.cantidad_adju > 0
+                            and lower(cin.tipo) = 'bien' 
+                            and lower(cin.almacenable) = 'si'
+                            and lower(cin.activo_fijo) = 'no') then
+                v_alm = 1;
+            end if;
+            
+            -- registramo un  nuevo proceso de de preingreso de almacenes
+            -- copiamos los datos de la cotizacion detalle
+            
+            --------------------------
+            -- CREACIÓN DE PREINGRESO
+            --------------------------
+            --Preingreso para almacenes
+            if v_alm>0 then
+            
+            
+              -- REgistra el proceso siguiente de la cotización para el Preingreso de almacenes
+                    
+                    SELECT 
+                      ps_id_proceso_wf, ps_id_estado_wf, ps_codigo_estado
+                    into 
+                      v_id_proceso_wf, v_id_estado_wf, v_codigo_estado
+                    FROM wf.f_registra_proceso_disparado_wf(
+                       p_id_usuario, 
+                       v_rec_cot.id_estado_wf,
+                       v_id_fun_proceso_pi_al, 
+                       v_id_dep_proceso_pi_al, 
+                      'Preingreso de almacenes',
+                       v_codigo_proceso_pi_al,  --no tiene que tenes espacios
+                      'PAL-'||v_rec_cot.numero_oc
+                       );
+                       
+                   
+                  insert into alm.tpreingreso(
+                       id_usuario_reg, 
+                       fecha_reg, 
+                       estado_reg, 
+                       id_cotizacion,
+                       id_depto, 
+                       id_estado_wf, 
+                       id_proceso_wf,  
+                       estado, 
+                       id_moneda,
+                       tipo, 
+                       descripcion, 
+                       id_depto_conta
+                    ) values(
+                       p_id_usuario, 
+                       now(),
+                       'activo',
+                       p_id_cotizacion,
+                       null, 
+                       v_id_estado_wf, 
+                       v_id_proceso_wf, 
+                       v_codigo_estado, 
+                       v_id_moneda,
+                       'almacen', 
+                       v_rec_cot.justificacion, 
+                       v_id_depto_conta
+                    ) returning id_preingreso into v_id_preingreso;
+                    
+                    --Generación del detalle del preingreso  de activo fijo
+                    insert into alm.tpreingreso_det(
+                    id_usuario_reg, fecha_reg, estado_reg,
+                    id_preingreso, id_cotizacion_det, cantidad_det, precio_compra
+                    )
+                    select
+                    p_id_usuario, now(),'activo',
+                    v_id_preingreso,cdet.id_cotizacion_det, cdet.cantidad_adju, cdet.precio_unitario_mb
+                    from adq.tcotizacion_det cdet
+                    inner join adq.tsolicitud_det sdet
+                    on sdet.id_solicitud_det = cdet.id_solicitud_det
+                    inner join param.tconcepto_ingas cin
+                    on cin.id_concepto_ingas = sdet.id_concepto_ingas
+                    where cdet.id_cotizacion = p_id_cotizacion
+                    and lower(cin.tipo) = 'bien'
+                    and cin.almacenable = 'si'
+                    and lower(cin.activo_fijo) = 'no';
+            
+             end if;
+    
+    
+    END IF;
+    
+    
+    ------------------------------------
+    --  PREINGRESO DE activos fijos  ---
+    ------------------------------------
+    
+    
+    -- obtener los preingresos de AF  cancelado, y verificar que no se tenga activos (borrador o finalizado)
+    
+    v_sw_af = false;
+    
     if exists(select 1
-                  from adq.tcotizacion_det cdet
-                  inner join adq.tsolicitud_det sdet
-                  on sdet.id_solicitud_det = cdet.id_solicitud_det
-                  inner join param.tconcepto_ingas cin
-                  on cin.id_concepto_ingas = sdet.id_concepto_ingas
-                  where cdet.id_cotizacion = p_id_cotizacion
-                  and lower(cin.tipo) = 'bien' 
-                  and lower(cin.almacenable) = 'si') then
-        v_alm = 1;
+                from alm.tpreingreso  pi
+                inner join wf.tproceso_wf  pw on pw.id_proceso_wf = pi.id_proceso_wf
+                inner join wf.ttipo_proceso tp on tp.id_tipo_proceso = pw.id_tipo_proceso
+                where pi.id_cotizacion = p_id_cotizacion 
+                   and tp.codigo_llave = 'preingreso_activo_fijo'
+                   and estado in ('cancelado')) then
+    	  
+          v_sw_af = true ;  
+    
     end if;
     
-    if exists(select 1
-                  from adq.tcotizacion_det cdet
-                  inner join adq.tsolicitud_det sdet
-                  on sdet.id_solicitud_det = cdet.id_solicitud_det
-                  inner join param.tconcepto_ingas cin
-                  on cin.id_concepto_ingas = sdet.id_concepto_ingas
-                  where cdet.id_cotizacion = p_id_cotizacion
-                  and lower(cin.tipo) = 'bien'
-                  and lower(cin.activo_fijo) = 'si' 
-                  and lower(cin.almacenable) = 'no') then
-        v_af = 1;
-    end if;
+    
+    IF exists(select 1
+              from alm.tpreingreso  pi
+              inner join wf.tproceso_wf  pw on pw.id_proceso_wf = pi.id_proceso_wf
+                inner join wf.ttipo_proceso tp on tp.id_tipo_proceso = pw.id_tipo_proceso
+              where pi.id_cotizacion = p_id_cotizacion 
+               and tp.codigo_llave = 'preingreso_activo_fijo'
+              and estado in ('borrador','finalizado')) then
+    	
+         v_sw_af = false;   
+    
+    end IF;
+    
+    --IF si existe un Preingreso de almacens,cancelado  y no se tiene estado borrador ni finalizado
+   
+    IF  v_sw_af  THEN
+            -- obtenemos el id_tipo_proceso, y el id_estado_wf anterior
+             select 
+               tp.id_tipo_proceso,
+               tp.codigo,
+               ewf.id_funcionario,
+               ewf.id_depto
+            into
+               v_id_tipo_proceso_pi_af,
+               v_codigo_proceso_pi_af,
+               v_id_fun_proceso_pi_af,
+               v_id_dep_proceso_pi_af
+            from alm.tpreingreso  pi
+            inner join wf.tproceso_wf  pw on pw.id_proceso_wf = pi.id_proceso_wf
+            inner join wf.ttipo_proceso tp on tp.id_tipo_proceso = pw.id_tipo_proceso
+            inner join wf.testado_wf ewf on ewf.id_proceso_wf = pw.id_proceso_wf
+            inner join wf.ttipo_estado tew on tew.id_tipo_estado = ewf.id_tipo_estado  and tew.codigo = 'borrador'
+            where pi.id_cotizacion = p_id_cotizacion 
+             and  tp.codigo_llave = 'preingreso_activo_fijo'
+            and estado in ('cancelado')
+            offset  0 limit 1;
+            
+            
+            
+            --Verifica que en el detalle de la cotización existan almacenables
+            if exists(select 1
+                          from adq.tcotizacion_det cdet
+                          inner join adq.tsolicitud_det sdet
+                              on sdet.id_solicitud_det = cdet.id_solicitud_det
+                          inner join param.tconcepto_ingas cin
+                              on cin.id_concepto_ingas = sdet.id_concepto_ingas
+                          where cdet.id_cotizacion = p_id_cotizacion
+                            and cdet.estado_reg = 'activo'
+                            and cdet.cantidad_adju > 0
+                            and lower(cin.tipo) = 'bien' 
+                            and lower(cin.almacenable) = 'no'
+                            and lower(cin.activo_fijo) = 'si') then
+                            
+                             
+                            
+                v_af = 1;
+            end if;
+            
+            -- registramo un  nuevo proceso de de preingreso de almacenes
+            -- copiamos los datos de la cotizacion detalle
+            
+            --------------------------
+            -- CREACIÓN DE PREINGRESO
+            --------------------------
+            --Preingreso para almacenes
+            if v_af > 0 then
+            
+            
+              -- REgistra el proceso siguiente de la cotización para el Preingreso de almacenes
+                    
+                    SELECT 
+                      ps_id_proceso_wf, ps_id_estado_wf, ps_codigo_estado
+                    into 
+                      v_id_proceso_wf, v_id_estado_wf, v_codigo_estado
+                    FROM wf.f_registra_proceso_disparado_wf(
+                       p_id_usuario, 
+                       v_rec_cot.id_estado_wf,
+                       v_id_fun_proceso_pi_af, 
+                       v_id_dep_proceso_pi_af, 
+                      'Preingreso de activos fijos',
+                       v_codigo_proceso_pi_af, 
+                      'PAF-'||v_rec_cot.numero_oc
+                       );
+                       
+                   
+                  insert into alm.tpreingreso(
+                       id_usuario_reg, 
+                       fecha_reg, 
+                       estado_reg, 
+                       id_cotizacion,
+                       id_depto, 
+                       id_estado_wf, 
+                       id_proceso_wf,  
+                       estado, 
+                       id_moneda,
+                       tipo, 
+                       descripcion, 
+                       id_depto_conta
+                    ) values(
+                       p_id_usuario, 
+                       now(),
+                       'activo',
+                       p_id_cotizacion,
+                       null, 
+                       v_id_estado_wf, 
+                       v_id_proceso_wf, 
+                       v_codigo_estado, 
+                       v_id_moneda,
+                       'activo_fijo', 
+                       v_rec_cot.justificacion, 
+                       v_id_depto_conta
+                    ) returning id_preingreso into v_id_preingreso;
+                    
+                    --Generación del detalle del preingreso  de activo fijo
+                    insert into alm.tpreingreso_det(
+                    id_usuario_reg, fecha_reg, estado_reg,
+                    id_preingreso, id_cotizacion_det, cantidad_det, precio_compra
+                    )
+                    select
+                     p_id_usuario, now(),'activo',
+                     v_id_preingreso,cdet.id_cotizacion_det, cdet.cantidad_adju, cdet.precio_unitario_mb
+                    from adq.tcotizacion_det cdet
+                    inner join adq.tsolicitud_det sdet
+                    on sdet.id_solicitud_det = cdet.id_solicitud_det
+                    inner join param.tconcepto_ingas cin
+                    on cin.id_concepto_ingas = sdet.id_concepto_ingas
+                    where cdet.id_cotizacion = p_id_cotizacion
+                    and lower(cin.tipo) = 'bien'
+                    and cin.almacenable = 'no'
+                    and lower(cin.activo_fijo) = 'si';
+            
+             end if;
+    
+    
+    END IF;
+   
 
-    if v_alm + v_af = 0 then
-    	raise exception 'La cotización no tiene ningún Bien Almacenable ni Activo Fijo. Nada que hacer.';
-    end if;
 
-	
-    --------------------------
-    -- CREACIÓN DE PREINGRESO
-    --------------------------
-    --Preingreso para almacenes
-    if v_alm>0 then
-    
-    
-      -- REgistra el proceso siguiente de la cotización para el Preingreso de almacenes
-            
-            SELECT ps_id_proceso_wf, ps_id_estado_wf, ps_codigo_estado
-            into v_id_proceso_wf, v_id_estado_wf, v_codigo_estado
-            FROM wf.f_registra_proceso_disparado_wf(
-               p_id_usuario, 
-               v_rec_cot.id_estado_wf,
-               NULL, 
-               v_id_depto, 
-               'Preingreso de almacenes',
-               'ALPRE,ALPREIND,ALPREND,ALPRENR,ALPREINPR',  --no tiene que tenes espacios
-               'PAL-'||v_rec_cot.numero_oc
-               );
-        
-        
-          insert into alm.tpreingreso(
-               id_usuario_reg, 
-               fecha_reg, 
-               estado_reg, 
-               id_cotizacion,
-               id_depto, 
-               id_estado_wf, 
-               id_proceso_wf,  
-               estado, 
-               id_moneda,
-               tipo, 
-               descripcion, 
-               id_depto_conta
-            ) values(
-               p_id_usuario, 
-               now(),
-               'activo',
-               p_id_cotizacion,
-               null, 
-               v_id_estado_wf, 
-               v_id_proceso_wf, 
-               v_codigo_estado, 
-               v_id_moneda,
-               'almacen', 
-               v_rec_cot.justificacion, 
-               v_id_depto_conta
-            ) returning id_preingreso into v_id_preingreso;
-            
-            --Generación del detalle del preingreso  de activo fijo
-            insert into alm.tpreingreso_det(
-            id_usuario_reg, fecha_reg, estado_reg,
-            id_preingreso, id_cotizacion_det, cantidad_det, precio_compra
-            )
-            select
-            p_id_usuario, now(),'activo',
-            v_id_preingreso,cdet.id_cotizacion_det, cdet.cantidad_adju, cdet.precio_unitario_mb
-            from adq.tcotizacion_det cdet
-            inner join adq.tsolicitud_det sdet
-            on sdet.id_solicitud_det = cdet.id_solicitud_det
-            inner join param.tconcepto_ingas cin
-            on cin.id_concepto_ingas = sdet.id_concepto_ingas
-            where cdet.id_cotizacion = p_id_cotizacion
-            and lower(cin.tipo) = 'bien'
-            and cin.almacenable = 'si';
-            
-    end if;
-    
-    --Preingreso para Activos Fijos
-    if v_af>0 then
-    
-    
-           -- REgistra el proceso siguiente de la cotización para el Preingreso de Aactivo Fijos
-            
-            SELECT ps_id_proceso_wf, ps_id_estado_wf, ps_codigo_estado
-            into v_id_proceso_wf, v_id_estado_wf, v_codigo_estado
-            FROM wf.f_registra_proceso_disparado_wf(
-               p_id_usuario, 
-               v_rec_cot.id_estado_wf,
-               NULL, 
-               v_id_depto, 
-               'Preingreso de activos fijos',
-               'ALPRE,ALPREIND,ALPREND,ALPRENR,ALPREINPR',  --no tiene que tenes espacios
-               'PAF-'||v_rec_cot.numero_oc
-               );
-    
-    
-    
-    
-    
-            insert into alm.tpreingreso(
-            id_usuario_reg, fecha_reg, estado_reg, id_cotizacion,
-            id_depto, id_estado_wf, id_proceso_wf, estado, id_moneda,
-            tipo
-            ) values(
-            p_id_usuario, now(),'activo',p_id_cotizacion,
-            null, v_id_estado_wf, v_id_proceso_wf, v_codigo_estado, v_id_moneda,
-            'activo_fijo'
-            ) returning id_preingreso into v_id_preingreso;
-
-            --Generación del detalle del preingreso de activo fijo
-            insert into alm.tpreingreso_det(
-            id_usuario_reg, fecha_reg, estado_reg,
-            id_preingreso, id_cotizacion_det, cantidad_det, precio_compra
-            )
-            select
-            p_id_usuario, now(),'activo',        
-            v_id_preingreso,cdet.id_cotizacion_det, cdet.cantidad_adju, cdet.precio_unitario_mb
-            from adq.tcotizacion_det cdet
-            inner join adq.tsolicitud_det sdet
-            on sdet.id_solicitud_det = cdet.id_solicitud_det
-            inner join param.tconcepto_ingas cin
-            on cin.id_concepto_ingas = sdet.id_concepto_ingas
-            where cdet.id_cotizacion = p_id_cotizacion
-            and lower(cin.tipo) = 'bien'
-            and lower(cin.activo_fijo) = 'si'
-            and lower(cin.almacenable) = 'no';
-    end if;
 
     ------------
     --RESPUESTA

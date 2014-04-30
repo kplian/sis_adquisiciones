@@ -482,7 +482,7 @@ class MODCotizacion extends MODbase{
         //Devuelve la respuesta
         return $this->respuesta;
     }
-    
+    /*
      function habilitarPago(){
         //Definicion de variables para ejecucion del procedimiento
         $this->procedimiento='adq.f_cotizacion_ime';
@@ -492,6 +492,30 @@ class MODCotizacion extends MODbase{
         //Define los parametros para la funcion
         $this->setParametro('id_cotizacion','id_cotizacion','int4');
         $this->setParametro('id_depto_tes','id_depto_tes','int4');
+    
+
+        //Ejecuta la instruccion
+        $this->armarConsulta();
+        $this->ejecutarConsulta();
+
+        //Devuelve la respuesta
+        return $this->respuesta;
+    }*/
+    
+    
+    function habilitarPago(){
+        //Definicion de variables para ejecucion del procedimiento
+        $this->procedimiento='adq.f_cotizacion_ime';
+        $this->transaccion='ADQ_HABPAG_IME';
+        $this->tipo_procedimiento='IME';
+                
+        //Define los parametros para la funcion
+        $this->setParametro('id_proceso_wf_act','id_proceso_wf_act','int4');
+        $this->setParametro('id_tipo_estado','id_tipo_estado','int4');
+        $this->setParametro('id_funcionario_wf','id_funcionario_wf','int4');
+        $this->setParametro('id_depto_wf','id_depto_wf','int4');
+        $this->setParametro('obs','obs','text');
+        $this->setParametro('json_procesos','json_procesos','text');
     
 
         //Ejecuta la instruccion

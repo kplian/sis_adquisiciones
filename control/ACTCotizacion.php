@@ -373,7 +373,7 @@ class ACTCotizacion extends ACTbase{
     }
     
 
-       function habilitarPago(){
+    function habilitarPago(){
         $this->objFunc=$this->create('MODCotizacion');  
         $this->res=$this->objFunc->habilitarPago($this->objParam);
         $this->res->imprimirRespuesta($this->res->generarJson());

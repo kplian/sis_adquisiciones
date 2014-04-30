@@ -283,7 +283,7 @@ Class RSolicitudCompra extends Report {
                         'nombre_partida'  => 'Nombre Partida',
                         'desc_centro_costo'    => 'Centro de Costo',
                         //'totalRef' => '',
-                        'ejecutado' => 'Disponibilidad'
+                        'ejecutado' => 'Presupuesto'
                     );     
                          
              $pdf-> MultiRow($RowArray,false,0); 

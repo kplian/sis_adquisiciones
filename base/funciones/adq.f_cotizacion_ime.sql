@@ -120,6 +120,10 @@ DECLARE
       v_instruc_rpc varchar;
       
       v_total_costo_mo numeric;
+      v_registros_proc  record;
+      v_codigo_llave    varchar;
+      v_codigo_tipo_pro    varchar;
+      v_sw_obligacion_pago  boolean;
      
 			    
 BEGIN
@@ -1312,15 +1316,306 @@ BEGIN
             --Devuelve la respuesta
             return v_resp;
 
-		end;     
-	     
-	/*********************************    
+		end;  
+    /*********************************    
  	#TRANSACCION:  'ADQ_HABPAG_IME'
  	#DESCRIPCION:	Habilita los pagos en tesoreria en modulo de cuentas por pagar
  	#AUTOR:     	Rensi Arteaga Copari	
  	#FECHA:		    05-04-2013 14:48:35
 	***********************************/
 
+	elsif(p_transaccion = 'ADQ_HABPAG_IME')then
+
+		begin
+			--recupera parametros
+			
+            select 
+           	 s.id_subsistema
+            into
+            	v_id_subsistema
+            from segu.tsubsistema s 
+            where s.codigo = 'ADQ';
+            
+            
+            -------------------------------------
+            --recuperar datos de la cotizacion e inserta en oblligacion
+            ------------------------------------------------
+      
+            select 
+              c.id_cotizacion,
+              c.numero_oc,
+              c.id_proveedor,
+              c.id_estado_wf,
+              c.id_proceso_wf,
+              c.id_moneda,
+              pc.id_depto,
+              pc.num_tramite,
+              c.estado,
+              c.tipo_cambio_conv,
+              sol.id_gestion
+            into
+             v_id_cotizacion,
+             v_numero_oc,
+             v_id_proveedor,
+             v_id_estado_wf_cot,
+             v_id_proceso_wf_cot,
+             v_id_moneda,
+             v_id_depto,
+             v_num_tramite,
+             v_codigo_estado,
+             v_tipo_cambio_conv,
+             v_id_gestion
+            from adq.tcotizacion c
+            inner join adq.tproceso_compra pc on pc.id_proceso_compra = c.id_proceso_compra
+            inner join adq.tsolicitud sol on sol.id_solicitud = pc.id_solicitud
+            WHERE c.id_proceso_wf = v_parametros.id_proceso_wf_act;            
+            
+            IF  v_codigo_estado != 'adjudicado' THEN
+            
+          	  raise exception 'Solo pueden habilitarce pago para cotizaciones adjudicadas';
+            
+            END IF;
+            
+            
+            INSERT INTO 
+              tes.tobligacion_pago
+            (
+              id_usuario_reg,
+              fecha_reg,
+              estado_reg,
+              id_proveedor,
+              id_subsistema,
+              id_moneda,
+             -- id_depto,
+              tipo_obligacion,
+              fecha,
+              numero,
+              tipo_cambio_conv,
+              num_tramite,
+              id_gestion,
+              comprometido
+            ) 
+            VALUES (
+              p_id_usuario,
+              now(),
+              'activo',
+              v_id_proveedor,
+              v_id_subsistema,
+              v_id_moneda,
+             -- v_parametros.id_depto_tes,    ------------------ojo
+              'adquisiciones',
+              now(),
+              v_numero_oc,
+              v_tipo_cambio_conv,
+              v_num_tramite,
+              v_id_gestion,
+              'si'
+            ) RETURNING id_obligacion_pago into v_id_obligacion_pago;
+    
+            
+                       
+            
+            -----------------------------------------------------------------------------
+            --recupera datos del detalle de cotizacion e inserta en detalle de obligacion
+            -----------------------------------------------------------------------------
+            
+            FOR v_registros in (
+              select 
+                cd.id_cotizacion_det,
+                sd.id_concepto_ingas,
+                sd.id_cuenta,
+                sd.id_auxiliar,
+                sd.id_partida,
+                sd.id_partida_ejecucion,
+                cd.cantidad_adju,
+                cd.precio_unitario,
+                cd.precio_unitario_mb,
+                sd.id_centro_costo,
+                sd.descripcion
+              from adq.tcotizacion_det cd
+              inner join adq.tsolicitud_det sd on sd.id_solicitud_det = cd.id_solicitud_det
+              where cd.id_cotizacion = v_id_cotizacion 
+                    and cd.estado_reg='activo'
+              
+            )LOOP
+            
+            
+              --TO DO,  para el pago de dos gestion  gestion hay que  
+              --        mandar solamente el total comprometido  de la gestion actual menos el revrtido
+              --         o el monto total adjudicado, el que sea menor.  
+            
+               -- inserta detalle obligacion
+                IF((v_registros.cantidad_adju *v_registros.precio_unitario) > 0)THEN
+                   
+                       INSERT INTO 
+                        tes.tobligacion_det
+                      (
+                        id_usuario_reg,
+                        fecha_reg,
+                         estado_reg,
+                        id_obligacion_pago,
+                        id_concepto_ingas,
+                        id_centro_costo,
+                        id_partida,
+                        id_cuenta,
+                        id_auxiliar,
+                        id_partida_ejecucion_com,
+                        monto_pago_mo,
+                        monto_pago_mb,
+                        descripcion) 
+                      VALUES (
+                        p_id_usuario,
+                        now(),
+                        'activo',
+                        v_id_obligacion_pago,
+                        v_registros.id_concepto_ingas,
+                        v_registros.id_centro_costo,
+                        v_registros.id_partida,
+                        v_registros.id_cuenta,
+                        v_registros.id_auxiliar,
+                        v_registros.id_partida_ejecucion,
+                        (v_registros.cantidad_adju *v_registros.precio_unitario), 
+                        (v_registros.cantidad_adju *v_registros.precio_unitario_mb),
+                        v_registros.descripcion
+                      )RETURNING id_obligacion_det into v_id_obligacion_det;
+                       
+                       -- actulizar detalle de cotizacion
+                       
+                       update adq.tcotizacion_det set 
+                       id_obligacion_det = v_id_obligacion_det
+                       where id_cotizacion_det=v_registros.id_cotizacion_det;
+                   
+               END IF;
+            
+            END LOOP;
+           
+             --registra el estado de la cotizacion
+             v_id_estado_actual =  wf.f_registra_estado_wf(v_parametros.id_tipo_estado,   --p_id_tipo_estado_siguiente
+                                                         v_parametros.id_funcionario_wf, 
+                                                         v_id_estado_wf_cot,   --  p_id_estado_wf_anterior
+                                                         v_parametros.id_proceso_wf_act,
+                                                         p_id_usuario,
+                                                         v_parametros.id_depto_wf,
+                                                         v_parametros.obs);
+            
+            
+             -- actualiza estado en la solicitud
+            
+             update adq.tcotizacion  c set 
+               id_estado_wf =  v_id_estado_actual,
+               estado =   wf.f_get_codigo_estado(v_parametros.id_tipo_estado::integer),
+               id_usuario_mod=p_id_usuario,
+               id_obligacion_pago = v_id_obligacion_pago,
+               fecha_mod=now()
+             where c.id_cotizacion  = v_id_cotizacion;
+            
+            
+            --------------------------------------------------------------
+            --registra procesos disparados , preingreso AF, alamecnes, OP
+            ---------------------------------------------------------------
+            
+            v_sw_obligacion_pago = false;
+           
+            FOR v_registros_proc in ( select * from json_populate_recordset(null::wf.proceso_disparado_wf, v_parametros.json_procesos::json)) LOOP
+     
+                       --get cdigo tipo proceso
+                       select   
+                          tp.codigo,
+                          tp.codigo_llave  
+                       into 
+                          v_codigo_tipo_pro, 
+                          v_codigo_llave  
+                       from wf.ttipo_proceso tp 
+                        where  tp.id_tipo_proceso =  v_registros_proc.id_tipo_proceso_pro;
+                      
+                       -- raise exception 'llega... %',v_registros_proc;  
+                 
+                       -- disparar creacion de procesos seleccionados
+                      
+                      SELECT
+                               ps_id_proceso_wf,
+                               ps_id_estado_wf,
+                               ps_codigo_estado
+                         into
+                               v_id_proceso_wf,
+                               v_id_estado_wf,
+                               v_codigo_estado
+                      FROM wf.f_registra_proceso_disparado_wf(
+                               p_id_usuario,
+                               v_id_estado_actual::integer, 
+                               v_registros_proc.id_funcionario_wf_pro::integer, 
+                               v_registros_proc.id_depto_wf_pro::integer,
+                               v_registros_proc.obs_pro,
+                               v_codigo_tipo_pro,    
+                               v_codigo_tipo_pro);
+                       
+                        
+                   IF v_codigo_llave = 'obligacion_pago' THEN
+                     
+                          IF  v_registros_proc.id_depto_wf_pro::integer  is NULL  THEN
+                          
+                             raise exception 'Para obligaciones de pago el depto es indispensable';
+                          
+                          END IF;
+                     
+                           update tes.tobligacion_pago  o set 
+                               id_estado_wf =  v_id_estado_wf,
+                               id_proceso_wf = v_id_proceso_wf,
+                               id_depto =   v_registros_proc.id_depto_wf_pro::integer,
+                               estado = v_codigo_estado,
+                               id_usuario_mod=p_id_usuario,
+                               fecha_mod=now()
+                               where o.id_obligacion_pago  = v_id_obligacion_pago;
+                           
+                           v_sw_obligacion_pago = true;
+                    
+                    ELSIF v_codigo_llave = 'preingreso_activo_fijo' or v_codigo_llave = 'preingreso_almacen' THEN
+                       
+                          IF NOT adq.f_genera_preingreso_af_al(p_id_usuario, 
+                                                        v_id_cotizacion, 
+                                                        v_id_proceso_wf, 
+                                                        v_id_estado_wf, 
+                                                        v_codigo_estado,
+                                                        v_codigo_llave) THEN
+                                                         
+                             raise exception 'Error al generar preingreso';
+                          
+                          END IF;
+                    
+                    ELSE   
+                    
+                      raise exception 'Codigo llave no reconodido  verifique el WF (%)', v_codigo_llave;
+                    
+                    
+                    END IF;
+            
+            
+             END LOOP;
+            
+                                 
+             IF not v_sw_obligacion_pago  THEN
+             
+               raise exception 'No se encontro ningun proceso de obligacion de pago (Verificar en el WF si  el codigo llave es correcto  (obligacion_pago))';
+             
+             END IF;
+        
+               
+            --Definicion de la respuesta
+            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Finalizacion del registro de la cotizacion'); 
+            v_resp = pxp.f_agrega_clave(v_resp,'id_cotizacion',v_id_cotizacion::varchar);
+              
+            --Devuelve la respuesta
+            return v_resp;
+
+		end;    
+           
+	     
+	/*********************************    
+ 	#TRANSACCION:  'ADQ_HABPAG_IME'
+ 	#DESCRIPCION:	Habilita los pagos en tesoreria en modulo de cuentas por pagar
+ 	#AUTOR:     	Rensi Arteaga Copari	
+ 	#FECHA:		    05-04-2013 14:48:35
+	***********************************
 	elsif(p_transaccion = 'ADQ_HABPAG_IME')then
 
 		begin
@@ -1576,7 +1871,7 @@ BEGIN
             --Devuelve la respuesta
             return v_resp;
 
-		end;
+		end;*/
      /*********************************    
  	#TRANSACCION:  'ADQ_OBEPUO_IME'
  	#DESCRIPCION:	Obtener listado de up y ep correspondientes a los centros de costo
@@ -1639,7 +1934,7 @@ BEGIN
         
     /*********************************    
  	#TRANSACCION:  'ADQ_SOLCON_IME'
- 	#DESCRIPCION:	Cambia el mmento de los contrato y los hace exigibles
+ 	#DESCRIPCION:	Cambia el momento de los contrato y los hace exigibles
  	#AUTOR:	        RCM
  	#FECHA:		    02/10/2013
 	***********************************/
