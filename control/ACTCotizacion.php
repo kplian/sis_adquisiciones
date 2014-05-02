@@ -24,6 +24,10 @@ class ACTCotizacion extends ACTbase{
 		
 		$this->objParam->addParametro('id_funcionario_usu',$_SESSION["ss_id_funcionario"]); 
 		
+		if($this->objParam->getParametro('filtro_campo')!=''){
+            $this->objParam->addFiltro($this->objParam->getParametro('filtro_campo')." = ".$this->objParam->getParametro('filtro_valor'));  
+        }
+		
 		if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
 			$this->objReporte = new Reporte($this->objParam,$this);
 			$this->res = $this->objReporte->generarReporteListado('MODCotizacion','listarCotizacion');
@@ -43,6 +47,10 @@ class ACTCotizacion extends ACTbase{
         $this->objParam->addParametro('id_funcionario_rpc',$_SESSION["ss_id_funcionario"]); 
         
         $this->objParam->addParametro('id_funcionario_usu',$_SESSION["ss_id_funcionario"]); 
+        
+        if($this->objParam->getParametro('filtro_campo')!=''){
+            $this->objParam->addFiltro($this->objParam->getParametro('filtro_campo')." = ".$this->objParam->getParametro('filtro_valor'));  
+        }
         
         
         if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
@@ -71,7 +79,7 @@ class ACTCotizacion extends ACTbase{
 			$this->objFunc=$this->create('MODCotizacion' );
         $this->res=$this->objFunc->eliminarCotizacion($this->objParam);
         $this->res->imprimirRespuesta($this->res->generarJson());
-        }
+    }
 
    function reporteCotizacion($create_file=false){
             $dataSource = new DataSource();
@@ -394,14 +402,12 @@ class ACTCotizacion extends ACTbase{
 
         $this->datos=array();
         $this->datos=$this->res->getDatos();
-        
         $uos=$this->res->datos['uos'];
         $eps=$this->res->datos['eps'];
    
         
         $this->objParam->addParametro('eps',$eps);
         $this->objParam->addParametro('uos',$uos);
-        
         
         // parametros de ordenacion por defecto
         $this->objParam->defecto('ordenacion','depto');
@@ -411,8 +417,7 @@ class ACTCotizacion extends ACTbase{
         //ejecuta el metodo de lista personas a travez de la intefaz objetoFunSeguridad 
         $this->res=$this->objFunc->listarDeptoFiltradoXUOsEPs($this->objParam);
         $this->res->imprimirRespuesta($this->res->generarJson());
-        
-        
+    
     }
 
 	function generarPreingreso(){

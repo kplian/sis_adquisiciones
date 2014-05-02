@@ -124,6 +124,12 @@ DECLARE
       v_codigo_llave    varchar;
       v_codigo_tipo_pro    varchar;
       v_sw_obligacion_pago  boolean;
+      
+      v_acceso_directo  	varchar;
+      v_clase   			varchar;
+      v_parametros_ad   		varchar;
+      v_tipo_noti  			varchar;
+      v_titulo   			varchar;
      
 			    
 BEGIN
@@ -576,133 +582,8 @@ BEGIN
     
     
     /*********************************    
- 	#TRANSACCION:  'ADQ_SOLAPRO_IME'
- 	#DESCRIPCION:	depues de (Recomendar)adjudicar pasa al siguiente estado, de solicitud de aprobacion
-    
-    
-    --  NO SE TIENE QUE USAR MAS ESTA TRASACCION
-    
-    
- 	#AUTOR:	        Rensi Arteaga Copari	
- 	#FECHA:		    7-05-2013 14:48:35
-	***********************************/
-
-	elsif(p_transaccion='ADQ_SOLAPRO_IME')then
-
-		begin
-        
-           select
-            c.numero_oc,
-            c.id_estado_wf,
-            c.id_proceso_wf,
-            pc.id_depto,
-            c.estado,
-            sc.id_funcionario_rpc,
-            sc.numero
-           into 
-            v_numero_oc,
-            v_id_estado_wf,
-            v_id_proceso_wf,
-            v_id_depto,
-            v_estado_cot,
-            v_id_funcionario_rpc,
-            v_num_sol
-            
-           from adq.tcotizacion c
-           inner join adq.tproceso_compra pc on pc.id_proceso_compra = c.id_proceso_compra
-           inner join adq.tsolicitud sc on sc.id_solicitud = pc.id_solicitud 
-           where c.id_cotizacion = v_parametros.id_cotizacion;
-           
-           
-           --validamos que la cotizacion por lo menos tenga un item adjudicado
-           select 
-            sum(cd.cantidad_adju)
-            into
-            v_total_adj
-           from adq.tcotizacion_det cd
-           where cd.id_cotizacion = v_parametros.id_cotizacion and cd.estado_reg='activo';
-                   
-                   
-           IF v_total_adj  <= 0  or v_total_adj is null THEN
-                   
-             raise exception 'La cotización no tiene items adjudicados';
-                   
-           END IF;
-           
-           
-                      
-             IF  v_estado_cot != 'cotizado' THEN
-             
-              raise exception 'Solo se admiten cotizaciones en estado cotizado';
-             END IF;
-             
-             --obtenemos el estado siguiente
-             SELECT 
-                 *
-              into
-                va_id_tipo_estado,
-                va_codigo_estado,
-                va_disparador,
-                va_regla,
-                va_prioridad
-            
-            FROM wf.f_obtener_estado_wf(v_id_proceso_wf, v_id_estado_wf,NULL,'siguiente');
-            
-            
-            
-            IF va_codigo_estado[2] is not null THEN
-            
-             raise exception 'El proceso de WF esta mal parametrizado, el estado cotizado de la cotizacion solo admite un estado siguiente';
-            
-            END IF;
-            
-             IF va_codigo_estado[1] is  null THEN
-            
-             raise exception 'El proceso de WF esta mal parametrizado, no se encuentra el estado siguiente ';
-            
-            END IF;
-			
-             
-             --  pasamos la cotizacion al siguiente estado
-           
-           
-                 v_id_estado_actual =  wf.f_registra_estado_wf(va_id_tipo_estado[1], 
-                                                               v_id_funcionario_rpc, 
-                                                               v_id_estado_wf, 
-                                                               v_id_proceso_wf,
-                                                               p_id_usuario,
-                                                               v_id_depto,
-                                                               'Se requiere la aprobacion de la solicitud '||v_num_sol,
-                                                               '../../../sis_adquisiciones/vista/cotizacion/CotizacionVbDin.php',
-                                                               'CotizacionVbDin');
-                
-              
-            
-             
-            
-             -- actualiza estado en la solicitud
-            
-             update adq.tcotizacion  c set 
-               id_estado_wf =  v_id_estado_actual,
-               estado = va_codigo_estado[1],
-               id_usuario_mod=p_id_usuario,
-               fecha_mod=now()
-             where c.id_cotizacion  = v_parametros.id_cotizacion;
-           
-              
-            --Definicion de la respuesta
-            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Solicitud de Aprobacion enviada'); 
-            v_resp = pxp.f_agrega_clave(v_resp,'cantidad',v_total_adj::varchar);
-              
-            --Devuelve la respuesta
-            return v_resp;
-
-		end;
-    
-    
-     /*********************************    
  	#TRANSACCION:  'ADQ_SIGECOT_IME'
- 	#DESCRIPCION:	funcion que controla el cambio al Siguiente esado de la solicitud, integrado con el WF
+ 	#DESCRIPCION:	funcion que controla el cambio al Siguiente esado de la cotizacion, integrado con el WF
  	#AUTOR:		RAC	
  	#FECHA:		19-02-2013 12:12:51
 	***********************************/
@@ -946,7 +827,7 @@ BEGIN
            
             
            ----------------------------------------
-           --Se se solicita cambiar de estado a la solicitud
+           -- Se solicita cambiar de estado a la solicitud
            ------------------------------------------
            ELSEIF  v_parametros.operacion = 'cambiar' THEN
           
@@ -956,10 +837,6 @@ BEGIN
                        --si no existe un numero de oc obtenemos uno
                      IF  v_numero_oc is NULL THEN
                      
-                              
-                           
-                            
-                             
                              -- determina la fecha del periodo
                             
                              select id_periodo into v_id_periodo from
@@ -968,11 +845,7 @@ BEGIN
                                              and per.fecha_fin >=  v_parametros.fecha_oc
                                              limit 1 offset 0;
                             
-                            
-                         
-                         
-                         
-                            --obtener correlativo
+                             --obtener correlativo
                              v_numero_oc =   param.f_obtener_correlativo(
                                       'OC', 
                                        v_id_periodo,-- par_id, 
@@ -1007,8 +880,7 @@ BEGIN
                  END IF;
           
           
-            
-                -- obtener datos tipo estado
+             -- obtener datos tipo estado
                 
                 select
                  te.codigo
@@ -1027,22 +899,43 @@ BEGIN
                 v_obs=v_parametros.obs;
                 
                  
+                
+                --configurar acceso directo para la alarma   
+               v_acceso_directo = '';
+               v_clase = '';
+               v_parametros_ad = '';
+               v_tipo_noti = 'notificacion';
+               v_titulo  = 'Visto Bueno';
+               
+             
+               IF   v_codigo_estado_siguiente  in('recomendado')   THEN
+                    v_acceso_directo = '../../../sis_adquisiciones/vista/cotizacion/CotizacionVbDin.php';
+                   v_clase = 'CotizacionVbDin';
+                   v_parametros_ad = '{filtro_directo:{campo:"cot.id_proceso_wf",valor:"'||v_id_proceso_wf::varchar||'"}}';
+                   v_tipo_noti = 'notificacion';
+                   v_titulo  = 'Visto Bueno';
+               
+                END IF;
+                
                 --pasamos la cotizacion al siguiente estado
            
-                 v_id_estado_actual =  wf.f_registra_estado_wf(v_parametros.id_tipo_estado, 
+               v_id_estado_actual =  wf.f_registra_estado_wf(v_parametros.id_tipo_estado, 
                                                             v_parametros.id_funcionario, 
                                                             v_id_estado_wf, 
                                                             v_id_proceso_wf,
                                                             p_id_usuario,
                                                             v_id_depto,
                                                            'Se requiere VB '||v_num_sol||' Obs:'||v_obs,
-                                                           '../../../sis_adquisiciones/vista/cotizacion/CotizacionVbDin.php',
-                                                           'CotizacionVbDin');              
+                                                            v_acceso_directo ,
+                                                            v_clase,
+                                                            v_parametros_ad,
+                                                            v_tipo_noti,
+                                                            v_titulo);
+                              
                
                 
                                 
                 
-                 -- actualiza estado en la solicitud
                 
                  -- actualiza estado en la solicitud
             
@@ -1611,268 +1504,6 @@ BEGIN
            
 	     
 	/*********************************    
- 	#TRANSACCION:  'ADQ_HABPAG_IME'
- 	#DESCRIPCION:	Habilita los pagos en tesoreria en modulo de cuentas por pagar
- 	#AUTOR:     	Rensi Arteaga Copari	
- 	#FECHA:		    05-04-2013 14:48:35
-	***********************************
-	elsif(p_transaccion = 'ADQ_HABPAG_IME')then
-
-		begin
-			--recupera parametros
-			
-            select 
-           	 s.id_subsistema
-            into
-            	v_id_subsistema
-            from segu.tsubsistema s 
-            where s.codigo = 'ADQ';
-            
-            
-            ----------------------------------
-            --recuperar datos de la cotizacion e inserta en oblligacion
-            --------------------------
-      
-            select 
-              c.numero_oc,
-              c.id_proveedor,
-              c.id_estado_wf,
-              c.id_proceso_wf,
-              c.id_moneda,
-              pc.id_depto,
-              pc.num_tramite,
-              c.estado,
-              c.tipo_cambio_conv,
-              sol.id_gestion
-            into
-             v_numero_oc,
-             v_id_proveedor,
-             v_id_estado_wf_cot,
-             v_id_proceso_wf_cot,
-             v_id_moneda,
-             v_id_depto,
-             v_num_tramite,
-             v_codigo_estado,
-             v_tipo_cambio_conv,
-             v_id_gestion
-            from adq.tcotizacion c
-            inner join adq.tproceso_compra pc on pc.id_proceso_compra = c.id_proceso_compra
-            inner join adq.tsolicitud sol on sol.id_solicitud = pc.id_solicitud
-            WHERE c.id_cotizacion = v_parametros.id_cotizacion;            
-            
-            IF  v_codigo_estado != 'adjudicado' THEN
-            
-          	  raise exception 'Solo pueden habilitarce pago para cotizaciones adjudicadas';
-            
-            END IF;
-            
-            
-            INSERT INTO 
-              tes.tobligacion_pago
-            (
-              id_usuario_reg,
-              fecha_reg,
-              estado_reg,
-              id_proveedor,
-              id_subsistema,
-              id_moneda,
-              id_depto,
-              tipo_obligacion,
-              fecha,
-              numero,
-              tipo_cambio_conv,
-              num_tramite,
-              id_gestion,
-              comprometido
-            ) 
-            VALUES (
-              p_id_usuario,
-              now(),
-              'activo',
-              v_id_proveedor,
-              v_id_subsistema,
-              v_id_moneda,
-              v_parametros.id_depto_tes,
-              'adquisiciones',
-              now(),
-              v_numero_oc,
-              v_tipo_cambio_conv,
-              v_num_tramite,
-              v_id_gestion,
-              'si'
-            ) RETURNING id_obligacion_pago into v_id_obligacion_pago;
-    
-            
-            
-            update adq.tcotizacion set
-            id_obligacion_pago = v_id_obligacion_pago
-            where id_cotizacion = v_parametros.id_cotizacion;
-            
-            
-            -----------------------------------------------------------------------------
-            --recupera datos del detalle de cotizacion e inserta en detalle de obligacion
-            -----------------------------------------------------------------------------
-            
-            FOR v_registros in (
-              select 
-                cd.id_cotizacion_det,
-                sd.id_concepto_ingas,
-                sd.id_cuenta,
-                sd.id_auxiliar,
-                sd.id_partida,
-                sd.id_partida_ejecucion,
-                cd.cantidad_adju,
-                cd.precio_unitario,
-                cd.precio_unitario_mb,
-                sd.id_centro_costo,
-                sd.descripcion
-              from adq.tcotizacion_det cd
-              inner join adq.tsolicitud_det sd on sd.id_solicitud_det = cd.id_solicitud_det
-              where cd.id_cotizacion = v_parametros.id_cotizacion 
-                    and cd.estado_reg='activo'
-              
-            )LOOP
-            
-            
-              --TO DO,  para el pago de dos gestion  gestion hay que  
-              --        mandar solamente el total comprometido  de la gestion actual menos el revrtido
-              --         o el monto total adjudicado, el que sea menor.  
-            
-               -- inserta detalle obligacion
-                IF((v_registros.cantidad_adju *v_registros.precio_unitario) > 0)THEN
-                   
-                       INSERT INTO 
-                        tes.tobligacion_det
-                      (
-                        id_usuario_reg,
-                        fecha_reg,
-                         estado_reg,
-                        id_obligacion_pago,
-                        id_concepto_ingas,
-                        id_centro_costo,
-                        id_partida,
-                        id_cuenta,
-                        id_auxiliar,
-                        id_partida_ejecucion_com,
-                        monto_pago_mo,
-                        monto_pago_mb,
-                        descripcion) 
-                      VALUES (
-                        p_id_usuario,
-                        now(),
-                        'activo',
-                        v_id_obligacion_pago,
-                        v_registros.id_concepto_ingas,
-                        v_registros.id_centro_costo,
-                        v_registros.id_partida,
-                        v_registros.id_cuenta,
-                        v_registros.id_auxiliar,
-                        v_registros.id_partida_ejecucion,
-                        (v_registros.cantidad_adju *v_registros.precio_unitario), 
-                        (v_registros.cantidad_adju *v_registros.precio_unitario_mb),
-                        v_registros.descripcion
-                      )RETURNING id_obligacion_det into v_id_obligacion_det;
-                       
-                       -- actulizar detalle de cotizacion
-                       
-                       update adq.tcotizacion_det set 
-                       id_obligacion_det = v_id_obligacion_det
-                       where id_cotizacion_det=v_registros.id_cotizacion_det;
-                   
-               END IF;
-            
-            END LOOP;
-            -----------------------------------------
-            --cambia de estado la cotizacion
-            ----------------------------------------
-            
-            SELECT 
-                 *
-              into
-                va_id_tipo_estado,
-                va_codigo_estado,
-                va_disparador,
-                va_regla,
-                va_prioridad
-            
-            FROM wf.f_obtener_estado_wf(v_id_proceso_wf_cot, v_id_estado_wf_cot,NULL,'siguiente');
-            
-            
-            
-            IF va_codigo_estado[2] is not null THEN
-            
-             raise exception 'El proceso de WF esta mal parametrizado, el estado adjudicado de la cotizacion solo admite un estado ';
-            
-            END IF;
-            
-            IF va_codigo_estado[1] is  null THEN
-            
-             raise exception 'El proceso de WF esta mal parametrizado, no se encuentra el estado siguiente ';
-            
-            END IF;
-            
-            -- hay que registrar el estado actual de la cotizacion..
-             v_id_estado_actual =  wf.f_registra_estado_wf(va_id_tipo_estado[1], 
-                                                           NULL, 
-                                                           v_id_estado_wf_cot, 
-                                                           v_id_proceso_wf_cot,
-                                                           p_id_usuario,
-                                                           v_id_depto);
-            
-            
-             -- actualiza estado en la solicitud
-            
-             update adq.tcotizacion  c set 
-               id_estado_wf =  v_id_estado_actual,
-                estado = va_codigo_estado[1],
-               id_usuario_mod=p_id_usuario,
-               fecha_mod=now()
-             where c.id_cotizacion  = v_parametros.id_cotizacion;
-            
-            
-            -----------------------------------------
-            --inicia tramite para obligacion, y registra el estado de la obligacion
-            ----------------------------------------
-             
-            --registra estado de cotizacion
-
-             SELECT
-                       ps_id_proceso_wf,
-                       ps_id_estado_wf,
-                       ps_codigo_estado
-                 into
-                       v_id_proceso_wf,
-                       v_id_estado_wf,
-                       v_codigo_estado
-              FROM wf.f_registra_proceso_disparado_wf(
-                       p_id_usuario,
-                       v_id_estado_actual, 
-                       NULL, 
-                       v_parametros.id_depto_tes,
-                       'Obligacion de pago para la OC'||v_numero_oc,
-                       'OBLI,OBLIND,OBLINR,OBLIINTPD,OBLIINTPR',     -->  si se agregan flujos se tiene que regsitras mas codigos de obligacion (sin espacio, solo divididos por comas)
-                       'OP-'||v_numero_oc);
-                       
-                       
-        
-             update tes.tobligacion_pago  o set 
-               id_estado_wf =  v_id_estado_wf,
-               id_proceso_wf = v_id_proceso_wf,
-               estado = v_codigo_estado,
-               id_usuario_mod=p_id_usuario,
-               fecha_mod=now()
-             where o.id_obligacion_pago  = v_id_obligacion_pago;
-        
-               
-            --Definicion de la respuesta
-            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Finalizacion del registro de la cotizacion'); 
-            v_resp = pxp.f_agrega_clave(v_resp,'id_cotizacion',v_parametros.id_cotizacion::varchar);
-              
-            --Devuelve la respuesta
-            return v_resp;
-
-		end;*/
-     /*********************************    
  	#TRANSACCION:  'ADQ_OBEPUO_IME'
  	#DESCRIPCION:	Obtener listado de up y ep correspondientes a los centros de costo
                     del detalle de la cotizacion adjudicados al proveedor 
