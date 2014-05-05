@@ -249,23 +249,7 @@ ALTER TABLE adq.tsolicitud_det
     NOT DEFERRABLE;
     
 
-ALTER TABLE adq.tsolicitud_det
-  ADD CONSTRAINT fk_tsolicitud_det__id_partida FOREIGN KEY (id_partida)
-    REFERENCES pre.tpartida(id_partida)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION
-    NOT DEFERRABLE;
     
---------------- SQL ---------------
-
-ALTER TABLE adq.tsolicitud_det
-  ADD CONSTRAINT fk_tsolicitud_det__id_cuenta FOREIGN KEY (id_cuenta)
-    REFERENCES conta.tcuenta(id_cuenta)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION
-    NOT DEFERRABLE;    
-
-
 --------------- SQL ---------------
 
 ALTER TABLE adq.tsolicitud_det
