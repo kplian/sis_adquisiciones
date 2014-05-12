@@ -6,12 +6,10 @@
 *@date 19-02-2013 12:12:51
 *@description Clase que recibe los parametros enviados por la vista para mandar a la capa de Modelo
 */
-
 require_once(dirname(__FILE__).'/../../pxp/pxpReport/ReportWriter.php');
 require_once(dirname(__FILE__).'/../reportes/RSolicitudCompra.php');
 require_once(dirname(__FILE__).'/../reportes/DiagramadorGantt.php');
 require_once(dirname(__FILE__).'/../../pxp/pxpReport/DataSource.php');
-
 include_once(dirname(__FILE__).'/../../lib/PHPMailer/class.phpmailer.php');
 include_once(dirname(__FILE__).'/../../lib/PHPMailer/class.smtp.php');
 include_once(dirname(__FILE__).'/../../lib/lib_general/cls_correo_externo.php');
@@ -21,7 +19,6 @@ class ACTSolicitud extends ACTbase{
 			
 	function listarSolicitud(){
 		$this->objParam->defecto('ordenacion','id_solicitud');
-
 		$this->objParam->defecto('dir_ordenacion','asc');
 		
 		if($this->objParam->getParametro('id_depto')!=''){
@@ -29,25 +26,20 @@ class ACTSolicitud extends ACTbase{
         }
         
         if($this->objParam->getParametro('estado')!=''){
-                
-            
             $this->objParam->addFiltro("sol.estado = ''".$this->objParam->getParametro('estado')."''");
-            
         }
         
-         if($this->objParam->getParametro('filtro_aprobadas')==1){
-                 
+        if($this->objParam->getParametro('filtro_aprobadas')==1){
              $this->objParam->addFiltro("(sol.estado = ''aprobado'' or  sol.estado = ''proceso'')");
-            
-         }
+        }
          
-         if($this->objParam->getParametro('filtro_campo')!=''){
+        if($this->objParam->getParametro('filtro_campo')!=''){
             $this->objParam->addFiltro($this->objParam->getParametro('filtro_campo')." = ".$this->objParam->getParametro('filtro_valor'));  
-         }
+       }
 		
 		 //var_dump($_SESSION["ss_id_funcionario"]);
 		
-		 $this->objParam->addParametro('id_funcionario_usu',$_SESSION["ss_id_funcionario"]); 
+		$this->objParam->addParametro('id_funcionario_usu',$_SESSION["ss_id_funcionario"]); 
 		
 		if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
 			$this->objReporte = new Reporte($this->objParam,$this);
