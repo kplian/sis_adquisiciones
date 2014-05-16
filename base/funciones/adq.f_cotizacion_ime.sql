@@ -130,6 +130,7 @@ DECLARE
       v_parametros_ad   		varchar;
       v_tipo_noti  			varchar;
       v_titulo   			varchar;
+      v_id_alarma     integer;
      
 			    
 BEGIN
@@ -443,6 +444,7 @@ BEGIN
  	#AUTOR:	        Rensi Arteaga Copari
     
     ESTA TRANSACCION YA NOSE UTILIZA FUE REMPLAZADA PRO LA ADQ_SIGECOT_IME
+    VERIFICADO(Solo se utiliz aadesde el vistu nueno de cotizacion el momento de aprobar la cotizacion)
     	
  	#FECHA:		    1-04-2013 14:48:35
 	***********************************/
@@ -451,21 +453,37 @@ BEGIN
 
 		begin
         
+           --raise exception 'XXXXXX';
+        
            select
             c.numero_oc,
             c.id_estado_wf,
             c.id_proceso_wf,
             pc.id_depto,
-            c.estado
+            c.estado,
+            pc.id_usuario_auxiliar,
+            f.desc_funcionario1,
+            so.numero,
+            so.num_tramite,
+            pc.id_proceso_compra
            into 
-            v_numero_oc,
-            v_id_estado_wf,
-            v_id_proceso_wf,
-            v_id_depto,
-            v_estado_cot
+              v_registros_proc
+           
+           
            from adq.tcotizacion c
            inner join adq.tproceso_compra pc on pc.id_proceso_compra = c.id_proceso_compra
+           inner join adq.tsolicitud so on so.id_solicitud = pc.id_solicitud
+           inner join orga.vfuncionario f on f.id_funcionario = so.id_funcionario
            where c.id_cotizacion = v_parametros.id_cotizacion;
+           
+           
+            v_numero_oc = v_registros_proc.numero_oc;
+            v_id_estado_wf = v_registros_proc.id_estado_wf;
+            v_id_proceso_wf= v_registros_proc.id_proceso_wf;
+            v_id_depto= v_registros_proc.id_depto;
+            v_estado_cot= v_registros_proc.estado;
+           
+           
            
            --validamos que la cotizacion por lo menos tenga un item adjudicado
                     select 
@@ -521,8 +539,7 @@ BEGIN
            END IF;
            
              IF  v_estado_cot != 'recomendado' THEN
-             
-              raise exception 'Solo se admiten cotizaciones en estado recomendado';
+                  raise exception 'Solo se admiten cotizaciones en estado recomendado';
              END IF;
              
              --obtenemos el estado siguiente
@@ -536,6 +553,27 @@ BEGIN
                 va_prioridad
             
             FROM wf.f_obtener_estado_wf(v_id_proceso_wf, v_id_estado_wf,NULL,'siguiente');
+            
+            --alerta independiente al WF dirigida al auiliar de adquisiciones
+            
+             v_id_alarma = param.f_inserta_alarma(
+                                    NULL::integer,
+                                    'El RPC aprobo la cotizacion de la solicitud de compra: '||v_registros_proc.numero||'('||v_registros_proc.desc_funcionario1||') del tramite '||v_registros_proc.num_tramite,    --descripcion alarmce
+                                    '../../../sis_adquisiciones/vista/proceso_compra/ProcesoCompra.php',--acceso directo
+                                    now()::date,
+                                    'notificacion',
+                                    'RPC aprueba adjudicacion',  --asunto
+                                    p_id_usuario,
+                                    'ProcesoCompra', --clase
+                                    'Proceso de compra',--titulo
+                                    '{filtro_directo:{campo:"id_proceso_compra",valor:"'||v_registros_proc.id_proceso_compra::varchar||'"}}',
+                                    v_registros_proc.id_usuario_auxiliar, --usuario a quien va dirigida la alarma
+                                    'RPC aprueba adjudicacion'
+                                   );
+            
+            
+    
+            
             
             
             
@@ -909,13 +947,14 @@ BEGIN
                
              
                IF   v_codigo_estado_siguiente  in('recomendado')   THEN
-                    v_acceso_directo = '../../../sis_adquisiciones/vista/cotizacion/CotizacionVbDin.php';
+                  
+                   v_acceso_directo = '../../../sis_adquisiciones/vista/cotizacion/CotizacionVbDin.php';
                    v_clase = 'CotizacionVbDin';
                    v_parametros_ad = '{filtro_directo:{campo:"cot.id_proceso_wf",valor:"'||v_id_proceso_wf::varchar||'"}}';
                    v_tipo_noti = 'notificacion';
                    v_titulo  = 'Visto Bueno';
                
-                END IF;
+               END IF;
                 
                 --pasamos la cotizacion al siguiente estado
            
@@ -933,10 +972,6 @@ BEGIN
                                                             v_titulo);
                               
                
-                
-                                
-                
-                
                  -- actualiza estado en la solicitud
             
                  update adq.tcotizacion  c set 
@@ -948,10 +983,7 @@ BEGIN
                  
                  
                  
-                            
-              
-              
-               -- si hay mas de un estado disponible  preguntamos al usuario
+                -- si hay mas de un estado disponible  preguntamos al usuario
                 v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Se realizo el cambio de estado)'); 
                 v_resp = pxp.f_agrega_clave(v_resp,'operacion','cambio_exitoso');
           

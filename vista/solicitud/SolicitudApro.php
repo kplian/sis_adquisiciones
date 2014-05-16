@@ -514,8 +514,10 @@ Phx.vista.SolicitudApro = {
     
     initAsigUsu:function(){
        
+       
         var d= this.sm.getSelected().data;
         if(d){
+            
             this.cmb_id_depto_usuario.store.baseParams.id_depto = d.id_depto;
             this.cmb_id_depto_usuario.modificado = true
             this.cmb_id_solicitud.setValue(d.id_solicitud);

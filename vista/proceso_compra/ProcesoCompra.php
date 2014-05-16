@@ -30,8 +30,13 @@ Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
 	    this.addButton('btnRevePres',{text:'Rev. Pre.',iconCls: 'balert',disabled:true,handler:this.onBtnRevPres,tooltip: '<b>Revertir Presupeusto</b> Revierte todo el presupuesto no adjudicado para la solicitud.'});
         this.addButton('btnFinPro',{text:'Fin Proc.',iconCls: 'balert',disabled:true,handler:this.onBtnFinPro,tooltip: '<b>Finzalizar Proceso</b> Finaliza el proceso y la solicitud y revierte el presupeusto. No  puede deshacerse'});
         this.addButton('diagrama_gantt',{text:'',iconCls: 'bgantt',disabled:true,handler:this.diagramGantt,tooltip: '<b>Diagrama Gantt de proceso macro</b>'});
-  
-      
+        
+        this.store.baseParams={};
+        //coloca filtros para acceso directo si existen
+        if(config.filtro_directo){
+           this.store.baseParams.filtro_valor = config.filtro_directo.valor;
+           this.store.baseParams.filtro_campo = config.filtro_directo.campo;
+        }
         this.load({params:{start:0, limit:this.tam_pag}});
 	    this.iniciarEventos();
 	
@@ -86,7 +91,7 @@ Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
                 maxLength:200
             },
             type:'TextField',
-            filters:{pfiltro:'proc.num_tramite',type:'string'},
+            filters:{pfiltro:'num_tramite',type:'string'},
             id_grupo:1,
             grid:true,
             form:true
@@ -111,7 +116,7 @@ Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
                 maxLength:30
             },
             type:'TextField',
-            filters:{pfiltro:'proc.estado',type:'string'},
+            filters:{pfiltro:'estado',type:'string'},
             id_grupo:1,
             grid:true,
             form:false
@@ -126,11 +131,28 @@ Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
                 maxLength:4
             },
             type:'NumberField',
-            filters:{pfiltro:'usua.cuenta',type:'string'},
+            filters:{pfiltro:'usr_aux',type:'string'},
             id_grupo:1,
             grid:true,
             form:false
         },
+        {
+            config:{
+                name: 'desc_cotizacion',
+                fieldLabel: 'Est Cot',
+                allowBlank: true,
+                anchor: '80%',
+                gwidth: 200,
+                maxLength:4
+            },
+            type:'Field',
+            filters:{pfiltro:'desc_cotizacion',type:'string'},
+            id_grupo:1,
+            grid:true,
+            form:false
+        },
+        
+        
 		{
             config:{
                 name:'id_depto',
@@ -147,7 +169,7 @@ Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
             //type:'TrigguerCombo',
             type:'ComboRec',
             id_grupo:0,
-            filters:{pfiltro:'dep.nombre',type:'string'},
+            filters:{pfiltro:'desc_depto',type:'string'},
             grid:true,
             form:true
         },
@@ -202,7 +224,7 @@ Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
             type: 'ComboBox',
             id_grupo: 0,
             filters: {
-                pfiltro: 'sol.numero',
+                pfiltro: 'desc_solicitud',
                 type: 'string'
             },
             grid: true,
@@ -218,7 +240,7 @@ Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
                 maxLength:30
             },
             type:'TextField',
-            filters:{pfiltro:'fun.desc_funcionario1',type:'string'},
+            filters:{pfiltro:'desc_funcionario',type:'string'},
             id_grupo:1,
             grid:true,
             form:false
@@ -250,7 +272,7 @@ Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
                 maxLength:50
             },
             type:'TextField',
-            filters:{pfiltro:'mon.codigo',type:'string'},
+            filters:{pfiltro:'desc_moneda',type:'string'},
             id_grupo:1,
             grid:true,
             form:false
@@ -265,7 +287,7 @@ Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
                 maxLength:50
             },
             type:'TextField',
-            filters:{pfiltro:'proc.codigo_proceso',type:'string'},
+            filters:{pfiltro:'codigo_proceso',type:'string'},
             id_grupo:1,
             grid:true,
             form:true
@@ -282,7 +304,7 @@ Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
                         renderer:function (value,p,record){return value?value.dateFormat('d/m/Y'):''}
             },
             type:'DateField',
-            filters:{pfiltro:'proc.fecha_ini_proc',type:'date'},
+            filters:{pfiltro:'fecha_ini_proc',type:'date'},
             id_grupo:1,
             grid:true,
             form:true
@@ -297,7 +319,7 @@ Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
                 maxLength:500
             },
             type:'TextArea',
-            filters:{pfiltro:'proc.obs_proceso',type:'string'},
+            filters:{pfiltro:'obs_proceso',type:'string'},
             id_grupo:1,
             grid:true,
             form:true
@@ -312,7 +334,7 @@ Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
                 maxLength:30
             },
             type:'TextField',
-            filters:{pfiltro:'proc.num_cotizacion',type:'string'},
+            filters:{pfiltro:'num_cotizacion',type:'string'},
             id_grupo:1,
             grid:true,
             form:false
@@ -328,7 +350,7 @@ Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
 				maxLength:30
 			},
 			type:'TextField',
-			filters:{pfiltro:'proc.num_convocatoria',type:'string'},
+			filters:{pfiltro:'num_convocatoria',type:'string'},
 			id_grupo:1,
 			grid:true,
 			form:false
@@ -343,7 +365,7 @@ Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
 				maxLength:10
 			},
 			type:'TextField',
-			filters:{pfiltro:'proc.estado_reg',type:'string'},
+			filters:{pfiltro:'estado_reg',type:'string'},
 			id_grupo:1,
 			grid:true,
 			form:false
@@ -358,7 +380,7 @@ Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
 				maxLength:4
 			},
 			type:'NumberField',
-			filters:{pfiltro:'usu1.cuenta',type:'string'},
+			filters:{pfiltro:'usr_reg',type:'string'},
 			id_grupo:1,
 			grid:true,
 			form:false
@@ -374,7 +396,7 @@ Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
 						renderer:function (value,p,record){return value?value.dateFormat('d/m/Y H:i:s'):''}
 			},
 			type:'DateField',
-			filters:{pfiltro:'proc.fecha_reg',type:'date'},
+			filters:{pfiltro:'fecha_reg',type:'date'},
 			id_grupo:1,
 			grid:true,
 			form:false
@@ -390,7 +412,7 @@ Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
 						renderer:function (value,p,record){return value?value.dateFormat('d/m/Y H:i:s'):''}
 			},
 			type:'DateField',
-			filters:{pfiltro:'proc.fecha_mod',type:'date'},
+			filters:{pfiltro:'fecha_mod',type:'date'},
 			id_grupo:1,
 			grid:true,
 			form:false
@@ -404,8 +426,8 @@ Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
 				gwidth: 100,
 				maxLength:4
 			},
-			type:'NumberField',
-			filters:{pfiltro:'usu2.cuenta',type:'string'},
+			type:'Field',
+			filters:{pfiltro:'usr_mod',type:'string'},
 			id_grupo:1,
 			grid:true,
 			form:false
@@ -440,7 +462,7 @@ Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
 		{name:'usr_mod', type: 'string'},
 		'desc_moneda','desc_funcionario',
 		'desc_uo','desc_depto','desc_solicitud','instruc_rpc',
-		'usr_aux','id_moneda','id_funcionario'
+		'usr_aux','id_moneda','id_funcionario','desc_cotizacion'
 		
 	],
 	
@@ -624,7 +646,7 @@ Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
     },
     
 	sortInfo:{
-		field: 'proc.fecha_reg',
+		field: 'fecha_reg',
 		direction: 'DESC'
 	},
 	south:

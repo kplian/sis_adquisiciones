@@ -27,7 +27,7 @@ DECLARE
 
 	v_nro_requerimiento    	integer;
 	v_parametros           	record;
-	v_id_requerimiento     	integer;
+   v_id_requerimiento     	integer;
 	v_resp		            varchar;
 	v_nombre_funcion        text;
 	v_mensaje_error         text;
@@ -68,6 +68,7 @@ DECLARE
     v_id_moneda  integer;
     
     v_tipo_cambio  numeric;
+    v_id_alarma  integer;
 			    
 BEGIN
 
@@ -327,6 +328,39 @@ BEGIN
              v_id_usuario 
             from param.tdepto_usuario d 
             where d.id_depto_usuario =  v_parametros.id_depto_usuario;
+            
+           select 
+             sol.num_tramite,
+             sol.numero,
+             f.desc_funcionario1
+           into 
+            v_registros
+           
+           from adq.tsolicitud sol
+           inner join orga.vfuncionario f on f.id_funcionario = sol.id_funcionario 
+           where sol.id_solicitud =v_parametros.id_solicitud ;
+        
+          
+        
+        --inserta alarma cuando se afigna a un auxiliar
+        
+         v_id_alarma = param.f_inserta_alarma(
+                                    NULL::integer,
+                                    'Usted fue asignado a la solicitud de compra: '||v_registros.numero||'('||v_registros.desc_funcionario1||') del tramite '||v_registros.num_tramite,    --descripcion alarmce
+                                    '../../../sis_adquisiciones/vista/proceso_compra/ProcesoCompra.php',--acceso directo
+                                    now()::date,
+                                    'notificacion',
+                                    'Asignacion de proceso de compra',  --asunto
+                                    p_id_usuario,
+                                    'ProcesoCompra', --clase
+                                    'Proceso de compra',--titulo
+                                    '{filtro_directo:{campo:"id_solicitud",valor:"'||v_parametros.id_solicitud::varchar||'"}}',
+                                    v_id_usuario, --usuario a quien va dirigida la alarma
+                                    'Asignacion de proceso de compra'
+                                   );
+            
+            
+            
             
             
             --Sentencia de la modificacion

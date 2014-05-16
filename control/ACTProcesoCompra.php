@@ -16,7 +16,12 @@ class ACTProcesoCompra extends ACTbase{
 	function listarProcesoCompra(){
 		$this->objParam->defecto('ordenacion','id_proceso_compra');
 
-		$this->objParam->defecto('proc.fecha_reg','desc');
+		$this->objParam->defecto('fecha_reg','desc');
+		
+		if($this->objParam->getParametro('filtro_campo')!=''){
+            $this->objParam->addFiltro($this->objParam->getParametro('filtro_campo')." = ".$this->objParam->getParametro('filtro_valor'));  
+        }
+		
 		if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
 			$this->objReporte = new Reporte($this->objParam,$this);
 			$this->res = $this->objReporte->generarReporteListado('MODProcesoCompra','listarProcesoCompra');

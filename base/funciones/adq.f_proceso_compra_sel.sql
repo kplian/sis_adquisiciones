@@ -54,64 +54,54 @@ BEGIN
         
            IF   p_administrador != 1 THEN
            
-             
-             
-             select  
-                 pxp.aggarray(depu.id_depto)
-              into 
-                 va_id_depto
-             from param.tdepto_usuario depu 
-             where depu.id_usuario =  p_id_usuario and depu.cargo = 'responsable'; 
-        
-             
-             v_filadd='( (dep.id_depto  in ('|| COALESCE(array_to_string(va_id_depto,','),'0')||'))   or   id_usuario_auxiliar = '||p_id_usuario::varchar ||' ) and ';
+               select  
+                   pxp.aggarray(depu.id_depto)
+                into 
+                   va_id_depto
+               from param.tdepto_usuario depu 
+               where depu.id_usuario =  p_id_usuario and depu.cargo = 'responsable'; 
           
-         
-             
-        
-        
-         END IF;
+               
+               v_filadd='( (id_depto  in ('|| COALESCE(array_to_string(va_id_depto,','),'0')||'))   or   id_usuario_auxiliar = '||p_id_usuario::varchar ||' ) and ';
+            
+          END IF;
         
         
     		--Sentencia de la consulta
-			v_consulta:='select proc.id_proceso_compra,
-                         proc.id_depto,
-                         proc.num_convocatoria,
-                         proc.id_solicitud,
-                         proc.id_estado_wf,
-                         proc.fecha_ini_proc,
-                         proc.obs_proceso,
-                         proc.id_proceso_wf,
-                         proc.num_tramite,
-                         proc.codigo_proceso,
-                         proc.estado_reg,
-                         proc.estado,
-                         proc.num_cotizacion,
-                         proc.id_usuario_reg,
-                         proc.fecha_reg,
-                         proc.fecha_mod,
-                         proc.id_usuario_mod,
-                         usu1.cuenta as usr_reg,
-                         usu2.cuenta as usr_mod,
-                         dep.codigo as desc_depto,
-                         fun.desc_funcionario1 as desc_funcionario,
-                         sol.numero as desc_solicitud,
-                         mon.codigo as desc_moneda,
-                         sol.instruc_rpc,
-                         sol.id_categoria_compra,
-                         usua.cuenta as usr_aux,
-                         sol.id_moneda,
-                         sol.id_funcionario
+			v_consulta:='select 
+                              id_proceso_compra,
+                              id_depto,
+                              num_convocatoria,
+                              id_solicitud,
+                              id_estado_wf,
+                              fecha_ini_proc,
+                              obs_proceso,
+                              id_proceso_wf,
+                              num_tramite,
+                              codigo_proceso,
+                              estado_reg,
+                              estado,
+                              num_cotizacion,
+                              id_usuario_reg,
+                              fecha_reg,
+                              fecha_mod,
+                              id_usuario_mod,
+                              usr_reg,
+                              usr_mod,
+                              desc_depto,
+                              desc_funcionario,
+                              desc_solicitud,
+                              desc_moneda,
+                              instruc_rpc,
+                              id_categoria_compra,
+                              usr_aux,
+                              id_moneda,
+                              id_funcionario,
+                              id_usuario_auxiliar,
+                              desc_cotizacion 
                          
-                   from adq.tproceso_compra proc
-                       inner join segu.tusuario usu1 on usu1.id_usuario = proc.id_usuario_reg
-                       inner join param.tdepto dep on dep.id_depto = proc.id_depto 
-                       inner join adq.tsolicitud sol on sol.id_solicitud = proc.id_solicitud
-                       inner join orga.vfuncionario fun on  fun.id_funcionario = sol.id_funcionario
-                       inner join param.tmoneda mon on mon.id_moneda = sol.id_moneda
-                       left join segu.tusuario usu2 on usu2.id_usuario = proc.id_usuario_mod
-                       left join segu.tusuario  usua on usua.id_usuario = proc.id_usuario_auxiliar
-                       where  '||v_filadd||'  ';
+                   from adq.vproceso_compra  
+                   where  '||v_filadd||'  ';
 			
 			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;
@@ -279,23 +269,16 @@ BEGIN
              from param.tdepto_usuario depu 
              where depu.id_usuario =  p_id_usuario and depu.cargo = 'responsable'; 
         
-             v_filadd='( (dep.id_depto  in ('|| COALESCE(array_to_string(va_id_depto,','),'0')||'))   or   id_usuario_auxiliar = '||p_id_usuario::varchar ||' ) and ';
+             v_filadd='( (id_depto  in ('|| COALESCE(array_to_string(va_id_depto,','),'0')||'))   or   id_usuario_auxiliar = '||p_id_usuario::varchar ||' ) and ';
           
           
           END IF;
         
 			--Sentencia de la consulta de conteo de registros
-			v_consulta:='select count(proc.id_proceso_compra)
+			v_consulta:='select count(id_proceso_compra)
 					    
-                        from adq.tproceso_compra proc
-                       inner join segu.tusuario usu1 on usu1.id_usuario = proc.id_usuario_reg
-                       inner join param.tdepto dep on dep.id_depto = proc.id_depto 
-                       inner join adq.tsolicitud sol on sol.id_solicitud = proc.id_solicitud
-                       inner join orga.vfuncionario fun on  fun.id_funcionario = sol.id_funcionario
-                       inner join param.tmoneda mon on mon.id_moneda = sol.id_moneda
-                       left join segu.tusuario usu2 on usu2.id_usuario = proc.id_usuario_mod
-                       left join segu.tusuario usua on usua.id_usuario = proc.id_usuario_auxiliar
-                       where  '||v_filadd||'  ';
+                        from adq.vproceso_compra 
+                        where  '||v_filadd||'  ';
 			
 			--Definicion de la respuesta		    
 			v_consulta:=v_consulta||v_parametros.filtro;
