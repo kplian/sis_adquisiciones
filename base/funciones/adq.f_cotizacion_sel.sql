@@ -87,7 +87,8 @@ BEGIN
                         pro.email,
                         sol.numero,
                         sol.num_tramite,
-                        cot.id_obligacion_pago
+                        cot.id_obligacion_pago,
+                        cot.tiempo_entrega
 						from adq.tcotizacion cot
                         inner join adq.tproceso_compra proc on proc.id_proceso_compra = cot.id_proceso_compra
                         inner join adq.tsolicitud sol on sol.id_solicitud = proc.id_solicitud
@@ -285,7 +286,8 @@ BEGIN
                         sol.id_solicitud,
                         sol.id_categoria_compra,
                         sol.numero,
-                        sol.num_tramite
+                        sol.num_tramite,
+                        cot.tiempo_entrega
 						from adq.tcotizacion cot
 						inner join segu.tusuario usu1 on usu1.id_usuario = cot.id_usuario_reg
                         inner join adq.tproceso_compra pc on pc.id_proceso_compra = cot.id_proceso_compra
@@ -556,7 +558,8 @@ BEGIN
                     sol.tipo,
                     cot.fecha_adju as fecha_oc,
                     mon.moneda,
-                    mon.codigo as codigo_moneda
+                    mon.codigo as codigo_moneda,
+                    cot.tiempo_entrega
               from adq.tcotizacion cot 
               inner join param.vproveedor pv on pv.id_proveedor=cot.id_proveedor
               left join segu.tpersona per on per.id_persona=pv.id_persona

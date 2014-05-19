@@ -293,3 +293,19 @@ ALTER TABLE adq.tsolicitud
   ADD COLUMN id_funcionario_supervisor INTEGER;
 
 /***********************************F-SCP-RAC-ADQ-0-27/03/2014****************************************/
+
+
+
+/***********************************I-SCP-RAC-ADQ-0-19/05/2014****************************************/
+
+--------------- SQL ---------------
+
+ALTER TABLE adq.tcotizacion
+  ADD COLUMN tiempo_entrega VARCHAR(350);
+
+ALTER TABLE adq.tcotizacion
+  ALTER COLUMN tiempo_entrega SET DEFAULT 'xx dias a partir de la recepción de la presente';
+
+/***********************************F-SCP-RAC-ADQ-0-19/05/2014****************************************/
+
+

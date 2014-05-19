@@ -87,6 +87,7 @@ Phx.vista.SolicitudDet=Ext.extend(Phx.gridInterfaz,{
                typeAhead: true,
                triggerAction: 'all',
                 listWidth:350,
+               resizable:true,
                lazyRender:true,
                mode:'remote',
                pageSize:10,

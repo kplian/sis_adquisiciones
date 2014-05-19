@@ -61,6 +61,8 @@ class MODCotizacion extends MODbase{
 		$this->captura('numero','varchar');
 		$this->captura('num_tramite','varchar');
 		$this->captura('id_obligacion_pago','int4');
+		
+		$this->captura('tiempo_entrega','varchar');
 				
 		
 		//Ejecuta la instruccion
@@ -156,6 +158,7 @@ class MODCotizacion extends MODbase{
 		$this->captura('id_categoria_compra','integer');
 		$this->captura('numero','varchar');
         $this->captura('num_tramite','varchar');
+        $this->captura('tiempo_entrega','varchar');
         
         
         //Ejecuta la instruccion
@@ -189,9 +192,8 @@ class MODCotizacion extends MODbase{
 		$this->setParametro('obs','obs','text');
 		$this->setParametro('fecha_adju','fecha_adju','date');
 		$this->setParametro('nro_contrato','nro_contrato','varchar');
-		
-		
 		$this->setParametro('tipo_cambio_conv','tipo_cambio_conv','numeric');
+		$this->setParametro('tiempo_entrega','tiempo_entrega','varchar');
 		
 		
 
@@ -231,6 +233,8 @@ class MODCotizacion extends MODbase{
 		
 		
         $this->setParametro('tipo_cambio_conv','tipo_cambio_conv','numeric');
+        $this->setParametro('tiempo_entrega','tiempo_entrega','varchar');
+        
         
 
 		//Ejecuta la instruccion
@@ -456,6 +460,7 @@ class MODCotizacion extends MODbase{
 		$this->captura('fecha_oc','date');
 		$this->captura('moneda','varchar');
 		$this->captura('codigo_moneda','varchar');
+		$this->captura('tiempo_entrega','varchar');
 		
 		
 		

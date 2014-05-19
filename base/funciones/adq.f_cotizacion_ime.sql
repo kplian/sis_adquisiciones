@@ -199,6 +199,7 @@ BEGIN
            
            END IF;             
            
+       -- raise exception '%', v_parametros.tiempo_entrega ;
         
 			--Sentencia de la modificacion
 			update adq.tcotizacion set
@@ -216,7 +217,8 @@ BEGIN
 			nro_contrato = v_parametros.nro_contrato,
 			fecha_mod = now(),
             tipo_cambio_conv = v_parametros.tipo_cambio_conv,
-			id_usuario_mod = p_id_usuario
+			id_usuario_mod = p_id_usuario,
+            tiempo_entrega=v_parametros.tiempo_entrega
 			where id_cotizacion=v_parametros.id_cotizacion;
                
 			--Definicion de la respuesta

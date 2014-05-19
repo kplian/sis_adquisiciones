@@ -51,6 +51,8 @@ include_once dirname(__FILE__)."/../../lib/lib_reporte/lang.es_AR.php";
 								$this->Cell(6, $height/5, 'Mes', 1, 0, 'L', false, '', 1, false, 'T', 'C');
 								$this->Cell(7, $height/5, 'Año', 1, 0, 'L', false, '', 1, false, 'T', 'C');
 								$this->setXY($x,$y+12);
+								
+																
 								$fecha_oc = explode('-', $this->getDataSource()->getParameter('fecha_oc'));
 								$this->Cell(6, $height/4, $fecha_oc[2], 1, 0, 'C', false, '', 1, false, 'T', 'C');
 								$this->Cell(6, $height/4, $fecha_oc[1], 1, 0, 'C', false, '', 1, false, 'T', 'C');
@@ -184,46 +186,70 @@ Class ROrdenCompra extends Report {
 		$this->writeDetalles($this->getDataSource()->getParameter('detalleDataSource'), $pdf,$tipo, $this->getDataSource()->getParameter('codigo_moneda') );
 
 		$pdf->SetFontSize(9);
-		
-		
 		$pdf->Ln();
-        $pdf->SetFont('', 'B');
-        $pdf->Cell($width3, $height, 'Fecha de Entrega:', 0, 0, 'L', false, '', 0, false, 'T', 'C');
-        $pdf->SetFont('', '');
-        $pdf->SetFillColor(192,192,192, true);
-        $pdf->Cell($width3+$width2, $height, $this->getDataSource()->getParameter('fecha_entrega'), $white, 0, 'L', true, '', 0, false, 'T', 'C');        
-        $pdf->Cell(5, $height, '', 0, 0, 'L', false, '', 0, false, 'T', 'C');
-        $pdf->Ln();
-        $pdf->SetFont('', 'B');
+		
+		if($this->getDataSource()->getParameter('fecha_entrega')!=''){  
+    		
+            $pdf->SetFont('', 'B');
+            $pdf->Cell($width3, $height, 'Fecha de Entrega:', 0, 0, 'L', false, '', 0, false, 'T', 'C');
+            $pdf->SetFont('', '');
+            $pdf->SetFillColor(192,192,192, true);
+            $pdf->Cell($width4+$width3+$width2, $height, $this->getDataSource()->getParameter('fecha_entrega'), $white, 0, 'L', true, '', 0, false, 'T', 'C');        
+            $pdf->Cell(5, $height, '', 0, 0, 'L', false, '', 0, false, 'T', 'C');
+            $pdf->Ln();
+            $pdf->SetFont('', 'B');
+        }
+        else{
+            $pdf->SetFont('', 'B');
+            $pdf->Cell($width3, $height, 'Plazo de Entrega:', 0, 0, 'L', false, '', 0, false, 'T', 'C');
+            $pdf->SetFont('', '');
+            $pdf->SetFillColor(192,192,192, true);
+            $pdf->Cell($width4+$width3+$width2, $height, $this->getDataSource()->getParameter('tiempo_entrega'), $white, 0, 'L', true, '', 0, false, 'T', 'C');        
+            $pdf->Cell(5, $height, '', 0, 0, 'L', false, '', 0, false, 'T', 'C');
+            $pdf->Ln();
+            $pdf->SetFont('', 'B');
+       }
+        
+        
+        
+        
+        
         $pdf->Cell($width3, $height, 'Tipo de Entrega:', 0, 0, 'L', false, '', 0, false, 'T', 'C');
         $pdf->SetFont('', '');
         $pdf->SetFillColor(192,192,192, true);
-        $pdf->Cell($width3+$width2, $height, $this->getDataSource()->getParameter('tipo_entrega'), $white, 0, 'L', true, '', 0, false, 'T', 'C');        
+        $pdf->Cell($width4+$width3+$width2, $height, $this->getDataSource()->getParameter('tipo_entrega'), $white, 0, 'L', true, '', 0, false, 'T', 'C');        
         $pdf->Ln();
         $pdf->SetFont('', 'B');
+        
+        
+        
         $pdf->Cell($width3, $height, 'Lugar de Entrega:', 0, 0, 'L', false, '', 0, false, 'T', 'C');
         $pdf->SetFont('', '');
         $pdf->SetFillColor(192,192,192, true);
-        $pdf->Cell($width3+$width2, $height, $this->getDataSource()->getParameter('lugar_entrega'), $white, 0, 'L', true, '', 0, false, 'T', 'C');        
+        $pdf->Cell($width4+$width3+$width2, $height, $this->getDataSource()->getParameter('lugar_entrega'), $white, 0, 'L', true, '', 0, false, 'T', 'C');        
         $pdf->Ln();
-								if($this->getDataSource()->getParameter('tipo')=='adjudicado'){	        
+        
+		if($this->getDataSource()->getParameter('tipo')=='adjudicado'){	        
 	        $pdf->SetFont('', 'B');
 	        $pdf->Cell($width3, $height, 'Fecha Adjudicacion:', 0, 0, 'L', false, '', 0, false, 'T', 'C');
 	        $pdf->SetFont('', '');
 	        $pdf->SetFillColor(192,192,192, true);
 	        $pdf->Cell($width3+$width2, $height, $this->getDataSource()->getParameter('fecha_adju'), $white, 0, 'L', true, '', 0, false, 'T', 'C');        
-								}	
-								$pdf->Ln();
-								$pdf->SetFont('','B');
-								$pdf->Cell($width1, $height, 'NOTA:', 0, 0, 'L', false, '', 0, false, 'T', 'C');							 
+		}	
+		
+		$pdf->Ln();
+		$pdf->SetFont('','B');
+		$pdf->Cell($width1, $height, 'NOTA:', 0, 0, 'L', false, '', 0, false, 'T', 'C');							 
         $pdf->SetFont('','');
-								$pdf->setFontSize(7);								
+		$pdf->setFontSize(7);								
         $pdf->MultiCell(0, $height, $this->getDataSource()->getParameter('desc_proveedor').' se compromete a entregar los '.$tipo.' de acuerdo a la presente orden de '.$tipo.'; a cuyo fin y en señal de conformidad suscribe al pie del presente', 1,'L', false ,1);
-								$pdf->Ln($height*3);
-								$pdf->MultiCell(0, $height, 'Firma Proveedor o Sello ', 1,'R', false ,1);							
-								$pdf->MultiCell(0, $height, 'La presente Orden de '.$tipo.' tiene calidad de contrato de suministro de acuerdo a los articulos 919 al 925 del Código de Comercio.', 1,'L', false ,1);
-								$pdf->Ln($height);
-								$pdf->MultiCell(0, $height, 'El proveedor se compromete a entregar el suministro en el plazo de '.$this->getDataSource()->getParameter('dias_entrega').' dias calendarios que seran computables a partir de la fecha de elaboracion de la presente orden de '.$tipo.'. El incumplimiento se sancionara con una multa del 0,1% del monto de contrato por cada dia calendario de retraso, multa que no debe exceder del 2%.', 1,'L', false ,1);
+		$pdf->Ln($height*3);
+		$pdf->MultiCell(0, $height, 'Firma Proveedor o Sello ', 1,'R', false ,1);							
+		$pdf->MultiCell(0, $height, 'La presente Orden de '.$tipo.' tiene calidad de contrato de suministro de acuerdo a los articulos 919 al 925 del Código de Comercio.', 1,'L', false ,1);
+		$pdf->Ln($height);
+		$pdf->MultiCell(0, $height, 'El proveedor se compromete a entregar el suministro en el plazo estipulado que seran computables a partir de la fecha de elaboracion de la presente orden de '.$tipo.'. El incumplimiento se sancionara con una multa del 0,1% del monto de contrato por cada dia calendario de retraso, multa que no debe exceder del 2%.', 1,'L', false ,1);
+        
+		//$pdf->MultiCell(0, $height, 'El proveedor se compromete a entregar el suministro en el plazo de '.$this->getDataSource()->getParameter('dias_entrega').' dias calendarios que seran computables a partir de la fecha de elaboracion de la presente orden de '.$tipo.'. El incumplimiento se sancionara con una multa del 0,1% del monto de contrato por cada dia calendario de retraso, multa que no debe exceder del 2%.', 1,'L', false ,1);
         $pdf->Output($fileName, 'F');
     }
     

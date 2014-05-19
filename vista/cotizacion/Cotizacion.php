@@ -319,11 +319,30 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
 			grid:true,
 			form:true
 		},
+        {
+            config:{
+                name: 'tiempo_entrega',
+                qtip:'Dias en que se espera la entrega a partir de la recpcion de la OC',
+                fieldLabel: 'Tiempo de entrega',
+                allowBlank: true,
+                anchor: '80%',
+                gwidth: 100,
+                maxLength:150
+            },
+            type:'TextField',
+            filters:{pfiltro:'cot.tiempo_entrega',type:'string'},
+            valorInicial:'X días Hábiles de recibida la presente orden',
+            id_grupo:1,
+            grid:true,
+            form:true
+        },
 		{
 			config:{
 				name: 'fecha_venc',
+				gtipo:'Fechas estimada de vencimiento',
 				fieldLabel: 'Fecha Venc',
 				allowBlank: true,
+				
 				anchor: '80%',
 				gwidth: 100,
 						format: 'd/m/Y', 
@@ -512,7 +531,7 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
 		{name:'usr_reg', type: 'string'},
 		{name:'usr_mod', type: 'string'},'email','desc_moneda','tipo_cambio_conv','id_estado_wf','id_proceso_wf','numero',
 		'num_tramite',
-		{name:'id_obligacion_pago', type: 'numeric'}
+		{name:'id_obligacion_pago', type: 'numeric'},'tiempo_entrega'
 		
 	],
 

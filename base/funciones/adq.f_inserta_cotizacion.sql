@@ -70,6 +70,7 @@ DECLARE
    
    v_tipo_cambio_conv numeric;
    v_precio_unitario_mb_coti   numeric;
+   v_tiempo_entrega   varchar;
  
     
     
@@ -243,9 +244,16 @@ BEGIN
           END IF;
           
           
-          
-           
+            --predefine tiempod de entrega sie s blanco o nulo
+            v_tiempo_entrega = (p_hstore_cotizacion->'tiempo_entrega')::varchar;
             
+            IF  v_tiempo_entrega is NULL or v_tiempo_entrega = '' THEN
+               
+               v_tiempo_entrega  = 'X días Hábiles de recibida la presente orden';
+            
+            END IF;
+           
+           
         
         
         	--Sentencia de la insercion
@@ -274,7 +282,8 @@ BEGIN
             id_estado_wf,
             id_proceso_wf,
             tipo_cambio_conv,
-            num_tramite
+            num_tramite,
+            tiempo_entrega
           	) values(
 			'activo',
 			v_codigo_estado,
@@ -300,8 +309,9 @@ BEGIN
             v_id_estado_wf,
             v_id_proceso_wf,
             (p_hstore_cotizacion->'tipo_cambio_conv')::numeric,
-            v_num_tramite
-			)RETURNING id_cotizacion into v_id_cotizacion;
+            v_num_tramite,
+            v_tiempo_entrega
+            )RETURNING id_cotizacion into v_id_cotizacion;
             
             
             
