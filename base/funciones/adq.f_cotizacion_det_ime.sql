@@ -150,7 +150,9 @@ BEGIN
 			id_usuario_reg,
 			fecha_mod,
 			id_usuario_mod,
-            precio_unitario_mb
+            precio_unitario_mb,
+            id_usuario_ai,
+            usuario_ai
           	) values(
 			'activo',
 			v_parametros.id_cotizacion,
@@ -163,7 +165,9 @@ BEGIN
 			p_id_usuario,
 			null,
 			null,
-            v_precio_unitario_mb_coti
+            v_precio_unitario_mb_coti,
+            v_parametros._id_usuario_ai,
+            v_parametros._nombre_usuario_ai
 							
 			)RETURNING id_cotizacion_det into v_id_cotizacion_det;
 			
@@ -247,7 +251,9 @@ BEGIN
 			obs = v_parametros.obs,
 			id_solicitud_det = v_parametros.id_solicitud_det,
 			fecha_mod = now(),
-			id_usuario_mod = p_id_usuario
+			id_usuario_mod = p_id_usuario,
+            id_usuario_ai = v_parametros._id_usuario_ai,
+            usuario_ai = v_parametros._nombre_usuario_ai
 			where id_cotizacion_det=v_parametros.id_cotizacion_det;
                
 			--Definicion de la respuesta

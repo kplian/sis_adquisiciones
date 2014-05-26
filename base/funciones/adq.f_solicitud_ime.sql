@@ -170,6 +170,8 @@ BEGIN
               
         FROM wf.f_inicia_tramite(
              p_id_usuario, 
+             v_parametros._id_usuario_ai,
+             v_parametros._nombre_usuario_ai,
              v_parametros.id_gestion, 
              v_codigo_tipo_proceso, 
              v_parametros.id_funcionario,
@@ -210,7 +212,9 @@ BEGIN
             id_uo,
             id_proceso_macro,
             id_proveedor,
-            id_funcionario_supervisor
+            id_funcionario_supervisor,
+            id_usuario_ai,
+            usuario_ai
           	) values(
 			'activo',
 			--v_parametros.id_solicitud_ext,
@@ -241,7 +245,9 @@ BEGIN
             v_parametros.id_uo,
             v_id_proceso_macro,
             v_parametros.id_proveedor,
-            v_parametros.id_funcionario_supervisor
+            v_parametros.id_funcionario_supervisor,
+            v_parametros._id_usuario_ai,
+            v_parametros._nombre_usuario_ai
 							
 			)RETURNING id_solicitud into v_id_solicitud;
 			
@@ -291,7 +297,9 @@ BEGIN
             id_uo = v_parametros.id_uo,
             id_proceso_macro=id_proceso_macro,
             id_proveedor=v_parametros.id_proveedor,
-            id_funcionario_supervisor= v_parametros.id_funcionario_supervisor
+            id_funcionario_supervisor= v_parametros.id_funcionario_supervisor,
+            id_usuario_ai= v_parametros._id_usuario_ai,
+            usuario_ai = v_parametros._nombre_usuario_ai
 			where id_solicitud=v_parametros.id_solicitud;
                
 			--Definicion de la respuesta
@@ -371,6 +379,8 @@ BEGIN
                                                            v_id_estado_wf, 
                                                            v_id_proceso_wf,
                                                            p_id_usuario,
+                                                           v_parametros._id_usuario_ai,
+                                                           v_parametros._nombre_usuario_ai,
                                                            v_id_depto,
                                                            'Eliminacion de la solicitud '|| COALESCE(v_numero_sol,'SN')::text);
             
@@ -491,7 +501,13 @@ BEGIN
                       
                        IF v_cont = 1 THEN
                  
-                         v_resp =  adq.f_finalizar_reg_solicitud(p_administrador, p_id_usuario,v_registros.id_funcionario, v_parametros.id_solicitud);
+                         v_resp =  adq.f_finalizar_reg_solicitud(
+                                            p_administrador, 
+                                            p_id_usuario,
+                                            v_parametros._id_usuario_ai,
+                                            v_parametros._nombre_usuario_ai,
+                                            v_registros.id_funcionario, 
+                                            v_parametros.id_solicitud);
                   
                        END IF;
                        
@@ -782,6 +798,8 @@ BEGIN
                                                            v_id_estado_wf, 
                                                            v_id_proceso_wf,
                                                            p_id_usuario,
+                                                           v_parametros._id_usuario_ai,
+                                                           v_parametros._nombre_usuario_ai,
                                                            v_id_depto,
                                                            v_obs,
                                                            v_acceso_directo ,
@@ -951,6 +969,8 @@ BEGIN
                           v_parametros.id_estado_wf, 
                           v_id_proceso_wf, 
                           p_id_usuario,
+                          v_parametros._id_usuario_ai,
+                          v_parametros._nombre_usuario_ai,
                           v_id_depto,
                           '[RETROCEDE]: #'|| COALESCE(v_numero_sol,'S/N')||' - '||v_parametros.obs,
                            v_acceso_directo ,
@@ -1050,6 +1070,8 @@ BEGIN
                   v_parametros.id_estado_wf, 
                   v_id_proceso_wf, 
                   p_id_usuario,
+                  v_parametros._id_usuario_ai,
+                  v_parametros._nombre_usuario_ai,
                   v_id_depto,
                   'RETRO: #'|| COALESCE(v_numero_sol,'S/N')||' - '||v_parametros.obs,
                   v_acceso_directo ,
@@ -1077,7 +1099,10 @@ BEGIN
               
                   -- llamada a funcion de reversion de presupuesto
                    
-                   IF not adq.f_gestionar_presupuesto_solicitud(v_parametros.id_solicitud, p_id_usuario, 'revertir')  THEN
+                   IF not adq.f_gestionar_presupuesto_solicitud(
+                             v_parametros.id_solicitud, 
+                             p_id_usuario, 
+                              'revertir')  THEN
                  
                       raise exception 'Error al revertir  el presupeusto';
                  

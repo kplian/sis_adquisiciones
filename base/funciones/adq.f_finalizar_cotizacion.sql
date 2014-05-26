@@ -2,7 +2,9 @@
 
 CREATE OR REPLACE FUNCTION adq.f_finalizar_cotizacion (
   p_id_cotizacion integer,
-  p_id_usuario integer
+  p_id_usuario integer,
+  p_id_usuario_ai integer,
+  p_usuario_ai varchar
 )
 RETURNS boolean AS
 $body$
@@ -81,6 +83,8 @@ BEGIN
                                                            v_id_estado_wf, 
                                                            v_id_proceso_wf,
                                                            p_id_usuario,
+                                                           p_id_usuario_ai,
+                                                           p_usuario_ai,
                                                            v_id_depto);
             
             
@@ -90,7 +94,9 @@ BEGIN
                  id_estado_wf =  v_id_estado_actual,
                  estado = 'finalizada',
                  id_usuario_mod=p_id_usuario,
-                 fecha_mod=now()
+                 fecha_mod=now(),
+                 id_usuario_ai = p_id_usuario_ai,
+                 usuario_ai = p_usuario_ai
                where c.id_cotizacion  = p_id_cotizacion;
                
               

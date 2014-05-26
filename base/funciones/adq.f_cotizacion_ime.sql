@@ -218,7 +218,9 @@ BEGIN
 			fecha_mod = now(),
             tipo_cambio_conv = v_parametros.tipo_cambio_conv,
 			id_usuario_mod = p_id_usuario,
-            tiempo_entrega=v_parametros.tiempo_entrega
+            tiempo_entrega=v_parametros.tiempo_entrega,
+            id_usuario_ai = v_parametros._id_usuario_ai,
+            usuario_ai = v_parametros._nombre_usuario_ai
 			where id_cotizacion=v_parametros.id_cotizacion;
                
 			--Definicion de la respuesta
@@ -286,6 +288,8 @@ BEGIN
                                                            v_id_estado_wf, 
                                                            v_id_proceso_wf,
                                                            p_id_usuario,
+                                                           v_parametros._id_usuario_ai,
+                                                           v_parametros._nombre_usuario_ai,
                                                            v_id_depto);
             
             
@@ -598,6 +602,8 @@ BEGIN
                                                            v_id_estado_wf, 
                                                            v_id_proceso_wf,
                                                            p_id_usuario,
+                                                           v_parametros._id_usuario_ai,
+                                                           v_parametros._nombre_usuario_ai,
                                                            v_id_depto);
             
             
@@ -965,6 +971,8 @@ BEGIN
                                                             v_id_estado_wf, 
                                                             v_id_proceso_wf,
                                                             p_id_usuario,
+                                                            v_parametros._id_usuario_ai,
+                                                            v_parametros._nombre_usuario_ai,
                                                             v_id_depto,
                                                            'Se requiere VB '||v_num_sol||' Obs:'||v_obs,
                                                             v_acceso_directo ,
@@ -1073,6 +1081,8 @@ BEGIN
                           v_parametros.id_estado_wf, 
                           v_id_proceso_wf, 
                           p_id_usuario,
+                          v_parametros._id_usuario_ai,
+                          v_parametros._nombre_usuario_ai,
                           v_id_depto,
                           'Solictud de Correción/Revisión por retroceso de estado en la cotiazacion');
                       
@@ -1222,6 +1232,8 @@ BEGIN
                                                            v_id_estado_wf, 
                                                            v_id_proceso_wf,
                                                            p_id_usuario,
+                                                           v_parametros._id_usuario_ai,
+                                                           v_parametros._nombre_usuario_ai,
                                                            v_id_depto);
             
             
@@ -1422,6 +1434,8 @@ BEGIN
                                                          v_id_estado_wf_cot,   --  p_id_estado_wf_anterior
                                                          v_parametros.id_proceso_wf_act,
                                                          p_id_usuario,
+                                                         v_parametros._id_usuario_ai,
+                                                         v_parametros._nombre_usuario_ai,
                                                          v_parametros.id_depto_wf,
                                                          v_parametros.obs);
             
@@ -1469,6 +1483,8 @@ BEGIN
                                v_codigo_estado
                       FROM wf.f_registra_proceso_disparado_wf(
                                p_id_usuario,
+                               v_parametros._id_usuario_ai,
+                               v_parametros._nombre_usuario_ai,
                                v_id_estado_actual::integer, 
                                v_registros_proc.id_funcionario_wf_pro::integer, 
                                v_registros_proc.id_depto_wf_pro::integer,
@@ -1491,14 +1507,19 @@ BEGIN
                                id_depto =   v_registros_proc.id_depto_wf_pro::integer,
                                estado = v_codigo_estado,
                                id_usuario_mod=p_id_usuario,
-                               fecha_mod=now()
+                               fecha_mod=now(),
+                               id_usuario_ai = v_parametros._id_usuario_ai,
+                               usuario_ai = v_parametros._nombre_usuario_ai
                                where o.id_obligacion_pago  = v_id_obligacion_pago;
                            
                            v_sw_obligacion_pago = true;
                     
                     ELSIF v_codigo_llave = 'preingreso_activo_fijo' or v_codigo_llave = 'preingreso_almacen' THEN
                        
-                          IF NOT adq.f_genera_preingreso_af_al(p_id_usuario, 
+                          IF NOT adq.f_genera_preingreso_af_al(
+                                                        p_id_usuario,
+                                                        v_parametros._id_usuario_ai,
+                                                        v_parametros._nombre_usuario_ai, 
                                                         v_id_cotizacion, 
                                                         v_id_proceso_wf, 
                                                         v_id_estado_wf, 

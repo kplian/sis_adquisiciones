@@ -3,6 +3,8 @@
 CREATE OR REPLACE FUNCTION adq.f_finalizar_reg_solicitud (
   p_administrador integer,
   p_id_usuario integer,
+  p_id_usuario_ai integer,
+  p_usuario_ai varchar,
   p_id_funcionario_rpc integer,
   p_id_solicitud integer
 )
@@ -202,6 +204,8 @@ p_hstore->'id_solicitud'
                                                          v_id_estado_wf, 
                                                          v_id_proceso_wf,
                                                          p_id_usuario,
+                                                         p_id_usuario_ai,
+                                                         p_usuario_ai,
                                                          NULL,
                                                          'Solicitud a espera de aprobación #'||COALESCE(v_numero_sol,'S/N'),
                                                          v_acceso_directo ,
@@ -248,7 +252,9 @@ p_hstore->'id_solicitud'
              estado = va_codigo_estado[1],
              id_funcionario_rpc=p_id_funcionario_rpc,
              id_usuario_mod=p_id_usuario,
-             fecha_mod=now()
+             fecha_mod=now(),
+             id_usuario_ai= p_id_usuario_ai,
+             usuario_ai = p_usuario_ai
            where id_solicitud = p_id_solicitud;
            
       --Definicion de la respuesta

@@ -2,6 +2,8 @@
 
 CREATE OR REPLACE FUNCTION adq.f_genera_preingreso_af_al (
   p_id_usuario integer,
+  p_id_usuario_ai integer,
+  p_usuario_ai varchar,
   p_id_cotizacion integer,
   p_id_proceso_wf integer,
   p_id_estado_wf integer,
@@ -152,7 +154,9 @@ BEGIN
               id_proceso_wf, 
               estado, 
               id_moneda,
-              tipo
+              tipo,
+              id_usuario_ai,
+              usuario_ai
             ) 
             values(
               p_id_usuario, 
@@ -164,7 +168,9 @@ BEGIN
               p_id_proceso_wf, 
               p_codigo_ewf, 
               v_id_moneda,
-              v_tipo
+              v_tipo,
+              p_id_usuario_ai,
+              p_usuario_ai
             ) returning id_preingreso into v_id_preingreso;
             
             
@@ -173,11 +179,13 @@ BEGIN
             --Generación del detalle del preingreso de activo fijo
             insert into alm.tpreingreso_det(
               id_usuario_reg, fecha_reg, estado_reg,
-              id_preingreso, id_cotizacion_det, cantidad_det, precio_compra
+              id_preingreso, id_cotizacion_det, cantidad_det, precio_compra,
+              id_usuario_ai,usuario_ai
             )
             select
               p_id_usuario, now(),'activo',        
-              v_id_preingreso,cdet.id_cotizacion_det, cdet.cantidad_adju, cdet.precio_unitario_mb
+              v_id_preingreso,cdet.id_cotizacion_det, cdet.cantidad_adju, cdet.precio_unitario_mb,
+              p_id_usuario_ai,p_usuario_ai
             from adq.tcotizacion_det cdet
             inner join adq.tsolicitud_det sdet
             on sdet.id_solicitud_det = cdet.id_solicitud_det

@@ -97,6 +97,11 @@ BEGIN
     (p_hstore_cotizacion->obs)::text,
 	(p_hstore_cotizacion->fecha_adju)::date,
 	(p_hstore_cotizacion->nro_contrato)::varchar,
+    (p_hstore_cotizacion->_id_usuario_ai)::varchar,
+    (p_hstore_cotizacion->_nombre_usuario_ai)::varchar,
+    
+    v_parametros._id_usuario_ai,
+             v_parametros._nombre_usuario_ai,
     
     
     */
@@ -179,6 +184,9 @@ BEGIN
                                                                    v_id_estado_wf_pro, 
                                                                    v_id_proceso_wf_pro,
                                                                    p_id_usuario,
+                                                                   (p_hstore_cotizacion->'_id_usuario_ai')::integer,
+                                                                   (p_hstore_cotizacion->'_nombre_usuario_ai')::varchar,
+                                                                   
                                                                    v_id_depto);
                      
                     --actualiza el proceso
@@ -206,6 +214,8 @@ BEGIN
                                v_codigo_estado
                       FROM wf.f_registra_proceso_disparado_wf(
                                p_id_usuario,
+                               (p_hstore_cotizacion->'_id_usuario_ai')::integer,
+                               (p_hstore_cotizacion->'_nombre_usuario_ai')::varchar,
                                v_id_estado_actual, 
                                NULL, 
                                v_id_depto, 
@@ -228,6 +238,8 @@ BEGIN
                            v_codigo_estado
                   FROM wf.f_registra_proceso_disparado_wf(
                            p_id_usuario,
+                          (p_hstore_cotizacion->'_id_usuario_ai')::integer,
+                          (p_hstore_cotizacion->'_nombre_usuario_ai')::varchar,
                            v_id_estado_wf_pro, 
                            NULL, 
                            v_id_depto,
@@ -283,7 +295,9 @@ BEGIN
             id_proceso_wf,
             tipo_cambio_conv,
             num_tramite,
-            tiempo_entrega
+            tiempo_entrega,
+            id_usuario_ai,
+            usuario_ai
           	) values(
 			'activo',
 			v_codigo_estado,
@@ -310,7 +324,9 @@ BEGIN
             v_id_proceso_wf,
             (p_hstore_cotizacion->'tipo_cambio_conv')::numeric,
             v_num_tramite,
-            v_tiempo_entrega
+            v_tiempo_entrega,
+            (p_hstore_cotizacion->'_id_usuario_ai')::integer,
+            (p_hstore_cotizacion->'_nombre_usuario_ai')::varchar
             )RETURNING id_cotizacion into v_id_cotizacion;
             
             
@@ -431,7 +447,9 @@ BEGIN
                     precio_unitario,
                     cantidad_coti,
                     cantidad_adju,
-                    precio_unitario_mb
+                    precio_unitario_mb,
+                    id_usuario_ai,
+                    usuario_ai
                    ) 
                   VALUES (
                     p_id_usuario,
@@ -442,7 +460,9 @@ BEGIN
                     v_prec_of,--:precio_unitario,
                     v_cant_of,--:cantidad_coti,
                     0,   --cantidad_aduj
-                    v_precio_unitario_mb_coti
+                    v_precio_unitario_mb_coti,
+                    (p_hstore_cotizacion->'_id_usuario_ai')::integer,
+                    (p_hstore_cotizacion->'_nombre_usuario_ai')::varchar
                     );
             
             END LOOP;

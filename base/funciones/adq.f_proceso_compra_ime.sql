@@ -27,7 +27,7 @@ DECLARE
 
 	v_nro_requerimiento    	integer;
 	v_parametros           	record;
-   v_id_requerimiento     	integer;
+    v_id_requerimiento     	integer;
 	v_resp		            varchar;
 	v_nombre_funcion        text;
 	v_mensaje_error         text;
@@ -175,6 +175,8 @@ BEGIN
                                                          v_id_estado_wf_sol, 
                                                          v_id_proceso_wf_sol,
                                                          p_id_usuario,
+                                                         v_parametros._id_usuario_ai,
+                                                         v_parametros._nombre_usuario_ai,
                                                          v_parametros.id_depto);
            
            
@@ -201,6 +203,8 @@ BEGIN
                      v_codigo_estado
             FROM wf.f_registra_proceso_disparado_wf(
                      p_id_usuario,
+                     v_parametros._id_usuario_ai,
+                     v_parametros._nombre_usuario_ai,
                      v_id_estado_actual, 
                      NULL, 
                      v_parametros.id_depto,
@@ -234,7 +238,9 @@ BEGIN
 			id_usuario_reg,
 			fecha_reg,
 			fecha_mod,
-			id_usuario_mod
+			id_usuario_mod,
+            id_usuario_ai,
+            usuario_ai
           	) values(
 			v_parametros.id_depto,
 			'1',
@@ -251,7 +257,9 @@ BEGIN
 			p_id_usuario,
 			now(),
 			null,
-			null
+			null,
+            v_parametros._id_usuario_ai,
+            v_parametros._nombre_usuario_ai
 							
 			)RETURNING id_proceso_compra into v_id_proceso_compra;
             
@@ -285,7 +293,9 @@ BEGIN
                                              'tipo_cambio_conv',v_tipo_cambio::varchar,
                                              'obs','generado a partir de la precotización',
                                              'fecha_adju',NULL::varchar,
-                                             'nro_contrato',NULL::varchar
+                                             'nro_contrato',NULL::varchar,
+                                             '_id_usuario_ai',v_parametros._id_usuario_ai::varchar,
+                                             '_nombre_usuario_ai',v_parametros._nombre_usuario_ai::varchar
                                              ]);
             
            
@@ -366,7 +376,9 @@ BEGIN
             --Sentencia de la modificacion
 			update adq.tproceso_compra set
 			id_usuario_auxiliar = v_id_usuario,
-            id_usuario_mod = p_id_usuario
+            id_usuario_mod = p_id_usuario,
+            id_usuario_ai = v_parametros._id_usuario_ai,
+            usuario_ai =  v_parametros._nombre_usuario_ai
 			where id_solicitud=v_parametros.id_solicitud;
                
 			--Definicion de la respuesta
@@ -398,7 +410,9 @@ BEGIN
 			codigo_proceso = v_parametros.codigo_proceso,
 		    num_cotizacion = v_parametros.num_cotizacion,
 			fecha_mod = now(),
-			id_usuario_mod = p_id_usuario
+			id_usuario_mod = p_id_usuario,
+            id_usuario_ai = v_parametros._id_usuario_ai,
+            usuario_ai =  v_parametros._nombre_usuario_ai
 			where id_proceso_compra=v_parametros.id_proceso_compra;
                
 			--Definicion de la respuesta
@@ -502,6 +516,8 @@ BEGIN
                                                            v_id_estado_wf, 
                                                            v_id_proceso_wf,
                                                            p_id_usuario,
+                                                           v_parametros._id_usuario_ai,
+                                                           v_parametros._nombre_usuario_ai,
                                                            v_id_depto);
             
             
@@ -511,7 +527,9 @@ BEGIN
                  id_estado_wf =  v_id_estado_actual,
                  estado = v_estado,
                  id_usuario_mod=p_id_usuario,
-                 fecha_mod=now()
+                 fecha_mod=now(),
+                 id_usuario_ai = v_parametros._id_usuario_ai,
+                 usuario_ai =  v_parametros._nombre_usuario_ai
                where id_proceso_compra  = v_parametros.id_proceso_compra;
            
              -------------------------------------------------
@@ -556,6 +574,8 @@ BEGIN
                   v_id_estado_wf, 
                   v_id_proceso_wf, 
                   p_id_usuario,
+                  v_parametros._id_usuario_ai,
+                   v_parametros._nombre_usuario_ai,
                   v_id_depto);
                       
                     
@@ -668,6 +688,8 @@ BEGIN
                                                            v_id_estado_wf, 
                                                            v_id_proceso_wf,
                                                            p_id_usuario,
+                                                           v_parametros._id_usuario_ai,
+                                                           v_parametros._nombre_usuario_ai,
                                                            v_id_depto);
             
             
@@ -677,7 +699,9 @@ BEGIN
                  id_estado_wf =  v_id_estado_actual,
                  estado = v_estado,
                  id_usuario_mod=p_id_usuario,
-                 fecha_mod=now()
+                 fecha_mod=now(),
+                 id_usuario_ai = v_parametros._id_usuario_ai,
+                 usuario_ai = v_parametros._nombre_usuario_ai
                where id_proceso_compra  = v_parametros.id_proceso_compra;
            
              -------------------------------------------------
@@ -724,6 +748,8 @@ BEGIN
                                                             v_id_estado_wf, 
                                                             v_id_proceso_wf, 
                                                             p_id_usuario,
+                                                            v_parametros._id_usuario_ai,
+                                                            v_parametros._nombre_usuario_ai,
                                                             v_id_depto);
                       
                     
