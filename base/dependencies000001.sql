@@ -2688,3 +2688,107 @@ select pxp.f_insert_trol_procedimiento_gui ('ADQ - Solicitud de Compra', 'RH_MAI
 
 
 /***********************************F-DEP-JRR-ADQ-0-24/04/2014*****************************************/
+
+
+
+
+/***********************************I-DEP-RAC-ADQ-0-29/05/2014*****************************************/
+
+
+--------------- SQL ---------------
+
+ALTER TABLE adq.trpc
+  ADD CONSTRAINT trpc_id_cargo_fk FOREIGN KEY (id_cargo)
+    REFERENCES orga.tcargo(id_cargo)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+    NOT DEFERRABLE;
+    
+
+--------------- SQL ---------------
+
+ALTER TABLE adq.trpc
+  ADD CONSTRAINT trpc_id_cargo_ai_fk FOREIGN KEY (id_cargo_ai)
+    REFERENCES orga.tcargo(id_cargo)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+    NOT DEFERRABLE;
+    
+    
+--------------- SQL ---------------
+
+ALTER TABLE adq.trpc
+  ADD CONSTRAINT trpc_id_cargo_ai_fk FOREIGN KEY (id_cargo_ai)
+    REFERENCES orga.tcargo(id_cargo)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+    NOT DEFERRABLE;
+    
+
+--------------- SQL ---------------
+
+ALTER TABLE adq.trpc
+  ADD CONSTRAINT trpc_id_usuario_mod_fk FOREIGN KEY (id_usuario_mod)
+    REFERENCES segu.tusuario(id_usuario)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+    NOT DEFERRABLE;
+    
+    
+--------------- SQL ---------------
+
+ALTER TABLE adq.trpc_uo
+  ADD CONSTRAINT trpc_uo_id_usuario_reg_fk FOREIGN KEY (id_usuario_reg)
+    REFERENCES segu.tusuario(id_usuario)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+    NOT DEFERRABLE;
+
+
+--------------- SQL ---------------
+
+ALTER TABLE adq.trpc_uo
+  ADD CONSTRAINT trpc_uo_id_usuario_mod_fk FOREIGN KEY (id_usuario_mod)
+    REFERENCES segu.tusuario(id_usuario)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+    NOT DEFERRABLE;
+    
+--------------- SQL ---------------
+
+ALTER TABLE adq.trpc_uo
+  ADD CONSTRAINT trpc_uo_id_rpc_fk FOREIGN KEY (id_rpc)
+    REFERENCES adq.trpc(id_rpc)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+    NOT DEFERRABLE;
+
+ALTER TABLE adq.trpc_uo
+  ADD CONSTRAINT trpc_uo_gd_uo_fk FOREIGN KEY (id_uo)
+    REFERENCES orga.tuo(id_uo)
+    MATCH FULL
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+    NOT DEFERRABLE;
+
+ALTER TABLE adq.trpc_uo
+  ADD CONSTRAINT trpc_uo_id_usuario_ai_fk FOREIGN KEY (id_usuario_ai)
+    REFERENCES segu.tusuario(id_usuario)
+    MATCH FULL
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+    NOT DEFERRABLE;
+
+
+--------------- SQL ---------------
+
+ALTER TABLE adq.trpc_uo
+  ADD CONSTRAINT trpc_uo_gategoria_fk FOREIGN KEY (id_categoria_compra)
+    REFERENCES adq.tcategoria_compra(id_categoria_compra)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+    NOT DEFERRABLE;
+
+
+/***********************************F-DEP-RAC-ADQ-0-29/05/2014*****************************************/
+

@@ -309,3 +309,54 @@ ALTER TABLE adq.tcotizacion
 /***********************************F-SCP-RAC-ADQ-0-19/05/2014****************************************/
 
 
+
+
+
+/***********************************I-SCP-RAC-ADQ-0-29/05/2014****************************************/
+
+
+CREATE TABLE adq.trpc (
+  id_rpc SERIAL NOT NULL, 
+  id_cargo INTEGER NOT NULL, 
+  id_cargo_ai INTEGER, 
+  ai_habilitado BOOLEAN NOT NULL, 
+  PRIMARY KEY(id_rpc)
+) INHERITS (pxp.tbase)
+WITHOUT OIDS;
+
+ALTER TABLE adq.trpc
+  ALTER COLUMN id_cargo_ai SET STATISTICS 0;
+
+--------------- SQL ---------------
+
+ALTER TABLE adq.trpc
+  ALTER COLUMN ai_habilitado TYPE VARCHAR(3);
+  
+--------------- SQL ---------------
+ALTER TABLE adq.trpc
+  ALTER COLUMN ai_habilitado SET DEFAULT 'no';  
+
+
+CREATE TABLE adq.trpc_uo (
+  id_rpc_uo SERIAL NOT NULL, 
+  id_rpc INTEGER NOT NULL, 
+  id_uo INTEGER NOT NULL, 
+  fecha_ini DATE NOT NULL,
+  fecha_fin date,
+  monto_min numeric NOT NULL,
+  monto_max numeric,  
+  PRIMARY KEY(id_rpc_uo)
+) INHERITS (pxp.tbase)
+WITHOUT OIDS;
+
+ALTER TABLE adq.trpc_uo
+  ADD COLUMN id_categoria_compra INTEGER NOT NULL;
+
+
+
+/***********************************F-SCP-RAC-ADQ-0-29/05/2014****************************************/
+
+
+
+
+
