@@ -2792,3 +2792,26 @@ ALTER TABLE adq.trpc_uo
 
 /***********************************F-DEP-RAC-ADQ-0-29/05/2014*****************************************/
 
+
+/***********************************I-DEP-RAC-ADQ-0-30/05/2014*****************************************/
+--------------- SQL ---------------
+
+ALTER TABLE adq.tsolicitud
+  ADD CONSTRAINT tsolicitud_rd_cargo_rpc_fk FOREIGN KEY (id_cargo_rpc)
+    REFERENCES orga.tcargo(id_cargo)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+    NOT DEFERRABLE;
+
+--------------- SQL ---------------
+
+ALTER TABLE adq.tsolicitud
+  ADD CONSTRAINT tsolicitud_id_cargo_rpc_ai_fk FOREIGN KEY (id_cargo_rpc_ai)
+    REFERENCES orga.tcargo(id_cargo)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+    NOT DEFERRABLE;
+
+
+/***********************************F-DEP-RAC-ADQ-0-30/05/2014*****************************************/
+

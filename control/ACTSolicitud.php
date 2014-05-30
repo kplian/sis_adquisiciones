@@ -39,6 +39,18 @@ class ACTSolicitud extends ACTbase{
 		
 		 //var_dump($_SESSION["ss_id_funcionario"]);
 		
+		if($this->objParam->getParametro('id_cargo')!='' && $this->objParam->getParametro('id_cargo_ai')!=''){
+            $this->objParam->addFiltro("(sol.id_cargo_rpc = ".$this->objParam->getParametro('id_cargo')." or sol.id_cargo_rpc_ai =".$this->objParam->getParametro('id_cargo_ai').")");    
+        }
+        elseif($this->objParam->getParametro('id_cargo')!='' ){
+            $this->objParam->addFiltro("sol.id_cargo_rpc = ".$this->objParam->getParametro('id_cargo'));    
+        }
+        
+        if($this->objParam->getParametro('tipo_interfaz')=='solicitudRpc'){
+             $this->objParam->addFiltro("(sol.estado != ''finalizado'' and  sol.estado != ''cancelado'')");
+        }
+		
+		
 		$this->objParam->addParametro('id_funcionario_usu',$_SESSION["ss_id_funcionario"]); 
 		
 		if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){

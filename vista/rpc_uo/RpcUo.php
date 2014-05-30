@@ -17,7 +17,8 @@ Phx.vista.RpcUo=Ext.extend(Phx.gridInterfaz,{
     	//llama al constructor de la clase padre
 		Phx.vista.RpcUo.superclass.constructor.call(this,config);
 		this.init();
-		this.load({params:{start:0, limit:this.tam_pag}})
+		this.bloquearMenus();
+		
 	},
 			
 	Atributos:[
@@ -93,13 +94,58 @@ Phx.vista.RpcUo=Ext.extend(Phx.gridInterfaz,{
             form: true
         },
         
+        {
+                config:{
+                    name:'id_uos',
+                    fieldLabel:'Unidad',
+                    allowBlank:false,
+                    emptyText:'Unidades que presupuestan...',
+                    store: new Ext.data.JsonStore({
+                        url: '../../sis_organigrama/control/Uo/listarUo',
+                        id: 'id_uo',
+                        root: 'datos',
+                        sortInfo:{
+                            field: 'nombre_unidad',
+                            direction: 'ASC'
+                        },
+                        totalProperty: 'total',
+                        fields: ['id_uo','codigo','nombre_unidad','nombre_cargo','presupuesta','correspondencia'],
+                        // turn on remote sorting
+                        remoteSort: true,
+                        baseParams:{par_filtro:'nombre_unidad#codigo',presupuesta:'si'}
+                        
+                    }),
+                    valueField: 'id_uo',
+                    displayField: 'nombre_unidad',
+                    //tpl:'<tpl for="."><div class="x-combo-list-item">{codigo}<p>{nombre_unidad}</p> </div></tpl>',
+                    hiddenName: 'id_uos',
+                    
+                    forceSelection:true,
+                    typeAhead: true,
+                    triggerAction: 'all',
+                    lazyRender:true,
+                    mode:'remote',
+                    pageSize:10,
+                    queryDelay:1000,
+                    width:250,
+                    minChars:2,
+                    enableMultiSelect:true
+                
+                    //renderer:function(value, p, record){return String.format('{0}', record.data['descripcion']);}
+
+                },
+                type:'AwesomeCombo',
+                id_grupo:0,
+                grid:false,
+                form:true
+        },
         
-         {
+        {
             config:{
                     name:'id_uo',
                     origen:'UO',
                     fieldLabel:'Unidad',
-                    allowBlank:true,
+                    allowBlank:false,
                     gdisplayField:'desc_uo',//mapea al store del grid
                     gwidth:200,
                     baseParams:{presupuesta:'si'},
@@ -143,23 +189,6 @@ Phx.vista.RpcUo=Ext.extend(Phx.gridInterfaz,{
             grid:true,
             form:true
         },
-       
-       
-		{
-			config:{
-				name: 'estado_reg',
-				fieldLabel: 'Estado Reg.',
-				allowBlank: true,
-				anchor: '80%',
-				gwidth: 100,
-				maxLength:10
-			},
-				type:'Field',
-				filters:{pfiltro:'ruo.estado_reg',type:'string'},
-				id_grupo:1,
-				grid:true,
-				form:false
-		},
         {
             config:{
                 name: 'fecha_ini',
@@ -318,12 +347,29 @@ Phx.vista.RpcUo=Ext.extend(Phx.gridInterfaz,{
     },
     
     onReloadPage:function(m){
-       this.maestro=m;
+        this.maestro=m;
+        this.store.baseParams={id_rpc:this.maestro.id_rpc};
+        this.load({params:{start:0, limit:50}});
+   },
+   
+    onButtonNew:function(){
        
-       this.store.baseParams={id_rpc:this.maestro.id_rpc};
-       this.load({params:{start:0, limit:50}});
-              
+       Phx.vista.RpcUo.superclass.onButtonNew.call(this);
+       this.Cmp.id_uo.disable();
+       this.Cmp.id_uo.hide();
+       this.Cmp.id_uos.enable();
+       this.Cmp.id_uos.show()
+    
+    },
+    
+    onButtonEdit:function(){
        
+       Phx.vista.RpcUo.superclass.onButtonEdit.call(this);
+       this.Cmp.id_uo.enable();
+       this.Cmp.id_uo.show();
+       this.Cmp.id_uos.disable();
+       this.Cmp.id_uos.hide();
+    
     },
 	sortInfo:{
 		field: 'id_rpc_uo',

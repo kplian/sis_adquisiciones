@@ -1,3 +1,5 @@
+--------------- SQL ---------------
+
 CREATE OR REPLACE FUNCTION adq.f_solicitud_sel (
   p_administrador integer,
   p_id_usuario integer,
@@ -169,7 +171,10 @@ BEGIN
                         pro.desc_proveedor,
                         sol.id_proveedor,
                         sol.id_funcionario_supervisor,
-                        funs.desc_funcionario1 as desc_funcionario_supervisor
+                        funs.desc_funcionario1 as desc_funcionario_supervisor,
+                        sol.ai_habilitado,
+                        sol.id_cargo_rpc,
+                        sol.id_cargo_rpc_ai
                         	
 						from adq.tsolicitud sol
 						inner join segu.tusuario usu1 on usu1.id_usuario = sol.id_usuario_reg

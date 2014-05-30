@@ -256,7 +256,8 @@ Phx.vista.SolicitudReq = {
                 }); 
             } 
      },
-        successFinSol:function(resp){
+    
+    successFinSol:function(resp){
             
             Phx.CP.loadingHide();
             var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));

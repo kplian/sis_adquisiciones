@@ -608,7 +608,11 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
 		'desc_proceso_macro',
 		'desc_categoria_compra',
 		'id_proceso_macro',
-		'obs','instruc_rpc','desc_proveedor','id_proveedor'
+		'obs','instruc_rpc','desc_proveedor',
+		'id_proveedor',
+		'ai_habilitado',
+		'id_cargo_rpc',
+		'id_cargo_rpc_ai'
 		
 	],
 	

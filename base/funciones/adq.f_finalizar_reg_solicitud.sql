@@ -6,7 +6,10 @@ CREATE OR REPLACE FUNCTION adq.f_finalizar_reg_solicitud (
   p_id_usuario_ai integer,
   p_usuario_ai varchar,
   p_id_funcionario_rpc integer,
-  p_id_solicitud integer
+  p_id_solicitud integer,
+  p_id_cargo integer = NULL::integer,
+  p_id_cargo_ai integer = NULL::integer,
+  p_ai_habilitado varchar = 'no'::character varying
 )
 RETURNS varchar AS
 $body$
@@ -233,7 +236,12 @@ p_hstore->'id_solicitud'
            
                    update adq.tsolicitud  s set 
                      presu_comprometido =  'si',
-                     fecha_apro = now()
+                     fecha_apro = now(),
+                     id_usuario_ai = p_id_usuario_ai,
+                     usuario_ai = p_usuario_ai,
+                     id_cargo_rpc = p_id_cargo,
+                     id_cargo_rpc_ai = p_id_cargo_ai,
+                     ai_habilitado = p_ai_habilitado
                    where id_solicitud = p_id_solicitud;
             
             

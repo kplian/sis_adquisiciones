@@ -93,6 +93,7 @@ DECLARE
        v_tipo_noti  			varchar;
        v_titulo   			varchar;
        v_estado_actual   varchar;
+       v_id_categoria_compra   integer;
 
 			    
 BEGIN
@@ -459,11 +460,13 @@ BEGIN
                     select 
                      sol.fecha_soli,
                      sol.id_proceso_macro,
-                     sol.id_uo
+                     sol.id_uo,
+                     sol.id_categoria_compra
                     INTO
                      v_fecha_soli,
                      v_id_proceso_macro,
-                     v_id_uo 
+                     v_id_uo,
+                     v_id_categoria_compra 
                     from adq.tsolicitud sol
                     where sol.id_solicitud = v_parametros.id_solicitud;
                   
@@ -471,30 +474,49 @@ BEGIN
                    v_cont = 0;
                    v_mensaje_resp = '';
                     --  obtener listado de RPC
+                    
+                    /*
+                            p_id_usuario integer,
+                            p_id_uo integer,
+                            p_fecha date,
+                            p_monto numeric,
+                            p_id_categoria_compra integer,
+                    
+                    */
+                    
+                  
                    	FOR v_registros in (
                             SELECT 
-                                  DISTINCT (
-                                  id_funcionario),
+                                  DISTINCT (id_funcionario),
+                                  id_rpc,
+                                  id_rpc_uo,
                                   desc_funcionario,
-                                  prioridad
-                                  FROM param.f_obtener_listado_aprobadores(
+                                  fecha_ini,
+                                  fecha_fin,
+                                  monto_min,
+                                  monto_max,
+                                  id_cargo,
+                                  id_cargo_ai,
+                                  ai_habilitado 
+                                  
+                            FROM adq.f_obtener_listado_rpc(
+                                  p_id_usuario,
                                   v_id_uo, --id_uo
-                                  NULL,--p_id_ep,
-                                  NULL,--p_id_centro_costo, 
-                                  v_id_subsistema, --id_subsistema
                                   v_fecha_soli, 
                                   v_total_soli,
-                                  p_id_usuario,
-                                  v_id_proceso_macro)
-                                  AS ( id_aprobador integer,
-                                      id_funcionario integer,
-                                      fecha_ini date,
-                                      fecha_fin date,
-                                      desc_funcionario text,
-                                      monto_min numeric,
-                                      monto_max numeric,
-                                      prioridad integer)
-                                  ORDER BY prioridad asc )LOOP     
+                                  v_id_categoria_compra)
+                                  AS ( id_rpc   integer,
+                                       id_rpc_uo integer,
+                                       id_funcionario integer,
+                                       desc_funcionario text,
+                                       fecha_ini date,
+                                       fecha_fin date,
+                                       monto_min numeric,
+                                       monto_max numeric,
+                                       id_cargo integer,
+                                       id_cargo_ai integer,
+                                       ai_habilitado varchar)
+                                  )LOOP     
                                   
                      
                        v_cont = v_cont +1;
@@ -507,7 +529,10 @@ BEGIN
                                             v_parametros._id_usuario_ai,
                                             v_parametros._nombre_usuario_ai,
                                             v_registros.id_funcionario, 
-                                            v_parametros.id_solicitud);
+                                            v_parametros.id_solicitud,
+                                            v_registros.id_cargo,
+                                            v_registros.id_cargo_ai,
+                                            v_registros.ai_habilitado);
                   
                        END IF;
                        
@@ -525,6 +550,17 @@ BEGIN
                   
                   
                   END IF;
+                  
+                  -- si existe mas de un posible aprobador lanzamos un error
+                  IF v_cont = 0 THEN
+                  
+                      raise exception 'No se encontro RPC para esta solicitud';
+                  
+                  
+                  END IF;
+                  
+                  
+                
                   
                   
                  

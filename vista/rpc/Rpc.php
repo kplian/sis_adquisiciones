@@ -18,6 +18,11 @@ Phx.vista.Rpc=Ext.extend(Phx.gridInterfaz,{
 		Phx.vista.Rpc.superclass.constructor.call(this,config);
 		this.init();
 		this.load({params:{start:0, limit:this.tam_pag}})
+		
+		this.addButton('clonar',{text:'Clonar',iconCls: 'blist',disabled:true,handler:this.clonarConfig,tooltip: '<b>Clonar ... </b><br/>Clona las configuraciones del RPC seleccioando '});
+        
+		this.crearVentanaClon();
+		
 	},
 			
 	Atributos:[
@@ -271,14 +276,209 @@ Phx.vista.Rpc=Ext.extend(Phx.gridInterfaz,{
 		{name:'usr_mod', type: 'string'},'desc_cargo','desc_cargo_suplente'
 		
 	],
-	south:
-          { 
+	tabsouth:[
+         { 
           url:'../../../sis_adquisiciones/vista/rpc_uo/RpcUo.php',
           title:'Detalle', 
           height:'50%',
           cls:'RpcUo'
+        },
+          {
+           url:'../../../sis_adquisiciones/vista/solicitud/SolicitudRpc.php',
+           title:'Solicitudes en proceso del RPC', 
+           height:'50%',
+           cls:'SolicitudRpc'
+         }
+    
+       ],
+       
+    crearVentanaClon:function(){
+         
+         
+         this.formClon = new Ext.form.FormPanel({
+            baseCls: 'x-plain',
+            autoDestroy: true,
+           
+            layout: 'form',
+              
+            items: [{
+                xtype:'combo',
+                name: 'id_cargo',
+                fieldLabel: 'Cargo RPC',
+                allowBlank: false,
+                emptyText: 'Elija una opción...',
+                store: new Ext.data.JsonStore({
+                    url: '../../sis_organigrama/control/Cargo/listarCargo',
+                    id: 'id_cargo',
+                    root: 'datos',
+                    sortInfo: {
+                        field: 'cargo.nombre',
+                        direction: 'ASC'
+                    },
+                    totalProperty: 'total',
+                    fields: ['id_cargo', 'nombre',],
+                    remoteSort: true,
+                    baseParams: {par_filtro: 'cargo.nombre'}
+                }),
+                valueField: 'id_cargo',
+                displayField: 'nombre',
+                gdisplayField: 'desc_cargo',
+                hiddenName: 'id_cargo',
+                forceSelection: true,
+                typeAhead: false,
+                triggerAction: 'all',
+                lazyRender: true,
+                mode: 'remote',
+                pageSize: 15,
+                queryDelay: 1000,
+                anchor: '100%',
+                gwidth: 150,
+                minChars: 2
+                
+            },
+            {
+                xtype:'datefield',
+                name: 'fecha_ini',
+                fieldLabel: 'Fecha ini a copiar',
+                allowBlank: false,
+                anchor: '80%',
+                format: 'd/m/Y'
+                            
+            },
+            {
+                xtype:'datefield',
+                name: 'fecha_fin',
+                fieldLabel: 'Fecha Fin a copiar',
+                allowBlank: false,
+                anchor: '80%',
+                format: 'd/m/Y'  
+              },
+            {
+                xtype:'datefield',
+                name: 'new_fecha_ini',
+                fieldLabel: 'Nueva Fecha ini',
+                allowBlank: false,
+                anchor: '80%',
+                format: 'd/m/Y'
+                            
+            },
+            {
+                xtype:'datefield',
+                name: 'new_fecha_fin',
+                fieldLabel: 'Nueva Fecha Fin',
+                allowBlank: false,
+                anchor: '80%',
+                format: 'd/m/Y'  
+              }
+            ]
+        });
+        
+        
+         this.cmbCargo = this.formClon.getForm().findField('id_cargo');
+         this.cmbCargo.store.on('exception', this.conexionFailure);
+         
+         
+         
+         this.wClon = new Ext.Window({
+            title: 'Clonar RPC',
+            collapsible: true,
+            maximizable: true,
+            autoDestroy: true,
+            width: 400,
+            height: 250,
+            layout: 'fit',
+            plain: true,
+            bodyStyle: 'padding:5px;',
+            buttonAlign: 'center',
+            items: this.formClon,
+            modal:true,
+            closeAction: 'hide',
+            buttons: [{
+                text: 'Guardar',
+                 handler:this.onClonar,
+                scope:this
+                
+            },{
+                text: 'Cancelar',
+                handler:function(){this.wClon.hide()},
+                scope:this
+            }]
+        });
+        
+        
     },
 	
+	clonarConfig:function(){
+	    var rec=this.sm.getSelected();
+	    if(rec){
+	        this.formClon.getForm().reset();
+            this.wClon.show();
+	     }
+	},
+	
+	onClonar:function(){
+	     var rec=this.sm.getSelected();
+	     if(rec&& this.formClon.getForm().isValid()){
+	         
+	        Phx.CP.loadingShow();
+            
+            
+            
+            
+            Ext.Ajax.request({
+                // form:this.form.getForm().getEl(),
+                url:'../../sis_adquisiciones/control/Rpc/clonarRpc',
+                params:{
+                    
+                    'id_rpc':rec.data.id_rpc,
+                    'id_cargo':this.formClon.getForm().findField('id_cargo').getValue(),
+                    'fecha_ini':this.formClon.getForm().findField('fecha_ini').getValue().dateFormat('d/m/Y'),
+                    'fecha_fin':this.formClon.getForm().findField('fecha_fin').getValue().dateFormat('d/m/Y'),
+                    'new_fecha_ini':this.formClon.getForm().findField('new_fecha_ini').getValue().dateFormat('d/m/Y'),
+                    'new_fecha_fin':this.formClon.getForm().findField('new_fecha_fin').getValue().dateFormat('d/m/Y')
+                 },
+                success:this.successSinc,
+                failure: this.conexionFailure,
+                timeout:this.timeout,
+                scope:this
+            });
+	         
+	         
+	         
+	     }
+	    
+	},
+	
+	successSinc:function(resp){
+            
+            Phx.CP.loadingHide();
+            var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
+            if(!reg.ROOT.error){
+                alert(reg.ROOT.detalle.mensaje)
+                
+            }else{
+                
+                alert('ocurrio un error durante el proceso')
+            }
+            
+          this.reload();
+            
+     },
+	
+	preparaMenu:function(n){
+	   var tb = Phx.vista.Rpc.superclass.preparaMenu.call(this,n);
+	   this.getBoton('clonar').enable();
+	   
+	   return tb
+	
+	},
+	 
+	liberaMenu:function(){
+       var tb = Phx.vista.Rpc.superclass.liberaMenu.call(this);
+       this.getBoton('clonar').disable();
+	   return tb
+	
+	},
 	sortInfo:{
 		field: 'id_rpc',
 		direction: 'ASC'

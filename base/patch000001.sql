@@ -357,6 +357,19 @@ ALTER TABLE adq.trpc_uo
 /***********************************F-SCP-RAC-ADQ-0-29/05/2014****************************************/
 
 
+/***********************************I-SCP-RAC-ADQ-0-30/05/2014****************************************/
+ALTER TABLE adq.tsolicitud
+  ADD COLUMN id_cargo_rpc INTEGER;
+  
+ --------------- SQL ---------------
 
+ALTER TABLE adq.tsolicitud
+  ADD COLUMN id_cargo_rpc_ai INTEGER;
 
+--------------- SQL ---------------
+
+ALTER TABLE adq.tsolicitud
+  ADD COLUMN ai_habilitado VARCHAR(4) DEFAULT 'no' NOT NULL;
+
+/***********************************F-SCP-RAC-ADQ-0-30/05/2014****************************************/
 

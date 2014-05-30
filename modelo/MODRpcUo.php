@@ -57,6 +57,7 @@ class MODRpcUo extends MODbase{
 		//Define los parametros para la funcion
 		$this->setParametro('id_rpc','id_rpc','int4');
 		$this->setParametro('id_uo','id_uo','int4');
+		$this->setParametro('id_uos','id_uos','varchar');
 		$this->setParametro('monto_max','monto_max','numeric');
 		$this->setParametro('estado_reg','estado_reg','varchar');
 		$this->setParametro('fecha_fin','fecha_fin','date');

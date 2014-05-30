@@ -79,9 +79,13 @@ class MODSolicitud extends MODbase{
 		$this->captura('id_funcionario_supervisor','integer');
 		$this->captura('desc_funcionario_supervisor','text');
 		
+		$this->captura('ai_habilitado','varchar');
+		$this->captura('id_cargo_rpc','integer');
+		$this->captura('id_cargo_rpc_ai','integer');
 		
 		
 		
+		 
 		
 		
 		

@@ -33,7 +33,11 @@ DECLARE
 	v_mensaje_error         text;
 	v_id_rpc_uo	integer;
    
-    v_nombre    varchar;
+    v_nombre           varchar;
+    v_id_uos           integer[];
+    v_tamano           integer;
+    v_nombre_unidad    varchar;
+    v_i                integer;
 			    
 BEGIN
 
@@ -51,123 +55,141 @@ BEGIN
 					
         begin
         
-          --validar que no exista otro rpc para la misma uo
-          --misma categoria, mismos montos y mismas fechas ...
-          --( se se realizan cambio tambien hacerlos para el caso de update)
-         
-          select
-              ruo.id_rpc_uo 
-          into 
-            v_id_rpc_uo
-          from adq.trpc_uo ruo
-          where 
-             ruo.estado_reg = 'activo' and
-             ruo.id_uo = v_parametros.id_uo  and
-             ruo.id_categoria_compra = v_parametros.id_categoria_compra 
-            
-             AND 
-             (      
-                (
-                       (   
-                               ruo.monto_max is NULL 
-                          and  v_parametros.monto_max is NULL
-                       )
-                       or 
-                       (
-                             (   
-                               ( v_parametros.monto_max <= ruo.monto_max
-                            and  
-                                v_parametros.monto_max >= ruo.monto_min )
-                            
-                            or
-                            
-                            ( v_parametros.monto_min <= ruo.monto_max
-                            and  v_parametros.monto_min >= ruo.monto_min )
-                            )
-                       )
-                )
-                
-              )
-              and
-              (  
-               
-                (
-                             ruo.fecha_fin is NULL
-                       and  v_parametros.fecha_fin is NULL
-                )
-                
-                or 
-                       (
-                             (   
-                               ( v_parametros.fecha_fin <= ruo.fecha_fin
-                            and  
-                                v_parametros.fecha_fin >= ruo.fecha_ini )
-                            
-                            or
-                            
-                            ( v_parametros.fecha_ini <= ruo.fecha_fin
-                            and  v_parametros.fecha_ini >= ruo.fecha_ini )
-                            )
-                       )
-                    
-                );
-             
-             
-            IF v_id_rpc_uo is not null  THEN   
-              
-                select  
-                  car.nombre 
-                into
-                   v_nombre
-                from adq.trpc_uo ruo
-                inner join adq.trpc rpc on rpc.id_rpc =  ruo.id_rpc
-                inner join orga.tcargo car on car.id_cargo =   rpc.id_cargo
-                where ruo.id_rpc_uo = v_id_rpc_uo;
-                
-                raise exception 'existe un registro para el mismo rango, con el cargo: %',v_nombre;
-              
-            END IF;  
+        
+              --insertamos los roles del usuario
+             v_id_uos= string_to_array(v_parametros.id_uos,',');
+             v_tamano = coalesce(array_length(v_id_uos, 1),0);
           
-        
-        
-        
-        
-        
-        	--Sentencia de la insercion
-        	insert into adq.trpc_uo(
-			id_rpc,
-			id_uo,
-			monto_max,
-			estado_reg,
-			fecha_fin,
-			fecha_ini,
-			monto_min,
-			id_usuario_reg,
-			id_usuario_ai,
-			fecha_reg,
-			usuario_ai,
-			id_usuario_mod,
-			fecha_mod,
-            id_categoria_compra
-          	) values(
-			v_parametros.id_rpc,
-			v_parametros.id_uo,
-			v_parametros.monto_max,
-			'activo',
-			v_parametros.fecha_fin,
-			v_parametros.fecha_ini,
-			v_parametros.monto_min,
-			p_id_usuario,
-			v_parametros._id_usuario_ai,
-			now(),
-			v_parametros._nombre_usuario_ai,
-			null,
-			null,
-            v_parametros.id_categoria_compra
-							
-			
-			
-			)RETURNING id_rpc_uo into v_id_rpc_uo;
+          FOR v_i IN 1..v_tamano LOOP
+         
+                      --validar que no exista otro rpc para la misma uo
+                      --misma categoria, mismos montos y mismas fechas ...
+                      --( se se realizan cambio tambien hacerlos para el caso de update)
+                     
+                      select
+                          ruo.id_rpc_uo 
+                      into 
+                        v_id_rpc_uo
+                      from adq.trpc_uo ruo
+                      where 
+                         ruo.estado_reg = 'activo' and
+                         ruo.id_uo = v_id_uos[v_i]  and
+                         ruo.id_categoria_compra = v_parametros.id_categoria_compra 
+                        
+                         AND 
+                         (      
+                            (
+                                   (   
+                                           ruo.monto_max is NULL 
+                                      and  v_parametros.monto_max is NULL
+                                   )
+                                   or 
+                                   (
+                                         (   
+                                           ( v_parametros.monto_max <= ruo.monto_max
+                                        and  
+                                            v_parametros.monto_max >= ruo.monto_min )
+                                        
+                                        or
+                                        
+                                        ( v_parametros.monto_min <= ruo.monto_max
+                                        and  v_parametros.monto_min >= ruo.monto_min )
+                                        )
+                                   )
+                            )
+                            
+                          )
+                          and
+                          (  
+                           
+                            (
+                                         ruo.fecha_fin is NULL
+                                   and  v_parametros.fecha_fin is NULL
+                            )
+                            
+                            or 
+                                   (
+                                         (   
+                                           ( v_parametros.fecha_fin <= ruo.fecha_fin
+                                        and  
+                                            v_parametros.fecha_fin >= ruo.fecha_ini )
+                                        
+                                        or
+                                        
+                                        ( v_parametros.fecha_ini <= ruo.fecha_fin
+                                        and  v_parametros.fecha_ini >= ruo.fecha_ini )
+                                        )
+                                   )
+                                
+                            );
+                         
+                         
+                        IF v_id_rpc_uo is not null  THEN   
+                          
+                            select  
+                              car.nombre 
+                            into
+                               v_nombre
+                            from adq.trpc_uo ruo
+                            inner join adq.trpc rpc on rpc.id_rpc =  ruo.id_rpc
+                            inner join orga.tcargo car on car.id_cargo =   rpc.id_cargo
+                            where ruo.id_rpc_uo = v_id_rpc_uo;
+                            
+                            select 
+                            uo.nombre_unidad
+                            into
+                            v_nombre_unidad
+                            from orga.tuo uo
+                            where uo.id_uo =  v_id_uos[v_i];
+                            
+                            
+                            raise exception 'existe un registro para el mismo rango, con el cargo: % en la unidad %',v_nombre, v_nombre_unidad;
+                          
+                        END IF;  
+                      
+                    
+                    
+                    
+                    
+                    
+                        --Sentencia de la insercion
+                        insert into adq.trpc_uo(
+                        id_rpc,
+                        id_uo,
+                        monto_max,
+                        estado_reg,
+                        fecha_fin,
+                        fecha_ini,
+                        monto_min,
+                        id_usuario_reg,
+                        id_usuario_ai,
+                        fecha_reg,
+                        usuario_ai,
+                        id_usuario_mod,
+                        fecha_mod,
+                        id_categoria_compra
+                        ) values(
+                        v_parametros.id_rpc,
+                        v_id_uos[v_i],
+                        v_parametros.monto_max,
+                        'activo',
+                        v_parametros.fecha_fin,
+                        v_parametros.fecha_ini,
+                        v_parametros.monto_min,
+                        p_id_usuario,
+                        v_parametros._id_usuario_ai,
+                        now(),
+                        v_parametros._nombre_usuario_ai,
+                        null,
+                        null,
+                        v_parametros.id_categoria_compra
+            							
+            			
+            			
+                        )RETURNING id_rpc_uo into v_id_rpc_uo;
+            
+            
+            END LOOP;
 			
 			--Definicion de la respuesta
 			v_resp = pxp.f_agrega_clave(v_resp,'mensaje','RPC UO almacenado(a) con exito (id_rpc_uo'||v_id_rpc_uo||')'); 
