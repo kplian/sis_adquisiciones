@@ -35,10 +35,18 @@ class ACTRpc extends ACTbase{
 	}
 						
 	function eliminarRpc(){
-			$this->objFunc=$this->create('MODRpc');	
+		$this->objFunc=$this->create('MODRpc');	
 		$this->res=$this->objFunc->eliminarRpc($this->objParam);
 		$this->res->imprimirRespuesta($this->res->generarJson());
 	}
+	
+	function clonarRpc(){
+        $this->objFunc=$this->create('MODRpc'); 
+        $this->res=$this->objFunc->clonarRpc($this->objParam);
+        $this->res->imprimirRespuesta($this->res->generarJson());
+    }
+	
+	
 			
 }
 

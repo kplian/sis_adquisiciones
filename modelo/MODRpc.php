@@ -101,6 +101,31 @@ class MODRpc extends MODbase{
 		//Devuelve la respuesta
 		return $this->respuesta;
 	}
+	
+	function clonarRpc(){
+        //Definicion de variables para ejecucion del procedimiento
+        $this->procedimiento='adq.ft_rpc_ime';
+        $this->transaccion='ADQ_CLONRPC_IME';
+        $this->tipo_procedimiento='IME';
+                
+        //Define los parametros para la funcion
+        $this->setParametro('id_rpc','id_rpc','int4');
+        $this->setParametro('id_cargo','id_cargo','int4');
+        $this->setParametro('fecha_ini','fecha_ini','date');
+        $this->setParametro('fecha_fin','fecha_fin','date');
+        $this->setParametro('new_fecha_ini','new_fecha_ini','date');
+        $this->setParametro('new_fecha_fin','new_fecha_fin','date');
+
+        //Ejecuta la instruccion
+        $this->armarConsulta();
+        $this->ejecutarConsulta();
+
+        //Devuelve la respuesta
+        return $this->respuesta;
+    }
+    
+    
+	
 			
 }
 ?>

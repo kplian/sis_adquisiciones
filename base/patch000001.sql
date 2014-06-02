@@ -373,3 +373,28 @@ ALTER TABLE adq.tsolicitud
 
 /***********************************F-SCP-RAC-ADQ-0-30/05/2014****************************************/
 
+
+
+
+/***********************************I-SCP-RAC-ADQ-0-02/06/2014****************************************/
+
+CREATE TABLE adq.trpc_uo_log (
+  id_rpc_uo_log SERIAL, 
+  id_rpc_uo INTEGER, 
+  id_rpc INTEGER, 
+  fecha_ini DATE, 
+  fecha_fin DATE, 
+  monto_min NUMERIC, 
+  monto_max NUMERIC, 
+  id_uo INTEGER , 
+  id_categoria_compra INTEGER,
+  operacion varchar,
+  descripcion text,
+  id_cargo_ai INTEGER,
+  id_cargo INTEGER,
+  ai_habilitado varchar
+) INHERITS (pxp.tbase)
+WITHOUT OIDS;
+
+/***********************************F-SCP-RAC-ADQ-0-02/06/2014****************************************/
+

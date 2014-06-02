@@ -376,7 +376,8 @@ Phx.vista.RpcUo=Ext.extend(Phx.gridInterfaz,{
 		direction: 'ASC'
 	},
 	bdel:true,
-	bsave:true
+	bsave:true,
+	bedit:false
 	}
 )
 </script>

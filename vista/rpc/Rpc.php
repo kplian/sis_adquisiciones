@@ -239,6 +239,7 @@ Phx.vista.Rpc=Ext.extend(Phx.gridInterfaz,{
 		},
 		{
 			config:{
+			    
 				name: 'fecha_mod',
 				fieldLabel: 'Fecha Modif.',
 				allowBlank: true,
@@ -347,6 +348,7 @@ Phx.vista.Rpc=Ext.extend(Phx.gridInterfaz,{
             },
             {
                 xtype:'datefield',
+                disabled:true,
                 name: 'fecha_fin',
                 fieldLabel: 'Fecha Fin a copiar',
                 allowBlank: false,
@@ -355,6 +357,7 @@ Phx.vista.Rpc=Ext.extend(Phx.gridInterfaz,{
               },
             {
                 xtype:'datefield',
+                disabled:true,
                 name: 'new_fecha_ini',
                 fieldLabel: 'Nueva Fecha ini',
                 allowBlank: false,
@@ -364,6 +367,7 @@ Phx.vista.Rpc=Ext.extend(Phx.gridInterfaz,{
             },
             {
                 xtype:'datefield',
+                disabled:true,
                 name: 'new_fecha_fin',
                 fieldLabel: 'Nueva Fecha Fin',
                 allowBlank: false,
@@ -377,7 +381,52 @@ Phx.vista.Rpc=Ext.extend(Phx.gridInterfaz,{
          this.cmbCargo = this.formClon.getForm().findField('id_cargo');
          this.cmbCargo.store.on('exception', this.conexionFailure);
          
+         this.cmb_fecha_ini = this.formClon.getForm().findField('fecha_ini');
+         this.cmb_fecha_fin = this.formClon.getForm().findField('fecha_fin');
+         this.cmb_new_fecha_ini = this.formClon.getForm().findField('new_fecha_ini');
+         this.cmb_new_fecha_fin = this.formClon.getForm().findField('new_fecha_fin');
          
+         
+         
+          this.cmb_fecha_ini.on('change',function( cmp, newValue, oldValue){
+              this.cmb_fecha_fin.reset();
+              this.cmb_new_fecha_ini.reset();
+              this.cmb_new_fecha_fin.reset();
+              this.cmb_fecha_fin.enable();
+              
+              var myDate = new Date();
+              
+              myDate.setTime(newValue.getTime() + (1* 86400000));
+              
+              console.log(newValue.getTime() + (1* 86400000));
+              
+              console.log(myDate)
+              
+              this.cmb_fecha_fin.setMinValue(myDate);
+          },this);
+          
+           this.cmb_fecha_fin.on('change',function(cmp, newValue, oldValue){
+              this.cmb_new_fecha_ini.reset();
+              this.cmb_new_fecha_fin.reset();
+              this.cmb_new_fecha_ini.enable();
+              var myDate = new Date();
+              myDate.setTime(newValue.getTime() + (1* 86400000));
+              
+              this.cmb_new_fecha_ini.setMinValue(myDate);
+          },this);
+          
+          this.cmb_new_fecha_ini.on('change',function(cmp, newValue, oldValue){
+              this.cmb_new_fecha_fin.reset();
+              this.cmb_new_fecha_fin.enable();
+              var myDate = new Date();
+              myDate.setTime(newValue.getTime() + (1* 86400000));
+              this.cmb_new_fecha_fin.setMinValue(myDate);
+          },this);
+          
+          
+          //this.cmb_fecha_fin
+          //this.cmb_new_fecha_ini
+          //this.cmb_new_fecha_fin
          
          this.wClon = new Ext.Window({
             title: 'Clonar RPC',
@@ -418,18 +467,14 @@ Phx.vista.Rpc=Ext.extend(Phx.gridInterfaz,{
 	
 	onClonar:function(){
 	     var rec=this.sm.getSelected();
-	     if(rec&& this.formClon.getForm().isValid()){
+	     if(rec && this.formClon.getForm().isValid()){
 	         
 	        Phx.CP.loadingShow();
-            
-            
-            
             
             Ext.Ajax.request({
                 // form:this.form.getForm().getEl(),
                 url:'../../sis_adquisiciones/control/Rpc/clonarRpc',
                 params:{
-                    
                     'id_rpc':rec.data.id_rpc,
                     'id_cargo':this.formClon.getForm().findField('id_cargo').getValue(),
                     'fecha_ini':this.formClon.getForm().findField('fecha_ini').getValue().dateFormat('d/m/Y'),
@@ -460,11 +505,16 @@ Phx.vista.Rpc=Ext.extend(Phx.gridInterfaz,{
                 
                 alert('ocurrio un error durante el proceso')
             }
+          this.wClon.hide();  
             
           this.reload();
             
      },
-	
+	iniciarVentos:function(){
+	    
+	    
+	    
+	},
 	preparaMenu:function(n){
 	   var tb = Phx.vista.Rpc.superclass.preparaMenu.call(this,n);
 	   this.getBoton('clonar').enable();

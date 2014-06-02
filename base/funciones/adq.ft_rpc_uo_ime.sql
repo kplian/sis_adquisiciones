@@ -50,13 +50,13 @@ BEGIN
  	#AUTOR:		admin	
  	#FECHA:		29-05-2014 15:58:17
 	***********************************/
-
+/*
 	if(p_transaccion='ADQ_RUO_INS')then
 					
         begin
         
         
-              --insertamos los roles del usuario
+             --insertamos los roles del usuario
              v_id_uos= string_to_array(v_parametros.id_uos,',');
              v_tamano = coalesce(array_length(v_id_uos, 1),0);
           
@@ -187,6 +187,41 @@ BEGIN
             			
             			
                         )RETURNING id_rpc_uo into v_id_rpc_uo;
+            
+            
+            END LOOP;
+			
+			--Definicion de la respuesta
+			v_resp = pxp.f_agrega_clave(v_resp,'mensaje','RPC UO almacenado(a) con exito (id_rpc_uo'||v_id_rpc_uo||')'); 
+            v_resp = pxp.f_agrega_clave(v_resp,'id_rpc_uo',v_id_rpc_uo::varchar);
+
+            --Devuelve la respuesta
+            return v_resp;
+
+		end;*/
+
+/*********************************    
+ 	#TRANSACCION:  'ADQ_RUO_INS'
+ 	#DESCRIPCION:	Insercion de registros
+ 	#AUTOR:		admin	
+ 	#FECHA:		29-05-2014 15:58:17
+	***********************************/
+
+	if(p_transaccion='ADQ_RUO_INS')then
+					
+        begin
+        
+        
+             --insertamos los roles del usuario
+             v_id_uos= string_to_array(v_parametros.id_uos,',');
+             v_tamano = coalesce(array_length(v_id_uos, 1),0);
+          
+            FOR v_i IN 1..v_tamano LOOP
+         
+                
+                 v_parametros.id_uo = v_id_uos[v_i];
+                 v_id_rpc_uo =  adq.f_inserta_rpc_uo(p_administrador, p_id_usuario, hstore(v_parametros));
+               
             
             
             END LOOP;

@@ -2815,3 +2815,16 @@ ALTER TABLE adq.tsolicitud
 
 /***********************************F-DEP-RAC-ADQ-0-30/05/2014*****************************************/
 
+
+
+/***********************************I-DEP-RAC-ADQ-0-02/06/2014*****************************************/
+
+
+CREATE TRIGGER trpc_tr
+  AFTER INSERT OR UPDATE OR DELETE 
+  ON adq.trpc FOR EACH ROW 
+  EXECUTE PROCEDURE adq.f_trig_rpc();
+
+
+/***********************************F-DEP-RAC-ADQ-0-02/06/2014*****************************************/
+

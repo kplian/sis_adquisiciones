@@ -67,7 +67,9 @@ BEGIN
  -- crea tabla temporal
   
         --Creación de tabla temporal
-		v_consulta = 'create temp table tt_rpc_'||p_id_usuario||'(
+		v_consulta = '
+        DROP TABLE IF EXISTS tt_rpc_'||p_id_usuario||';
+        create temp table tt_rpc_'||p_id_usuario||'(
                  id_rpc   integer,
                  id_rpc_uo integer,
 			     id_funcionario integer,
@@ -79,7 +81,7 @@ BEGIN
                  id_cargo integer,
                  id_cargo_ai integer,
                  ai_habilitado varchar
-			)on commit drop';
+			)on commit drop;';
         
          execute(v_consulta);
  

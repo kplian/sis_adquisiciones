@@ -32,6 +32,10 @@ DECLARE
 	v_nombre_funcion        text;
 	v_mensaje_error         text;
 	v_id_rpc	integer;
+    v_registros          record;
+    v_registros_det      record;
+    v_id_rpc_uo 	integer;
+    v_count         integer;
 			    
 BEGIN
 
@@ -141,6 +145,8 @@ BEGIN
             return v_resp;
             
 		end;
+        
+        
 
 	/*********************************    
  	#TRANSACCION:  'ADQ_RPC_ELI'
@@ -152,7 +158,15 @@ BEGIN
 	elsif(p_transaccion='ADQ_RPC_ELI')then
 
 		begin
-			--Sentencia de la eliminacion
+			
+            if exists(select 1 from adq.trpc_uo ruo where ruo.id_rpc =v_parametros.id_rpc and ruo.estado_reg = 'activo') then
+            
+              raise exception 'tiene rangos activos, primero elimine todos los rangos asignados' ; 
+            
+            end if;
+            
+            
+            --Sentencia de la eliminacion
 			update adq.trpc set
             estado_reg = 'inactivo'
             where id_rpc=v_parametros.id_rpc;
@@ -165,6 +179,108 @@ BEGIN
             return v_resp;
 
 		end;
+        
+    /*********************************    
+ 	#TRANSACCION:  'ADQ_CLONRPC_IME'
+ 	#DESCRIPCION:	clona el rpc selecionado en sus registros marcados con la fecha inicial y fecha fin,
+                    hacia el id_cargo selecionado en las nueva fecha inicio y fecha fin
+ 	#AUTOR:		RAC	
+ 	#FECHA:		02-06-2014 15:57:51
+	***********************************/
+
+	elsif(p_transaccion='ADQ_CLONRPC_IME')then
+
+		begin
+			--inserta rpc con el cargo selecionado
+             -- chequea que el cargo  no este duplicado
+             
+           
+           select 
+             r.id_rpc
+           into 
+              v_id_rpc
+           from adq.trpc r   
+           where r.id_cargo = v_parametros.id_cargo 
+             and r.estado_reg = 'activo';  
+             
+          --si el cargo no existe como rpc creamos uno nuevo 
+          IF v_id_rpc is NULL THEN
+              --Sentencia de la insercion
+              insert into adq.trpc(
+                  id_cargo,
+                  estado_reg,
+                  ai_habilitado,
+                  id_usuario_reg,
+                  id_usuario_ai,
+                  usuario_ai,
+                  fecha_reg
+      			
+                  ) values(
+                  v_parametros.id_cargo,
+                  'activo',
+                  'no',
+                  p_id_usuario,
+                  v_parametros._id_usuario_ai,
+                  v_parametros._nombre_usuario_ai,
+                  now()
+  							
+              )RETURNING id_rpc into v_id_rpc;
+			
+            END IF;
+            
+            v_count = 0;
+            FOR v_registros in (
+                                 SELECT
+                                    ruo.fecha_ini,
+                                    ruo.monto_min,
+                                    ruo.monto_max,
+                                    ruo.id_uo,
+                                    ruo.id_categoria_compra
+            
+                                FROM adq.trpc_uo ruo
+                                WHERE ruo.fecha_ini = v_parametros.fecha_ini   
+                                and ruo.fecha_fin = v_parametros.fecha_fin 
+                                and ruo.id_rpc = v_parametros.id_rpc
+                                and ruo.estado_reg = 'activo'
+                       )LOOP
+            
+                
+                    select
+                        v_registros.monto_min as monto_min,
+                        v_registros.monto_max as monto_max,
+                        v_parametros.new_fecha_ini as fecha_ini,
+                        v_parametros.new_fecha_fin as fecha_fin,
+                        v_registros.id_uo as id_uo,
+                         v_registros.id_categoria_compra as id_categoria_compra,
+                        v_parametros._id_usuario_ai as _id_usuario_ai,
+                        v_parametros._nombre_usuario_ai as _nombre_usuario_ai,
+                        v_id_rpc as id_rpc
+                        
+                    
+                    into v_registros_det;
+                    
+                    
+            
+            
+                    v_id_rpc_uo =  adq.f_inserta_rpc_uo(p_administrador, p_id_usuario, hstore(v_registros_det));
+                
+                    v_count = v_count +1;
+            
+            
+            END LOOP;
+            
+            
+            
+               
+            --Definicion de la respuesta
+            v_resp = pxp.f_agrega_clave(v_resp,'mensaje',v_count::varchar||' rango(s) insertado'); 
+            v_resp = pxp.f_agrega_clave(v_resp,'id_rpc',v_parametros.id_rpc::varchar);
+              
+            --Devuelve la respuesta
+            return v_resp;
+
+		end;    
+        
          
 	else
      
