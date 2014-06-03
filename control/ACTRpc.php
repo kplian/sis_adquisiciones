@@ -45,6 +45,12 @@ class ACTRpc extends ACTbase{
         $this->res=$this->objFunc->clonarRpc($this->objParam);
         $this->res->imprimirRespuesta($this->res->generarJson());
     }
+    
+    function changeRpc(){
+        $this->objFunc=$this->create('MODRpc'); 
+        $this->res=$this->objFunc->changeRpc($this->objParam);
+        $this->res->imprimirRespuesta($this->res->generarJson());
+    }
 	
 	
 			

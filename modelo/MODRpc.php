@@ -124,6 +124,24 @@ class MODRpc extends MODbase{
         return $this->respuesta;
     }
     
+    function changeRpc(){
+        //Definicion de variables para ejecucion del procedimiento
+        $this->procedimiento='adq.ft_rpc_ime';
+        $this->transaccion='ADQ_CHARPC_IME';
+        $this->tipo_procedimiento='IME';
+                
+        //Define los parametros para la funcion
+        $this->setParametro('id_solicitud','id_solicitud','int4');
+        
+
+        //Ejecuta la instruccion
+        $this->armarConsulta();
+        $this->ejecutarConsulta();
+
+        //Devuelve la respuesta
+        return $this->respuesta;
+    }
+    
     
 	
 			

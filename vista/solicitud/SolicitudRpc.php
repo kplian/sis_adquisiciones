@@ -75,7 +75,7 @@ Phx.vista.SolicitudRpc = {
         this.historico = 'no';
         
         Phx.vista.SolicitudRpc.superclass.constructor.call(this,config);
-    	this.addButton('change_rpc',{  argument: {estado: 'inicio'},text:'Cabiar RPC',iconCls: 'blist',disabled:true,handler:this.antEstado,tooltip: '<b>Cabiar RPC</b>'});
+    	this.addButton('change_rpc',{  argument: {estado: 'inicio'},text:'Cabiar RPC',iconCls: 'blist',disabled:true,handler:this.changeRpc,tooltip: '<b>Cabiar RPC</b>'});
         
         
         //si la interface es pestanha este código es para iniciar 
@@ -127,7 +127,47 @@ Phx.vista.SolicitudRpc = {
               };
         
         this.load({params:{start:0, limit:50}})
-   },      
+   },  
+   
+   changeRpc:function(){
+         var rec=this.sm.getSelected();
+         if(rec){
+             
+            Phx.CP.loadingShow();
+            
+            Ext.Ajax.request({
+                // form:this.form.getForm().getEl(),
+                url:'../../sis_adquisiciones/control/Rpc/changeRpc',
+                params:{
+                    'id_solicitud':rec.data.id_solicitud
+                  },
+                success:this.successSinc,
+                failure: this.conexionFailure,
+                timeout:this.timeout,
+                scope:this
+            });
+             
+             
+             
+         }
+        
+    },
+    
+    successSinc:function(resp){
+            
+            Phx.CP.loadingHide();
+            var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
+            if(!reg.ROOT.error){
+                alert(reg.ROOT.detalle.mensaje)
+                
+            }else{
+                
+                alert('ocurrio un error durante el proceso')
+            }
+         
+          this.reload();
+            
+     },    
        
 	
 	
