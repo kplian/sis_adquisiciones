@@ -18,7 +18,9 @@ Phx.vista.SolicitudReq = {
 	constructor: function(config) {
     		Phx.vista.SolicitudReq.superclass.constructor.call(this,config);
     		this.addButton('fin_requerimiento',{text:'Finalizar',iconCls: 'badelante',disabled:true,handler:this.fin_requerimiento,tooltip: '<b>Finalizar</b>'});
-            
+            this.addButton('btnSolpre',{text:'Sol Pre.',iconCls: 'bemail',disabled:true,handler:this.onSolModPresupuesto,tooltip: '<b>Solicitar Presuuesto</b><p>Emite un correo para solicitar traspaso presupuestario</p>'});
+       
+        
             this.iniciarEventos();
             
             //agrega ventana para selecion de RPC
@@ -369,12 +371,22 @@ Phx.vista.SolicitudReq = {
               
               
           }
+        
+        if(data.estado =='borrador' || data.estado =='pendiente' ||data.estado =='vbgerencia'){ 
+          this.getBoton('btnSolpre').enable(); 
+        }
+        else{
+           this.getBoton('btnSolpre').disable();     
+        }
+          
+          
         return tb 
      }, 
      liberaMenu:function(){
         var tb = Phx.vista.SolicitudReq.superclass.liberaMenu.call(this);
         if(tb){
             this.getBoton('fin_requerimiento').disable();
+            this.getBoton('btnSolpre').disable(); 
            
         }
         

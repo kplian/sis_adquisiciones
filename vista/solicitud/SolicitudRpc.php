@@ -25,6 +25,32 @@ Phx.vista.SolicitudRpc = {
 	    
 	    this.maestro=config.maestro;
 	    
+	    this.Atributos.unshift({
+            config:{
+                name: 'ai_habilitado',
+                fieldLabel: 'Sup.',
+                allowBlank: true,
+                anchor: '80%',
+                gwidth: 50,
+                renderer:function (value,p,record){
+                    if(value=='no'){
+                        return String.format('<font color="green">{0}</font>', value);
+                    }
+                    else{
+                        return String.format('<font color="red">{0}</font>', value);
+                    }
+                    
+                },
+                maxLength:2
+            },
+            type:'Field',
+            filters:{pfiltro:'sol.ai_habilitado',type:'string'},
+            id_grupo:1,
+            grid:true,
+            form:false
+        });
+	    
+	    
 	    this.Atributos[this.getIndAtributo('id_funcionario')].form=false;
         this.Atributos[this.getIndAtributo('id_funcionario_aprobador')].form=false;
         this.Atributos[this.getIndAtributo('id_moneda')].form=false;
@@ -49,7 +75,7 @@ Phx.vista.SolicitudRpc = {
         this.historico = 'no';
         
         Phx.vista.SolicitudRpc.superclass.constructor.call(this,config);
-    	this.addButton('ini_estado',{  argument: {estado: 'inicio'},text:'Dev. a Borrador',iconCls: 'batras',disabled:true,handler:this.antEstado,tooltip: '<b>Cabiar RPC</b>'});
+    	this.addButton('change_rpc',{  argument: {estado: 'inicio'},text:'Cabiar RPC',iconCls: 'blist',disabled:true,handler:this.antEstado,tooltip: '<b>Cabiar RPC</b>'});
         
         
         //si la interface es pestanha este código es para iniciar 
@@ -71,13 +97,23 @@ Phx.vista.SolicitudRpc = {
   preparaMenu:function(n){
       var data = this.getSelectedData();
       var tb =this.tbar;
-      Phx.vista.SolicitudRpc.superclass.preparaMenu.call(this,n);  
+      Phx.vista.SolicitudRpc.superclass.preparaMenu.call(this,n); 
+       if(data.estado !='finalizado' || data.estado !='cancelado' ||data.estado !='anulado'){ 
+          this.getBoton('change_rpc').enable(); 
+       }
+        else{
+           this.getBoton('change_rpc').disable();     
+       }
+          
+       
        
       return tb 
   }, 
    liberaMenu:function(){
         var tb = Phx.vista.SolicitudRpc.superclass.liberaMenu.call(this);
-        
+        if(tb){
+             this.getBoton('change_rpc').disable(); 
+        }
         return tb
   },
   

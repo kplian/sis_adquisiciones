@@ -2828,3 +2828,15 @@ CREATE TRIGGER trpc_tr
 
 /***********************************F-DEP-RAC-ADQ-0-02/06/2014*****************************************/
 
+
+/***********************************I-DEP-RAC-ADQ-0-03/06/2014*****************************************/
+  
+  CREATE TRIGGER trpc_uo_tr
+  AFTER INSERT OR UPDATE OR DELETE 
+  ON adq.trpc_uo FOR EACH ROW 
+  EXECUTE PROCEDURE adq.f_trig_rpc_uo();
+
+
+/***********************************F-DEP-RAC-ADQ-0-03/06/2014*****************************************/
+
+

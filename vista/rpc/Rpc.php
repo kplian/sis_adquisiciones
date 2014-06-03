@@ -284,11 +284,17 @@ Phx.vista.Rpc=Ext.extend(Phx.gridInterfaz,{
           height:'50%',
           cls:'RpcUo'
         },
-          {
+         {
            url:'../../../sis_adquisiciones/vista/solicitud/SolicitudRpc.php',
            title:'Solicitudes en proceso del RPC', 
            height:'50%',
            cls:'SolicitudRpc'
+         },
+         {
+           url:'../../../sis_adquisiciones/vista/rpc_uo_log/RpcUoLog.php',
+           title:'LOG', 
+           height:'50%',
+           cls:'RpcUoLog'
          }
     
        ],

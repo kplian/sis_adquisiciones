@@ -41,8 +41,6 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
         
         
         
-        this.addButton('btnSolpre',{text:'Sol Pre.',iconCls: 'bemail',disabled:true,handler:this.onSolModPresupuesto,tooltip: '<b>Solicitar Presuuesto</b><p>Emite un correo para solicitar traspaso presupuestario</p>'});
-       
         
         
        function diagramGantt(){			
@@ -612,7 +610,8 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
 		'id_proveedor',
 		'ai_habilitado',
 		'id_cargo_rpc',
-		'id_cargo_rpc_ai'
+		'id_cargo_rpc_ai',
+		'ai_habilitado'
 		
 	],
 	
@@ -645,12 +644,7 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
         this.getBoton('btnReporte').setDisabled(false); 
         this.getBoton('diagrama_gantt').enable();
         
-        if(data.estado =='borrador' || data.estado =='pendiente' ||data.estado =='vbgerencia'){ 
-          this.getBoton('btnSolpre').enable(); 
-        }
-        else{
-           this.getBoton('btnSolpre').disable();     
-        }
+        
         
         return tb 
      }, 
@@ -662,7 +656,7 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
             //this.getBoton('btnChequeoDocumentos').setDisabled(true);
             this.getBoton('btnChequeoDocumentosWf').setDisabled(true);
             this.getBoton('diagrama_gantt').disable();  
-            this.getBoton('btnSolpre').disable();   
+              
                     
         }
        return tb
