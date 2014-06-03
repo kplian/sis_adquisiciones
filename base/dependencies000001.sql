@@ -2715,14 +2715,6 @@ ALTER TABLE adq.trpc
     NOT DEFERRABLE;
     
     
---------------- SQL ---------------
-
-ALTER TABLE adq.trpc
-  ADD CONSTRAINT trpc_id_cargo_ai_fk FOREIGN KEY (id_cargo_ai)
-    REFERENCES orga.tcargo(id_cargo)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION
-    NOT DEFERRABLE;
     
 
 --------------- SQL ---------------
