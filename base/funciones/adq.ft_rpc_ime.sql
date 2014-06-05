@@ -34,8 +34,12 @@ DECLARE
 	v_id_rpc	integer;
     v_registros          record;
     v_registros_det      record;
+    v_registros_sol      record;
     v_id_rpc_uo 	integer;
     v_count         integer;
+    v_total_soli    numeric;
+    v_cont integer;
+    v_mensaje_resp  varchar;
 			    
 BEGIN
 
@@ -179,6 +183,127 @@ BEGIN
             return v_resp;
 
 		end;
+        
+    
+    
+    /*********************************    
+ 	#TRANSACCION:  'ADQ_CHARPC_IME'
+ 	#DESCRIPCION:	Cambia el RPC segun configuracion 
+ 	#AUTOR:		rac	
+ 	#FECHA:		03-06-2014 15:57:51
+	***********************************/
+
+	elsif(p_transaccion='ADQ_CHARPC_IME')then
+
+		begin
+			
+             select
+               sol.id_solicitud,
+               sol.id_funcionario_rpc,
+               sol.id_cargo_rpc,
+               sol.id_cargo_rpc_ai,
+               sol.ai_habilitado,
+               sol.id_uo,
+               sol.id_categoria_compra,
+               sol.fecha_soli
+              
+             INTO
+               v_registros_sol
+             from adq.tsolicitud sol
+             where sol.id_solicitud = v_parametros.id_solicitud;
+             
+             
+             select 
+                  sum( COALESCE( sd.precio_ga_mb,0)  + COALESCE(sd.precio_sg_mb,0)) 
+                  into  
+                  v_total_soli
+                  from adq.tsolicitud_det sd
+                  where sd.id_solicitud = v_parametros.id_solicitud
+                  and sd.estado_reg = 'activo';
+             
+             
+             v_cont = 0;
+             
+             
+             FOR v_registros in (
+                            SELECT 
+                                  DISTINCT (id_funcionario),
+                                  id_rpc,
+                                  id_rpc_uo,
+                                  desc_funcionario,
+                                  fecha_ini,
+                                  fecha_fin,
+                                  monto_min,
+                                  monto_max,
+                                  id_cargo,
+                                  id_cargo_ai,
+                                  ai_habilitado 
+                                  
+                            FROM adq.f_obtener_listado_rpc(
+                                  p_id_usuario,
+                                  v_registros_sol.id_uo, --id_uo
+                                  v_registros_sol.fecha_soli, 
+                                  v_total_soli,
+                                  v_registros_sol.id_categoria_compra)
+                                  AS ( id_rpc   integer,
+                                       id_rpc_uo integer,
+                                       id_funcionario integer,
+                                       desc_funcionario text,
+                                       fecha_ini date,
+                                       fecha_fin date,
+                                       monto_min numeric,
+                                       monto_max numeric,
+                                       id_cargo integer,
+                                       id_cargo_ai integer,
+                                       ai_habilitado varchar)
+                                  )LOOP     
+                                  
+                     
+                       v_cont = v_cont +1;
+                      v_mensaje_resp = v_mensaje_resp||' - '||v_registros.desc_funcionario||' <br>';
+                   
+                    END LOOP;
+                  
+                  
+                  -- si existe mas de un posible aprobador lanzamos un error
+                  IF v_cont > 1 THEN
+                  
+                      raise exception 'Existe mas de un aprobador para el monto (%), revice la configuracion para los funcionarios: <br> %',v_total_soli,v_mensaje_resp;
+                  
+                  ELSIF   v_cont = 0  THEN
+                   
+                    raise exception 'no se encontro ningun RPC par ael monto %',v_total_soli;
+                  
+                  ELSIF v_cont = 1 THEN
+                    --actualiza 
+                     -- actualiza el nuevo rpc
+          
+                     update adq.tsolicitud  set 
+                       id_funcionario_rpc= v_registros.id_funcionario,
+                       id_cargo_rpc= v_registros.id_cargo,
+                       id_cargo_rpc_ai= v_registros.id_cargo_ai,
+                       ai_habilitado= v_registros.ai_habilitado,
+                       id_usuario_mod=p_id_usuario,
+                       fecha_mod=now(),
+                       id_usuario_ai= v_parametros._id_usuario_ai,
+                       usuario_ai = v_parametros._nombre_usuario_ai
+                      where id_solicitud = v_parametros.id_solicitud;
+                  
+                  --TODO segun el estado de la solicitud, si el RPC tiene un estado activo, cambiar el estado
+                  
+                  --TODO segun el estado de la cotizacion, si el RPC tiene un estado activo, cambiar el estado
+                  else
+                    raise exception 'no reconocido';
+                  
+                  END IF;
+            
+        
+            --Devuelve la respuesta
+            return v_resp;
+
+		end;    
+       
+        
         
     /*********************************    
  	#TRANSACCION:  'ADQ_CLONRPC_IME'

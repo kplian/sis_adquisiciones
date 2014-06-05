@@ -125,6 +125,7 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
 	       		id_grupo:0,
 	       		filters:{	
 	       		         type: 'list',
+	       		          pfiltro:'sol.tipo',
 	       				 options: ['Bien','Servicio','Bien - Servicio'],	
 	       		 	},
 	       		grid:true,
