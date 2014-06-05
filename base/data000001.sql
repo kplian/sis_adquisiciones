@@ -725,3 +725,74 @@ select pxp.f_insert_trol ('Para el Encargado de habilitar los preingreso y envia
 
 
 /***********************************F-DAT-JRR-ADQ-0-24/04/2014*****************************************/
+
+
+
+
+
+/***********************************I-DAT-RAC-ADQ-0-05/06/2014*****************************************/
+
+
+---------------------------------
+--COPY LINES TO data.sql FILE  
+---------------------------------
+
+select pxp.f_insert_tgui ('RPC', 'Configuracion de RPC', 'RPCI', 'si', 3, 'sis_adquisiciones/vista/rpc/Rpc.php', 3, '', 'Rpc', 'ADQ');
+select pxp.f_insert_tgui ('Estado de Wf', 'Estado de Wf', 'PROC.4.4', 'no', 0, 'sis_workflow/vista/estado_wf/FormEstadoWf.php', 4, '', 'FormEstadoWf', 'ADQ');
+select pxp.f_insert_tgui ('Estado de Wf', 'Estado de Wf', 'OBPAGOA.2.4', 'no', 0, 'sis_workflow/vista/estado_wf/AntFormEstadoWf.php', 4, '', 'AntFormEstadoWf', 'ADQ');
+select pxp.f_insert_tgui ('Estado de Wf', 'Estado de Wf', 'OBPAGOA.2.5', 'no', 0, 'sis_workflow/vista/estado_wf/FormEstadoWf.php', 4, '', '../../sis_tesoreria/control/PlanPago/siguienteEstadoPlanPago', 'ADQ');
+select pxp.f_insert_tgui ('Estado de Wf', 'Estado de Wf', 'OBPAGOA.4.4', 'no', 0, 'sis_workflow/vista/estado_wf/AntFormEstadoWf.php', 4, '', 'AntFormEstadoWf', 'ADQ');
+select pxp.f_insert_tgui ('Estado de Wf', 'Estado de Wf', 'OBPAGOA.4.5', 'no', 0, 'sis_workflow/vista/estado_wf/FormEstadoWf.php', 4, '', '../../sis_tesoreria/control/PlanPago/siguienteEstadoPlanPago', 'ADQ');
+select pxp.f_insert_tgui ('Detalle', 'Detalle', 'RPCI.1', 'no', 0, 'sis_adquisiciones/vista/rpc_uo/RpcUo.php', 4, '', '50%', 'ADQ');
+select pxp.f_insert_tgui ('Solicitudes en proceso del RPC', 'Solicitudes en proceso del RPC', 'RPCI.2', 'no', 0, 'sis_adquisiciones/vista/solicitud/SolicitudRpc.php', 4, '', '50%', 'ADQ');
+select pxp.f_insert_tgui ('LOG', 'LOG', 'RPCI.3', 'no', 0, 'sis_adquisiciones/vista/rpc_uo_log/RpcUoLog.php', 4, '', '50%', 'ADQ');
+select pxp.f_insert_tgui ('Chequear documento del WF', 'Chequear documento del WF', 'RPCI.2.1', 'no', 0, 'sis_workflow/vista/documento_wf/DocumentoWf.php', 5, '', '90%', 'ADQ');
+select pxp.f_insert_tgui ('Solicitar Traspaso presupuestario', 'Solicitar Traspaso presupuestario', 'RPCI.2.2', 'no', 0, 'sis_adquisiciones/vista/solicitud/SolModPresupuesto.php', 5, '', 'SolModPresupuesto', 'ADQ');
+select pxp.f_insert_tgui ('Proveedor', 'Proveedor', 'RPCI.2.3', 'no', 0, 'sis_parametros/vista/proveedor/Proveedor.php', 5, '', 'proveedor', 'ADQ');
+select pxp.f_insert_tgui ('Subir Archivo', 'Subir Archivo', 'RPCI.2.1.1', 'no', 0, 'sis_workflow/vista/documento_wf/SubirArchivoWf.php', 6, '', 'SubirArchivoWf', 'ADQ');
+select pxp.f_insert_tgui ('Estados por momento', 'Estados por momento', 'RPCI.2.1.2', 'no', 0, 'sis_workflow/vista/tipo_documento_estado/TipoDocumentoEstadoWF.php', 6, '', 'TipoDocumentoEstadoWF', 'ADQ');
+select pxp.f_insert_tgui ('Items/Servicios ofertados', 'Items/Servicios ofertados', 'RPCI.2.3.1', 'no', 0, 'sis_parametros/vista/proveedor_item_servicio/ProveedorItemServicio.php', 6, '', '50%', 'ADQ');
+select pxp.f_insert_tgui ('Personas', 'Personas', 'RPCI.2.3.2', 'no', 0, 'sis_seguridad/vista/persona/Persona.php', 6, '', 'persona', 'ADQ');
+select pxp.f_insert_tgui ('Instituciones', 'Instituciones', 'RPCI.2.3.3', 'no', 0, 'sis_parametros/vista/institucion/Institucion.php', 6, '', 'Institucion', 'ADQ');
+select pxp.f_insert_tgui ('Subir foto', 'Subir foto', 'RPCI.2.3.2.1', 'no', 0, 'sis_seguridad/vista/persona/subirFotoPersona.php', 7, '', 'subirFotoPersona', 'ADQ');
+select pxp.f_insert_tgui ('Personas', 'Personas', 'RPCI.2.3.3.1', 'no', 0, 'sis_seguridad/vista/persona/Persona.php', 7, '', 'persona', 'ADQ');
+select pxp.f_insert_tgui ('Subir foto', 'Subir foto', 'RPCI.2.3.3.1.1', 'no', 0, 'sis_seguridad/vista/persona/subirFotoPersona.php', 8, '', 'subirFotoPersona', 'ADQ');
+select pxp.f_insert_tfuncion ('adq.f_validar_preingreso_activo_fijo', 'Funcion para tabla     ', 'ADQ');
+select pxp.f_insert_tfuncion ('adq.f_lista_depto_tesoreria_wf_sel', 'Funcion para tabla     ', 'ADQ');
+select pxp.f_insert_tfuncion ('adq.f_genera_preingreso_af_al', 'Funcion para tabla     ', 'ADQ');
+select pxp.f_insert_tfuncion ('adq.f_validar_preingreso_almacen', 'Funcion para tabla     ', 'ADQ');
+select pxp.f_insert_tfuncion ('adq.f_get_desc_cotizaciones', 'Funcion para tabla     ', 'ADQ');
+select pxp.f_insert_tfuncion ('adq.f_inserta_rpc_uo', 'Funcion para tabla     ', 'ADQ');
+select pxp.f_insert_tfuncion ('adq.f_obtener_listado_rpc', 'Funcion para tabla     ', 'ADQ');
+select pxp.f_insert_tfuncion ('adq.f_trig_rpc', 'Funcion para tabla     ', 'ADQ');
+select pxp.f_insert_tfuncion ('adq.f_trig_rpc_uo', 'Funcion para tabla     ', 'ADQ');
+select pxp.f_insert_tfuncion ('adq.ft_rpc_ime', 'Funcion para tabla     ', 'ADQ');
+select pxp.f_insert_tfuncion ('adq.ft_rpc_sel', 'Funcion para tabla     ', 'ADQ');
+select pxp.f_insert_tfuncion ('adq.ft_rpc_uo_ime', 'Funcion para tabla     ', 'ADQ');
+select pxp.f_insert_tfuncion ('adq.ft_rpc_uo_log_sel', 'Funcion para tabla     ', 'ADQ');
+select pxp.f_insert_tfuncion ('adq.ft_rpc_uo_sel', 'Funcion para tabla     ', 'ADQ');
+select pxp.f_insert_tprocedimiento ('ADQ_SIGECOT_IME', 'funcion que controla el cambio al Siguiente esado de la cotizacion, integrado con el WF', 'si', '', '', 'adq.f_cotizacion_ime');
+select pxp.f_insert_tprocedimiento ('ADQ_RPC_INS', 'Insercion de registros de rpc', 'si', '', '', 'adq.ft_rpc_ime');
+select pxp.f_insert_tprocedimiento ('ADQ_RPC_MOD', 'Modificacion de registros', 'si', '', '', 'adq.ft_rpc_ime');
+select pxp.f_insert_tprocedimiento ('ADQ_RPC_ELI', 'Eliminacion de registros', 'si', '', '', 'adq.ft_rpc_ime');
+select pxp.f_insert_tprocedimiento ('ADQ_CHARPC_IME', 'Cambia el RPC segun configuracion', 'si', '', '', 'adq.ft_rpc_ime');
+select pxp.f_insert_tprocedimiento ('ADQ_CLONRPC_IME', 'clona el rpc selecionado en sus registros marcados con la fecha inicial y fecha fin,
+                    hacia el id_cargo selecionado en las nueva fecha inicio y fecha fin', 'si', '', '', 'adq.ft_rpc_ime');
+select pxp.f_insert_tprocedimiento ('ADQ_RPC_SEL', 'Consulta de datos', 'si', '', '', 'adq.ft_rpc_sel');
+select pxp.f_insert_tprocedimiento ('ADQ_RPC_CONT', 'Conteo de registros', 'si', '', '', 'adq.ft_rpc_sel');
+select pxp.f_insert_tprocedimiento ('ADQ_RUO_INS', 'Insercion de registros', 'si', '', '', 'adq.ft_rpc_uo_ime');
+select pxp.f_insert_tprocedimiento ('ADQ_RUO_MOD', 'Modificacion de registros', 'si', '', '', 'adq.ft_rpc_uo_ime');
+select pxp.f_insert_tprocedimiento ('ADQ_RUO_ELI', 'Eliminacion de registros', 'si', '', '', 'adq.ft_rpc_uo_ime');
+select pxp.f_insert_tprocedimiento ('ADQ_RPCL_SEL', 'Consulta de datos', 'si', '', '', 'adq.ft_rpc_uo_log_sel');
+select pxp.f_insert_tprocedimiento ('ADQ_RPCL_CONT', 'Conteo de registros', 'si', '', '', 'adq.ft_rpc_uo_log_sel');
+select pxp.f_insert_tprocedimiento ('ADQ_RUO_SEL', 'Consulta de datos', 'si', '', '', 'adq.ft_rpc_uo_sel');
+select pxp.f_insert_tprocedimiento ('ADQ_RUO_CONT', 'Conteo de registros', 'si', '', '', 'adq.ft_rpc_uo_sel');
+
+
+/***********************************F-DAT-RAC-ADQ-0-05/06/2014*****************************************/
+
+
+
+
+
+

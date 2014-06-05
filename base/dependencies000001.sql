@@ -2831,4 +2831,229 @@ CREATE TRIGGER trpc_tr
 
 /***********************************F-DEP-RAC-ADQ-0-03/06/2014*****************************************/
 
+/***********************************I-DEP-RAC-ADQ-0-05/06/2014*****************************************/
+ 
 
+select pxp.f_delete_trol ('ADQ - Visto Bueno DEV/PAG');
+select pxp.f_delete_trol ('OP - VoBo Plan de PAgos');
+select pxp.f_insert_testructura_gui ('RPCI', 'ADQ.1');
+select pxp.f_insert_testructura_gui ('PROC.4.4', 'PROC.4');
+select pxp.f_insert_testructura_gui ('OBPAGOA.2.4', 'OBPAGOA.2');
+select pxp.f_insert_testructura_gui ('OBPAGOA.2.5', 'OBPAGOA.2');
+select pxp.f_insert_testructura_gui ('OBPAGOA.4.4', 'OBPAGOA.4');
+select pxp.f_insert_testructura_gui ('OBPAGOA.4.5', 'OBPAGOA.4');
+select pxp.f_insert_testructura_gui ('RPCI.1', 'RPCI');
+select pxp.f_insert_testructura_gui ('RPCI.2', 'RPCI');
+select pxp.f_insert_testructura_gui ('RPCI.3', 'RPCI');
+select pxp.f_insert_testructura_gui ('RPCI.2.1', 'RPCI.2');
+select pxp.f_insert_testructura_gui ('RPCI.2.2', 'RPCI.2');
+select pxp.f_insert_testructura_gui ('RPCI.2.3', 'RPCI.2');
+select pxp.f_insert_testructura_gui ('RPCI.2.1.1', 'RPCI.2.1');
+select pxp.f_insert_testructura_gui ('RPCI.2.1.2', 'RPCI.2.1');
+select pxp.f_insert_testructura_gui ('RPCI.2.3.1', 'RPCI.2.3');
+select pxp.f_insert_testructura_gui ('RPCI.2.3.2', 'RPCI.2.3');
+select pxp.f_insert_testructura_gui ('RPCI.2.3.3', 'RPCI.2.3');
+select pxp.f_insert_testructura_gui ('RPCI.2.3.2.1', 'RPCI.2.3.2');
+select pxp.f_insert_testructura_gui ('RPCI.2.3.3.1', 'RPCI.2.3.3');
+select pxp.f_insert_testructura_gui ('RPCI.2.3.3.1.1', 'RPCI.2.3.3.1');
+select pxp.f_insert_tprocedimiento_gui ('WF_DOCWFAR_MOD', 'PROC.4.4', 'no');
+select pxp.f_insert_tprocedimiento_gui ('WF_VERSIGPRO_IME', 'PROC.4.4', 'no');
+select pxp.f_insert_tprocedimiento_gui ('WF_CHKSTA_IME', 'PROC.4.4', 'no');
+select pxp.f_insert_tprocedimiento_gui ('WF_TIPES_SEL', 'PROC.4.4', 'no');
+select pxp.f_insert_tprocedimiento_gui ('WF_FUNTIPES_SEL', 'PROC.4.4', 'no');
+select pxp.f_insert_tprocedimiento_gui ('WF_DEPTIPES_SEL', 'PROC.4.4', 'no');
+select pxp.f_insert_tprocedimiento_gui ('MIG_CBANESIS_SEL', 'OBPAGOA.2', 'no');
+select pxp.f_insert_tprocedimiento_gui ('WF_DOCWFAR_MOD', 'OBPAGOA.2.4', 'no');
+select pxp.f_insert_tprocedimiento_gui ('WF_DOCWFAR_MOD', 'OBPAGOA.2.5', 'no');
+select pxp.f_insert_tprocedimiento_gui ('WF_VERSIGPRO_IME', 'OBPAGOA.2.5', 'no');
+select pxp.f_insert_tprocedimiento_gui ('WF_CHKSTA_IME', 'OBPAGOA.2.5', 'no');
+select pxp.f_insert_tprocedimiento_gui ('WF_TIPES_SEL', 'OBPAGOA.2.5', 'no');
+select pxp.f_insert_tprocedimiento_gui ('WF_FUNTIPES_SEL', 'OBPAGOA.2.5', 'no');
+select pxp.f_insert_tprocedimiento_gui ('WF_DEPTIPES_SEL', 'OBPAGOA.2.5', 'no');
+select pxp.f_insert_tprocedimiento_gui ('MIG_CBANESIS_SEL', 'OBPAGOA.4', 'no');
+select pxp.f_insert_tprocedimiento_gui ('WF_DOCWFAR_MOD', 'OBPAGOA.4.4', 'no');
+select pxp.f_insert_tprocedimiento_gui ('WF_DOCWFAR_MOD', 'OBPAGOA.4.5', 'no');
+select pxp.f_insert_tprocedimiento_gui ('WF_VERSIGPRO_IME', 'OBPAGOA.4.5', 'no');
+select pxp.f_insert_tprocedimiento_gui ('WF_CHKSTA_IME', 'OBPAGOA.4.5', 'no');
+select pxp.f_insert_tprocedimiento_gui ('WF_TIPES_SEL', 'OBPAGOA.4.5', 'no');
+select pxp.f_insert_tprocedimiento_gui ('WF_FUNTIPES_SEL', 'OBPAGOA.4.5', 'no');
+select pxp.f_insert_tprocedimiento_gui ('WF_DEPTIPES_SEL', 'OBPAGOA.4.5', 'no');
+select pxp.f_insert_tprocedimiento_gui ('OR_CARGO_SEL', 'RPCI', 'no');
+select pxp.f_insert_tprocedimiento_gui ('ADQ_RPC_INS', 'RPCI', 'no');
+select pxp.f_insert_tprocedimiento_gui ('ADQ_RPC_MOD', 'RPCI', 'no');
+select pxp.f_insert_tprocedimiento_gui ('ADQ_RPC_ELI', 'RPCI', 'no');
+select pxp.f_insert_tprocedimiento_gui ('ADQ_RPC_SEL', 'RPCI', 'no');
+select pxp.f_insert_tprocedimiento_gui ('ADQ_CLONRPC_IME', 'RPCI', 'no');
+select pxp.f_insert_tprocedimiento_gui ('ADQ_CATCOMP_SEL', 'RPCI.1', 'no');
+select pxp.f_insert_tprocedimiento_gui ('RH_UO_SEL', 'RPCI.1', 'no');
+select pxp.f_insert_tprocedimiento_gui ('RH_INIUOARB_SEL', 'RPCI.1', 'no');
+select pxp.f_insert_tprocedimiento_gui ('ADQ_RUO_INS', 'RPCI.1', 'no');
+select pxp.f_insert_tprocedimiento_gui ('ADQ_RUO_MOD', 'RPCI.1', 'no');
+select pxp.f_insert_tprocedimiento_gui ('ADQ_RUO_ELI', 'RPCI.1', 'no');
+select pxp.f_insert_tprocedimiento_gui ('ADQ_RUO_SEL', 'RPCI.1', 'no');
+select pxp.f_insert_tprocedimiento_gui ('ADQ_CHARPC_IME', 'RPCI.2', 'no');
+select pxp.f_insert_tprocedimiento_gui ('WF_GATNREP_SEL', 'RPCI.2', 'no');
+select pxp.f_insert_tprocedimiento_gui ('PM_DEPFILUSU_SEL', 'RPCI.2', 'no');
+select pxp.f_insert_tprocedimiento_gui ('ADQ_CATCOMP_SEL', 'RPCI.2', 'no');
+select pxp.f_insert_tprocedimiento_gui ('ADQ_SOL_INS', 'RPCI.2', 'no');
+select pxp.f_insert_tprocedimiento_gui ('ADQ_SOL_MOD', 'RPCI.2', 'no');
+select pxp.f_insert_tprocedimiento_gui ('ADQ_SOL_ELI', 'RPCI.2', 'no');
+select pxp.f_insert_tprocedimiento_gui ('ADQ_SOL_SEL', 'RPCI.2', 'no');
+select pxp.f_insert_tprocedimiento_gui ('ADQ_SOLREP_SEL', 'RPCI.2', 'no');
+select pxp.f_insert_tprocedimiento_gui ('ADQ_SOLD_SEL', 'RPCI.2', 'no');
+select pxp.f_insert_tprocedimiento_gui ('ADQ_SOLDETCOT_SEL', 'RPCI.2', 'no');
+select pxp.f_insert_tprocedimiento_gui ('PRE_VERPRE_IME', 'RPCI.2', 'no');
+select pxp.f_insert_tprocedimiento_gui ('PM_MONEDA_SEL', 'RPCI.2', 'no');
+select pxp.f_insert_tprocedimiento_gui ('PM_DEPUSUCOMB_SEL', 'RPCI.2', 'no');
+select pxp.f_insert_tprocedimiento_gui ('RH_FUNCIOCAR_SEL', 'RPCI.2', 'no');
+select pxp.f_insert_tprocedimiento_gui ('RH_UO_SEL', 'RPCI.2', 'no');
+select pxp.f_insert_tprocedimiento_gui ('RH_INIUOARB_SEL', 'RPCI.2', 'no');
+select pxp.f_insert_tprocedimiento_gui ('PM_PROVEEV_SEL', 'RPCI.2', 'no');
+select pxp.f_insert_tprocedimiento_gui ('WF_DWF_MOD', 'RPCI.2.1', 'no');
+select pxp.f_insert_tprocedimiento_gui ('WF_DWF_ELI', 'RPCI.2.1', 'no');
+select pxp.f_insert_tprocedimiento_gui ('WF_DWF_SEL', 'RPCI.2.1', 'no');
+select pxp.f_insert_tprocedimiento_gui ('WF_CABMOM_IME', 'RPCI.2.1', 'no');
+select pxp.f_insert_tprocedimiento_gui ('WF_DOCWFAR_MOD', 'RPCI.2.1.1', 'no');
+select pxp.f_insert_tprocedimiento_gui ('WF_TIPPROC_SEL', 'RPCI.2.1.2', 'no');
+select pxp.f_insert_tprocedimiento_gui ('WF_TIPES_SEL', 'RPCI.2.1.2', 'no');
+select pxp.f_insert_tprocedimiento_gui ('WF_DES_INS', 'RPCI.2.1.2', 'no');
+select pxp.f_insert_tprocedimiento_gui ('WF_DES_MOD', 'RPCI.2.1.2', 'no');
+select pxp.f_insert_tprocedimiento_gui ('WF_DES_ELI', 'RPCI.2.1.2', 'no');
+select pxp.f_insert_tprocedimiento_gui ('WF_DES_SEL', 'RPCI.2.1.2', 'no');
+select pxp.f_insert_tprocedimiento_gui ('ADQ_SOLREP_SEL', 'RPCI.2.2', 'no');
+select pxp.f_insert_tprocedimiento_gui ('ADQ_SOLD_SEL', 'RPCI.2.2', 'no');
+select pxp.f_insert_tprocedimiento_gui ('ADQ_SOLDETCOT_SEL', 'RPCI.2.2', 'no');
+select pxp.f_insert_tprocedimiento_gui ('PRE_VERPRE_IME', 'RPCI.2.2', 'no');
+select pxp.f_insert_tprocedimiento_gui ('RH_MAILFUN_GET', 'RPCI.2.2', 'no');
+select pxp.f_insert_tprocedimiento_gui ('PM_SERVIC_SEL', 'RPCI.2.3', 'no');
+select pxp.f_insert_tprocedimiento_gui ('SAL_ITEMNOTBASE_SEL', 'RPCI.2.3', 'no');
+select pxp.f_insert_tprocedimiento_gui ('PM_LUG_SEL', 'RPCI.2.3', 'no');
+select pxp.f_insert_tprocedimiento_gui ('PM_LUG_ARB_SEL', 'RPCI.2.3', 'no');
+select pxp.f_insert_tprocedimiento_gui ('PM_PROVEE_INS', 'RPCI.2.3', 'no');
+select pxp.f_insert_tprocedimiento_gui ('PM_PROVEE_MOD', 'RPCI.2.3', 'no');
+select pxp.f_insert_tprocedimiento_gui ('PM_PROVEE_ELI', 'RPCI.2.3', 'no');
+select pxp.f_insert_tprocedimiento_gui ('PM_PROVEE_SEL', 'RPCI.2.3', 'no');
+select pxp.f_insert_tprocedimiento_gui ('PM_PROVEEV_SEL', 'RPCI.2.3', 'no');
+select pxp.f_insert_tprocedimiento_gui ('SEG_PERSON_SEL', 'RPCI.2.3', 'no');
+select pxp.f_insert_tprocedimiento_gui ('SEG_PERSONMIN_SEL', 'RPCI.2.3', 'no');
+select pxp.f_insert_tprocedimiento_gui ('PM_INSTIT_SEL', 'RPCI.2.3', 'no');
+select pxp.f_insert_tprocedimiento_gui ('SAL_ITEM_SEL', 'RPCI.2.3.1', 'no');
+select pxp.f_insert_tprocedimiento_gui ('SAL_ITEMNOTBASE_SEL', 'RPCI.2.3.1', 'no');
+select pxp.f_insert_tprocedimiento_gui ('SAL_ITMALM_SEL', 'RPCI.2.3.1', 'no');
+select pxp.f_insert_tprocedimiento_gui ('PM_SERVIC_SEL', 'RPCI.2.3.1', 'no');
+select pxp.f_insert_tprocedimiento_gui ('PM_PRITSE_INS', 'RPCI.2.3.1', 'no');
+select pxp.f_insert_tprocedimiento_gui ('PM_PRITSE_MOD', 'RPCI.2.3.1', 'no');
+select pxp.f_insert_tprocedimiento_gui ('PM_PRITSE_ELI', 'RPCI.2.3.1', 'no');
+select pxp.f_insert_tprocedimiento_gui ('PM_PRITSE_SEL', 'RPCI.2.3.1', 'no');
+select pxp.f_insert_tprocedimiento_gui ('SEG_PERSON_INS', 'RPCI.2.3.2', 'no');
+select pxp.f_insert_tprocedimiento_gui ('SEG_PERSON_MOD', 'RPCI.2.3.2', 'no');
+select pxp.f_insert_tprocedimiento_gui ('SEG_PERSON_ELI', 'RPCI.2.3.2', 'no');
+select pxp.f_insert_tprocedimiento_gui ('SEG_PERSONMIN_SEL', 'RPCI.2.3.2', 'no');
+select pxp.f_insert_tprocedimiento_gui ('SEG_UPFOTOPER_MOD', 'RPCI.2.3.2.1', 'no');
+select pxp.f_insert_tprocedimiento_gui ('PM_INSTIT_INS', 'RPCI.2.3.3', 'no');
+select pxp.f_insert_tprocedimiento_gui ('PM_INSTIT_MOD', 'RPCI.2.3.3', 'no');
+select pxp.f_insert_tprocedimiento_gui ('PM_INSTIT_ELI', 'RPCI.2.3.3', 'no');
+select pxp.f_insert_tprocedimiento_gui ('PM_INSTIT_SEL', 'RPCI.2.3.3', 'no');
+select pxp.f_insert_tprocedimiento_gui ('SEG_PERSON_SEL', 'RPCI.2.3.3', 'no');
+select pxp.f_insert_tprocedimiento_gui ('SEG_PERSONMIN_SEL', 'RPCI.2.3.3', 'no');
+select pxp.f_insert_tprocedimiento_gui ('SEG_PERSON_INS', 'RPCI.2.3.3.1', 'no');
+select pxp.f_insert_tprocedimiento_gui ('SEG_PERSON_MOD', 'RPCI.2.3.3.1', 'no');
+select pxp.f_insert_tprocedimiento_gui ('SEG_PERSON_ELI', 'RPCI.2.3.3.1', 'no');
+select pxp.f_insert_tprocedimiento_gui ('SEG_PERSONMIN_SEL', 'RPCI.2.3.3.1', 'no');
+select pxp.f_insert_tprocedimiento_gui ('SEG_UPFOTOPER_MOD', 'RPCI.2.3.3.1.1', 'no');
+select pxp.f_insert_tprocedimiento_gui ('ADQ_RPCL_SEL', 'RPCI.3', 'no');
+select pxp.f_delete_trol_procedimiento_gui ('ADQ - Visto Bueno Sol', 'WF_DWF_MOD', 'VBSOL.2');
+select pxp.f_delete_trol_procedimiento_gui ('ADQ - Visto Bueno Sol', 'WF_DOCWFAR_MOD', 'VBSOL.2.1');
+select pxp.f_delete_trol_procedimiento_gui ('ADQ - Visto Bueno OC/COT', 'WF_DWF_MOD', 'VBCOT.2');
+select pxp.f_delete_trol_procedimiento_gui ('ADQ - Visto Bueno OC/COT', 'WF_DOCWFAR_MOD', 'VBCOT.2.1');
+select pxp.f_delete_trol_procedimiento_gui ('ADQ - Solicitud de Compra', 'WF_DWF_MOD', 'ADQ.3.2');
+/***********************************F-DEP-RAC-ADQ-0-05/06/2014*****************************************/
+ 
+ 
+ 
+ 
+ 
+ 
+ /***********************************I-DEP-RAC-ADQ-1-05/06/2014*****************************************/
+ 
+ 
+ 
+ 
+ 
+ --------------- SQL ---------------
+
+CREATE VIEW adq.vproceso_compra (
+    id_proceso_compra,
+    id_depto,
+    num_convocatoria,
+    id_solicitud,
+    id_estado_wf,
+    fecha_ini_proc,
+    obs_proceso,
+    id_proceso_wf,
+    num_tramite,
+    codigo_proceso,
+    estado_reg,
+    estado,
+    num_cotizacion,
+    id_usuario_reg,
+    fecha_reg,
+    fecha_mod,
+    id_usuario_mod,
+    usr_reg,
+    usr_mod,
+    desc_depto,
+    desc_funcionario,
+    desc_solicitud,
+    desc_moneda,
+    instruc_rpc,
+    id_categoria_compra,
+    usr_aux,
+    id_moneda,
+    id_funcionario,
+    id_usuario_auxiliar,
+    desc_cotizacion)
+AS
+SELECT proc.id_proceso_compra,
+    proc.id_depto,
+    proc.num_convocatoria,
+    proc.id_solicitud,
+    proc.id_estado_wf,
+    proc.fecha_ini_proc,
+    proc.obs_proceso,
+    proc.id_proceso_wf,
+    proc.num_tramite,
+    proc.codigo_proceso,
+    proc.estado_reg,
+    proc.estado,
+    proc.num_cotizacion,
+    proc.id_usuario_reg,
+    proc.fecha_reg,
+    proc.fecha_mod,
+    proc.id_usuario_mod,
+    usu1.cuenta AS usr_reg,
+    usu2.cuenta AS usr_mod,
+    dep.codigo AS desc_depto,
+    fun.desc_funcionario1 AS desc_funcionario,
+    sol.numero AS desc_solicitud,
+    mon.codigo AS desc_moneda,
+    sol.instruc_rpc,
+    sol.id_categoria_compra,
+    usua.cuenta AS usr_aux,
+    sol.id_moneda,
+    sol.id_funcionario,
+    proc.id_usuario_auxiliar,
+    adq.f_get_desc_cotizaciones(proc.id_proceso_compra) AS desc_cotizacion
+FROM adq.tproceso_compra proc
+   JOIN segu.tusuario usu1 ON usu1.id_usuario = proc.id_usuario_reg
+   JOIN param.tdepto dep ON dep.id_depto = proc.id_depto
+   JOIN adq.tsolicitud sol ON sol.id_solicitud = proc.id_solicitud
+   JOIN orga.vfuncionario fun ON fun.id_funcionario = sol.id_funcionario
+   JOIN param.tmoneda mon ON mon.id_moneda = sol.id_moneda
+   LEFT JOIN segu.tusuario usu2 ON usu2.id_usuario = proc.id_usuario_mod
+   LEFT JOIN segu.tusuario usua ON usua.id_usuario = proc.id_usuario_auxiliar;
+ 
+/***********************************F-DEP-RAC-ADQ-1-05/06/2014*****************************************/
+ 
+ 
+ 
