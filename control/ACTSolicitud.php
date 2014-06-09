@@ -229,6 +229,7 @@ class ACTSolicitud extends ACTbase{
     $dataSource->putParameter('posibles_proveedores', $datosSolicitud[0]['posibles_proveedores']);
     $dataSource->putParameter('desc_funcionario_rpc', $datosSolicitud[0]['desc_funcionario_rpc']);
     $dataSource->putParameter('desc_funcionario_apro', $datosSolicitud[0]['desc_funcionario_apro']);
+    $dataSource->putParameter('nombre_usuario_ai', $datosSolicitud[0]['nombre_usuario_ai']);
                 
     //get detalle
     //Reset all extra params:

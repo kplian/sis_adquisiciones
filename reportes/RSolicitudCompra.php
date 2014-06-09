@@ -161,8 +161,25 @@ Class RSolicitudCompra extends Report {
         //$pdf->Cell($width3+$width2, $height, $this->getDataSource()->getParameter('desc_funcionario'), $white, 0, 'L', true, '', 0, false, 'T', 'C');        
        
        
-        $pdf->Ln();
-        
+       if($this->getDataSource()->getParameter('nombre_usuario_ai')!= ''&&$this->getDataSource()->getParameter('nombre_usuario_ai')!= 'NULL'){
+            $pdf->SetFont('', 'B');                             
+            $pdf->Cell($width3, $height, '', 0, 0, 'L', false, '', 0, false, 'T', 'C');
+            $pdf->SetFont('', '');
+            $pdf->SetFillColor(192,192,192, true);
+            $pdf->MultiCell($width3+$width2, $height, '', 0,'L', true ,0);
+            
+            $pdf->Cell(5, $height, '', 0, 0, 'L', false, '', 0, false, 'T', 'C');
+            $pdf->SetFont('', 'B');
+            $pdf->Cell($width3, $height, 'Funcionario AI:', 0, 0, 'L', false, '', 0, false, 'T', 'C');
+            $pdf->SetFont('', '');
+            $pdf->SetFillColor(192,192,192, true);
+            $pdf->MultiCell($width3+$width2, $height, $this->getDataSource()->getParameter('nombre_usuario_ai'), 1,'L', true ,1);
+           
+            $pdf->Ln();     
+           
+       }
+       
+                
         
         //imprime el detalle de la solicitud
         

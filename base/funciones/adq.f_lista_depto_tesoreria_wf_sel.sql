@@ -132,7 +132,7 @@ BEGIN
                             INNER JOIN segu.tsubsistema SUBSIS on SUBSIS.id_subsistema=DEPPTO.id_subsistema
                             inner join param.tdepto_uo_ep due on 
                                 due.id_depto = DEPPTO.id_depto and due.estado_reg = ''activo'' 
-                            WHERE  
+                            WHERE  DEPPTO.estado_reg = ''activo'' and
                                (
                                 (due.id_ep,due.id_uo) in ('||v_uos_eps||')
                                  or
@@ -155,7 +155,9 @@ BEGIN
                                   FROM param.tdepto DEPPTO
                                   INNER JOIN segu.tsubsistema SUBSIS on SUBSIS.id_subsistema=DEPPTO.id_subsistema
                                   inner join param.tdepto_uo_ep due on due.id_depto = DEPPTO.id_depto and due.estado_reg = ''activo'' 
-                                where (
+                                where DEPPTO.estado_reg = ''activo'' and
+                                
+                                (
                                         (due.id_ep,due.id_uo) in ('||v_uos_eps||')
                                          or
                                         (due.id_uo is null and  due.id_ep in ('||v_cad_ep||') ) 

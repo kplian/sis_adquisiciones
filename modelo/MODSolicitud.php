@@ -327,6 +327,8 @@ class MODSolicitud extends MODbase{
 		$this->captura('id_proceso_macro','integer');
 		$this->captura('numero','varchar');
 		$this->captura('desc_funcionario_rpc','text');
+		$this->captura('nombre_usuario_ai','varchar');
+		
 		
 		//Ejecuta la instruccion
 		$this->armarConsulta();

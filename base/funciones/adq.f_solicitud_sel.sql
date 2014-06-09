@@ -362,7 +362,8 @@ BEGIN
                         cat.nombre as desc_categoria_compra,
                         sol.id_proceso_macro,
                         sol.numero,
-                        funrpc.desc_funcionario1 as desc_funcionario_rpc
+                        funrpc.desc_funcionario1 as desc_funcionario_rpc,
+                        COALESCE(sol.usuario_ai,'''')::varchar as nombre_usuario_ai
                         	
 						from adq.tsolicitud sol
 						inner join segu.tusuario usu1 on usu1.id_usuario = sol.id_usuario_reg
@@ -387,6 +388,8 @@ BEGIN
 			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;
 			v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
+
+               
 
 			--Devuelve la respuesta
 			return v_consulta;			
