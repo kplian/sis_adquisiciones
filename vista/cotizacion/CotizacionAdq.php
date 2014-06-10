@@ -300,7 +300,8 @@ Phx.vista.CotizacionAdq = {
         onSolAprobacion:function(){
             
             this.cmpFechaOC.setValue(new Date());
-            this.cmpFechaOC.setReadOnly(true);
+            //comentado temporalmente para regularizar
+            //this.cmpFechaOC.setReadOnly(true);
             this.wOC.show(); 
             
         },

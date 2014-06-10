@@ -501,6 +501,7 @@ Phx.vista.SolicitudApro = {
        
         var d= this.sm.getSelected().data;
         if(d){
+            this.formProceso.getForm().reset();
             this.cmbNumTramite.setValue(d.num_tramite);
             this.cmbIdSolicitud.setValue(d.id_solicitud);
             this.cmbIdDepto.setValue(this.cmbDeptoAdq.getValue());
