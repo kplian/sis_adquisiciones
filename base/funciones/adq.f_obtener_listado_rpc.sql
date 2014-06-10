@@ -85,7 +85,7 @@ BEGIN
         
          execute(v_consulta);
  
-
+     
  
         --  buscamos con la uo  especifica y categoria de compras especificas para la fecha y monto indicado
          FOR v_registros in(
@@ -139,11 +139,12 @@ BEGIN
                    
                    END IF;
                 
-                
+              
                 
                --recorremos el array de funcionarios
                 FOR v_i IN 1 .. array_upper(v_fun_array, 1)  LOOP    
                 
+                 
                     select  
                    fun.desc_funcionario1 
                     into 
@@ -165,20 +166,20 @@ BEGIN
                                       )
                                       VALUES
                                       (
-                                      '||v_registros.id_rpc::varchar||',
-                                      '||v_registros.id_rpc_uo::varchar||',
-                                      '||v_fun_array[v_i]::varchar||',
+                                      '||COALESCE(v_registros.id_rpc::varchar,'NULL')||',
+                                      '||COALESCE(v_registros.id_rpc_uo::varchar,'NULL')||',
+                                      '||COALESCE(v_fun_array[v_i]::varchar,'NULL')||',
                                       '''||COALESCE(v_desc_funcionario,'---')||''',
                                       '||COALESCE(''''||v_registros.fecha_ini::VARCHAR||'''','NULL')||',
                                       '||COALESCE(''''||v_registros.fecha_fin::varchar||'''','NULL')||',
                                       '||COALESCE(v_registros.monto_min::varchar,'NULL')||',
                                       '||COALESCE(v_registros.monto_max::varchar,'NULL')||',
-                                      '||v_registros.id_cargo::varchar||',
-                                      '||v_registros.id_cargo_ai::varchar||',
+                                      '||COALESCE(v_registros.id_cargo::varchar,'NULL')||',
+                                      '||COALESCE(v_registros.id_cargo_ai::varchar,'NULL')||',
                                       '''||COALESCE(v_registros.ai_habilitado,'---')||'''
                                       );';
                 
-               
+                --raise exception 'xxxx %',v_consulta;
                  execute(v_consulta);
                END LOOP;
                     
