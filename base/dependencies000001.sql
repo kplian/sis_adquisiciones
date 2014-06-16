@@ -2982,77 +2982,47 @@ select pxp.f_delete_trol_procedimiento_gui ('ADQ - Solicitud de Compra', 'WF_DWF
  
  --------------- SQL ---------------
 
-CREATE VIEW adq.vproceso_compra (
-    id_proceso_compra,
-    id_depto,
-    num_convocatoria,
-    id_solicitud,
-    id_estado_wf,
-    fecha_ini_proc,
-    obs_proceso,
-    id_proceso_wf,
-    num_tramite,
-    codigo_proceso,
-    estado_reg,
-    estado,
-    num_cotizacion,
-    id_usuario_reg,
-    fecha_reg,
-    fecha_mod,
-    id_usuario_mod,
-    usr_reg,
-    usr_mod,
-    desc_depto,
-    desc_funcionario,
-    desc_solicitud,
-    desc_moneda,
-    instruc_rpc,
-    id_categoria_compra,
-    usr_aux,
-    id_moneda,
-    id_funcionario,
-    id_usuario_auxiliar,
-    desc_cotizacion)
+--------------- SQL ---------------
+
+CREATE OR REPLACE VIEW tes.vcomp_devtesprov_plan_pago
 AS
-SELECT proc.id_proceso_compra,
-    proc.id_depto,
-    proc.num_convocatoria,
-    proc.id_solicitud,
-    proc.id_estado_wf,
-    proc.fecha_ini_proc,
-    proc.obs_proceso,
-    proc.id_proceso_wf,
-    proc.num_tramite,
-    proc.codigo_proceso,
-    proc.estado_reg,
-    proc.estado,
-    proc.num_cotizacion,
-    proc.id_usuario_reg,
-    proc.fecha_reg,
-    proc.fecha_mod,
-    proc.id_usuario_mod,
-    usu1.cuenta AS usr_reg,
-    usu2.cuenta AS usr_mod,
-    dep.codigo AS desc_depto,
-    fun.desc_funcionario1 AS desc_funcionario,
-    sol.numero AS desc_solicitud,
-    mon.codigo AS desc_moneda,
-    sol.instruc_rpc,
-    sol.id_categoria_compra,
-    usua.cuenta AS usr_aux,
-    sol.id_moneda,
-    sol.id_funcionario,
-    proc.id_usuario_auxiliar,
-    adq.f_get_desc_cotizaciones(proc.id_proceso_compra) AS desc_cotizacion
-FROM adq.tproceso_compra proc
-   JOIN segu.tusuario usu1 ON usu1.id_usuario = proc.id_usuario_reg
-   JOIN param.tdepto dep ON dep.id_depto = proc.id_depto
-   JOIN adq.tsolicitud sol ON sol.id_solicitud = proc.id_solicitud
-   JOIN orga.vfuncionario fun ON fun.id_funcionario = sol.id_funcionario
-   JOIN param.tmoneda mon ON mon.id_moneda = sol.id_moneda
-   LEFT JOIN segu.tusuario usu2 ON usu2.id_usuario = proc.id_usuario_mod
-   LEFT JOIN segu.tusuario usua ON usua.id_usuario = proc.id_usuario_auxiliar;
- 
+  SELECT pp.id_plan_pago,
+         op.id_proveedor,
+         p.desc_proveedor,
+         op.id_moneda,
+         op.id_depto_conta,
+         op.numero,
+         now() AS fecha_actual,
+         pp.estado,
+         pp.monto_ejecutar_total_mb,
+         pp.monto_ejecutar_total_mo,
+         pp.monto,
+         pp.monto_mb,
+         pp.monto_retgar_mb,
+         pp.monto_retgar_mo,
+         pp.monto_no_pagado,
+         pp.monto_no_pagado_mb,
+         pp.otros_descuentos,
+         pp.otros_descuentos_mb,
+         pp.id_plantilla,
+         pp.id_cuenta_bancaria,
+         pp.id_cuenta_bancaria_mov,
+         pp.nro_cheque,
+         pp.nro_cuenta_bancaria,
+         op.num_tramite,
+         pp.tipo,
+         op.id_gestion AS id_gestion_cuentas,
+         pp.id_int_comprobante,
+         pp.liquido_pagable,
+         pp.liquido_pagable_mb,
+         pp.nombre_pago,
+         pp.porc_monto_excento_var,
+         (COALESCE(op.numero, '' )||' '|| COALESCE(pp.obs_monto_no_pagado, '' ))::character varying AS obs_pp
+        
+  FROM tes.tplan_pago pp
+       JOIN tes.tobligacion_pago op ON pp.id_obligacion_pago =
+        op.id_obligacion_pago
+       JOIN param.vproveedor p ON p.id_proveedor = op.id_proveedor;
 /***********************************F-DEP-RAC-ADQ-1-05/06/2014*****************************************/
  
  
