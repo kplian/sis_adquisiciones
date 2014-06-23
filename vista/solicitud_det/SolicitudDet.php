@@ -67,7 +67,7 @@ Phx.vista.SolicitudDet=Ext.extend(Phx.gridInterfaz,{
                 allowBlank: false,
                 emptyText : 'Concepto...',
                 store : new Ext.data.JsonStore({
-                            url:'../../sis_parametros/control/ConceptoIngas/listarConceptoIngas',
+                            url:'../../sis_parametros/control/ConceptoIngas/listarConceptoIngasMasPartida',
                             id : 'id_concepto_ingas',
                             root: 'datos',
                             sortInfo:{
@@ -77,7 +77,7 @@ Phx.vista.SolicitudDet=Ext.extend(Phx.gridInterfaz,{
                             totalProperty: 'total',
                             fields: ['id_concepto_ingas','tipo','movimiento','desc_ingas'],
                             remoteSort: true,
-                            baseParams:{par_filtro:'desc_ingas',movimiento:'gasto'}
+                            baseParams:{par_filtro:'desc_ingas#par.codigo#par.nombre_partida',movimiento:'gasto'}
                 }),
                 valueField: 'id_concepto_ingas',
                displayField: 'desc_ingas',
@@ -95,7 +95,7 @@ Phx.vista.SolicitudDet=Ext.extend(Phx.gridInterfaz,{
                width:350,
                gwidth:200,
                minChars:2,
-               tpl: '<tpl for="."><div class="x-combo-list-item"><p>{desc_ingas}</p><strong>{tipo}</strong></div></tpl>',
+               tpl: '<tpl for="."><div class="x-combo-list-item"><p>{desc_ingas}</p><strong>{tipo}</strong><p>PARTIDA:{desc_partida}</p></div></tpl>',
                renderer:function(value, p, record){return String.format('{0}', record.data['desc_concepto_ingas']);}
             },
             type:'ComboBox',
