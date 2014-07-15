@@ -211,7 +211,7 @@ Phx.vista.Proveedor=Ext.extend(Phx.gridInterfaz,{
 				allowBlank: false,
 				anchor: '100%',
 				gwidth: 100,
-				maxLength:50
+				maxLength:150
 			},
 			type:'TextField',
 			filters:{pfiltro:'provee.rotulo_comercial',type:'string'},
