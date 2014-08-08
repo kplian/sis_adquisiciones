@@ -174,7 +174,8 @@ BEGIN
                         funs.desc_funcionario1 as desc_funcionario_supervisor,
                         sol.ai_habilitado,
                         sol.id_cargo_rpc,
-                        sol.id_cargo_rpc_ai
+                        sol.id_cargo_rpc_ai,
+                        sol.tipo_concepto
                         	
 						from adq.tsolicitud sol
 						inner join segu.tusuario usu1 on usu1.id_usuario = sol.id_usuario_reg

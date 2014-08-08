@@ -94,6 +94,7 @@ DECLARE
        v_titulo   			varchar;
        v_estado_actual   varchar;
        v_id_categoria_compra   integer;
+       v_resp_doc boolean;
 
 			    
 BEGIN
@@ -157,6 +158,81 @@ BEGIN
         
         END IF;
         
+        
+        --inserta solicitud
+        insert into adq.tsolicitud(
+			estado_reg,
+			--id_solicitud_ext,
+			--presu_revertido,
+			--fecha_apro,
+			--estado,
+			id_funcionario_aprobador,
+			id_moneda,
+			id_gestion,
+			tipo,
+			--num_tramite,
+			justificacion,
+			id_depto,
+			lugar_entrega,
+			extendida,
+			numero,
+			posibles_proveedores,
+			--id_proceso_wf,
+			comite_calificacion,
+			id_categoria_compra,
+			id_funcionario,
+			--id_estado_wf,
+			fecha_soli,
+			fecha_reg,
+			id_usuario_reg,
+			fecha_mod,
+			id_usuario_mod,
+            id_uo,
+            id_proceso_macro,
+            id_proveedor,
+            id_funcionario_supervisor,
+            id_usuario_ai,
+            usuario_ai,
+            tipo_concepto
+          	) values(
+			'activo',
+			--v_parametros.id_solicitud_ext,
+			--v_parametros.presu_revertido,
+			--v_parametros.fecha_apro,
+			--v_codigo_estado,
+			v_parametros.id_funcionario_aprobador,
+			v_parametros.id_moneda,
+			v_parametros.id_gestion,
+			v_parametros.tipo,
+			--v_num_tramite,
+			v_parametros.justificacion,
+			v_parametros.id_depto,
+			v_parametros.lugar_entrega,
+			'no',
+			v_num_sol,--v_parametros.numero,
+			v_parametros.posibles_proveedores,
+			--v_id_proceso_wf,
+			v_parametros.comite_calificacion,
+			v_parametros.id_categoria_compra,
+			v_parametros.id_funcionario,
+			--v_id_estado_wf,
+			v_parametros.fecha_soli,
+			now(),
+			p_id_usuario,
+			null,
+			null,
+            v_parametros.id_uo,
+            v_id_proceso_macro,
+            v_parametros.id_proveedor,
+            v_parametros.id_funcionario_supervisor,
+            v_parametros._id_usuario_ai,
+            v_parametros._nombre_usuario_ai,
+            v_parametros.tipo_concepto
+							
+			)RETURNING id_solicitud into v_id_solicitud;
+        
+        
+        
         -- inciiar el tramite en el sistema de WF
        SELECT 
              ps_num_tramite ,
@@ -180,81 +256,27 @@ BEGIN
              'Solicitud de Compra '||v_num_sol,
              v_num_sol);
         
-        -- obtiene el funcionario aprobador
+        -- UPDATE DATOS wf
         
+          UPDATE adq.tsolicitud  SET
+             num_tramite = v_num_tramite,
+             id_proceso_wf = v_id_proceso_wf,
+             id_estado_wf = v_id_estado_wf,
+             estado = v_codigo_estado
+          
+          WHERE id_solicitud = v_id_solicitud;
+          
+          
+          -- inserta documentos en estado borrador si estan configurados
+           v_resp_doc =  wf.f_inserta_documento_wf(p_id_usuario, v_id_proceso_wf, v_id_estado_wf);
+           
+           -- verificar documentos
+           v_resp_doc = wf.f_verifica_documento(p_id_usuario, v_id_estado_wf); 
         
-        	insert into adq.tsolicitud(
-			estado_reg,
-			--id_solicitud_ext,
-			--presu_revertido,
-			--fecha_apro,
-			estado,
-			id_funcionario_aprobador,
-			id_moneda,
-			id_gestion,
-			tipo,
-			num_tramite,
-			justificacion,
-			id_depto,
-			lugar_entrega,
-			extendida,
-			numero,
-			posibles_proveedores,
-			id_proceso_wf,
-			comite_calificacion,
-			id_categoria_compra,
-			id_funcionario,
-			id_estado_wf,
-			fecha_soli,
-			fecha_reg,
-			id_usuario_reg,
-			fecha_mod,
-			id_usuario_mod,
-            id_uo,
-            id_proceso_macro,
-            id_proveedor,
-            id_funcionario_supervisor,
-            id_usuario_ai,
-            usuario_ai
-          	) values(
-			'activo',
-			--v_parametros.id_solicitud_ext,
-			--v_parametros.presu_revertido,
-			--v_parametros.fecha_apro,
-			v_codigo_estado,
-			v_parametros.id_funcionario_aprobador,
-			v_parametros.id_moneda,
-			v_parametros.id_gestion,
-			v_parametros.tipo,
-			v_num_tramite,
-			v_parametros.justificacion,
-			v_parametros.id_depto,
-			v_parametros.lugar_entrega,
-			'no',
-			v_num_sol,--v_parametros.numero,
-			v_parametros.posibles_proveedores,
-			v_id_proceso_wf,
-			v_parametros.comite_calificacion,
-			v_parametros.id_categoria_compra,
-			v_parametros.id_funcionario,
-			v_id_estado_wf,
-			v_parametros.fecha_soli,
-			now(),
-			p_id_usuario,
-			null,
-			null,
-            v_parametros.id_uo,
-            v_id_proceso_macro,
-            v_parametros.id_proveedor,
-            v_parametros.id_funcionario_supervisor,
-            v_parametros._id_usuario_ai,
-            v_parametros._nombre_usuario_ai
-							
-			)RETURNING id_solicitud into v_id_solicitud;
-			
-			--Definicion de la respuesta
-			v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Solicitud de Compras almacenado(a) con exito (id_solicitud'||v_id_solicitud||')'); 
-            v_resp = pxp.f_agrega_clave(v_resp,'id_solicitud',v_id_solicitud::varchar);
+        	
+		   --Definicion de la respuesta
+		   v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Solicitud de Compras almacenado(a) con exito (id_solicitud'||v_id_solicitud||')'); 
+           v_resp = pxp.f_agrega_clave(v_resp,'id_solicitud',v_id_solicitud::varchar);
 
             --Devuelve la respuesta
             return v_resp;
@@ -300,7 +322,8 @@ BEGIN
             id_proveedor=v_parametros.id_proveedor,
             id_funcionario_supervisor= v_parametros.id_funcionario_supervisor,
             id_usuario_ai= v_parametros._id_usuario_ai,
-            usuario_ai = v_parametros._nombre_usuario_ai
+            usuario_ai = v_parametros._nombre_usuario_ai,
+            tipo_concepto =  v_parametros.tipo_concepto
 			where id_solicitud=v_parametros.id_solicitud;
                
 			--Definicion de la respuesta

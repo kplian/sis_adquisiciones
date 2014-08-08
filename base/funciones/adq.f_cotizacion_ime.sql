@@ -131,6 +131,7 @@ DECLARE
       v_tipo_noti  			varchar;
       v_titulo   			varchar;
       v_id_alarma     integer;
+      v_id_categoria_compra   integer;
      
 			    
 BEGIN
@@ -1291,7 +1292,8 @@ BEGIN
               pc.num_tramite,
               c.estado,
               c.tipo_cambio_conv,
-              sol.id_gestion
+              sol.id_gestion,
+              sol.id_categoria_compra
             into
              v_id_cotizacion,
              v_numero_oc,
@@ -1303,7 +1305,8 @@ BEGIN
              v_num_tramite,
              v_codigo_estado,
              v_tipo_cambio_conv,
-             v_id_gestion
+             v_id_gestion,
+             v_id_categoria_compra
             from adq.tcotizacion c
             inner join adq.tproceso_compra pc on pc.id_proceso_compra = c.id_proceso_compra
             inner join adq.tsolicitud sol on sol.id_solicitud = pc.id_solicitud
@@ -1332,7 +1335,8 @@ BEGIN
               tipo_cambio_conv,
               num_tramite,
               id_gestion,
-              comprometido
+              comprometido,
+              id_categoria_compra
             ) 
             VALUES (
               p_id_usuario,
@@ -1348,7 +1352,8 @@ BEGIN
               v_tipo_cambio_conv,
               v_num_tramite,
               v_id_gestion,
-              'si'
+              'si',
+              v_id_categoria_compra
             ) RETURNING id_obligacion_pago into v_id_obligacion_pago;
     
             

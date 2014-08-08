@@ -131,6 +131,32 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
 	       		grid:true,
 	       		form:true
 	       	},
+            {
+                config:{
+                    name:'tipo_concepto',
+                    fieldLabel:'Concepto',
+                    allowBlank:false,
+                    emptyText:'Tipo...',
+                    typeAhead: true,
+                    triggerAction: 'all',
+                    lazyRender:true,
+                    mode: 'local',
+                    valueField: 'estilo',
+                    gwidth: 100,
+                    store:['bien','servicio','consultoria individual','consultoria empresa','alquileres','obras']
+                },
+                type:'ComboBox',
+                id_grupo:0,
+                filters:{   
+                         type: 'list',
+                          pfiltro:'sol.tipo_concepto',
+                         options: ['Bien','Servicio','Bien - Servicio'],    
+                    },
+                grid:true,
+                form:true
+            },
+          
+          
           
                 
          {
@@ -612,7 +638,8 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
 		'ai_habilitado',
 		'id_cargo_rpc',
 		'id_cargo_rpc_ai',
-		'ai_habilitado'
+		'ai_habilitado',
+		'tipo_concepto'
 		
 	],
 	
@@ -710,7 +737,7 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
                         modal:true,
                         width:700,
                         height:500
-                    },data ,this.idContenedor,'SolModPresupuesto')
+                    },data ,this.idContenedor,'SolModPresupuesto');
          },
     
 

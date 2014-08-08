@@ -84,6 +84,13 @@ class MODSolicitud extends MODbase{
 		$this->captura('id_cargo_rpc_ai','integer');
 		
 		
+		$this->captura('tipo_concepto','varchar');
+		
+		
+		
+		
+		
+		
 		
 		 
 		
@@ -137,7 +144,8 @@ class MODSolicitud extends MODbase{
 		
 		$this->setParametro('id_proveedor','id_proveedor','int4');
 		$this->setParametro('id_funcionario_supervisor','id_funcionario_supervisor','int4');
-        
+
+		$this->setParametro('tipo_concepto','tipo_concepto','varchar');
 		
 
 		//Ejecuta la instruccion
@@ -183,6 +191,7 @@ class MODSolicitud extends MODbase{
 		$this->setParametro('id_proceso_macro','id_proceso_macro','int4');
 		$this->setParametro('id_proveedor','id_proveedor','int4');
 		$this->setParametro('id_funcionario_supervisor','id_funcionario_supervisor','int4');
+		$this->setParametro('tipo_concepto','tipo_concepto','varchar');
         
 		
 

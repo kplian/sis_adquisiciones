@@ -71,6 +71,7 @@ DECLARE
    v_tipo_cambio_conv numeric;
    v_precio_unitario_mb_coti   numeric;
    v_tiempo_entrega   varchar;
+   v_resp_doc  boolean;
  
     
     
@@ -330,6 +331,11 @@ BEGIN
             )RETURNING id_cotizacion into v_id_cotizacion;
             
             
+            
+            -- inserta documentos en estado borrador si estan configurados
+            v_resp_doc =  wf.f_inserta_documento_wf(p_id_usuario, v_id_proceso_wf, v_id_estado_wf);
+            -- verificar documentos
+            v_resp_doc = wf.f_verifica_documento(p_id_usuario, v_id_estado_wf);
             
             
             

@@ -69,6 +69,7 @@ DECLARE
     
     v_tipo_cambio  numeric;
     v_id_alarma  integer;
+    v_resp_doc  boolean;
 			    
 BEGIN
 
@@ -262,6 +263,11 @@ BEGIN
             v_parametros._nombre_usuario_ai
 							
 			)RETURNING id_proceso_compra into v_id_proceso_compra;
+            
+            -- inserta documentos en estado borrador si estan configurados
+            v_resp_doc =  wf.f_inserta_documento_wf(p_id_usuario, v_id_proceso_wf, v_id_estado_wf);
+            -- verificar documentos
+            v_resp_doc = wf.f_verifica_documento(p_id_usuario, v_id_estado_wf);
             
             
             --chequear que si la solicitud de compra tiene proveedor 
