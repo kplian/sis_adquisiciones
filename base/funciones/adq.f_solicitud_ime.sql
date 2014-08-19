@@ -626,15 +626,10 @@ BEGIN
           
           select
             s.id_proceso_wf,
-            s.id_estado_wf,
-            s.estado,
             s.fecha_soli,
             s.numero
           into 
-          
             v_id_proceso_wf,
-            v_id_estado_wf,
-            v_codigo_estado,
             v_fecha_soli,
             v_numero_sol
             
@@ -643,133 +638,135 @@ BEGIN
           
            select 
             ew.id_tipo_estado ,
-            te.pedir_obs
+            te.pedir_obs,
+            te.codigo
            into 
             v_id_tipo_estado,
-            v_perdir_obs
+            v_perdir_obs,
+            v_codigo_estado
           from wf.testado_wf ew
           inner join wf.ttipo_estado te on te.id_tipo_estado = ew.id_tipo_estado
-          where ew.id_estado_wf = v_id_estado_wf;
+          where ew.id_estado_wf = v_parametros.id_estado_wf;
           
           
        
-         --------------------------------------------- 
-         -- Verifica  los posibles estados sigueintes para que desde la interfza se tome la decision si es necesario
-         --------------------------------------------------
+         ------------------------------------------------------------------------------ 
+         -- Verifica  los posibles estados siguientes para que desde la interfza se tome la decision si es necesario
+         --------------------------------------------------------------------------------
           IF  v_parametros.operacion = 'verificar' THEN
           
-                  --buscamos siguiente estado correpondiente al proceso del WF
-                 
-                  ----- variables de retorno------
-                  
-                  v_num_estados=0;
-                  v_num_funcionarios=0;
-                  v_num_deptos=0;
-                  
-                  --------------------------------- 
-                  
-                 SELECT  
-                     ps_id_tipo_estado,
-                     ps_codigo_estado,
-                     ps_disparador,
-                     ps_regla,
-                     ps_prioridad
-                  into
-                    va_id_tipo_estado,
-                    va_codigo_estado,
-                    va_disparador,
-                    va_regla,
-                    va_prioridad 
-                  FROM adq.f_obtener_sig_estado_sol_rec(v_parametros.id_solicitud, v_id_proceso_wf, v_id_tipo_estado); 
-              
-                
-                v_num_estados= array_length(va_id_tipo_estado, 1);
-                
-                 IF v_perdir_obs = 'no' THEN
-                
-                    IF v_num_estados = 1 then
-                          -- si solo hay un estado,  verificamos si tiene mas de un funcionario por este estado
-                         SELECT 
-                         *
-                          into
-                         v_num_funcionarios 
-                         FROM wf.f_funcionario_wf_sel(
-                             p_id_usuario, 
-                             va_id_tipo_estado[1], 
-                             v_fecha_soli,
-                             v_id_estado_wf,
-                             TRUE) AS (total bigint);
-                             
-                        IF v_num_funcionarios = 1 THEN
-                        -- si solo es un funcionario, recuperamos el funcionario correspondiente
-                             SELECT 
-                                 id_funcionario
-                                   into
-                                 v_id_funcionario_estado
-                             FROM wf.f_funcionario_wf_sel(
-                                 p_id_usuario, 
-                                 va_id_tipo_estado[1], 
-                                 v_fecha_soli,
-                                 v_id_estado_wf,
-                                 FALSE) 
-                                 AS (id_funcionario integer,
-                                   desc_funcionario text,
-                                   desc_funcionario_cargo text,
-                                   prioridad integer);
-                        END IF;    
-                             
-                      
-                      --verificamos el numero de deptos
-                      
-                        SELECT 
-                        *
+                        --buscamos siguiente estado correpondiente al proceso del WF
+                       
+                        ----- variables de retorno------
+                        
+                        v_num_estados=0;
+                        v_num_funcionarios=0;
+                        v_num_deptos=0;
+                        
+                        --------------------------------- 
+                        
+                       SELECT  
+                           ps_id_tipo_estado,
+                           ps_codigo_estado,
+                           ps_disparador,
+                           ps_regla,
+                           ps_prioridad
                         into
-                          v_num_deptos 
-                       FROM wf.f_depto_wf_sel(
-                           p_id_usuario, 
-                           va_id_tipo_estado[1], 
-                           v_fecha_soli,
-                           v_id_estado_wf,
-                           TRUE) AS (total bigint);
-                           
-                      IF v_num_deptos = 1 THEN
-                          -- si solo es un funcionario, recuperamos el funcionario correspondiente
+                          va_id_tipo_estado,
+                          va_codigo_estado,
+                          va_disparador,
+                          va_regla,
+                          va_prioridad 
+                        FROM adq.f_obtener_sig_estado_sol_rec(v_parametros.id_solicitud, v_id_proceso_wf, v_id_tipo_estado); 
+                    
+                      
+                      v_num_estados= array_length(va_id_tipo_estado, 1);
+                      
+                       IF v_perdir_obs = 'no' THEN
+                      
+                          IF v_num_estados = 1 then
+                                -- si solo hay un estado,  verificamos si tiene mas de un funcionario por este estado
                                SELECT 
-                                   id_depto
-                                     into
-                                   v_id_depto_estado
-                              FROM wf.f_depto_wf_sel(
+                               *
+                                into
+                               v_num_funcionarios 
+                               FROM wf.f_funcionario_wf_sel(
                                    p_id_usuario, 
                                    va_id_tipo_estado[1], 
                                    v_fecha_soli,
-                                   v_id_estado_wf,
-                                   FALSE) 
-                                   AS (id_depto integer,
-                                     codigo_depto varchar,
-                                     nombre_corto_depto varchar,
-                                     nombre_depto varchar,
-                                     prioridad integer,
-                                     subsistema varchar);
-                        END IF;
-                      
-                      
-                      
-                      
+                                   v_parametros.id_estado_wf,
+                                   TRUE) AS (total bigint);
+                                   
+                              IF v_num_funcionarios = 1 THEN
+                              -- si solo es un funcionario, recuperamos el funcionario correspondiente
+                                   SELECT 
+                                       id_funcionario
+                                         into
+                                       v_id_funcionario_estado
+                                   FROM wf.f_funcionario_wf_sel(
+                                       p_id_usuario, 
+                                       va_id_tipo_estado[1], 
+                                       v_fecha_soli,
+                                       v_parametros.id_estado_wf,
+                                       FALSE) 
+                                       AS (id_funcionario integer,
+                                         desc_funcionario text,
+                                         desc_funcionario_cargo text,
+                                         prioridad integer);
+                              END IF;    
+                                   
+                            
+                            --verificamos el numero de deptos
+                            
+                              SELECT 
+                              *
+                              into
+                                v_num_deptos 
+                             FROM wf.f_depto_wf_sel(
+                                 p_id_usuario, 
+                                 va_id_tipo_estado[1], 
+                                 v_fecha_soli,
+                                 v_parametros.id_estado_wf,
+                                 TRUE) AS (total bigint);
+                                 
+                            IF v_num_deptos = 1 THEN
+                                -- si solo es un funcionario, recuperamos el funcionario correspondiente
+                                     SELECT 
+                                         id_depto
+                                           into
+                                         v_id_depto_estado
+                                    FROM wf.f_depto_wf_sel(
+                                         p_id_usuario, 
+                                         va_id_tipo_estado[1], 
+                                         v_fecha_soli,
+                                         v_parametros.id_estado_wf,
+                                         FALSE) 
+                                         AS (id_depto integer,
+                                           codigo_depto varchar,
+                                           nombre_corto_depto varchar,
+                                           nombre_depto varchar,
+                                           prioridad integer,
+                                           subsistema varchar);
+                              END IF;
+                            
+                            
+                            
+                            
+                           
+                           END IF;
                      
                      END IF;
-               
-               END IF;
-                
-                -- si hay mas de un estado disponible  preguntamos al usuario
-                v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Verificacion para el siguiente estado)'); 
-                v_resp = pxp.f_agrega_clave(v_resp,'estados', array_to_string(va_id_tipo_estado, ','));
-                v_resp = pxp.f_agrega_clave(v_resp,'operacion','preguntar_todo');
-                v_resp = pxp.f_agrega_clave(v_resp,'num_estados',v_num_estados::varchar);
-                v_resp = pxp.f_agrega_clave(v_resp,'num_funcionarios',v_num_funcionarios::varchar);
-                v_resp = pxp.f_agrega_clave(v_resp,'num_deptos',v_num_deptos::varchar);
-                v_resp = pxp.f_agrega_clave(v_resp,'id_funcionario_estado',v_id_funcionario_estado::varchar);
-                v_resp = pxp.f_agrega_clave(v_resp,'id_depto_estado',v_id_depto_estado::varchar);
-                v_resp = pxp.f_agrega_clave(v_resp,'id_tipo_estado', va_id_tipo_estado[1]::varchar);
+                      
+                      -- si hay mas de un estado disponible  preguntamos al usuario
+                      v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Verificacion para el siguiente estado)'); 
+                      v_resp = pxp.f_agrega_clave(v_resp,'estados', array_to_string(va_id_tipo_estado, ','));
+                      v_resp = pxp.f_agrega_clave(v_resp,'operacion','preguntar_todo');
+                      v_resp = pxp.f_agrega_clave(v_resp,'num_estados',v_num_estados::varchar);
+                      v_resp = pxp.f_agrega_clave(v_resp,'num_funcionarios',v_num_funcionarios::varchar);
+                      v_resp = pxp.f_agrega_clave(v_resp,'num_deptos',v_num_deptos::varchar);
+                      v_resp = pxp.f_agrega_clave(v_resp,'id_funcionario_estado',v_id_funcionario_estado::varchar);
+                      v_resp = pxp.f_agrega_clave(v_resp,'id_depto_estado',v_id_depto_estado::varchar);
+                      v_resp = pxp.f_agrega_clave(v_resp,'id_tipo_estado', va_id_tipo_estado[1]::varchar);
                 
                 
                -------------------------------------------------
@@ -778,144 +775,114 @@ BEGIN
            ELSEIF  v_parametros.operacion = 'cambiar' THEN
           
           
-            
-            -- obtener datos tipo estado
-            
-            select
-             te.codigo
-            into
-             v_codigo_estado_siguiente
-            from wf.ttipo_estado te
-            where te.id_tipo_estado = v_parametros.id_tipo_estado;
-            
-            IF  pxp.f_existe_parametro(p_tabla,'id_depto') THEN
-             
-             v_id_depto = v_parametros.id_depto;
-            
-            END IF;
-            
-            
-            v_obs=v_parametros.obs;
-            
-            IF v_codigo_estado_siguiente =  'aprobado' THEN
-                --si el siguient estado es aprobado obtenemos el depto que le correponde de la solictud de compra
-                
-                  select 
-                     s.id_depto,
-                     s.numero,
-                     uo.nombre_unidad 
-                  into 
-                     v_id_depto,
-                     v_num_sol,
-                     v_uo_sol
-                  from  adq.tsolicitud s
-                  inner join orga.tuo uo on uo.id_uo = s.id_uo 
-                  where s.id_solicitud = v_parametros.id_solicitud;
-                  
-                  v_obs =  'La solicitud '||v_num_sol||' fue aprobada para la uo '||v_uo_sol||' ('||v_parametros.obs||')';
-            END IF;
-            
-             
-             --v_acceso_directo = '../../../sis_adquisiciones/vista/solicitud/SolicitudVb.php';
-             --v_clases_acceso_directo = 'SolicitudVb';
-            
-           if v_obs ='' THEN
-           
-              v_obs = ' Cambio de estado de la solicitud '||COALESCE(v_numero_sol,'S/N')||'  de  la uo '||COALESCE(v_uo_sol,'-');
-           
-           ELSE
-           
-              v_obs = 'Solicitud  de compra '||COALESCE(v_numero_sol,'S/N')||'  para  la uo OBS:'||COALESCE(v_uo_sol,'-')||' ('|| COALESCE(v_obs,'S/O')||')';
-           
-           
-           END IF;
-           
-           
-           
-           --configurar acceso directo para la alarma   
-           v_acceso_directo = '';
-           v_clase = '';
-           v_parametros_ad = '';
-           v_tipo_noti = 'notificacion';
-           v_titulo  = 'Visto Bueno';
-                       
+                    
+                    -- obtener datos tipo estado
+                    
+                    select
+                     te.codigo
+                    into
+                     v_codigo_estado_siguiente
+                    from wf.ttipo_estado te
+                    where te.id_tipo_estado = v_parametros.id_tipo_estado;
+                    
+                    IF  pxp.f_existe_parametro(p_tabla,'id_depto') THEN
                      
-           IF  v_codigo_estado_siguiente not in('borrador','aprobado','en_proceso','finalizado','anulado')   THEN
-               v_acceso_directo = '../../../sis_adquisiciones/vista/solicitud/SolicitudVb.php';
-               v_clase = 'SolicitudVb';
-               v_parametros_ad = '{filtro_directo:{campo:"sol.id_proceso_wf",valor:"'||v_id_proceso_wf::varchar||'"}}';
-               v_tipo_noti = 'notificacion';
-               v_titulo  = 'Visto Bueno';
-                       
-            END IF;
+                     v_id_depto = v_parametros.id_depto;
+                    
+                    END IF;
+                    
+                    
+                    v_obs=v_parametros.obs;
+                    
+                    IF v_codigo_estado_siguiente =  'aprobado' THEN
+                        --si el siguient estado es aprobado obtenemos el depto que le correponde de la solictud de compra
+                        
+                          select 
+                             s.id_depto,
+                             s.numero,
+                             uo.nombre_unidad 
+                          into 
+                             v_id_depto,
+                             v_num_sol,
+                             v_uo_sol
+                          from  adq.tsolicitud s
+                          inner join orga.tuo uo on uo.id_uo = s.id_uo 
+                          where s.id_solicitud = v_parametros.id_solicitud;
+                          
+                          v_obs =  'La solicitud '||v_num_sol||' fue aprobada para la uo '||v_uo_sol||' ('||v_parametros.obs||')';
+                    END IF;
+                    
+                     
+                     --v_acceso_directo = '../../../sis_adquisiciones/vista/solicitud/SolicitudVb.php';
+                     --v_clases_acceso_directo = 'SolicitudVb';
+                    
+                   if v_obs ='' THEN
+                   
+                      v_obs = ' Cambio de estado de la solicitud '||COALESCE(v_numero_sol,'S/N')||'  de  la uo '||COALESCE(v_uo_sol,'-');
+                   
+                   ELSE
+                   
+                      v_obs = 'Solicitud  de compra '||COALESCE(v_numero_sol,'S/N')||'  para  la uo OBS:'||COALESCE(v_uo_sol,'-')||' ('|| COALESCE(v_obs,'S/O')||')';
+                   
+                   
+                   END IF;
+                   
+                   
+                   
+                   --configurar acceso directo para la alarma   
+                   v_acceso_directo = '';
+                   v_clase = '';
+                   v_parametros_ad = '';
+                   v_tipo_noti = 'notificacion';
+                   v_titulo  = 'Visto Bueno';
+                               
+                             
+                   IF  v_codigo_estado_siguiente not in('borrador','aprobado','en_proceso','finalizado','anulado')   THEN
+                       v_acceso_directo = '../../../sis_adquisiciones/vista/solicitud/SolicitudVb.php';
+                       v_clase = 'SolicitudVb';
+                       v_parametros_ad = '{filtro_directo:{campo:"sol.id_proceso_wf",valor:"'||v_id_proceso_wf::varchar||'"}}';
+                       v_tipo_noti = 'notificacion';
+                       v_titulo  = 'Visto Bueno';
+                               
+                    END IF;
+                    
+                    
+                    
+                   
+                   -- registra nuevo estado
+                   v_id_estado_actual =  wf.f_registra_estado_wf(v_parametros.id_tipo_estado, 
+                                                                   v_parametros.id_funcionario, 
+                                                                   v_parametros.id_estado_wf, 
+                                                                   v_id_proceso_wf,
+                                                                   p_id_usuario,
+                                                                   v_parametros._id_usuario_ai,
+                                                                   v_parametros._nombre_usuario_ai,
+                                                                   v_id_depto,
+                                                                   v_obs,
+                                                                   v_acceso_directo ,
+                                                                   v_clase,
+                                                                   v_parametros_ad,
+                                                                   v_tipo_noti,
+                                                                   v_titulo);
+                    
+                   
+                     IF  not adq.f_fun_inicio_solicitud_wf(p_id_usuario, 
+                                                   v_parametros._id_usuario_ai, 
+                                                   v_parametros._nombre_usuario_ai, 
+                                                   v_id_estado_actual, 
+                                                   v_id_proceso_wf, 
+                                                   v_codigo_estado_siguiente,
+                                                   v_parametros.instruc_rpc) THEN
             
+                             raise exception 'Error al retroceder estado';
             
-            
-           
-           -- registra nuevo estado
-           v_id_estado_actual =  wf.f_registra_estado_wf(v_parametros.id_tipo_estado, 
-                                                           v_parametros.id_funcionario, 
-                                                           v_id_estado_wf, 
-                                                           v_id_proceso_wf,
-                                                           p_id_usuario,
-                                                           v_parametros._id_usuario_ai,
-                                                           v_parametros._nombre_usuario_ai,
-                                                           v_id_depto,
-                                                           v_obs,
-                                                           v_acceso_directo ,
-                                                           v_clase,
-                                                           v_parametros_ad,
-                                                           v_tipo_noti,
-                                                           v_titulo);
-            
-            
-            
-            
-             
-            
-             -- actualiza estado en la solicitud
-            
-             update adq.tsolicitud  s set 
-               id_estado_wf =  v_id_estado_actual,
-               estado = v_codigo_estado_siguiente,
-               id_usuario_mod=p_id_usuario,
-               fecha_mod=now(),
-               instruc_rpc=v_parametros.instruc_rpc
-               
-             where id_solicitud = v_parametros.id_solicitud;
-             
-             
-
-             -- comprometer presupuesto cuando el estado anterior es el vbgerencia)
-             IF v_codigo_estado =  'borrador' THEN 
-
-              
-               -- Comprometer Presupuesto
-              
-              
-                 IF not adq.f_gestionar_presupuesto_solicitud(v_parametros.id_solicitud, p_id_usuario, 'comprometer')  THEN
-                 
-                   raise exception 'Error al comprometer el presupeusto';
-                 
-                 END IF;
-              
-              
-              --modifca bandera de comprometido  
-           
-                   update adq.tsolicitud  s set 
-                     presu_comprometido =  'si',
-                     fecha_apro = now()
-                   where id_solicitud = v_parametros.id_solicitud;
-            
-            
-            END IF;  
-          
-          
-          
-           -- si hay mas de un estado disponible  preguntamos al usuario
-            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Se realizo el cambio de estado)'); 
-            v_resp = pxp.f_agrega_clave(v_resp,'operacion','cambio_exitoso');
-          
+                    END IF;
+                    
+                  
+                     -- si hay mas de un estado disponible  preguntamos al usuario
+                    v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Se realizo el cambio de estado)'); 
+                    v_resp = pxp.f_agrega_clave(v_resp,'operacion','cambio_exitoso');
+                  
           
           END IF;
 
@@ -965,11 +932,11 @@ BEGIN
        
 
         --------------------------------------------------
-        --REtrocede al estado inmediatamente anterior
+        --Retrocede al estado inmediatamente anterior
         -------------------------------------------------
          IF  v_parametros.operacion = 'cambiar' THEN
                
-               raise notice 'es_estaado_wf %',v_parametros.id_estado_wf;
+              
               
                       --recuperaq estado anterior segun Log del WF
                         SELECT  
@@ -1001,6 +968,7 @@ BEGIN
                        
                      
                        IF  v_codigo_estado not in('borrador','aprobado','en_proceso','finalizado','anulado')   THEN
+                           
                            v_acceso_directo = '../../../sis_adquisiciones/vista/solicitud/SolicitudVb.php';
                            v_clase = 'SolicitudVb';
                            v_parametros_ad = '{filtro_directo:{campo:"sol.id_proceso_wf",valor:"'||v_id_proceso_wf::varchar||'"}}';
@@ -1010,6 +978,7 @@ BEGIN
                         END IF;
                         
                         IF v_codigo_estado  in('borrador')   THEN
+                           
                            v_acceso_directo = '../../../sis_adquisiciones/vista/solicitud/SolicitudReq.php';
                            v_clase = 'SolicitudReq';
                            v_parametros_ad = '{filtro_directo:{campo:"sol.id_proceso_wf",valor:"'||v_id_proceso_wf::varchar||'"}}';
@@ -1040,45 +1009,7 @@ BEGIN
                            v_titulo);
                       
                     
-                      
-                      -- actualiza estado en la solicitud
-                        update adq.tsolicitud  s set 
-                           id_estado_wf =  v_id_estado_actual,
-                           estado = v_codigo_estado,
-                           id_usuario_mod=p_id_usuario,
-                           fecha_mod=now()
-                         where id_solicitud = v_parametros.id_solicitud;
-                         
-
-                        -- cuando el estado al que regresa es pendiente revierte presusupesto comprometido
-                         IF v_codigo_estado = 'borrador' and v_presu_comprometido ='si' THEN
-                         
-                             --  llamar a funciond erevertir presupuesto
-                            
-                             IF not adq.f_gestionar_presupuesto_solicitud(v_parametros.id_solicitud, p_id_usuario, 'revertir')  THEN
-                 
-                     					 raise exception 'Error al revertir  el presupeusto';
-                 
-                          	 END IF;
-                           
-                           
-                           --  modifica bandera de presupuesto comprometido
-                            update adq.tsolicitud   set 
-                               presu_comprometido =  'no',
-                               fecha_apro = NULL
-                             where id_solicitud = v_parametros.id_solicitud;
-
-                           
-                         END IF;
-                         
-                         
-                        -- si hay mas de un estado disponible  preguntamos al usuario
-                        v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Se realizo el cambio de estado)'); 
-                        v_resp = pxp.f_agrega_clave(v_resp,'operacion','cambio_exitoso');
-                        
-                              
-                      --Devuelve la respuesta
-                        return v_resp;
+              
                         
            ----------------------------------------------------------------------
            -- PAra retornar al estado borrador de la solicitud de manera directa
@@ -1140,57 +1071,37 @@ BEGIN
                   v_tipo_noti,
                   v_titulo);
                       
-                    
-                      
-              -- actualiza estado en la solicitud
-                update adq.tsolicitud  s set 
-                   id_estado_wf =  v_id_estado_actual,
-                   estado = v_codigo_estado,
-                   id_usuario_mod=p_id_usuario,
-                   fecha_mod=now()
-                 where id_solicitud = v_parametros.id_solicitud;
              
-                       
-             
-             
-             --si bandera de comprometido activa revertimos
-           
-              IF v_presu_comprometido ='si'  THEN
-              
-                  -- llamada a funcion de reversion de presupuesto
-                   
-                   IF not adq.f_gestionar_presupuesto_solicitud(
-                             v_parametros.id_solicitud, 
-                             p_id_usuario, 
-                              'revertir')  THEN
-                 
-                      raise exception 'Error al revertir  el presupeusto';
-                 
-                   END IF;
-                
-              
-                  --modifca bandera de comprometido  
-                   update adq.tsolicitud  s set 
-                     presu_comprometido =  'no'
-                   where id_solicitud = v_parametros.id_solicitud;
-              END IF;
-              
-               -- si hay mas de un estado disponible  preguntamos al usuario
-                v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Se regresoa borrador con exito)'); 
-                v_resp = pxp.f_agrega_clave(v_resp,'operacion','cambio_exitoso');
-                        
-                              
-              --Devuelve la respuesta
-                return v_resp;
-              
-           
-           
            ELSE
            
            		raise exception 'Operacion no reconocida %',v_parametros.operacion;
            
            END IF;
-        
+           
+          
+         
+            IF  not adq.f_fun_regreso_solicitud_wf(p_id_usuario, 
+                                                   v_parametros._id_usuario_ai, 
+                                                   v_parametros._nombre_usuario_ai, 
+                                                   v_id_estado_actual, 
+                                                   v_id_proceso_wf, 
+                                                   v_codigo_estado) THEN
+            
+               raise exception 'Error al retroceder estado';
+            
+            END IF;
+           
+           
+           
+           
+           
+              -- si hay mas de un estado disponible  preguntamos al usuario
+             v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Se regresoa borrador con exito)'); 
+             v_resp = pxp.f_agrega_clave(v_resp,'operacion','cambio_exitoso');
+                        
+                              
+             --Devuelve la respuesta
+             return v_resp;
         
         
         end;

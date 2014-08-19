@@ -3027,3 +3027,84 @@ AS
  
  
  
+ 
+ 
+ 
+/***********************************I-DEP-RAC-ADQ-1-19/08/2014*****************************************/
+ --------------- SQL ---------------
+
+CREATE OR REPLACE VIEW VIEW adq.vsolicitud_compra
+AS
+  SELECT DISTINCT sol.id_solicitud,
+         sol.id_proveedor,
+         p.desc_proveedor,
+         sol.id_moneda,
+         sol.id_depto,
+         sol.numero,
+         sol.fecha_soli,
+         sol.estado,
+         sol.num_tramite,
+         sol.id_gestion,
+         sol.justificacion,
+         p.rotulo_comercial,
+         sol.id_categoria_compra,
+         mon.codigo,
+         sum(sd.precio_total) AS precio_total,
+         sum(sd.precio_unitario_mb * sd.cantidad::numeric) AS precio_total_mb,
+         COALESCE(cac.codigo, '' ::character varying) AS codigo_categoria,
+         COALESCE(cac.nombre, '' ::character varying) AS nombre_categoria,
+         sol.id_proceso_wf,
+         ('<table>' ::text || pxp.html_rows((((('<td>' ::text ||
+          ci.desc_ingas::text) || ' <br>' ::text) || sd.descripcion) || '</td>'
+           ::text) ::character varying) ::text) || '</table>' ::text AS detalle,
+         fun.desc_funcionario1,
+         uo.codigo AS codigo_uo,
+         uo.nombre_unidad,
+         lower(sol.tipo::text) AS tipo,
+         lower(sol.tipo_concepto::text) AS tipo_concepto,
+         fun.nombre_cargo,
+         fun.nombre_unidad AS nombre_unidad_cargo
+  FROM adq.tsolicitud sol
+       JOIN adq.tsolicitud_det sd ON sd.id_solicitud = sol.id_solicitud
+       JOIN param.tconcepto_ingas ci ON ci.id_concepto_ingas =
+        sd.id_concepto_ingas
+       JOIN param.tmoneda mon ON mon.id_moneda = sol.id_moneda
+       JOIN orga.vfuncionario_cargo fun ON fun.id_funcionario =
+        sol.id_funcionario
+       JOIN orga.tuo uo ON uo.id_uo = sol.id_uo
+       LEFT JOIN param.vproveedor p ON p.id_proveedor = sol.id_proveedor
+       LEFT JOIN adq.tcategoria_compra cac ON cac.id_categoria_compra =
+        sol.id_categoria_compra
+  WHERE fun.fecha_asignacion <= sol.fecha_soli AND
+        fun.fecha_finalizacion >= sol.fecha_soli OR
+        fun.fecha_asignacion <= sol.fecha_soli AND
+        fun.fecha_finalizacion IS NULL
+  GROUP BY sol.id_solicitud,
+           sol.id_proveedor,
+           p.desc_proveedor,
+           sol.id_moneda,
+           sol.id_depto,
+           sol.numero,
+           sol.fecha_soli,
+           sol.estado,
+           sol.num_tramite,
+           sol.id_gestion,
+           sol.justificacion,
+           p.rotulo_comercial,
+           sol.id_categoria_compra,
+           cac.codigo,
+           cac.nombre,
+           mon.codigo,
+           fun.desc_funcionario1,
+           uo.codigo,
+           uo.nombre_unidad,
+           sol.tipo_concepto,
+           sol.tipo,
+           fun.nombre_cargo,
+           fun.nombre_unidad;
+/***********************************F-DEP-RAC-ADQ-1-19/08/2014*****************************************/
+ 
+ 
+ 
+ 
+ 

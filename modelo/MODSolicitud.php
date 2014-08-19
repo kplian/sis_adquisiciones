@@ -247,6 +247,9 @@ class MODSolicitud extends MODbase{
                 
         //Define los parametros para la funcion
         $this->setParametro('id_solicitud','id_solicitud','int4');
+        $this->setParametro('id_estado_wf','id_estado_wf','int4');
+        
+        
         $this->setParametro('id_funcionario_usu','id_funcionario_usu','int4');
         $this->setParametro('operacion','operacion','varchar');
         $this->setParametro('id_funcionario','id_funcionario','int4');
@@ -292,6 +295,7 @@ class MODSolicitud extends MODbase{
 		$this->tipo_procedimiento='SEL';//tipo de transaccion
 		
 		$this->setParametro('id_solicitud','id_solicitud','int4');
+		$this->setParametro('id_proceso_wf','id_proceso_wf','int4');
 				
 		//Definicion de la lista del resultado del query
 		$this->captura('id_solicitud','int4');
@@ -338,6 +342,7 @@ class MODSolicitud extends MODbase{
 		$this->captura('desc_funcionario_rpc','text');
 		$this->captura('nombre_usuario_ai','varchar');
 		
+		//$this->captura('num_tramite','varchar');
 		
 		//Ejecuta la instruccion
 		$this->armarConsulta();

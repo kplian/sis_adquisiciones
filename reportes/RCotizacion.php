@@ -24,27 +24,32 @@ require_once dirname(__FILE__).'/../../pxp/pxpReport/Report.php';
 		$tipo=$this->getDataSource()->getParameter('tipo');       
         $this->Cell(145, $height, 'Cotización', 0, 0, 'C', false, '', 1, false, 'T', 'C');        
         
-        $x=$this->getX();
+		$x=$this->getX();
         $y=$this->getY();
         $this->setXY($x,$y-10);
         $this->SetFontSize(8);
         $this->SetFont('', 'B');
-        $this->Cell(20, $height, $this->getDataSource()->getParameter('nro_contrato'), 0, 0, 'L', false, '', 1, false, 'T', 'C');
+        $this->Cell(20, $height, $this->getDataSource()->getParameter('num_tramite'), 0, 0, 'L', false, '', 1, false, 'T', 'C');
         
         $this->setXY($x,$y-7);
+        $this->SetFontSize(8);
+        $this->SetFont('', 'B');
+        $this->Cell(20, $height, $this->getDataSource()->getParameter('nro_contrato'), 0, 0, 'L', false, '', 1, false, 'T', 'C');
+        
+        $this->setXY($x,$y-4);
         $this->SetFontSize(6);
         $this->SetFont('', 'B');
         $this->Cell(20, $height, 'Localidad', 0, 0, 'L', false, '', 1, false, 'T', 'C');
-        $this->setXY($x,$y-4);
+        $this->setXY($x,$y-1);
         $this->SetFontSize(7);
         $this->setFont('','');
         $this->Cell(20, $height, strtoupper($this->getDataSource()->getParameter('lugar_entrega')), 0, 0, 'L', false, '', 1, false, 'T', 'C');
-        $this->setXY($x,$y+8);
+        $this->setXY($x,$y+11);
         $this->setFont('','');
         $this->Cell(6, $height/5, 'Dia', 1, 0, 'L', false, '', 1, false, 'T', 'C');
         $this->Cell(6, $height/5, 'Mes', 1, 0, 'L', false, '', 1, false, 'T', 'C');
         $this->Cell(7, $height/5, 'Año', 1, 0, 'L', false, '', 1, false, 'T', 'C');
-        $this->setXY($x,$y+12);
+        $this->setXY($x,$y+15);
         $fecha_coti = explode('-', $this->getDataSource()->getParameter('fecha_coti'));
         $this->Cell(6, $height/4, $fecha_coti[2], 1, 0, 'C', false, '', 1, false, 'T', 'C');
         $this->Cell(6, $height/4, $fecha_coti[1], 1, 0, 'C', false, '', 1, false, 'T', 'C');

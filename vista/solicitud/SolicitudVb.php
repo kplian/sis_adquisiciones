@@ -263,6 +263,7 @@ Phx.vista.SolicitudVb = {
                         url:'../../sis_adquisiciones/control/Solicitud/siguienteEstadoSolicitud',
                         params:{
                             id_solicitud:d.id_solicitud,
+                            id_estado_wf:d.id_estado_wf,
                             operacion:'cambiar',
                             id_tipo_estado:this.cmbTipoEstado.getValue(),
                             id_funcionario:this.cmbFuncionarioWf.getValue(),
@@ -295,6 +296,7 @@ Phx.vista.SolicitudVb = {
                 // form:this.form.getForm().getEl(),
                 url:'../../sis_adquisiciones/control/Solicitud/siguienteEstadoSolicitud',
                 params:{id_solicitud:d.id_solicitud,
+                        id_estado_wf:d.id_estado_wf, 
                         operacion:'verificar',
                         obs:this.cmpObs.getValue()},
                 success:this.successSinc,
@@ -367,6 +369,7 @@ Phx.vista.SolicitudVb = {
                             id_funcionario:reg.ROOT.datos.id_funcionario_estado,
                             id_depto:reg.ROOT.datos.id_depto_estado,
                             id_solicitud:d.id_solicitud,
+                            id_estado_wf:d.id_estado_wf,
                             obs:this.cmpObs.getValue(),
                             instruc_rpc:this.cmbIntrucRPC.getValue()
                             },

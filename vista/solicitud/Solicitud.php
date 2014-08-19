@@ -279,9 +279,9 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
                 renderer:function (value, p, record){
                     
                     if(record.data['instruc_rpc'])
-                        return String.format('{1}, {0} ', record.data['desc_uo'],record.data['instruc_rpc']);
+                        return String.format('{1}, {0}, {2} ', record.data['desc_uo'],record.data['instruc_rpc'], record.data['obs']);
                     else
-                        return String.format('{0} ', record.data['desc_uo']);
+                        return String.format('{0}, {1} ', record.data['desc_uo'], record.data['obs']);
                     
                     
                     },

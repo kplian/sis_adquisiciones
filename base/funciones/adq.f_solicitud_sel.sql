@@ -320,7 +320,17 @@ BEGIN
 	elsif(p_transaccion='ADQ_SOLREP_SEL')then
     
     begin
-    --Sentencia de la consulta
+    
+            IF  pxp.f_existe_parametro(p_tabla,'id_solicitud') THEN
+             
+                  v_filtro = 'sol.id_solicitud='||v_parametros.id_solicitud||' and ';
+            ELSE
+                  v_filtro = 'sol.id_proceso_wf='||v_parametros.id_proceso_wf||' and ';
+            
+            END IF;
+    
+    
+            --Sentencia de la consulta
 			v_consulta:='select
 						sol.id_solicitud,
 						sol.estado_reg,
@@ -384,7 +394,7 @@ BEGIN
                         
                         inner join wf.testado_wf ew on ew.id_estado_wf = sol.id_estado_wf
                         
-				        where sol.id_solicitud='||v_parametros.id_solicitud||' and ';
+				        where '||v_filtro;
 			
 			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;

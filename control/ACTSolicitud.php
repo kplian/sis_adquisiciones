@@ -195,6 +195,7 @@ class ACTSolicitud extends ACTbase{
     $dataSource = new DataSource();
     
     $idSolicitud = $this->objParam->getParametro('id_solicitud');
+    $id_proceso_wf= $this->objParam->getParametro('id_proceso_wf');
     $estado = $this->objParam->getParametro('estado');
     
     $this->objParam->addParametroConsulta('ordenacion','id_solicitud');
@@ -209,9 +210,10 @@ class ACTSolicitud extends ACTbase{
     $datosSolicitud = $resultSolicitud->getDatos();
             
     //armamos el array parametros y metemos ahi los data sets de las otras tablas
-    $dataSource->putParameter('estado',$estado);
+    $dataSource->putParameter('estado', $datosSolicitud[0]['estado']);
     $dataSource->putParameter('id_solicitud', $datosSolicitud[0]['id_solicitud']);
     $dataSource->putParameter('numero', $datosSolicitud[0]['numero']);
+	$dataSource->putParameter('num_tramite', $datosSolicitud[0]['num_tramite']);
     $dataSource->putParameter('fecha_apro', $datosSolicitud[0]['fecha_apro']);
     $dataSource->putParameter('desc_moneda', $datosSolicitud[0]['desc_moneda']);
     $dataSource->putParameter('tipo', $datosSolicitud[0]['tipo']);
@@ -236,7 +238,10 @@ class ACTSolicitud extends ACTbase{
     $this->objParam->defecto('ordenacion', 'id_solicitud_det');
     $this->objParam->defecto('cantidad', 1000);
     $this->objParam->defecto('puntero', 0);
-    $this->objParam->addParametro('id_solicitud', $idSolicitud );
+    
+    $this->objParam->addParametro('id_solicitud', $datosSolicitud[0]['id_solicitud'] );
+   
+    
     $modSolicitudDet = $this->create('MODSolicitudDet');
     //lista el detalle de la solicitud
     $resultSolicitudDet = $modSolicitudDet->listarSolicitudDet();

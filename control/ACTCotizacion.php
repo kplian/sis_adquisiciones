@@ -206,6 +206,7 @@ class ACTCotizacion extends ACTbase{
                 $dataSource->putParameter('fecha_oc', $datosOrdenCompra[0]['fecha_oc']);
                 $dataSource->putParameter('moneda', $datosOrdenCompra[0]['moneda']);
                 $dataSource->putParameter('codigo_moneda', $datosOrdenCompra[0]['codigo_moneda']);
+				$dataSource->putParameter('num_tramite', $datosOrdenCompra[0]['num_tramite']);
 
                 //get detalle
                 //Reset all extra params:

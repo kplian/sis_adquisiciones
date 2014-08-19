@@ -461,11 +461,12 @@ class MODCotizacion extends MODbase{
 		$this->captura('moneda','varchar');
 		$this->captura('codigo_moneda','varchar');
 		$this->captura('tiempo_entrega','varchar');
-		
+		$this->captura('num_tramite','varchar');
 		
 		
 		$this->armarConsulta();
 		$this->ejecutarConsulta();
+		
 		return $this->respuesta;
 	}
     
