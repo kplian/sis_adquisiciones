@@ -3033,7 +3033,7 @@ AS
 /***********************************I-DEP-RAC-ADQ-1-19/08/2014*****************************************/
  --------------- SQL ---------------
 
-CREATE OR REPLACE VIEW VIEW adq.vsolicitud_compra
+CREATE OR REPLACE VIEW adq.vsolicitud_compra
 AS
   SELECT DISTINCT sol.id_solicitud,
          sol.id_proveedor,
