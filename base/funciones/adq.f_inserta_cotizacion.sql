@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION adq.f_inserta_cotizacion (
   p_administrador integer,
   p_id_usuario integer,
@@ -332,10 +330,7 @@ BEGIN
             
             
             
-            -- inserta documentos en estado borrador si estan configurados
-            v_resp_doc =  wf.f_inserta_documento_wf(p_id_usuario, v_id_proceso_wf, v_id_estado_wf);
-            -- verificar documentos
-            v_resp_doc = wf.f_verifica_documento(p_id_usuario, v_id_estado_wf);
+            
             
             
             
@@ -473,7 +468,10 @@ BEGIN
             
             END LOOP;
             
-            
+            -- inserta documentos en estado borrador si estan configurados
+            v_resp_doc =  wf.f_inserta_documento_wf(p_id_usuario, v_id_proceso_wf, v_id_estado_wf);
+            -- verificar documentos
+            v_resp_doc = wf.f_verifica_documento(p_id_usuario, v_id_estado_wf);
             
 			
 			--Definicion de la respuesta

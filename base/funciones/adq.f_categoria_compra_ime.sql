@@ -1,8 +1,13 @@
-CREATE OR REPLACE FUNCTION "adq"."f_categoria_compra_ime" (	
-				p_administrador integer, p_id_usuario integer, p_tabla character varying, p_transaccion character varying)
-RETURNS character varying AS
-$BODY$
+--------------- SQL ---------------
 
+CREATE OR REPLACE FUNCTION adq.f_categoria_compra_ime (
+  p_administrador integer,
+  p_id_usuario integer,
+  p_tabla varchar,
+  p_transaccion varchar
+)
+RETURNS varchar AS
+$body$
 /**************************************************************************
  SISTEMA:		Sistema de Adquisiciones
  FUNCION: 		adq.f_categoria_compra_ime
@@ -121,11 +126,14 @@ BEGIN
 
 		begin
 			--Sentencia de la eliminacion
-			delete from adq.tcategoria_compra
+            
+            update  adq.tcategoria_compra set
+            estado_reg = 'inactivo',
+            id_usuario_mod = p_id_usuario
             where id_categoria_compra=v_parametros.id_categoria_compra;
                
             --Definicion de la respuesta
-            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Categoria de Compra eliminado(a)'); 
+            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Categoria de Compra inactivada'); 
             v_resp = pxp.f_agrega_clave(v_resp,'id_categoria_compra',v_parametros.id_categoria_compra::varchar);
               
             --Devuelve la respuesta
@@ -149,7 +157,9 @@ EXCEPTION
 		raise exception '%',v_resp;
 				        
 END;
-$BODY$
-LANGUAGE 'plpgsql' VOLATILE
+$body$
+LANGUAGE 'plpgsql'
+VOLATILE
+CALLED ON NULL INPUT
+SECURITY INVOKER
 COST 100;
-ALTER FUNCTION "adq"."f_categoria_compra_ime"(integer, integer, character varying, character varying) OWNER TO postgres;

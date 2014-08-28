@@ -559,7 +559,8 @@ BEGIN
                     cot.fecha_adju as fecha_oc,
                     mon.moneda,
                     mon.codigo as codigo_moneda,
-                    cot.tiempo_entrega
+                    cot.tiempo_entrega,
+                    sol.num_tramite
               from adq.tcotizacion cot 
               inner join param.vproveedor pv on pv.id_proveedor=cot.id_proveedor
               left join segu.tpersona per on per.id_persona=pv.id_persona

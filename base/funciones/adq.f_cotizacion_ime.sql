@@ -132,6 +132,9 @@ DECLARE
       v_titulo   			varchar;
       v_id_alarma     integer;
       v_id_categoria_compra   integer;
+      
+      v_tipo varchar;
+      v_tipo_concepto varchar;
      
 			    
 BEGIN
@@ -1293,7 +1296,9 @@ BEGIN
               c.estado,
               c.tipo_cambio_conv,
               sol.id_gestion,
-              sol.id_categoria_compra
+              sol.id_categoria_compra,
+              sol.tipo,
+              sol.tipo_concepto
             into
              v_id_cotizacion,
              v_numero_oc,
@@ -1306,7 +1311,9 @@ BEGIN
              v_codigo_estado,
              v_tipo_cambio_conv,
              v_id_gestion,
-             v_id_categoria_compra
+             v_id_categoria_compra,
+             v_tipo,
+             v_tipo_concepto
             from adq.tcotizacion c
             inner join adq.tproceso_compra pc on pc.id_proceso_compra = c.id_proceso_compra
             inner join adq.tsolicitud sol on sol.id_solicitud = pc.id_solicitud
@@ -1336,7 +1343,9 @@ BEGIN
               num_tramite,
               id_gestion,
               comprometido,
-              id_categoria_compra
+              id_categoria_compra,
+              tipo_solicitud,
+              tipo_concepto_solicitud
             ) 
             VALUES (
               p_id_usuario,
@@ -1353,7 +1362,9 @@ BEGIN
               v_num_tramite,
               v_id_gestion,
               'si',
-              v_id_categoria_compra
+              v_id_categoria_compra,
+              v_tipo,
+              v_tipo_concepto
             ) RETURNING id_obligacion_pago into v_id_obligacion_pago;
     
             

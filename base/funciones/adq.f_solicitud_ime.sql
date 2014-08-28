@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION adq.f_solicitud_ime (
   p_administrador integer,
   p_id_usuario integer,
@@ -453,8 +451,10 @@ BEGIN
                   where sd.id_solicitud = v_parametros.id_solicitud
                   and sd.estado_reg = 'activo';
                   
+                  v_total_soli =  COALESCE(v_total_soli,0);
                   
-                  IF  v_total_soli=0  THEN
+                  
+                  IF  v_total_soli = 0  THEN
                     raise exception ' La Solicitud  tiene que ser por un valor mayor a 0';
                   END IF;
                 --  
@@ -526,7 +526,7 @@ BEGIN
                                   p_id_usuario,
                                   v_id_uo, --id_uo
                                   v_fecha_soli, 
-                                  v_total_soli,
+                                  COALESCE(v_total_soli,0),
                                   v_id_categoria_compra)
                                   AS ( id_rpc   integer,
                                        id_rpc_uo integer,

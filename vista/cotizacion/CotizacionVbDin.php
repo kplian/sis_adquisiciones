@@ -60,7 +60,7 @@ Phx.vista.CotizacionVbDin = {
                     iconCls : 'bok',
                     disabled: true,
                     handler : this.AprobarSolicitud,
-                    tooltip : '<b>Aprobar Adjudicación</b><br/><b> La Recomendación queda aprobada </b>'
+                    tooltip : '<b>Aprobar Adjudicación</b><br/><b> La recomendación queda aprobada </b>'
           });
          
         this.addButton('btnSolCom',{
@@ -68,7 +68,7 @@ Phx.vista.CotizacionVbDin = {
             iconCls : 'bpdf32',
             disabled: true,
             handler : this.onButtonSolicitud,
-            tooltip : '<b>Reporte Solicitud de Compra</b><br/><b>Reporte Solicitud de Compra</b>'
+            tooltip : '<b>Reporte Solicitud de Compra</b><br/><b>Reporte solicitud de compra</b>'
         });
         
         this.addButton('btnCuadroComparativo',{
@@ -76,10 +76,10 @@ Phx.vista.CotizacionVbDin = {
 											 iconCls : 'bexcel',
 											 disabled: true,
 											 handler : this.onCuadroComparativo,
-											 tooltip : '<b>Cuadro Comparativo</b><br/><b>Cuadro Comparativo de Cotizaciones</b>'
+											 tooltip : '<b>Cuadro Comparativo</b><br/><b>Cuadro comparativo de cotizaciones</b>'
 	 						});         
           
-        this.addButton('diagrama_gantt',{text:'',iconCls: 'bgantt',disabled:true,handler:this.diagramGantt,tooltip: '<b>Diagrama Gantt de proceso macro</b>'});
+        this.addButton('diagrama_gantt',{text:'',iconCls: 'bgantt',disabled:true,handler:this.diagramGantt,tooltip: '<b>Diagrama gantt de proceso macro</b>'});
   
         
         this.store.baseParams={tipo_interfaz:this.nombreVista}; 

@@ -1,3 +1,5 @@
+--------------- SQL ---------------
+
 CREATE OR REPLACE FUNCTION adq.f_categoria_compra_sel (
   p_administrador integer,
   p_id_usuario integer,
@@ -64,7 +66,7 @@ BEGIN
 						inner join segu.tusuario usu1 on usu1.id_usuario = catcomp.id_usuario_reg
                         inner join wf.tproceso_macro  pm on pm.id_proceso_macro = catcomp.id_proceso_macro
 						left join segu.tusuario usu2 on usu2.id_usuario = catcomp.id_usuario_mod
-				        where  ';
+				        where  catcomp.estado_reg = ''activo'' and ' ;
 			
 			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;
@@ -91,7 +93,7 @@ BEGIN
 					    inner join segu.tusuario usu1 on usu1.id_usuario = catcomp.id_usuario_reg
                         inner join wf.tproceso_macro  pm on pm.id_proceso_macro = catcomp.id_proceso_macro
 						left join segu.tusuario usu2 on usu2.id_usuario = catcomp.id_usuario_mod
-					    where ';
+					    where catcomp.estado_reg = ''activo'' and ';
 			
 			--Definicion de la respuesta		    
 			v_consulta:=v_consulta||v_parametros.filtro;

@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION adq.f_proceso_compra_ime (
   p_administrador integer,
   p_id_usuario integer,

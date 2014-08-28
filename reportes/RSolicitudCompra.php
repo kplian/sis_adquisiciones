@@ -349,8 +349,8 @@ Class RSolicitudCompra extends Report {
             $pdf->tabletextcolor=$conf_tabletextcolor;
             
             $RowArray = array(
-                        'descripcion'  => 'Descripcion' ,
-                        'desc_concepto_ingas'  => 'Concepto Gasto',
+            			'desc_concepto_ingas'  => 'Concepto Gasto',
+                        'descripcion'  => 'Descripcion' ,                        
                         'cantidad'    => 'Cantidad',
                         'precio_unitario' => 'Precio Unitario',
                         'precio_total' => 'Precio Total'

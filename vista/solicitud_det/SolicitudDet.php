@@ -208,6 +208,18 @@ Phx.vista.SolicitudDet=Ext.extend(Phx.gridInterfaz,{
             form:true
         },
         {
+            //configuracion del componente
+            config:{
+                    labelSeparator:'',
+                    inputType:'hidden',
+                    name: 'id_orden_trabajo'
+            },
+            type:'Field',
+            form:true 
+        },
+        
+        /*
+        {
             config:{
                 name: 'id_orden_trabajo',
                 fieldLabel: 'Orden Trabajo',
@@ -248,7 +260,7 @@ Phx.vista.SolicitudDet=Ext.extend(Phx.gridInterfaz,{
             id_grupo:1,
             grid:true,
             form:true
-        },
+        },*/
         
         {
             config:{

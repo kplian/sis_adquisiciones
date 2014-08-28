@@ -176,6 +176,18 @@ Phx.vista.SolicitudReq = {
             this.Cmp.id_funcionario_supervisor.enable();
             
            },this);
+           
+           this.Cmp.tipo.on('select',function(cmp,rec){
+               console.log('rec..',rec)
+               if(rec.json[0]=='Bien - Servicio'){
+                   
+                  this.Cmp.tipo_concepto.store.loadData(this.arrayStore['Bien'].concat(this.arrayStore['Servicio']));
+               }
+               else{
+                   this.Cmp.tipo_concepto.store.loadData(this.arrayStore[rec.json[0]]);
+               }
+              
+           },this);
       
     },
          
@@ -194,6 +206,10 @@ Phx.vista.SolicitudReq = {
        this.Cmp.fecha_soli.enable();
        this.Cmp.fecha_soli.setValue(new Date());
        this.Cmp.fecha_soli.fireEvent('change');
+       
+       this.Cmp.tipo.enable();
+       this.Cmp.tipo_concepto.enable();
+       this.Cmp.id_moneda.enable();
        
        
        this.Cmp.id_categoria_compra.store.load({params:{start:0,limit:this.tam_pag}, 
@@ -237,6 +253,10 @@ Phx.vista.SolicitudReq = {
        this.cmpIdFuncionarioAprobador.disable();
        this.Cmp.id_funcionario_supervisor.disable();      
        this.cmpIdUo.disable();
+       this.Cmp.tipo.disable();
+       this.Cmp.tipo_concepto.disable();
+       this.Cmp.id_moneda.disable();
+       
        Phx.vista.SolicitudReq.superclass.onButtonEdit.call(this);
        this.Cmp.id_funcionario.store.baseParams.fecha = this.cmpFechaSoli.getValue().dateFormat(this.cmpFechaSoli.format);
        //this.Cmp.fecha_soli.fireEvent('change');    

@@ -56,7 +56,20 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
 			});			
 		}
 	},
-			
+	
+	arrayStore :{
+                    'Bien':[
+                                ['bien','Bienes'],
+                                ['inmueble','Inmuebles'],
+                                ['vehiculo','Vehiculos']
+                     ],	
+                     'Servicio':[
+                                ['servicio','Servicios'],
+                                ['consultoria_personal','Consultoria de Personas'],
+                                ['consultoria_empresa','Consultoria de Empresas'],
+                                ['alquiler_inmueble','Alquiler Inmuebles']
+                     ]
+    },
 	Atributos:[
 		{
 			//configuracion del componente
@@ -107,7 +120,7 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
 			grid:true,
 			form:false
 		},
-	       	{
+	    {
 	       		config:{
 	       			name:'tipo',
 	       			fieldLabel:'Tipo',
@@ -131,35 +144,47 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
 	       		grid:true,
 	       		form:true
 	       	},
-            {
-                config:{
-                    name:'tipo_concepto',
-                    fieldLabel:'Concepto',
-                    allowBlank:false,
-                    emptyText:'Tipo...',
-                    typeAhead: true,
-                    triggerAction: 'all',
-                    lazyRender:true,
-                    mode: 'local',
-                    valueField: 'estilo',
-                    gwidth: 100,
-                    store:['bien','servicio','consultoria individual','consultoria empresa','alquileres','obras']
-                },
-                type:'ComboBox',
-                id_grupo:0,
-                filters:{   
-                         type: 'list',
-                          pfiltro:'sol.tipo_concepto',
-                         options: ['Bien','Servicio','Bien - Servicio'],    
+       
+        
+          {
+            config:{
+                name: 'tipo_concepto',
+                fieldLabel: 'Subtipo',
+                allowBlank: false,
+                emptyText:'Tipo de Cuoata',
+                renderer:function (value, p, record){
+                        var dato='';
+                        dato = (dato==''&&value=='alquiler_inmueble')?'Alquiler Inmuebles':dato;
+                        dato = (dato==''&&value=='consultoria_empresa')?'Consultoria de Empresas':dato;
+                        dato = (dato==''&&value=='consultoria_personal')?'Consultoria de Personas':dato;
+                        dato = (dato==''&&value=='servicio')?'Servicios':dato;
+                        dato = (dato==''&&value=='vehiculo')?'Vehiculos':dato;
+                        dato = (dato==''&&value=='inmueble')?'Inmuebles':dato;
+                        return String.format('{0}', dato);
                     },
-                grid:true,
-                form:true
-            },
-          
-          
-          
                 
-         {
+                store:new Ext.data.ArrayStore({
+                            fields :['variable','valor'],
+                            data :  []}),
+               
+                valueField: 'variable',
+                displayField: 'valor',
+                forceSelection: true,
+                triggerAction: 'all',
+                lazyRender: true,
+                resizable:true,
+                listWidth:'500',
+                mode: 'local',
+                wisth: 380
+                },
+            type:'ComboBox',
+            filters:{pfiltro:'sol.tipo_concepto',type:'string'},
+            id_grupo:0,
+            grid:true,
+            form:true
+        },
+           
+       {
             config:{
                 name:'id_moneda',
                 origen:'MONEDA',
@@ -256,10 +281,11 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
        		    hiddenName: 'id_uo',
           		origen:'UO',
    				fieldLabel:'UO',
+   				allowBlank:false,
    				gdisplayField:'desc_uo',//mapea al store del grid
-   				 disabled:true,
+   				disabled:true,
    			    gwidth:200,
-   			     renderer:function (value, p, record){return String.format('{0}', record.data['desc_uo']);}
+   			    renderer:function (value, p, record){return String.format('{0}', record.data['desc_uo']);}
        	     },
    			type:'ComboRec',
    			id_grupo:1,
@@ -398,7 +424,7 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
 		{
 			config:{
 				name: 'posibles_proveedores',
-				fieldLabel: 'Proveedores',
+				fieldLabel: 'Otros Proveedores',
 				allowBlank: true,
 				anchor: '80%',
 				gwidth: 100,
@@ -478,8 +504,8 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
                 name:'id_proveedor',
                 hiddenName: 'id_proveedor',
                 origen:'PROVEEDOR',
-                fieldLabel:'Prov. Precoti.',
-                allowBlank:true,
+                fieldLabel:'Proveedor Precotizacion',
+                allowBlank:false,
                 tinit:false,
                 gwidth:200,
                 valueField: 'id_proveedor',
