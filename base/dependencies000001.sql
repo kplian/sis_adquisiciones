@@ -3455,3 +3455,63 @@ AS
 
 /***********************************F-DEP-RAC-ADQ-1-22/08/2014*****************************************/
 
+
+/***********************************I-DEP-RAC-ADQ-1-29/08/2014*****************************************/
+
+select pxp.f_insert_testructura_gui ('OBPAGOA.1.1', 'OBPAGOA.1');
+select pxp.f_insert_tprocedimiento_gui ('TES_OBPGSOL_SEL', 'OBPAGOA', 'no');
+select pxp.f_insert_tprocedimiento_gui ('TES_OBPGSOL_SEL', 'OBPAGOA.3', 'no');
+select pxp.f_insert_tprocedimiento_gui ('PM_CONIGPAR_SEL', 'ADQ.3.1', 'no');
+select pxp.f_insert_tprocedimiento_gui ('PM_CONIGPAR_SEL', 'VBSOL.1', 'no');
+select pxp.f_insert_tprocedimiento_gui ('PM_CONIGPAR_SEL', 'PROC.2', 'no');
+select pxp.f_insert_tprocedimiento_gui ('PM_CONIGPAR_SEL', 'COPRE.3', 'no');
+select pxp.f_insert_tprocedimiento_gui ('PM_CONIGPAR_SEL', 'SOLPEN.1', 'no');
+select pxp.f_insert_tprocedimiento_gui ('PM_CONIGPAR_SEL', 'OBPAGOA.1', 'no');
+select pxp.f_insert_tprocedimiento_gui ('TES_PPANTPAR_INS', 'OBPAGOA.2', 'no');
+select pxp.f_insert_tprocedimiento_gui ('TES_PPANTPAR_INS', 'OBPAGOA.4', 'no');
+select pxp.f_insert_tprocedimiento_gui ('TES_TIPO_SEL', 'OBPAGOA.1.1', 'no');
+select pxp.f_insert_tprocedimiento_gui ('PM_CONIGPAR_SEL', 'OBPAGOA.1.1', 'no');
+select pxp.f_insert_tprocedimiento_gui ('OR_OFCU_SEL', 'OBPAGOA.1.1', 'no');
+select pxp.f_insert_tprocedimiento_gui ('PM_LUG_SEL', 'OBPAGOA.1.1', 'no');
+select pxp.f_insert_tprocedimiento_gui ('PM_LUG_ARB_SEL', 'OBPAGOA.1.1', 'no');
+select pxp.f_insert_tprocedimiento_gui ('PM_GES_SEL', 'OBPAGOA.1.1', 'no');
+select pxp.f_insert_tprocedimiento_gui ('PM_PER_SEL', 'OBPAGOA.1.1', 'no');
+select pxp.f_delete_tgui_rol ('VBSOL.2.1', 'ADQ - Visto Bueno Sol');
+select pxp.f_delete_tgui_rol ('VBDP', 'ADQ - Solicitud de Compra');
+select pxp.f_delete_tgui_rol ('TES', 'ADQ - Solicitud de Compra');
+select pxp.f_delete_tgui_rol ('VBDP.4', 'ADQ - Solicitud de Compra');
+select pxp.f_delete_tgui_rol ('VBDP.5', 'ADQ - Solicitud de Compra');
+select pxp.f_delete_tgui_rol ('VBDP.1', 'ADQ - Solicitud de Compra');
+select pxp.f_delete_tgui_rol ('VBDP.2', 'ADQ - Solicitud de Compra');
+select pxp.f_delete_tgui_rol ('VBDP.2.1', 'ADQ - Solicitud de Compra');
+select pxp.f_delete_tgui_rol ('VBDP.2.2', 'ADQ - Solicitud de Compra');
+select pxp.f_delete_tgui_rol ('VBDP.2.2.1', 'ADQ - Solicitud de Compra');
+select pxp.f_delete_tgui_rol ('VBDP.2.2.2', 'ADQ - Solicitud de Compra');
+select pxp.f_delete_tgui_rol ('VBDP.2.2.2.1', 'ADQ - Solicitud de Compra');
+select pxp.f_delete_tgui_rol ('VBDP.2.2.3', 'ADQ - Solicitud de Compra');
+select pxp.f_delete_tgui_rol ('VBDP.2.2.3.1', 'ADQ - Solicitud de Compra');
+select pxp.f_delete_tgui_rol ('VBDP.2.2.3.1.1', 'ADQ - Solicitud de Compra');
+select pxp.f_delete_tgui_rol ('VBDP.3', 'ADQ - Solicitud de Compra');
+select pxp.f_delete_tgui_rol ('VBDP.3.1', 'ADQ - Solicitud de Compra');
+select pxp.f_delete_tgui_rol ('VBDP.3.2', 'ADQ - Solicitud de Compra');
+select pxp.f_delete_trol_procedimiento_gui ('ADQ - Visto Bueno Sol', 'WF_DWF_MOD', 'VBSOL.2');
+select pxp.f_delete_trol_procedimiento_gui ('ADQ - Visto Bueno Sol', 'WF_DWF_ELI', 'VBSOL.2');
+select pxp.f_delete_trol_procedimiento_gui ('ADQ - Visto Bueno Sol', 'WF_DOCWFAR_MOD', 'VBSOL.2.1');
+select pxp.f_delete_trol_procedimiento_gui ('ADQ - Visto Bueno OC/COT', 'WF_DWF_MOD', 'VBCOT.2');
+select pxp.f_delete_trol_procedimiento_gui ('ADQ - Visto Bueno OC/COT', 'WF_DWF_ELI', 'VBCOT.2');
+select pxp.f_delete_trol_procedimiento_gui ('ADQ - Visto Bueno OC/COT', 'WF_DOCWFAR_MOD', 'VBCOT.2.1');
+select pxp.f_delete_trol_procedimiento_gui ('ADQ - Visto Bueno OC/COT', 'ADQ_DOCSOL_INS', 'VBCOT.1');
+select pxp.f_delete_trol_procedimiento_gui ('ADQ - Visto Bueno OC/COT', 'ADQ_DOCSOL_MOD', 'VBCOT.1');
+select pxp.f_delete_trol_procedimiento_gui ('ADQ - Visto Bueno OC/COT', 'ADQ_DOCSOL_ELI', 'VBCOT.1');
+select pxp.f_delete_trol_procedimiento_gui ('ADQ - Solicitud de Compra', 'WF_DWF_MOD', 'ADQ.3.2');
+select pxp.f_delete_trol_procedimiento_gui ('ADQ - Visto Bueno Sol', 'WF_DES_INS', 'VBSOL.2.2');
+select pxp.f_delete_trol_procedimiento_gui ('ADQ - Visto Bueno Sol', 'WF_DES_MOD', 'VBSOL.2.2');
+select pxp.f_delete_trol_procedimiento_gui ('ADQ - Visto Bueno Sol', 'WF_DES_ELI', 'VBSOL.2.2');
+select pxp.f_delete_trol_procedimiento_gui ('ADQ - Visto Bueno Sol', 'WF_DWF_MOD', 'VBSOL.2');
+select pxp.f_delete_trol_procedimiento_gui ('ADQ - Visto Bueno Sol', 'WF_DOCWFAR_MOD', 'VBSOL.2.1');
+select pxp.f_delete_trol_procedimiento_gui ('ADQ - Visto Bueno OC/COT', 'WF_DWF_MOD', 'VBCOT.2');
+select pxp.f_delete_trol_procedimiento_gui ('ADQ - Visto Bueno OC/COT', 'WF_DOCWFAR_MOD', 'VBCOT.2.1');
+select pxp.f_delete_trol_procedimiento_gui ('ADQ - Solicitud de Compra', 'WF_DWF_MOD', 'ADQ.3.2');
+select pxp.f_insert_trol_procedimiento_gui ('ADQ - Solicitud de Compra', 'PM_CONIGPAR_SEL', 'ADQ.3.1');
+
+/***********************************F-DEP-RAC-ADQ-1-29/08/2014*****************************************/

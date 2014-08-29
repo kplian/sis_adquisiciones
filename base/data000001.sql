@@ -792,7 +792,31 @@ select pxp.f_insert_tprocedimiento ('ADQ_RUO_CONT', 'Conteo de registros', 'si',
 /***********************************F-DAT-RAC-ADQ-0-05/06/2014*****************************************/
 
 
+/***********************************I-DAT-RAC-ADQ-0-29/08/2014*****************************************/
 
+
+select pxp.f_insert_tgui ('ADQUISICIONES', '', 'ADQ', 'si', 1, '', 1, '../../../lib/imagenes/adquisiciones.png', '', 'ADQ');
+select pxp.f_insert_tgui ('Documento de Solicitud', 'Documento de Solicitud', 'ADQ.2', 'no', 20, 'sis_adquisiciones/vista/documento_sol/DocumentoSol.php', 2, '', 'DocumentoSol', 'ADQ');
+select pxp.f_insert_tgui ('Solicitud de Compra', 'Solicitud de Compra', 'ADQ.3', 'si', 6, 'sis_adquisiciones/vista/solicitud/SolicitudReq.php', 2, '', 'SolicitudReq', 'ADQ');
+select pxp.f_insert_tgui ('Visto Bueno Solicitud', 'Solicitud de Compra', 'VBSOL', 'si', 7, 'sis_adquisiciones/vista/solicitud/SolicitudVb.php', 2, '', 'SolicitudVb', 'ADQ');
+select pxp.f_insert_tgui ('Proveedores', 'Proveedores de compra', 'ADQ.4', 'si', 2, 'sis_adquisiciones/vista/proveedor/Proveedor.php', 2, '', 'Proveedor', 'ADQ');
+select pxp.f_insert_tgui ('Proceso Compra', 'Proceso de Compra', 'PROC', 'si', 9, 'sis_adquisiciones/vista/proceso_compra/ProcesoCompra.php', 2, '', 'ProcesoCompra', 'ADQ');
+select pxp.f_insert_tgui ('Visto Bueno Cotizacion', 'Visto Bueno Cotizacion', 'VBCOT', 'si', 10, 'sis_adquisiciones/vista/cotizacion/CotizacionVbDin.php', 2, '', 'CotizacionVbDin', 'ADQ');
+select pxp.f_insert_tgui ('Presolicitud de Compra', 'Presolicitud de Compra', 'PRECOM', 'si', 3, 'sis_adquisiciones/vista/presolicitud/PresolicitudReq.php', 2, '', 'PresolicitudReq', 'ADQ');
+select pxp.f_insert_tgui ('Visto Bueno Presolicitud', 'Visto bueno de presolicitudes', 'VBPRE', 'si', 4, 'sis_adquisiciones/vista/presolicitud/PresolicitudVb.php', 2, '', 'PresolicitudVb', 'ADQ');
+select pxp.f_insert_tgui ('Consolidad Presolicitudes', 'Consolidar presolicitudes', 'COPRE', 'si', 5, 'sis_adquisiciones/vista/solicitud/SolicitudReqCon.php', 2, '', 'SolicitudReqCon', 'ADQ');
+select pxp.f_insert_tgui ('Solicitudes Pendientes', 'Solicitudes de compra aprobadas, pendientes de iniciio de proceso', 'SOLPEN', 'si', 8, 'sis_adquisiciones/vista/solicitud/SolicitudApro.php', 2, '', 'SolicitudApro', 'ADQ');
+select pxp.f_insert_tgui ('Obligaciones de Pago', 'Obligaciones de Pago', 'OBPAGOA', 'si', 11, 'sis_tesoreria/vista/obligacion_pago/ObligacionPagoAdq.php', 2, '', 'ObligacionPagoAdq', 'ADQ');
+select pxp.f_insert_tgui ('Prorrateo ...', 'Prorrateo ...', 'OBPAGOA.1.1', 'no', 0, 'sis_tesoreria/vista/tipo_prorrateo/WizardProrrateo.php', 4, '', '90%', 'ADQ');
+select pxp.f_insert_tfuncion ('adq.f_fun_inicio_solicitud_wf', 'Funcion para tabla     ', 'ADQ');
+select pxp.f_insert_tfuncion ('adq.f_fun_regreso_solicitud_wf', 'Funcion para tabla     ', 'ADQ');
+select pxp.f_insert_tprocedimiento ('ADQ_CLONRPC_IME', 'clona el rpc selecionado en sus registros marcados con la fecha inicial y fecha fin,
+                    hacia el id_cargo selecionado en las nueva fecha inicio y fecha fin', 'si', '', '', 'adq.ft_rpc_ime');
+select pxp.f_delete_trol ('ADQ - Visto Bueno DEV/PAG');
+select pxp.f_delete_trol ('OP - VoBo Plan de PAgos');
+
+
+/***********************************F-DAT-RAC-ADQ-0-29/08/2014*****************************************/
 
 
 
