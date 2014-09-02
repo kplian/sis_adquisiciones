@@ -151,7 +151,7 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
                 name: 'tipo_concepto',
                 fieldLabel: 'Subtipo',
                 allowBlank: false,
-                emptyText:'Tipo de Cuoata',
+                emptyText:'Subtipo...',
                 renderer:function (value, p, record){
                 	   console.log('value',value);
                         var dato='';
