@@ -153,13 +153,15 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
                 allowBlank: false,
                 emptyText:'Tipo de Cuoata',
                 renderer:function (value, p, record){
+                	   console.log('value',value);
                         var dato='';
-                        dato = (dato==''&&value=='alquiler_inmueble')?'Alquiler Inmuebles':dato;
+                        dato = (value=='alquiler_inmueble')?'Alquiler Inmuebles':dato;
                         dato = (dato==''&&value=='consultoria_empresa')?'Consultoria de Empresas':dato;
                         dato = (dato==''&&value=='consultoria_personal')?'Consultoria de Personas':dato;
                         dato = (dato==''&&value=='servicio')?'Servicios':dato;
                         dato = (dato==''&&value=='vehiculo')?'Vehiculos':dato;
                         dato = (dato==''&&value=='inmueble')?'Inmuebles':dato;
+                        dato = (dato==''&&value=='bien')?'Bienes':dato;
                         return String.format('{0}', dato);
                     },
                 
@@ -392,66 +394,6 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
 			form:false
 		},
 		{
-			config:{
-				name: 'lugar_entrega',
-				fieldLabel: 'Lug. Entrega',
-				allowBlank: true,
-				anchor: '80%',
-				gwidth: 100,
-				maxLength:255
-			},
-			type:'TextArea',
-			filters:{pfiltro:'sol.lugar_entrega',type:'string'},
-			id_grupo:1,
-			grid:true,
-			form:true
-		},
-		{
-			config:{
-				name: 'justificacion',
-				fieldLabel: 'Justificacion',
-				allowBlank: true,
-				anchor: '80%',
-				gwidth: 100,
-				maxLength:500
-			},
-			type:'TextArea',
-			filters:{pfiltro:'sol.justificacion',type:'string'},
-			id_grupo:1,
-			grid:true,
-			form:true
-		},
-		{
-			config:{
-				name: 'posibles_proveedores',
-				fieldLabel: 'Otros Proveedores',
-				allowBlank: true,
-				anchor: '80%',
-				gwidth: 100,
-				maxLength:500
-			},
-			type:'TextArea',
-			filters:{pfiltro:'sol.posibles_proveedores',type:'string'},
-			id_grupo:1,
-			grid:true,
-			form:true
-		},
-		{
-			config:{
-				name: 'comite_calificacion',
-				fieldLabel: 'Comite Calificación',
-				allowBlank: true,
-				anchor: '80%',
-				gwidth: 100,
-				maxLength:500
-			},
-			type:'TextArea',
-			filters:{pfiltro:'sol.comite_calificacion',type:'string'},
-			id_grupo:1,
-			grid:true,
-			form:true
-		},
-		{
 			config: {
 				name: 'id_categoria_compra',
 				hiddenName: 'id_categoria_compra',
@@ -505,7 +447,7 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
                 hiddenName: 'id_proveedor',
                 origen:'PROVEEDOR',
                 fieldLabel:'Proveedor Precotizacion',
-                allowBlank:false,
+                allowBlank:true,
                 tinit:false,
                 gwidth:200,
                 valueField: 'id_proveedor',
@@ -518,6 +460,67 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
             grid:true,
             form:true
         },
+		{
+			config:{
+				name: 'justificacion',
+				fieldLabel: 'Justificacion',
+				allowBlank: false,
+				anchor: '80%',
+				gwidth: 100,
+				maxLength:500
+			},
+			type:'TextArea',
+			filters:{pfiltro:'sol.justificacion',type:'string'},
+			id_grupo:1,
+			grid:true,
+			form:true
+		},
+		{
+			config:{
+				name: 'lugar_entrega',
+				fieldLabel: 'Lug. Entrega',
+				allowBlank: true,
+				anchor: '80%',
+				gwidth: 100,
+				maxLength:255
+			},
+			type:'TextArea',
+			filters:{pfiltro:'sol.lugar_entrega',type:'string'},
+			id_grupo:1,
+			grid:true,
+			form:true
+		},
+		{
+			config:{
+				name: 'posibles_proveedores',
+				fieldLabel: 'Otros Proveedores',
+				allowBlank: true,
+				anchor: '80%',
+				gwidth: 100,
+				maxLength:500
+			},
+			type:'TextArea',
+			filters:{pfiltro:'sol.posibles_proveedores',type:'string'},
+			id_grupo:1,
+			grid:true,
+			form:true
+		},
+		{
+			config:{
+				name: 'comite_calificacion',
+				fieldLabel: 'Comite Calificación',
+				allowBlank: true,
+				anchor: '80%',
+				gwidth: 100,
+				maxLength:500
+			},
+			type:'TextArea',
+			filters:{pfiltro:'sol.comite_calificacion',type:'string'},
+			id_grupo:1,
+			grid:true,
+			form:true
+		},
+		
 		{
 			config:{
 				name: 'extendida',

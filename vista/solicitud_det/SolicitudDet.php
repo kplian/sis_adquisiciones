@@ -218,7 +218,6 @@ Phx.vista.SolicitudDet=Ext.extend(Phx.gridInterfaz,{
             form:true 
         },
         
-        /*
         {
             config:{
                 name: 'id_orden_trabajo',
@@ -260,7 +259,7 @@ Phx.vista.SolicitudDet=Ext.extend(Phx.gridInterfaz,{
             id_grupo:1,
             grid:true,
             form:true
-        },*/
+        },
         
         {
             config:{
