@@ -1386,7 +1386,8 @@ BEGIN
                 cd.precio_unitario,
                 cd.precio_unitario_mb,
                 sd.id_centro_costo,
-                sd.descripcion
+                sd.descripcion,
+                sd.id_orden_trabajo
               from adq.tcotizacion_det cd
               inner join adq.tsolicitud_det sd on sd.id_solicitud_det = cd.id_solicitud_det
               where cd.id_cotizacion = v_id_cotizacion 
@@ -1407,7 +1408,7 @@ BEGIN
                       (
                         id_usuario_reg,
                         fecha_reg,
-                         estado_reg,
+                        estado_reg,
                         id_obligacion_pago,
                         id_concepto_ingas,
                         id_centro_costo,
@@ -1417,7 +1418,8 @@ BEGIN
                         id_partida_ejecucion_com,
                         monto_pago_mo,
                         monto_pago_mb,
-                        descripcion) 
+                        descripcion,
+                        id_orden_trabajo) 
                       VALUES (
                         p_id_usuario,
                         now(),
@@ -1431,7 +1433,8 @@ BEGIN
                         v_registros.id_partida_ejecucion,
                         (v_registros.cantidad_adju *v_registros.precio_unitario), 
                         (v_registros.cantidad_adju *v_registros.precio_unitario_mb),
-                        v_registros.descripcion
+                        v_registros.descripcion,
+                        v_registros.id_orden_trabajo
                       )RETURNING id_obligacion_det into v_id_obligacion_det;
                        
                        -- actulizar detalle de cotizacion

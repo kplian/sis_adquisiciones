@@ -59,6 +59,26 @@ Phx.vista.SolicitudDet=Ext.extend(Phx.gridInterfaz,{
             grid:true,
             form:true
         },
+        
+        {
+            config:{
+                    name:'id_orden_trabajo',
+                    sysorigen:'sis_contabilidad',
+                    fieldLabel: 'Orden Trabajo',
+	       		    origen:'OT',
+                    allowBlank:true,
+                    renderer:function(value, p, record){return String.format('{0}', record.data['desc_orden_trabajo']);},
+            
+                    gdisplayField: 'desc_orden_trabajo',
+                    
+                    gwidth:200
+            },
+            type:'ComboRec',
+            id_grupo:1,
+            filters:{pfiltro:'ot.motivo_orden#ot.desc_orden',type:'string'},
+            grid:true,
+            form:true
+        },
 		
         {
             config:{
@@ -183,7 +203,7 @@ Phx.vista.SolicitudDet=Ext.extend(Phx.gridInterfaz,{
                 maxLength:1245186
             },
             type:'MoneyField',
-            filters:{pfiltro:'sold.precio_sg',type:'numeric'},
+            filters:{pfiltro:'sold.precio_ga',type:'numeric'},
             id_grupo:1,
             grid:true,
             form:true
@@ -192,7 +212,7 @@ Phx.vista.SolicitudDet=Ext.extend(Phx.gridInterfaz,{
         {
             config:{
                 name: 'precio_sg',
-               // fieldLabel: 'Monto Sig. Ges.',
+                fieldLabel: 'Monto Sig. Ges.',
                 currencyChar:' ',
                 allowBlank: true,
                 inputType:'hidden',
@@ -207,59 +227,8 @@ Phx.vista.SolicitudDet=Ext.extend(Phx.gridInterfaz,{
             grid:true,
             form:true
         },
-        {
-            //configuracion del componente
-            config:{
-                    labelSeparator:'',
-                    inputType:'hidden',
-                    name: 'id_orden_trabajo'
-            },
-            type:'Field',
-            form:true 
-        },
         
-        {
-            config:{
-                name: 'id_orden_trabajo',
-                fieldLabel: 'Orden Trabajo',
-                allowBlank: true,
-                emptyText : 'OT...',
-                store : new Ext.data.JsonStore({
-                            url:'../../sis_contabilidad/control/OrdenTrabajo/listarOrdenTrabajo',
-                            id : 'id_orden_trabajo',
-                            root: 'datos',
-                            sortInfo:{
-                                    field: 'motivo_orden',
-                                    direction: 'ASC'
-                            },
-                            totalProperty: 'total',
-                            fields: ['id_orden_trabajo','motivo_orden','desc_orden'],
-                            remoteSort: true,
-                            baseParams:{par_filtro:'motivo_orden'}
-                }),
-                valueField: 'id_orden_trabajo',
-               displayField: 'motivo_orden',
-               gdisplayField: 'desc_orden_trabajo',
-               hiddenName: 'id_orden_trabajo',
-               forceSelection:true,
-               typeAhead: true,
-               triggerAction: 'all',
-                listWidth:350,
-               lazyRender:true,
-               mode:'remote',
-               pageSize:10,
-               queryDelay:1000,
-               width:350,
-               gwidth:350,
-               minChars:2,
-               renderer:function(value, p, record){return String.format('{0}', record.data['desc_orden_trabajo']);}
-            },
-            type:'ComboBox',
-            filters:{pfiltro:'ot.motivo_orden#ot.desc_orden',type:'string'},
-            id_grupo:1,
-            grid:true,
-            form:true
-        },
+        
         
         {
             config:{
@@ -495,6 +464,8 @@ Phx.vista.SolicitudDet=Ext.extend(Phx.gridInterfaz,{
         this.Cmp.id_solicitud.setValue(this.maestro.id_solicitud);
        
         Phx.vista.SolicitudDet.superclass.loadValoresIniciales.call(this);
+        this.Cmp.id_orden_trabajo.store.baseParams.fecha_solicitud = this.maestro.fecha_soli.dateFormat('d/m/Y');
+        this.Cmp.id_orden_trabajo.modificado = true;
     },
     
     
