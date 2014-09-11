@@ -150,8 +150,11 @@ Phx.vista.SolicitudReq = {
             
             //Supervisor  
             this.Cmp.id_funcionario_supervisor.store.baseParams.id_funcionario_dependiente=this.Cmp.id_funcionario.getValue();
-            this.Cmp.id_funcionario_supervisor.store.baseParams.presupuesto='todos';
-            this.Cmp.id_funcionario_supervisor.store.baseParams.gerencia='no';
+            this.Cmp.id_funcionario_supervisor.store.baseParams.presupuesto='todos';  //no se filtar solo las unidades que presupeustan
+            this.Cmp.id_funcionario_supervisor.store.baseParams.gerencia='no';  //no se aplica el filtro de gerencia de area
+            this.Cmp.id_funcionario_supervisor.store.baseParams.filter_rpc='si'; //se excluye a los rpc de esta lista
+            this.Cmp.id_funcionario_supervisor.store.baseParams.lista_blanca='4'; //solo se lista jefes de departamento
+            
             this.Cmp.id_funcionario_supervisor.store.baseParams.fecha = this.cmpFechaSoli.getValue().dateFormat(this.cmpFechaSoli.format);
             this.Cmp.id_funcionario_supervisor.modificado=true;
             
