@@ -7,7 +7,7 @@ CREATE OR REPLACE FUNCTION adq.f_fun_inicio_solicitud_wf (
   p_id_estado_wf integer,
   p_id_proceso_wf integer,
   p_codigo_estado varchar,
-  p_instrucciones_rpc varchar = 'Iniciar Contrato'::character varying
+  p_instrucciones_rpc varchar = 'Orden de Bien/Servicio'::character varying
 )
 RETURNS boolean AS
 $body$

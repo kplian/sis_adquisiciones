@@ -259,7 +259,7 @@ Phx.vista.SolicitudVb = {
             
            
            
-            if ( this.formEstado .getForm().isValid()){
+            if ( this.formEstado.getForm().isValid()){
                  Phx.CP.loadingShow();
                     Ext.Ajax.request({
                         // form:this.form.getForm().getEl(),
@@ -381,13 +381,14 @@ Phx.vista.SolicitudVb = {
                         timeout:this.timeout,
                         scope:this
                     }); 
-                 }
+                 }  
                    else{
                      this.cmbTipoEstado.store.baseParams.estados= reg.ROOT.datos.estados;
                      this.cmbTipoEstado.modificado=true;
                      if(resp.argument.data.estado=='vbrpc'){
                         this.cmbIntrucRPC.show();
                         this.cmbIntrucRPC.enable();
+                        this.cmbIntrucRPC.setValue('Orden de Bien/Servicio')
                      }
                      else{
                          this.cmbIntrucRPC.hide();
