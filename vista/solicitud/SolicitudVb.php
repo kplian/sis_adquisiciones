@@ -151,27 +151,30 @@ Phx.vista.SolicitudVb = {
                     tpl: '<tpl for="."><div class="x-combo-list-item"><p>{desc_funcionario}</p>Prioridad: <strong>{prioridad}</strong> </div></tpl>'
                 
                 },
-                    {
-                        name: 'obs',
-                        xtype: 'textarea',
-                        fieldLabel: 'Intrucciones',
-                        allowBlank: false,
-                        anchor: '80%',
-                        maxLength:500
-                    },
                   {
                     xtype: 'combo',
-                    name:'instruc_rpc',
-                    fieldLabel:'Proceder',
-                    allowBlank:false,
+                    name: 'instruc_rpc',
+                    fieldLabel:'Intrucciones',
+                    allowBlank: false,
                     emptyText:'Tipo...',
                     typeAhead: true,
                     triggerAction: 'all',
-                    lazyRender:true,
+                    lazyRender: true,
                     mode: 'local',
                     valueField: 'estilo',
                     gwidth: 100,
-                    store:['Iniciar Contrato','Orden de Bien/Servicio','Cotizar','Solicitar Pago']
+                    value: 'Orden de Bien/Servicio',
+                    //store:['Iniciar Contrato','Orden de Bien/Servicio','Cotizar','Solicitar Pago']
+                    store: ['Iniciar Contrato','Orden de Bien/Servicio','Cotizar']
+                },
+                {
+                    name: 'obs',
+                    xtype: 'textarea',
+                    fieldLabel: 'Obs',
+                    allowBlank: true,
+                    value:'',
+                    anchor: '80%',
+                    maxLength:500
                 }]
         });
         

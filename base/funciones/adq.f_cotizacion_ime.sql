@@ -757,7 +757,7 @@ BEGIN
                        - Cotizar
                        - Solicitar Pago
                       */
-                       IF(v_instruc_rpc in ('Iniciar Contrato','Solicitar Pago') ) THEN
+                       IF(v_instruc_rpc in ('Iniciar Contrato','Solicitar Pago','Orden de Bien/Servicio') ) THEN
                        
                              --obtenemos el estado siguiente
                              SELECT 
