@@ -274,12 +274,12 @@ Class RSolicitudCompra extends Report {
         
         $conf_det2_tablewidths=array($width2+$width1,$width2+25+$width3*2,$width1,$width3,$width3);
         $conf_det2_tablealigns=array('L','L','L','R','R');
-        $conf_det2_tablenumbers=array(0,0,0,1,1);
+        $conf_det2_tablenumbers=array(0,0,0,2,2);
         
         
         $conf_tp_tablewidths=array($width2+$width1+$width2+25+($width3*2)+$width1+$width3,$width3);
         $conf_tp_tablealigns=array('R','R');
-        $conf_tp_tablenumbers=array(0,1);
+        $conf_tp_tablenumbers=array(0,2);
         $conf_tp_tableborders=array(0,1);
         
         $total_solicitud = 0;
