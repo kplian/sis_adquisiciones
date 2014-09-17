@@ -1298,7 +1298,8 @@ BEGIN
               sol.id_gestion,
               sol.id_categoria_compra,
               sol.tipo,
-              sol.tipo_concepto
+              sol.tipo_concepto,
+              sol.id_funcionario
             into
              v_id_cotizacion,
              v_numero_oc,
@@ -1313,7 +1314,8 @@ BEGIN
              v_id_gestion,
              v_id_categoria_compra,
              v_tipo,
-             v_tipo_concepto
+             v_tipo_concepto,
+             v_id_funcionario
             from adq.tcotizacion c
             inner join adq.tproceso_compra pc on pc.id_proceso_compra = c.id_proceso_compra
             inner join adq.tsolicitud sol on sol.id_solicitud = pc.id_solicitud
@@ -1345,7 +1347,8 @@ BEGIN
               comprometido,
               id_categoria_compra,
               tipo_solicitud,
-              tipo_concepto_solicitud
+              tipo_concepto_solicitud,
+              id_funcionario
             ) 
             VALUES (
               p_id_usuario,
@@ -1364,7 +1367,9 @@ BEGIN
               'si',
               v_id_categoria_compra,
               v_tipo,
-              v_tipo_concepto
+              v_tipo_concepto,
+              v_id_funcionario
+              
             ) RETURNING id_obligacion_pago into v_id_obligacion_pago;
     
             

@@ -163,7 +163,7 @@ Phx.vista.SolicitudDet=Ext.extend(Phx.gridInterfaz,{
                 allowBlank: false,
                 width: 100,
                 gwidth: 100,
-                maxLength:4
+                maxLength:10
             },
             type:'NumberField',
             filters:{pfiltro:'sold.cantidad',type:'numeric'},
