@@ -293,6 +293,7 @@ class MODSolicitud extends MODbase{
 		$this->procedimiento='adq.f_solicitud_sel';
 		$this->transaccion='ADQ_SOLREP_SEL';
 		$this->tipo_procedimiento='SEL';//tipo de transaccion
+		$this->setCount(false);
 		
 		$this->setParametro('id_solicitud','id_solicitud','int4');
 		$this->setParametro('id_proceso_wf','id_proceso_wf','int4');
