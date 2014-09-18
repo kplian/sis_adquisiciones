@@ -1,3 +1,5 @@
+--------------- SQL ---------------
+
 CREATE OR REPLACE FUNCTION adq.f_solicitud_sel (
   p_administrador integer,
   p_id_usuario integer,
@@ -75,7 +77,7 @@ BEGIN
                 IF p_administrador !=1 THEN
                 
                               
-                    v_filtro = '(ew.id_funcionario='||v_parametros.id_funcionario_usu::varchar||' ) and  (lower(sol.estado)!=''borrador'') and ';
+                    v_filtro = ' (ew.id_funcionario='||v_parametros.id_funcionario_usu::varchar||' ) and  (lower(sol.estado)!=''borrador'') and ';
                   ELSE
                     v_filtro = ' (lower(sol.estado)!=''borrador''  and lower(sol.estado)!=''proceso'' and lower(sol.estado)!=''finalizado'') and ';
                   
@@ -85,9 +87,17 @@ BEGIN
             END IF;
             
             
-          
             
-            IF  pxp.f_existe_parametro(p_tabla,'historico') THEN
+            IF  lower(v_parametros.tipo_interfaz) = 'solicitudvbasistente' THEN
+            
+                       
+                v_filtro = ' (ew.id_funcionario  IN (select * FROM orga.f_get_funcionarios_x_usuario_asistente(now()::date,'||p_id_usuario||') AS (id_funcionario INTEGER))) and ';
+                
+                
+            END IF;  
+           
+          
+           IF  pxp.f_existe_parametro(p_tabla,'historico') THEN
              
              v_historico =  v_parametros.historico;
             
@@ -242,6 +252,10 @@ BEGIN
                 END IF;
                 
                 
+            END IF;
+            
+            IF  lower(v_parametros.tipo_interfaz) = 'solicitudvbasistente' THEN
+                v_filtro = ' (ew.id_funcionario  IN (select * FROM orga.f_get_funcionarios_x_usuario_asistente(now()::date,'||p_id_usuario||') AS (id_funcionario INTEGER))) and ';
             END IF;
             
             

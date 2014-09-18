@@ -45,15 +45,18 @@ BEGIN
           from adq.tsolicitud s
           where id_proceso_wf = p_id_proceso_wf;
      
-     
-      -- actualiza estado en la solicitud
+          IF p_instrucciones_rpc = '' THEN
+              p_instrucciones_rpc =  'Orden de Bien/Servicio';
+          END IF;
+             
+             -- actualiza estado en la solicitud
             
              update adq.tsolicitud  s set 
                id_estado_wf =  p_id_estado_wf,
                estado =p_codigo_estado,
                id_usuario_mod=p_id_usuario,
                fecha_mod=now(),
-               instruc_rpc=p_instrucciones_rpc
+               instruc_rpc= COALESCE(p_instrucciones_rpc,'Orden de Bien/Servicio')
                
              where id_proceso_wf = p_id_proceso_wf;
     
