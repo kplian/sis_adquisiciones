@@ -288,8 +288,8 @@ BEGIN
 
 	/*********************************    
  	#TRANSACCION:  'ADQ_SOLD_ELI'
- 	#DESCRIPCION:	Eliminacion de registros
- 	#AUTOR:		admin	
+ 	#DESCRIPCION:	Eliminacion de detalles de la solicitud
+ 	#AUTOR:		rac (kplian)	
  	#FECHA:		05-03-2013 01:28:10
 	***********************************/
 
@@ -297,11 +297,16 @@ BEGIN
 
 		begin
 			--Sentencia de la eliminacion
-			delete from adq.tsolicitud_det
+			
+            --delete from adq.tsolicitud_det
+            --where id_solicitud_det=v_parametros.id_solicitud_det;
+            
+            update adq.tsolicitud_det set
+            estado_reg = 'inactivo'
             where id_solicitud_det=v_parametros.id_solicitud_det;
                
             --Definicion de la respuesta
-            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Detalle eliminado(a)'); 
+            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Detalle de solicitud inactivado(a)'); 
             v_resp = pxp.f_agrega_clave(v_resp,'id_solicitud_det',v_parametros.id_solicitud_det::varchar);
               
             --Devuelve la respuesta

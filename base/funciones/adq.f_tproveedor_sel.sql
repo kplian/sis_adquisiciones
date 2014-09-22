@@ -1,3 +1,5 @@
+--------------- SQL ---------------
+
 CREATE OR REPLACE FUNCTION adq.f_tproveedor_sel (
   p_administrador integer,
   p_id_usuario integer,
@@ -73,7 +75,8 @@ BEGIN
                         else
                         	person.nombre_completo1
                         end):: varchar as nombre_proveedor,
-                        provee.rotulo_comercial
+                        provee.rotulo_comercial,
+                        person.ci
 						from param.tproveedor provee
 						inner join segu.tusuario usu1 on usu1.id_usuario = provee.id_usuario_reg
 						left join segu.tusuario usu2 on usu2.id_usuario = provee.id_usuario_mod   

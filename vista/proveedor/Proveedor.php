@@ -206,6 +206,21 @@ Phx.vista.Proveedor=Ext.extend(Phx.gridInterfaz,{
 		},
 		{
 			config:{
+				name: 'ci',
+				fieldLabel: 'CI',
+				allowBlank: true,
+				anchor: '100%',
+				gwidth: 100,
+				maxLength:50
+			},
+			type:'TextField',
+			filters:{pfiltro:'person.ci',type:'string'},
+			id_grupo:0,
+			grid:true,
+			form:false
+		},
+		{
+			config:{
 				name: 'rotulo_comercial',
 				fieldLabel: 'Rótulo Comercial',
 				allowBlank: false,
@@ -795,7 +810,7 @@ Phx.vista.Proveedor=Ext.extend(Phx.gridInterfaz,{
 		{name:'lugar', type: 'string'},
 		{name:'pais', type: 'string'},
 		{name:'rotulo_comercial', type: 'string'},
-		{name:'nombre_proveedor', type: 'string'}
+		{name:'nombre_proveedor', type: 'string'},'ci'
 	],
 	
 	cmbProveedor:new Ext.form.ComboBox({

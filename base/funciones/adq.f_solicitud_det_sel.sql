@@ -96,7 +96,7 @@ BEGIN
                         inner join pre.tpresupuesto pre on pre.id_centro_costo = cc.id_centro_costo 
 						left join segu.tusuario usu2 on usu2.id_usuario = sold.id_usuario_mod
                         left join conta.torden_trabajo ot on ot.id_orden_trabajo = sold.id_orden_trabajo
-                        where sold.id_solicitud='||v_parametros.id_solicitud||' and ';
+                        where sold.estado_reg= ''activo'' and  sold.id_solicitud='||v_parametros.id_solicitud||' and ';
 			
 			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;
@@ -130,7 +130,7 @@ BEGIN
                         inner join pre.tpresupuesto pre on pre.id_centro_costo = cc.id_centro_costo 
 						left join segu.tusuario usu2 on usu2.id_usuario = sold.id_usuario_mod
                         left join conta.torden_trabajo ot on ot.id_orden_trabajo = sold.id_orden_trabajo
-                        where sold.id_solicitud='||v_parametros.id_solicitud||' and ';
+                        where sold.estado_reg= ''activo'' and sold.id_solicitud='||v_parametros.id_solicitud||' and ';
 			
 			--Definicion de la respuesta		    
 			v_consulta:=v_consulta||v_parametros.filtro;

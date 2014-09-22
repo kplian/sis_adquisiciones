@@ -16,15 +16,38 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
     	//llama al constructor de la clase padre
 		
 		Phx.vista.Solicitud.superclass.constructor.call(this,config);		
-		this.init();
+		this.init();		
 		
-		this.addButton('btnReporte',{
+		this.menuAdq = new Ext.Toolbar.SplitButton({
+            id: 'btn-adqrep-' + this.idContenedor,
+            text: 'Rep.',
+            disabled: true,
+            iconCls : 'bpdf32',
+            scope: this,
+            menu:{
+            items: [{
+                id:'b-btnSolicitud-' + this.idContenedor,
+                text: 'Solicitud',
+                tooltip: '<b>Reporte de Solicitud de Compra</b>',
+                handler:this.onButtonSolicitud,
+                scope: this
+            }, {
+                id:'b-btnRepOC-' + this.idContenedor,
+                text: 'Orden de Compra',
+                tooltip: '<b>Reporte de Orden de Compra</b>',
+                handler:this.onButtonRepOC,
+                scope: this
+            }
+        ]}
+        });
+		
+		/*this.addButton('btnReporte',{
             text :'',
             iconCls : 'bpdf32',
             disabled: true,
             handler : this.onButtonSolicitud,
             tooltip : '<b>Reporte Solicitud de Compra</b><br/><b>Reporte Solicitud de Compra</b>'
-        });
+        });*/
   
         this.addButton('diagrama_gantt',{text:'',iconCls: 'bgantt',disabled:true,handler:diagramGantt,tooltip: '<b>Diagrama Gantt de proceso macro</b>'});
   
