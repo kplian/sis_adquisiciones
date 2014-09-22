@@ -18,7 +18,7 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
 		Phx.vista.Solicitud.superclass.constructor.call(this,config);		
 		this.init();		
 		
-		this.menuAdq = new Ext.Toolbar.SplitButton({
+		/*this.menuAdq = new Ext.Toolbar.SplitButton({
             id: 'btn-adqrep-' + this.idContenedor,
             text: 'Rep.',
             disabled: true,
@@ -39,15 +39,15 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
                 scope: this
             }
         ]}
-        });
+        });*/
 		
-		/*this.addButton('btnReporte',{
+		this.addButton('btnReporte',{
             text :'',
             iconCls : 'bpdf32',
             disabled: true,
             handler : this.onButtonSolicitud,
             tooltip : '<b>Reporte Solicitud de Compra</b><br/><b>Reporte Solicitud de Compra</b>'
-        });*/
+        });
   
         this.addButton('diagrama_gantt',{text:'',iconCls: 'bgantt',disabled:true,handler:diagramGantt,tooltip: '<b>Diagrama Gantt de proceso macro</b>'});
   
