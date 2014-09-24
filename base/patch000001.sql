@@ -432,4 +432,4 @@ ALTER TABLE adq.tsolicitud
 COMMENT ON COLUMN adq.tsolicitud.revisado_asistente
 IS 'sirve para indicar si el asistente reviso la documentacion';
 
-/***********************************I-SCP-RAC-ADQ-0-23/09/2014****************************************/
+/***********************************F-SCP-RAC-ADQ-0-23/09/2014****************************************/
