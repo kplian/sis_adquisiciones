@@ -117,6 +117,8 @@ Phx.vista.SolicitudVbAsistente = {
             this.getBoton('btnRev').setIconClass('bball_green')
         }
        this.getBoton('btnRev').enable();
+       //habilitar reporte de colicitud de comrpa y preorden de compra
+       this.menuAdq.enable();
        return tb 
     },  
     
@@ -124,6 +126,8 @@ Phx.vista.SolicitudVbAsistente = {
         var tb = Phx.vista.SolicitudVbAsistente.superclass.liberaMenu.call(this);
         if(tb){
             this.getBoton('btnRev').disable();
+            //boton de reporte de solicitud y preorden de compra
+            this.menuAdq.disable();
            
         }
         return tb

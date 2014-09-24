@@ -477,7 +477,8 @@ Phx.vista.SolicitudVb = {
                 this.getBoton('ini_estado').disable();
             }*/
             
-          
+           //habilitar reporte de colicitud de comrpa y preorden de compra
+           this.menuAdq.enable();
       } 
       else{
           this.desBotoneshistorico();
@@ -491,6 +492,8 @@ Phx.vista.SolicitudVb = {
             this.getBoton('sig_estado').disable();
             this.getBoton('ini_estado').disable();
             this.getBoton('ant_estado').disable();
+            //boton de reporte de solicitud y preorden de compra
+            this.menuAdq.disable();
            
         }
         return tb

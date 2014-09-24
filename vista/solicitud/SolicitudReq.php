@@ -379,21 +379,22 @@ Phx.vista.SolicitudReq = {
       var data = this.getSelectedData();
       var tb =this.tbar;
       Phx.vista.SolicitudReq.superclass.preparaMenu.call(this,n);  
+      //habilitar reporte de colicitud de comrpa y preorden de compra
       this.menuAdq.enable();    
-          if(data['estado']==  'borrador' || data['estado']==  'Borrador'){
-             this.getBoton('fin_requerimiento').enable();
-             
-           }
-          else{
-               this.getBoton('fin_requerimiento').disable();
-               this.getBoton('edit').disable();
-               //this.getBoton('new').disable();
-               this.getBoton('del').disable();
-              // this.getBoton('save').disable();
-            
-              
-              
-          }
+      if(data['estado']==  'borrador' || data['estado']==  'Borrador'){
+         this.getBoton('fin_requerimiento').enable();
+         
+       }
+       else{
+           this.getBoton('fin_requerimiento').disable();
+           this.getBoton('edit').disable();
+           //this.getBoton('new').disable();
+           this.getBoton('del').disable();
+          // this.getBoton('save').disable();
+        
+          
+          
+        }
         
         if(data.estado =='borrador' || data.estado =='pendiente' ||data.estado =='vbgerencia'){ 
           this.getBoton('btnSolpre').enable(); 

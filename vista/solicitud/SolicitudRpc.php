@@ -105,7 +105,8 @@ Phx.vista.SolicitudRpc = {
            this.getBoton('change_rpc').disable();     
        }
           
-       
+       //habilitar reporte de colicitud de comrpa y preorden de compra
+       this.menuAdq.enable();
        
       return tb 
   }, 
@@ -113,6 +114,8 @@ Phx.vista.SolicitudRpc = {
         var tb = Phx.vista.SolicitudRpc.superclass.liberaMenu.call(this);
         if(tb){
              this.getBoton('change_rpc').disable(); 
+             //boton de reporte de solicitud y preorden de compra
+            this.menuAdq.disable();
         }
         return tb
   },

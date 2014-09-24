@@ -18,15 +18,20 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
 		Phx.vista.Solicitud.superclass.constructor.call(this,config);		
 		this.init();		
 		
+
 		this.addBotones();
-		/*
+
+
+		
+		
+        /*
 		this.addButton('btnReporte',{
             text :'',
             iconCls : 'bpdf32',
             disabled: true,
             handler : this.onButtonSolicitud,
             tooltip : '<b>Reporte Solicitud de Compra</b><br/><b>Reporte Solicitud de Compra</b>'
-        });*/
+       }); */
   
         this.addButton('diagrama_gantt',{text:'',iconCls: 'bgantt',disabled:true,handler:diagramGantt,tooltip: '<b>Diagrama Gantt de proceso macro</b>'});
   
@@ -65,6 +70,7 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
             text: 'Rep.',
             disabled: true,
             iconCls : 'bpdf32',
+            handler:this.onButtonSolicitud,
             scope: this,
             menu:{
             items: [{

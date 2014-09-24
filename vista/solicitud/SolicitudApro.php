@@ -791,7 +791,8 @@ Phx.vista.SolicitudApro = {
             this.getBoton('asig_usu').disable();
         }
        
-       
+       //habilitar reporte de colicitud de comrpa y preorden de compra
+      this.menuAdq.enable(); 
        
         return tb 
      }, 
@@ -801,6 +802,8 @@ Phx.vista.SolicitudApro = {
             this.getBoton('ini_proc').disable();
             this.getBoton('ini_estado').disable();
             this.getBoton('ant_estado').disable();
+            //boton de reporte de solicitud y preorden de compra
+            this.menuAdq.disable();
            
         }
         return tb
