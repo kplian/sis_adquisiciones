@@ -164,6 +164,29 @@ class MODSolicitudDet extends MODbase{
 		//Devuelve la respuesta
 		return $this->respuesta;
 	}
+	
+	function reportePreOrdenCompra(){
+		$this->procedimiento='adq.f_solicitud_det_sel';
+		$this->transaccion='ADQ_SOLDETOC_REP';
+		$this->tipo_procedimiento='SEL';
+		$this->setCount(false);
+		
+		$this->setParametro('id_solicitud','id_solicitud','int4');
+		$this->setParametro('id_proveedor','id_proveedor','int4');
+		$this->captura('desc_ingas','varchar');
+		$this->captura('desc_centro_costo','text');
+		$this->captura('cantidad_sol','int4');
+		$this->captura('precio_unitario_sol','numeric');
+		$this->captura('descripcion_sol','text');
+		$this->captura('precio_unitario_mb_sol','numeric');
+		$this->captura('revertido_mb','numeric');
+		$this->captura('revertido_mo','numeric');
+				
+		$this->armarConsulta();
+		$this->ejecutarConsulta();
+		//var_dump($this->respuesta); exit;
+		return $this->respuesta;
+	}	
 			
 }
 ?>

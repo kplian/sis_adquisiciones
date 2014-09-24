@@ -421,3 +421,15 @@ ALTER TABLE adq.tsolicitud
 /***********************************F-SCP-RAC-ADQ-0-08/08/2014****************************************/
 
 
+
+/***********************************I-SCP-RAC-ADQ-0-23/09/2014****************************************/
+
+--------------- SQL ---------------
+
+ALTER TABLE adq.tsolicitud
+  ADD COLUMN revisado_asistente VARCHAR(4) DEFAULT 'no' NOT NULL;
+
+COMMENT ON COLUMN adq.tsolicitud.revisado_asistente
+IS 'sirve para indicar si el asistente reviso la documentacion';
+
+/***********************************I-SCP-RAC-ADQ-0-23/09/2014****************************************/

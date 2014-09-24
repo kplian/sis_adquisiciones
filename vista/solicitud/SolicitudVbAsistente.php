@@ -33,6 +33,7 @@ Phx.vista.SolicitudVbAsistente = {
         this.Atributos[this.getIndAtributo('id_categoria_compra')].form=false;
         this.Atributos[this.getIndAtributo('id_uo')].form=false;
         this.Atributos[this.getIndAtributo('id_depto')].form=false;
+        this.Atributos[this.getIndAtributo('revisado_asistente')].grid=true; 
         
         //funcionalidad para listado de historicos
         this.historico = 'no';
@@ -58,7 +59,13 @@ Phx.vista.SolicitudVbAsistente = {
         
     	Phx.vista.SolicitudVbAsistente.superclass.constructor.call(this,config);
     	   
-                
+        this.addButton('btnRev', {
+                text : 'Revisado',
+                iconCls : 'bball_green',
+                disabled : true,
+                handler : this.cambiarRev,
+                tooltip : '<b>Revisado</b><br/>Sirve como un indicador de que la documentacion fue revisada por el asistente'
+        });        
        
         this.store.baseParams={tipo_interfaz:this.nombreVista};
         //coloca filtros para acceso directo si existen
@@ -75,9 +82,52 @@ Phx.vista.SolicitudVbAsistente = {
 		
 	},
 	
-   
+   cambiarRev:function(){
+	    Phx.CP.loadingShow();
+	    var d = this.sm.getSelected().data;
+        Ext.Ajax.request({
+            url:'../../sis_adquisiciones/control/Solicitud/marcarRevisadoSol',
+            params:{id_solicitud:d.id_solicitud},
+            success:this.successRev,
+            failure: this.conexionFailure,
+            timeout:this.timeout,
+            scope:this
+        }); 
+	    
+	},
+	
+	successRev:function(resp){
+       Phx.CP.loadingHide();
+       var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
+       if(!reg.ROOT.error){
+         this.reload();
+       }
+    },
+	
      
-       
+    preparaMenu:function(n){
+      var data = this.getSelectedData();
+      var tb =this.tbar;
+      Phx.vista.SolicitudVbAsistente.superclass.preparaMenu.call(this,n);  
+      var data = this.getSelectedData();
+        if(data['revisado_asistente']== 'si'){
+            this.getBoton('btnRev').setIconClass('bball_white')
+        }
+        else{
+            this.getBoton('btnRev').setIconClass('bball_green')
+        }
+       this.getBoton('btnRev').enable();
+       return tb 
+    },  
+    
+    liberaMenu:function(){
+        var tb = Phx.vista.SolicitudVbAsistente.superclass.liberaMenu.call(this);
+        if(tb){
+            this.getBoton('btnRev').disable();
+           
+        }
+        return tb
+    }, 
 	south:
           { 
           url:'../../../sis_adquisiciones/vista/solicitud_det/SolicitudVbDet.php',

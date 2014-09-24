@@ -183,7 +183,8 @@ BEGIN
                         sol.ai_habilitado,
                         sol.id_cargo_rpc,
                         sol.id_cargo_rpc_ai,
-                        sol.tipo_concepto
+                        sol.tipo_concepto,
+                        sol.revisado_asistente
                         	
 						from adq.tsolicitud sol
 						inner join segu.tusuario usu1 on usu1.id_usuario = sol.id_usuario_reg
@@ -412,7 +413,7 @@ BEGIN
 			v_consulta:=v_consulta||v_parametros.filtro;
 			v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
 
-               
+            raise notice '%', v_consulta;   
 
 			--Devuelve la respuesta
 			return v_consulta;			
@@ -469,7 +470,49 @@ BEGIN
         return v_consulta;
 
 	end;
-   
+    
+    /*********************************    
+ 	#TRANSACCION:  'ADQ_SOLOC_REP'
+ 	#DESCRIPCION:	Reporte Pre Orden Compra
+ 	#AUTOR:		Gonzalo Sarmiento Sejas	
+ 	#FECHA:		22-09-2014
+	***********************************/
+	elsif(p_transaccion='ADQ_SOLOC_REP')then
+    	begin
+		v_consulta:='select pv.desc_proveedor,
+                     per.id_persona,
+                     per.direccion as dir_persona,
+                     per.telefono1 as telf1_persona,
+                     per.telefono2 as telf2_persona,
+                     per.celular1 as cel_persona,
+                     per.correo as correo_persona,
+                     ins.id_institucion,
+                     ins.direccion as dir_institucion,
+                     ins.telefono1 as telf1_institucion,
+                     ins.telefono2 as telf2_institucion,
+                     ins.celular1 as cel_institucion,
+                     ins.email1 as email_institucion,
+                     ins.fax as fax_institucion,
+                     sol.lugar_entrega,
+                     sol.tipo,
+                     mon.moneda,
+                     mon.codigo as codigo_moneda,
+                     sol.num_tramite
+                	 from adq.tsolicitud sol
+                   	 inner join param.vproveedor pv on pv.id_proveedor = sol.id_proveedor
+                   	 left join segu.tpersona per on per.id_persona = pv.id_persona
+                   	 left join param.tinstitucion ins on ins.id_institucion = pv.id_institucion
+                   	 inner join param.tmoneda mon on mon.id_moneda = sol.id_moneda
+                	 where sol.id_solicitud ='||v_parametros.id_solicitud||' and ';
+          
+          --Definicion de la respuesta
+          v_consulta:=v_consulta||v_parametros.filtro;
+          v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
+
+          --Devuelve la respuesta
+          return v_consulta;
+        end;
+       
 	/*********************************    
  	#TRANSACCION:  'ADQ_ESTPROC_SEL'
  	#DESCRIPCION:	Consulta estado de procesos

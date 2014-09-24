@@ -37,6 +37,26 @@ Phx.vista.SolicitudApro = {
         this.Atributos[this.getIndAtributo('id_uo')].form=false;
         this.Atributos[this.getIndAtributo('id_depto')].form=false;
         
+        //funcionalidad para listado de historicos
+        this.historico = 'no';
+        this.tbarItems = ['-',{
+            text: 'En Proceso',
+            enableToggle: true,
+            pressed: false,
+            toggleHandler: function(btn, pressed) {
+               
+                if(pressed){
+                    this.store.baseParams.filtro_solo_aprobadas = 0;
+                     
+                }
+                else{
+                   this.store.baseParams.filtro_solo_aprobadas = 1;
+                }
+                
+                this.onButtonAct();
+             },
+            scope: this
+           }];
         
     	Phx.vista.SolicitudApro.superclass.constructor.call(this,config);
     	
@@ -74,12 +94,8 @@ Phx.vista.SolicitudApro = {
              }
          },this);
         
-        this.store.baseParams={tipo_interfaz:this.nombreVista,tipo_interfaz:'aprobadores',filtro_aprobadas:1};
+        this.store.baseParams={tipo_interfaz:this.nombreVista,tipo_interfaz:'aprobadores',filtro_aprobadas:1,filtro_solo_aprobadas:1};
        
-        
-        
-        
-		
 	},
 	
 	
@@ -307,6 +323,43 @@ Phx.vista.SolicitudApro = {
                      inputType:'hidden',
                      name: 'id_proceso_copra',  
                    },
+                   {
+                    xtype: 'combo',
+                    name: 'id_depto_usuario',
+                    hiddenName: 'id_depto_usuario',
+                    fieldLabel: 'Auxiliar',
+                    listWidth:280,
+                    allowBlank: false,
+                    store:new Ext.data.JsonStore(
+                    {
+                        url:    '../../sis_parametros/control/DeptoUsuario/listarDeptoUsuario',
+                        id: 'id_depto_usuario',
+                        root:'datos',
+                        sortInfo:{
+                            field:'id_depto_usuario',
+                            direction:'ASC'
+                        },
+                        totalProperty:'total',
+                        fields: ['id_depto_usuario','id_usuario','desc_usuario','cargo'],
+                        // turn on remote sorting
+                        remoteSort: true,
+                        baseParams:{par_filtro:'person.nombre_completo1'}
+                    }),
+                    valueField: 'id_depto_usuario',
+                    displayField: 'desc_usuario',
+                    forceSelection:true,
+                    typeAhead: false,
+                    triggerAction: 'all',
+                    lazyRender:true,
+                    mode:'remote',
+                    pageSize:50,
+                    queryDelay:500,
+                    width:210,
+                    gwidth:220,
+                    minChars:2,
+                    tpl: '<tpl for="."><div class="x-combo-list-item"><p>{desc_usuario}</p>Tarea: <strong>{cargo}</strong> </div></tpl>'
+                
+                    },
                 
                 
                     {
@@ -347,6 +400,7 @@ Phx.vista.SolicitudApro = {
                         anchor: '80%',
                         gwidth: 100,
                         format: 'd/m/Y',   
+                        value: new Date()
                         
                     },
                     {
@@ -396,6 +450,10 @@ Phx.vista.SolicitudApro = {
         this.cmbIdDepto =this.formProceso.getForm().findField('id_depto');
        
         this.cmbInstrucRPC =this.formProceso.getForm().findField('instruc_rpc');
+        this.cmbFechaProc =this.formProceso.getForm().findField('fecha_ini_proc');
+        
+        this.cmb_id_depto_usuario_proc = this.formProceso.getForm().findField('id_depto_usuario');
+       
         
          
         
@@ -507,6 +565,10 @@ Phx.vista.SolicitudApro = {
             this.cmbIdDepto.setValue(this.cmbDeptoAdq.getValue());
             this.cmbInstrucRPC.setValue(d.obs+' \n----- \n Intr:'+d.instruc_rpc)
             this.winProc.show(); 
+            this.cmb_id_depto_usuario_proc.store.baseParams.id_depto = d.id_depto;
+            this.cmb_id_depto_usuario_proc.modificado = true;
+            this.cmbFechaProc.setValue(new Date());
+            
             
         }
          

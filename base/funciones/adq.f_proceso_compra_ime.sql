@@ -1,3 +1,5 @@
+--------------- SQL ---------------
+
 CREATE OR REPLACE FUNCTION adq.f_proceso_compra_ime (
   p_administrador integer,
   p_id_usuario integer,
@@ -305,12 +307,15 @@ BEGIN
            
                v_resp = adq.f_inserta_cotizacion(p_administrador, p_id_usuario,v_hstore_coti);
                 
-               
-            
             END IF;
             
+            IF  pxp.f_existe_parametro(p_tabla,'id_depto_usuario') THEN
+               IF adq.f_registrar_auxiliar_adq(p_id_usuario,  v_parametros.id_depto_usuario, v_parametros.id_solicitud ) != 'true' THEN
+                 raise exception 'No se pudo asignar el usuario';
+               END IF;
+            END IF;
             
-            
+             
 			
 			--Definicion de la respuesta
 			v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Proceso de Compra almacenado(a) con exito (id_proceso_compra'||v_id_proceso_compra||')'); 
@@ -336,54 +341,10 @@ BEGIN
 		begin
 			
             
-            select 
-             id_usuario
-            into
-             v_id_usuario 
-            from param.tdepto_usuario d 
-            where d.id_depto_usuario =  v_parametros.id_depto_usuario;
-            
-           select 
-             sol.num_tramite,
-             sol.numero,
-             f.desc_funcionario1
-           into 
-            v_registros
-           
-           from adq.tsolicitud sol
-           inner join orga.vfuncionario f on f.id_funcionario = sol.id_funcionario 
-           where sol.id_solicitud =v_parametros.id_solicitud ;
-        
-          
-        
-        --inserta alarma cuando se afigna a un auxiliar
-        
-         v_id_alarma = param.f_inserta_alarma(
-                                    NULL::integer,
-                                    'Usted fue asignado a la solicitud de compra: '||v_registros.numero||'('||v_registros.desc_funcionario1||') del tramite '||v_registros.num_tramite,    --descripcion alarmce
-                                    '../../../sis_adquisiciones/vista/proceso_compra/ProcesoCompra.php',--acceso directo
-                                    now()::date,
-                                    'notificacion',
-                                    'Asignacion de proceso de compra',  --asunto
-                                    p_id_usuario,
-                                    'ProcesoCompra', --clase
-                                    'Proceso de compra',--titulo
-                                    '{filtro_directo:{campo:"id_solicitud",valor:"'||v_parametros.id_solicitud::varchar||'"}}',
-                                    v_id_usuario, --usuario a quien va dirigida la alarma
-                                    'Asignacion de proceso de compra'
-                                   );
-            
-            
-            
-            
-            
-            --Sentencia de la modificacion
-			update adq.tproceso_compra set
-			id_usuario_auxiliar = v_id_usuario,
-            id_usuario_mod = p_id_usuario,
-            id_usuario_ai = v_parametros._id_usuario_ai,
-            usuario_ai =  v_parametros._nombre_usuario_ai
-			where id_solicitud=v_parametros.id_solicitud;
+             IF adq.f_registrar_auxiliar_adq(p_id_usuario,  v_parametros.id_depto_usuario, v_parametros.id_solicitud ) != 'true' THEN
+               
+               raise exception 'No se pudo asignar el usuario';
+             END IF;
                
 			--Definicion de la respuesta
             v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Usuario asignado al proceso)'); 

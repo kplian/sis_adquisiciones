@@ -52,8 +52,8 @@ class MODCotizacionDet extends MODbase{
 		//Ejecuta la instruccion
 		$this->armarConsulta();
 		$this->ejecutarConsulta();
-		
 		//Devuelve la respuesta
+		//var_dump($this->respuesta); exit;
 		return $this->respuesta;
 	}
 			

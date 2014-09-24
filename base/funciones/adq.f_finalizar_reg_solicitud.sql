@@ -59,6 +59,10 @@ DECLARE
     v_tipo_noti  			varchar;
     v_titulo   			varchar;
     
+    v_num_estados  integer;
+    v_fecha_soli date;
+    v_num_funcionarios integer;
+    
     
    
 			    
@@ -86,7 +90,8 @@ p_hstore->'id_solicitud'
             s.estado,
             s.id_funcionario_aprobador,
             s.id_funcionario_supervisor,
-            s.numero
+            s.numero,
+            s.fecha_soli
           into 
           
             v_id_proceso_wf,
@@ -94,7 +99,8 @@ p_hstore->'id_solicitud'
             v_codigo_estado,
             v_id_funcionario_aprobador,
             v_id_funcionario_supervisor,
-            v_numero_sol
+            v_numero_sol,
+            v_fecha_soli
             
           from adq.tsolicitud s
           where s.id_solicitud=p_id_solicitud;
@@ -113,11 +119,61 @@ p_hstore->'id_solicitud'
             va_regla,
             va_prioridad
         
-        FROM wf.f_obtener_estado_wf(v_id_proceso_wf, v_id_estado_wf,NULL,'siguiente');  
-         
+        FROM wf.f_obtener_estado_wf(v_id_proceso_wf, v_id_estado_wf,NULL,'siguiente');
         
-        v_id_funcionario_estado_sig = v_id_funcionario_supervisor;
+        
+        v_num_estados= array_length(va_id_tipo_estado, 1);
+                      
+        IF v_num_estados = 1 then
+                  -- si solo hay un estado,  verificamos si tiene mas de un funcionario por este estado
+                 SELECT 
+                 *
+                  into
+                  v_num_funcionarios
+                  
+                 FROM wf.f_funcionario_wf_sel(
+                     p_id_usuario, 
+                     va_id_tipo_estado[1], 
+                     v_fecha_soli,
+                     v_id_estado_wf,
+                     TRUE) AS (total bigint);
+                     
+                     
+             
+                                   
+                      IF v_num_funcionarios = 1 THEN
+                      -- si solo es un funcionario, recuperamos el funcionario correspondiente
+                           SELECT 
+                               id_funcionario
+                                 into
+                               v_id_funcionario_estado_sig
+                           FROM wf.f_funcionario_wf_sel(
+                               p_id_usuario, 
+                               va_id_tipo_estado[1], 
+                               v_fecha_soli,
+                               v_id_estado_wf,
+                               FALSE) 
+                               AS (id_funcionario integer,
+                                 desc_funcionario text,
+                                 desc_funcionario_cargo text,
+                                 prioridad integer);
+                      END IF;  
+        
+        ELSE
+        
+            raise exception 'El flujo se encuentra mal parametrizados, mas de un estado destino';
+        
+        END IF;
+        
+       
                  
+        
+        -- 22/09/2014  RAC,   se comenta  este if por que ahora se lo puede hacer dinamicamente 
+        -- con reglas en el WF
+        
+        /*
+         v_id_funcionario_estado_sig = v_id_funcionario_supervisor;
+        
         --verifica si tiene un supervisor
         IF v_id_funcionario_supervisor is NULL then
         
@@ -153,7 +209,7 @@ p_hstore->'id_solicitud'
             
       
         END IF;
-        
+        */
        
           
           --cambiamos estado de la solicitud

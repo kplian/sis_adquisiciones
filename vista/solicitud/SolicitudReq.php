@@ -379,7 +379,7 @@ Phx.vista.SolicitudReq = {
       var data = this.getSelectedData();
       var tb =this.tbar;
       Phx.vista.SolicitudReq.superclass.preparaMenu.call(this,n);  
-          
+      this.menuAdq.enable();    
           if(data['estado']==  'borrador' || data['estado']==  'Borrador'){
              this.getBoton('fin_requerimiento').enable();
              
@@ -410,7 +410,7 @@ Phx.vista.SolicitudReq = {
         if(tb){
             this.getBoton('fin_requerimiento').disable();
             this.getBoton('btnSolpre').disable(); 
-           
+            this.menuAdq.disable();
         }
         
        return tb

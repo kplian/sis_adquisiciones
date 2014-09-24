@@ -1,3 +1,5 @@
+--------------- SQL ---------------
+
 CREATE OR REPLACE FUNCTION adq.f_solicitud_ime (
   p_administrador integer,
   p_id_usuario integer,
@@ -93,6 +95,7 @@ DECLARE
        v_estado_actual   varchar;
        v_id_categoria_compra   integer;
        v_resp_doc boolean;
+       v_revisado varchar;
 
 			    
 BEGIN
@@ -132,9 +135,7 @@ BEGIN
       
         
         IF (v_num_sol is NULL or v_num_sol ='') THEN
-        
-          raise exception 'No se pudo obtener un numero correlativo para la solicitud consulte con el administrador';
-        
+           raise exception 'No se pudo obtener un numero correlativo para la solicitud consulte con el administrador';
         END IF;
         
         -- obtener el codigo del tipo_proceso
@@ -424,7 +425,48 @@ BEGIN
             return v_resp;
 
 		end;
+     /*********************************    
+ 	#TRANSACCION:  'ADQ_REVSOL_ELI'
+ 	#DESCRIPCION:	Marca la revision de las solicitudes de compra
+ 	#AUTOR:		RAC	
+ 	#FECHA:		23-09-2014 12:12:51
+	***********************************/
+
+	elsif(p_transaccion='ADQ_REVSOL_ELI')then
+
+		begin
+          
+          
+          --obtenemos datos basicos
+            select 
+            	s.revisado_asistente
+            into
+            	v_registros
+            from adq.tsolicitud s 
+            where s.id_solicitud = v_parametros.id_solicitud;
         
+            IF v_registros.revisado_asistente = 'si' THEN
+               v_revisado = 'no';
+            ELSE
+               v_revisado = 'si';
+            END IF;
+            
+             -- actualiza estado en la solicitud
+              
+             update adq.tsolicitud  set 
+               revisado_asistente = v_revisado,
+               id_usuario_mod=p_id_usuario,
+               fecha_mod=now()
+             where id_solicitud  = v_parametros.id_solicitud;
+               
+            --Definicion de la respuesta
+            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Revision de solicitud de compra'); 
+            v_resp = pxp.f_agrega_clave(v_resp,'id_solicitud',v_parametros.id_solicitud::varchar);
+              
+            --Devuelve la respuesta
+            return v_resp;
+
+		end;   
      /*********************************    
  	#TRANSACCION:  'ADQ_FINSOL_IME'
  	#DESCRIPCION:	Finalizar solicitud de Compras
@@ -929,7 +971,7 @@ BEGIN
        v_titulo  = 'Visto Bueno'; 
        
        
-       
+      
 
         --------------------------------------------------
         --Retrocede al estado inmediatamente anterior
@@ -988,7 +1030,7 @@ BEGIN
                         END IF;
                         
                         
-                        
+                       
                       
                        -- registra nuevo estado
                       
@@ -1009,7 +1051,7 @@ BEGIN
                            v_titulo);
                       
                     
-              
+               -- raise exception 'test';
                         
            ----------------------------------------------------------------------
            -- PAra retornar al estado borrador de la solicitud de manera directa

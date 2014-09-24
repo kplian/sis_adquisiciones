@@ -73,26 +73,15 @@ class MODSolicitud extends MODbase{
 		$this->captura('desc_funcionario_rpc','text');
 		$this->captura('obs','text');
 		$this->captura('instruc_rpc','varchar');
-		
 		$this->captura('desc_proveedor','varchar');
 		$this->captura('id_proveedor','integer');
 		$this->captura('id_funcionario_supervisor','integer');
 		$this->captura('desc_funcionario_supervisor','text');
-		
 		$this->captura('ai_habilitado','varchar');
 		$this->captura('id_cargo_rpc','integer');
 		$this->captura('id_cargo_rpc_ai','integer');
-		
-		
 		$this->captura('tipo_concepto','varchar');
-		
-		
-		
-		
-		
-		
-		
-		 
+		$this->captura('revisado_asistente','varchar');
 		
 		
 		
@@ -220,6 +209,23 @@ class MODSolicitud extends MODbase{
 		return $this->respuesta;
 	}
 	
+	function marcarRevisadoSol(){
+		//Definicion de variables para ejecucion del procedimiento
+		$this->procedimiento='adq.f_solicitud_ime';
+		$this->transaccion='ADQ_REVSOL_ELI';
+		$this->tipo_procedimiento='IME';
+				
+		//Define los parametros para la funcion
+		$this->setParametro('id_solicitud','id_solicitud','int4');
+
+		//Ejecuta la instruccion
+		$this->armarConsulta();
+		$this->ejecutarConsulta();
+
+		//Devuelve la respuesta
+		return $this->respuesta;
+	}
+	
 	function finalizarSolicitud(){
         //Definicion de variables para ejecucion del procedimiento
         $this->procedimiento='adq.f_solicitud_ime';
@@ -297,7 +303,7 @@ class MODSolicitud extends MODbase{
 		
 		$this->setParametro('id_solicitud','id_solicitud','int4');
 		$this->setParametro('id_proceso_wf','id_proceso_wf','int4');
-				
+		
 		//Definicion de la lista del resultado del query
 		$this->captura('id_solicitud','int4');
 		$this->captura('estado_reg','varchar');
@@ -327,8 +333,8 @@ class MODSolicitud extends MODbase{
 		$this->captura('fecha_mod','timestamp');
 		$this->captura('id_usuario_mod','int4');
 		$this->captura('usr_reg','varchar');
-		$this->captura('usr_mod','varchar');		
-		$this->captura('id_uo','integer');		
+		$this->captura('usr_mod','varchar');
+		$this->captura('id_uo','integer');
 		$this->captura('desc_funcionario','text');
 		
 		$this->captura('desc_funcionario_apro','text');
@@ -343,16 +349,48 @@ class MODSolicitud extends MODbase{
 		$this->captura('desc_funcionario_rpc','text');
 		$this->captura('nombre_usuario_ai','varchar');
 		
-		//$this->captura('num_tramite','varchar');
-		
-		//Ejecuta la instruccion
 		$this->armarConsulta();
 		$this->ejecutarConsulta();
 		
-		//Devuelve la respuesta
 		return $this->respuesta;
 	}
-
+	
+	function reportePreOrdenCompra(){
+		//Definicion de variables para ejecucion del procedimientp
+				
+		$this->procedimiento='adq.f_solicitud_sel';
+		$this->transaccion='ADQ_SOLOC_REP';
+		$this->tipo_procedimiento='SEL';
+		$this->setCount(false);
+		
+		$this->setParametro('id_solicitud','id_solicitud','int4');
+		$this->setParametro('id_proveedor','id_proveedor','int4');
+		$this->captura('desc_proveedor','varchar');
+		$this->captura('id_persona','int4');
+		$this->captura('dir_persona','varchar');
+		$this->captura('telf1_persona','varchar');
+		$this->captura('telf2_persona','varchar');
+		$this->captura('cel_persona','varchar');
+		$this->captura('correo_persona','varchar');
+		$this->captura('id_institucion','int4');
+		$this->captura('dir_institucion','varchar');
+		$this->captura('telf1_institucion','varchar');
+		$this->captura('telf2_institucion','varchar');
+		$this->captura('cel_institucion','varchar');
+		$this->captura('email_institucion','varchar');
+		$this->captura('fax_institucion','varchar');
+		$this->captura('lugar_entrega','varchar');
+		$this->captura('tipo','varchar');
+		$this->captura('moneda','varchar');
+		$this->captura('codigo_moneda','varchar');
+		$this->captura('num_tramite','varchar');
+				
+		$this->armarConsulta();
+		$this->ejecutarConsulta();
+		//var_dump($this->respuesta); exit;
+		return $this->respuesta;
+	}
+	
 	function estadosSolicitud(){
 		$this->procedimiento = 'adq.f_solicitud_sel';
 		$this->transaccion = 'ADQ_ESTSOL_SEL';

@@ -28,7 +28,7 @@ include_once dirname(__FILE__)."/../../lib/lib_reporte/lang.es_AR.php";
                                 else
                                   $tipo='Servicio';       
                                 
-                                $this->Cell(145, $height, 'Orden de '.$tipo, 0, 0, 'C', false, '', 1, false, 'T', 'C');        
+                                $this->Cell(145, $height, 'PreOrden de '.$tipo, 0, 0, 'C', false, '', 1, false, 'T', 'C');        
         
 								$x=$this->getX();
 								$y=$this->getY();
@@ -45,7 +45,7 @@ include_once dirname(__FILE__)."/../../lib/lib_reporte/lang.es_AR.php";
 								$this->setXY($x,$y-4);
 								$this->SetFontSize(6);
 								$this->SetFont('', 'B');
-								$this->Cell(20, $height, 'Localidad', 0, 0, 'L', false, '', 1, false, 'T', 'C');
+								$this->Cell(20, $height, '', 0, 0, 'L', false, '', 1, false, 'T', 'C');
 								$this->setXY($x,$y-1);
 								$this->SetFontSize(7);
 								$this->setFont('','');
@@ -54,7 +54,7 @@ include_once dirname(__FILE__)."/../../lib/lib_reporte/lang.es_AR.php";
 								$this->setFont('','');
 								$this->Cell(6, $height/5, 'Dia', 1, 0, 'L', false, '', 1, false, 'T', 'C');
 								$this->Cell(6, $height/5, 'Mes', 1, 0, 'L', false, '', 1, false, 'T', 'C');
-								$this->Cell(7, $height/5, 'Año', 1, 0, 'L', false, '', 1, false, 'T', 'C');
+								$this->Cell(7, $height/5, 'A�o', 1, 0, 'L', false, '', 1, false, 'T', 'C');
 								$this->setXY($x,$y+15);
 								
 																
@@ -85,15 +85,15 @@ include_once dirname(__FILE__)."/../../lib/lib_reporte/lang.es_AR.php";
 								$cur_y = $this->GetY();
 								//$this->Cell($ancho, 0, 'Generado por XPHS', 'T', 0, 'L');
 								$this->Cell($ancho, 0, 'Usuario: '.$_SESSION['_LOGIN'], '', 1, 'L');
-								$pagenumtxt = 'Página'.' '.$this->getAliasNumPage().' de '.$this->getAliasNbPages();
+								$pagenumtxt = 'P�gina'.' '.$this->getAliasNumPage().' de '.$this->getAliasNbPages();
 								//$this->Cell($ancho, 0, '', '', 0, 'C');
 								$fecha_rep = date("d-m-Y H:i:s");
-								$this->Cell($ancho, 0, "Fecha impresión: ".$fecha_rep, '', 0, 'L');
+								$this->Cell($ancho, 0, "Fecha impresi�n: ".$fecha_rep, '', 0, 'L');
 								$this->Ln($line_width);
 			 }
 }
 
-Class ROrdenCompra extends Report {
+Class RPreOrdenCompra extends Report {
 
     function write($fileName) {
         $pdf = new CustomReportOC('P', PDF_UNIT, "LETTER", true, 'UTF-8', false);
@@ -130,7 +130,7 @@ Class ROrdenCompra extends Report {
 		$black = array('T' =>array('width' => 0.3, 'cap' => 'butt', 'join' => 'miter', 'dash' => 0, 'color' => array(0, 0, 0)));
 		$pdf->SetFontSize(7);
 		$pdf->SetFont('', 'B');
-        $pdf->Cell($width1, $height, 'Señores:', 0, 0, 'L', false, '', 0, false, 'T', 'C');
+        $pdf->Cell($width1, $height, 'Se�ores:', 0, 0, 'L', false, '', 0, false, 'T', 'C');
         $pdf->SetFont('', '');
         $pdf->SetFillColor(192,192,192, true);
         $pdf->Cell($width4+$width3+$width2, $height, $this->getDataSource()->getParameter('desc_proveedor'), $white, 0, 'L', true, '', 0, false, 'T', 'C');
@@ -142,7 +142,7 @@ Class ROrdenCompra extends Report {
         $pdf->Cell($width2, $height, $this->getDataSource()->getParameter('telefono1'), $white, 0, 'L', true, '', 0, false, 'T', 'C');
         $pdf->Ln();
         $pdf->SetFont('', 'B');
-        $pdf->Cell($width1, $height, 'Dirección:', 0, 0, 'L', false, '', 0, false, 'T', 'C');
+        $pdf->Cell($width1, $height, 'Direcci�n:', 0, 0, 'L', false, '', 0, false, 'T', 'C');
         $pdf->SetFont('', '');
         $pdf->SetFillColor(192,192,192, true);
         $pdf->Cell($width4+$width3+$width2, $height, $this->getDataSource()->getParameter('direccion'), $white, 0, 'L', true, '', 0, false, 'T', 'C');        
@@ -243,18 +243,16 @@ Class ROrdenCompra extends Report {
 		}	
 		
 		$pdf->Ln();
-		//$pdf->SetFont('','B');
-		//$pdf->Cell($width1, $height, 'NOTA:', 0, 0, 'L', false, '', 0, false, 'T', 'C');							 
+		$pdf->SetFont('','B');
+		$pdf->Cell($width1, $height, 'NOTA:', 0, 0, 'L', false, '', 0, false, 'T', 'C');							 
         $pdf->SetFont('','');
 		$pdf->setFontSize(7);								
-        $pdf->MultiCell(0, $height, 'La suma de dinero será cancelada de la forma establecida, debiendo ustedes emitir la factura respectiva a nombre de BOLIVIANA DE AVIACIÓN – BOA, NIT 154422029,  de no emitirse la misma, BOA se reserva del derecho de efectuar las retenciones impositivas respectivas.', 1,'L', false ,1);
+        $pdf->MultiCell(0, $height, $this->getDataSource()->getParameter('desc_proveedor').' se compromete a entregar los '.$tipo.' de acuerdo a la presente orden de '.$tipo.'; a cuyo fin y en se�al de conformidad suscribe al pie del presente', 1,'L', false ,1);
+		$pdf->Ln($height*3);
+		$pdf->MultiCell(0, $height, 'Firma Proveedor o Sello ', 1,'R', false ,1);							
+		$pdf->MultiCell(0, $height, 'La presente PreOrden de '.$tipo.' tiene calidad de contrato de suministro de acuerdo a los articulos 919 al 925 del C�digo de Comercio.', 1,'L', false ,1);
 		$pdf->Ln($height);
-		//$pdf->MultiCell(0, $height, 'Firma Proveedor o Sello ', 1,'R', false ,1);							
-		$pdf->MultiCell(0, $height, 'El ítem deberá ser entregado en Almacenes de la Ciudad de Cochabamba, ubicado en la Calle JOrdnán esq. Nataniel Aguirre N° 202, conforme a lo solicitado, estipuladas en la cotización y la presente Orden, en coordinación con  el  Sr. Jaime Lazarte, celular 72249882,  ante cualquier demora BOLIVIANA DE AVIACIÓN – BOA se reserva el derecho de retener el UNO PORCIENTO (1%) del monto total por día de retraso hasta un 20%.', 1,'L', false ,1);
-		$pdf->Ln($height);
-		$pdf->MultiCell(0, $height, 'Sin otro particular y agradeciendo su gentil atención, saludo a usted', 1,'L', false ,1);
-        $pdf->Ln($height);
-		$pdf->MultiCell(0, $height, 'Atentamente.', 1,'L', false ,1);
+		$pdf->MultiCell(0, $height, 'El proveedor se compromete a entregar el suministro en el plazo estipulado que seran computables a partir de la fecha de elaboracion de la presente orden de '.$tipo.'. El incumplimiento se sancionara con una multa del 0,1% del monto de contrato por cada dia calendario de retraso, multa que no debe exceder del 2%.', 1,'L', false ,1);
         
 		//$pdf->MultiCell(0, $height, 'El proveedor se compromete a entregar el suministro en el plazo de '.$this->getDataSource()->getParameter('dias_entrega').' dias calendarios que seran computables a partir de la fecha de elaboracion de la presente orden de '.$tipo.'. El incumplimiento se sancionara con una multa del 0,1% del monto de contrato por cada dia calendario de retraso, multa que no debe exceder del 2%.', 1,'L', false ,1);
         $pdf->Output($fileName, 'F');
@@ -294,26 +292,26 @@ Class ROrdenCompra extends Report {
         foreach($dataSource->getDataset() as $row) {
         	     
         	   //Solo se muestra si la cantidad adjudicada es mayor a cero    
-              if($row['cantidad_adju']>0){
+              //if($row['cantidad_adju']>0){
             	       
             	$pdf->SetFont('', '');												
     			$xAntesMultiCell = $pdf->getX();
     			$yAntesMultiCell = $pdf->getY();		
                 //$totalItem
                 $pdf->setX($pdf->getX()+$width1-5);
-    			$pdf->MultiCell($width2, $height, $row['desc_solicitud_det']."\r\n".'  - '.$row['descripcion_sol'], 1,'L', false ,1);
+    			$pdf->MultiCell($width2, $height, $row['desc_ingas']."\r\n".'  - '.$row['descripcion_sol'], 1,'L', false ,1);
     			$yDespuesMultiCell= $pdf->getY();
     			$height = $pdf->getY()-$yAntesMultiCell;
     			$pdf->setX($xAntesMultiCell);
     			$pdf->setY($yAntesMultiCell);
-    			$pdf->Cell($width1-5, $height, $row['cantidad_adju'], 1, 0, 'L', false, '', 1, false, 'T', 'C');
+    			$pdf->Cell($width1-5, $height, $row['cantidad_sol'], 1, 0, 'L', false, '', 1, false, 'T', 'C');
                 $pdf->setX($xAntesMultiCell+$width2+$width1-5);
-                $pdf->Cell($width1, $height, number_format($row['precio_unitario'],2), 1, 0, 'R', false, '', 1, false, 'T', 'C');
-    			$totalItem =$row['cantidad_adju']*$row['precio_unitario'];
+                $pdf->Cell($width1, $height, number_format($row['precio_unitario_sol'],2), 1, 0, 'R', false, '', 1, false, 'T', 'C');
+    			$totalItem =$row['cantidad_sol']*$row['precio_unitario_sol'];
     			$pdf->Cell($width1, $height, number_format($totalItem,2), 1, 0, 'R', false, '', 1, false, 'T', 'C');
     			$pdf->Ln();
     			$totalOrdenCompra=$totalOrdenCompra + $totalItem;
-    		  }																																														        
+    		  //}																																														        
         }
     	$height=5;		 								
     	$obj = new Numbers_Words_es_AR;

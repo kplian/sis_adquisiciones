@@ -168,13 +168,17 @@ class ACTCotizacion extends ACTbase{
 
       function reporteOC($create_file=false){
                 $dataSource = new DataSource();
+				$idSolicitud = $this->objParam->getParametro('id_solicitud');
+				$id_proceso_wf= $this->objParam->getParametro('id_proceso_wf');				
                 $this->objParam->addParametroConsulta('ordenacion','id_cotizacion');
                 $this->objParam->addParametroConsulta('dir_ordenacion','ASC');
                 $this->objParam->addParametroConsulta('cantidad',1000);
                 $this->objParam->addParametroConsulta('puntero',0);
                 $this->objFunc = $this->create('MODCotizacion');
                 $resultOrdenCompra = $this->objFunc->reporteOrdenCompra();
+				
                 $datosOrdenCompra = $resultOrdenCompra->getDatos();
+				
                 //armamos el array parametros y metemos ahi los data sets de las otras tablas
                 $dataSource->putParameter('id_proceso_compra', $datosOrdenCompra[0]['id_proceso_compra']);
                 $dataSource->putParameter('desc_proveedor', $datosOrdenCompra[0]['desc_proveedor']);
@@ -213,7 +217,8 @@ class ACTCotizacion extends ACTbase{
                 $this->objParam->defecto('ordenacion', 'id_solicitud_det');
                 $this->objParam->defecto('cantidad', 1000);
                 $this->objParam->defecto('puntero', 0);
-                $this->objParam->addParametro('id_solicitud', $idSolicitud );
+				
+				$this->objParam->addParametro('id_cotizacion', $datosOrdenCompra[0]['id_cotizacion'] );
 
                 $modCotizacionDet = $this->create('MODCotizacionDet');
                 $resultCotizacionDet = $modCotizacionDet->listarCotizacionDet();

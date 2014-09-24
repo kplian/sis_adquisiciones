@@ -36,7 +36,8 @@ DECLARE
     v_inner            varchar;
   
     v_strg_cot			varchar;
-			    
+	v_filtro varchar;
+    		    
 BEGIN
 
 	v_nombre_funcion = 'adq.f_cotizacion_sel';
@@ -534,7 +535,16 @@ BEGIN
 	***********************************/
 	elsif(p_transaccion='ADQ_COTOC_REP')then
     	begin
+        IF  pxp.f_existe_parametro(p_tabla,'id_cotizacion') THEN
+             
+                  v_filtro = 'cot.id_cotizacion='||v_parametros.id_cotizacion||' and ';
+            ELSE
+                  v_filtro = 'pc.id_proceso_wf='||v_parametros.id_proceso_wf||' and ';
+            
+            END IF;
+            
 		v_consulta:='select  
+        			cot.id_cotizacion,
         			pv.desc_proveedor,
                     per.id_persona,
 					per.direccion as dir_persona,
@@ -568,12 +578,12 @@ BEGIN
               inner join adq.tproceso_compra pc on pc.id_proceso_compra=cot.id_proceso_compra
 			  inner join adq.tsolicitud sol on sol.id_solicitud=pc.id_solicitud
 			  inner join param.tmoneda mon on mon.id_moneda=cot.id_moneda
-              where cot.id_cotizacion='||v_parametros.id_cotizacion||' and ';
+              where '||v_filtro;
           
           --Definicion de la respuesta
           v_consulta:=v_consulta||v_parametros.filtro;
           v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
-
+		  raise notice '%', v_consulta;	
           --Devuelve la respuesta
           return v_consulta;
         end;

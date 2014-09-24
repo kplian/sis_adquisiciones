@@ -33,6 +33,7 @@ Phx.vista.SolicitudVb = {
         this.Atributos[this.getIndAtributo('id_categoria_compra')].form=false;
         this.Atributos[this.getIndAtributo('id_uo')].form=false;
         this.Atributos[this.getIndAtributo('id_depto')].form=false;
+        this.Atributos[this.getIndAtributo('revisado_asistente')].grid=true; 
         
         //funcionalidad para listado de historicos
         this.historico = 'no';

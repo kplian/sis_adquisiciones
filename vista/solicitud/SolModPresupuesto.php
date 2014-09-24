@@ -58,8 +58,8 @@ Phx.vista.SolModPresupuesto=Ext.extend(Phx.frmInterfaz,{
     
     loadValoresIniciales:function() 
     {        
-        console.log(this)
-        var CuerpoCorreo = " Solicitud de presupuesto <br>" ;
+        
+        var CuerpoCorreo = " <b>SOLICITUD DE TRASPASO PRESUPUESTARIO <br></b><br>" ;
         CuerpoCorreo+= '<b>Funcionario: '+ this.desc_funcionario+'<br></b>';
         CuerpoCorreo+='Tramite: '+ this.num_tramite+'<br>';
         CuerpoCorreo+='Numero: '+this.numero+'</BR>';

@@ -18,30 +18,9 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
 		Phx.vista.Solicitud.superclass.constructor.call(this,config);		
 		this.init();		
 		
-		this.menuAdq = new Ext.Toolbar.SplitButton({
-            id: 'btn-adqrep-' + this.idContenedor,
-            text: 'Rep.',
-            disabled: true,
-            iconCls : 'bpdf32',
-            scope: this,
-            menu:{
-            items: [{
-                id:'b-btnSolicitud-' + this.idContenedor,
-                text: 'Solicitud',
-                tooltip: '<b>Reporte de Solicitud de Compra</b>',
-                handler:this.onButtonSolicitud,
-                scope: this
-            }, {
-                id:'b-btnRepOC-' + this.idContenedor,
-                text: 'Orden de Compra',
-                tooltip: '<b>Reporte de Orden de Compra</b>',
-                handler:this.onButtonRepOC,
-                scope: this
-            }
-        ]}
-        });
-		
-		/*this.addButton('btnReporte',{
+		this.addBotones();
+		/*
+		this.addButton('btnReporte',{
             text :'',
             iconCls : 'bpdf32',
             disabled: true,
@@ -80,6 +59,32 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
 		}
 	},
 	
+	addBotones: function() {
+        this.menuAdq = new Ext.Toolbar.SplitButton({
+            id: 'btn-adqrep-' + this.idContenedor,
+            text: 'Rep.',
+            disabled: true,
+            iconCls : 'bpdf32',
+            scope: this,
+            menu:{
+            items: [{
+                id:'b-btnSolicitud-' + this.idContenedor,
+                text: 'Solicitud',
+                tooltip: '<b>Reporte de Solicitud de Compra</b>',
+                handler:this.onButtonSolicitud,
+                scope: this
+            }, {
+                id:'b-btnRepOC-' + this.idContenedor,
+                text: 'PreOrden de Compra',
+                tooltip: '<b>Reporte de PreOrden de Compra</b>',
+                handler:this.onButtonRepOC,
+                scope: this
+            }
+        ]}
+        });
+		this.tbar.add(this.menuAdq);
+    },
+	
 	arrayStore :{
                     'Bien':[
                                 ['bien','Bienes'],
@@ -113,6 +118,26 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
             },
             type:'Field',
             form:true 
+        },
+        {
+            config:{
+                name: 'revisado_asistente',
+                fieldLabel: 'Rev',
+                allowBlank: true,
+                anchor: '80%',
+                gwidth: 65,
+                renderer:function (value, p, record){  
+                            if(record.data['revisado_asistente'] == 'si')
+                                return  String.format('{0}',"<div style='text-align:center'><img src = '../../../lib/imagenes/ball_green.png' align='center' width='24' height='24'/></div>");
+                            else
+                                return  String.format('{0}',"<div style='text-align:center'><img src = '../../../lib/imagenes/ball_white.png' align='center' width='24' height='24'/></div>");
+                        },
+            },
+            type:'Checkbox',
+            filters:{pfiltro:'plapa.revisado_asistente',type:'string'},
+            id_grupo:1,
+            grid:false,
+            form:false
         },
         {
             config:{
@@ -691,7 +716,8 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
 		'id_cargo_rpc',
 		'id_cargo_rpc_ai',
 		'ai_habilitado',
-		'tipo_concepto'
+		'tipo_concepto',
+		'revisado_asistente'
 		
 	],
 	
@@ -721,7 +747,7 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
         //this.getBoton('btnChequeoDocumentos').setDisabled(false);
         this.getBoton('btnChequeoDocumentosWf').setDisabled(false);
         Phx.vista.Solicitud.superclass.preparaMenu.call(this,n);
-        this.getBoton('btnReporte').setDisabled(false); 
+        //this.getBoton('btnReporte').setDisabled(false); 
         this.getBoton('diagrama_gantt').enable();
         
         
@@ -732,7 +758,7 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
         var tb = Phx.vista.Solicitud.superclass.liberaMenu.call(this);
         if(tb){
            
-            this.getBoton('btnReporte').setDisabled(true);
+            //this.getBoton('btnReporte').setDisabled(true);
             //this.getBoton('btnChequeoDocumentos').setDisabled(true);
             this.getBoton('btnChequeoDocumentosWf').setDisabled(true);
             this.getBoton('diagrama_gantt').disable();  
@@ -753,6 +779,24 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
             scope:this
         });  
 	},
+	
+	onButtonRepOC: function(){
+                var rec=this.sm.getSelected();
+				//console.log(rec.data.id_cotizacion);
+                Ext.Ajax.request({
+                    url:'../../sis_adquisiciones/control/Solicitud/reporteOC',
+                    params:{'id_solicitud':rec.data.id_solicitud,'id_proveedor':rec.data.id_proveedor},
+                    success: this.successExport,
+                    failure: function() {
+                        alert("fail");
+                    },
+                    timeout: function() {
+                        alert("timeout");
+                    },
+                    scope:this
+                });
+        },
+		
 	obtenerSolicitud:function(){
 	    var d= this.sm.getSelected();
 	    if(d&&d.data){

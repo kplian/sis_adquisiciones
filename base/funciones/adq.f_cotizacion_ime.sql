@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION adq.f_cotizacion_ime (
   p_administrador integer,
   p_id_usuario integer,
@@ -1554,9 +1552,25 @@ BEGIN
                           
                           END IF;
                     
+                    ELSIF v_codigo_llave = 'contrato' THEN
+                       
+                          IF NOT adq.f_genera_contrato(
+                                                        p_id_usuario,
+                                                        v_parametros._id_usuario_ai,
+                                                        v_parametros._nombre_usuario_ai, 
+                                                        v_id_cotizacion, 
+                                                        v_id_proceso_wf, 
+                                                        v_id_estado_wf, 
+                                                        v_codigo_estado,
+                                                        v_codigo_llave) THEN
+                                                         
+                             raise exception 'Error al generar el contrato';
+                          
+                          END IF;
+                    
                     ELSE   
                     
-                      raise exception 'Codigo llave no reconodido  verifique el WF (%)', v_codigo_llave;
+                      raise exception 'Codigo llave no reconocido  verifique el WF (%)', v_codigo_llave;
                     
                     
                     END IF;
