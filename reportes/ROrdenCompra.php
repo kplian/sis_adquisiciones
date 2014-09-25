@@ -281,16 +281,24 @@ Class ROrdenCompra extends Report {
         $pdf->MultiCell(0, $height, 'La suma de dinero será cancelada de la forma establecida, debiendo ustedes emitir la factura respectiva a nombre de BOLIVIANA DE AVIACIÓN – BOA, NIT 154422029,  de no emitirse la misma, BOA se reserva del derecho de efectuar las retenciones impositivas respectivas.', 1,'L', false ,1);
 		$pdf->Ln($height);
 		//$pdf->MultiCell(0, $height, 'Firma Proveedor o Sello ', 1,'R', false ,1);							
-		if($tipo=='Bien'){
-			
-			$mensaje = 'El ítem deberá ser entregado conforme a lo solicitado, estipuladas en la cotización y la presente Orden, en coordinación con  el  Sr(a).'.$this->getDataSource()->getParameter('contacto');
+		
+		if($tipo=='Bien')			
+			$mensaje = 'El ítem deberá ser entregado conforme a lo solicitado, estipuladas en la cotización y la presente Orden, en coordinación con  el  Sr(a).'.$this->getDataSource()->getParameter('contacto');			
+		else
+			$mensaje = 'El servicio deberá ser entregado conforme a lo solicitado, estipuladas en la cotización y la presente Orden, en coordinación con  el  Sr(a).'.$this->getDataSource()->getParameter('contacto');			
+		if($this->getDataSource()->getParameter('celular_contacto')!='')
 			$mensaje = $mensaje.', celular '.$this->getDataSource()->getParameter('celular_contacto');
+		else
+			$mensaje = $mensaje.', celular 					';
+		if($this->getDataSource()->getParameter('email_contacto')!='')
 			$mensaje = $mensaje.', correo '.$this->getDataSource()->getParameter('email_contacto');
-			$mensaje = $mensaje.', ante cualquier demora BOLIVIANA DE AVIACIÓN – BOA se reserva el derecho de retener el UNO PORCIENTO (1%) del monto total por día de retraso hasta un 20%.';
-			
-			$pdf->MultiCell(0, $height, $mensaje, 1,'L', false ,1);
-			$pdf->Ln($height);
-		}
+		else
+			$mensaje = $mensaje.', correo 					';
+		$mensaje = $mensaje.', ante cualquier demora BOLIVIANA DE AVIACIÓN – BOA se reserva el derecho de retener el UNO PORCIENTO (1%) del monto total por día de retraso hasta un 20%.';
+		
+		$pdf->MultiCell(0, $height, $mensaje, 1,'L', false ,1);
+		$pdf->Ln($height);
+		
 		$pdf->MultiCell(0, $height, 'Sin otro particular y agradeciendo su gentil atención, saludo a usted', 1,'L', false ,1);
         $pdf->Ln($height);
 		$pdf->MultiCell(0, $height, 'Atentamente.', 1,'L', false ,1);
