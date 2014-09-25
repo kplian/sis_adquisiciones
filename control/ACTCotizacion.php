@@ -182,6 +182,9 @@ class ACTCotizacion extends ACTbase{
                 //armamos el array parametros y metemos ahi los data sets de las otras tablas
                 $dataSource->putParameter('id_proceso_compra', $datosOrdenCompra[0]['id_proceso_compra']);
                 $dataSource->putParameter('desc_proveedor', $datosOrdenCompra[0]['desc_proveedor']);
+				$dataSource->putParameter('contacto', $datosOrdenCompra[0]['nombre_completo1']);
+				$dataSource->putParameter('celular_contacto', $datosOrdenCompra[0]['celular1']);
+				$dataSource->putParameter('email_contacto', $datosOrdenCompra[0]['correo']);
                 
                 if($datosOrdenCompra[0]['id_persona']!=''){
                     $dataSource->putParameter('direccion', $datosOrdenCompra[0]['dir_persona']);

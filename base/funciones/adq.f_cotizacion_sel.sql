@@ -570,7 +570,10 @@ BEGIN
                     mon.moneda,
                     mon.codigo as codigo_moneda,
                     cot.tiempo_entrega,
-                    sol.num_tramite
+                    sol.num_tramite,
+                    persol.nombre_completo1,
+       				persol.celular1,
+       				persol.correo
               from adq.tcotizacion cot 
               inner join param.vproveedor pv on pv.id_proveedor=cot.id_proveedor
               left join segu.tpersona per on per.id_persona=pv.id_persona
@@ -578,6 +581,8 @@ BEGIN
               inner join adq.tproceso_compra pc on pc.id_proceso_compra=cot.id_proceso_compra
 			  inner join adq.tsolicitud sol on sol.id_solicitud=pc.id_solicitud
 			  inner join param.tmoneda mon on mon.id_moneda=cot.id_moneda
+              inner join orga.tfuncionario fun on fun.id_funcionario=sol.id_funcionario
+		      inner join segu.vpersona persol on persol.id_persona=fun.id_persona
               where '||v_filtro;
           
           --Definicion de la respuesta

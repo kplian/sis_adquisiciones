@@ -15,8 +15,8 @@ include_once dirname(__FILE__)."/../../lib/lib_reporte/lang.es_AR.php";
     
     public function Header() {
         $height = 20;
-								$this->Image(dirname(__FILE__).'/../../pxp/lib'.$_SESSION['_DIR_LOGO'], $x+10, $y+10, 36);
-        $this->Cell(20, $height, '', 0, 0, 'C', false, '', 1, false, 'T', 'C');
+		$this->Image(dirname(__FILE__).'/../../pxp/lib'.$_SESSION['_DIR_LOGO'], $x+10, $y+10, 36);
+		$this->Cell(20, $height, '', 0, 0, 'C', false, '', 1, false, 'T', 'C');
 								
         $this->SetFontSize(16);
         $this->SetFont('','B');
@@ -128,56 +128,84 @@ Class ROrdenCompra extends Report {
         
 		$white = array('LTRB' =>array('width' => 0.3, 'cap' => 'butt', 'join' => 'miter', 'dash' => 0, 'color' => array(255, 255, 255)));
 		$black = array('T' =>array('width' => 0.3, 'cap' => 'butt', 'join' => 'miter', 'dash' => 0, 'color' => array(0, 0, 0)));
+		
 		$pdf->SetFontSize(7);
 		$pdf->SetFont('', 'B');
         $pdf->Cell($width1, $height, 'Señores:', 0, 0, 'L', false, '', 0, false, 'T', 'C');
         $pdf->SetFont('', '');
         $pdf->SetFillColor(192,192,192, true);
-        $pdf->Cell($width4+$width3+$width2, $height, $this->getDataSource()->getParameter('desc_proveedor'), $white, 0, 'L', true, '', 0, false, 'T', 'C');
-        $pdf->SetFont('', 'B');
-								$pdf->Cell(5, $height, '', 0, 0, 'L', false, '', 0, false, 'T', 'C');
-        $pdf->Cell($width1, $height, 'Telf.:', 0, 0, 'L', false, '', 0, false, 'T', 'C');
-        $pdf->SetFont('', '');
-								$pdf->SetFillColor(192,192,192, true);
-        $pdf->Cell($width2, $height, $this->getDataSource()->getParameter('telefono1'), $white, 0, 'L', true, '', 0, false, 'T', 'C');
-        $pdf->Ln();
-        $pdf->SetFont('', 'B');
-        $pdf->Cell($width1, $height, 'Dirección:', 0, 0, 'L', false, '', 0, false, 'T', 'C');
-        $pdf->SetFont('', '');
-        $pdf->SetFillColor(192,192,192, true);
-        $pdf->Cell($width4+$width3+$width2, $height, $this->getDataSource()->getParameter('direccion'), $white, 0, 'L', true, '', 0, false, 'T', 'C');        
-        $pdf->Cell(5, $height, '', 0, 0, 'L', false, '', 0, false, 'T', 'C');
-        $pdf->SetFont('', 'B');
-        $pdf->Cell($width1, $height, 'Telf. 2:', 0, 0, 'L', false, '', 0, false, 'T', 'C');
-        $pdf->SetFont('', '');
-        $pdf->SetFillColor(192,192,192, true);
-        $pdf->Cell($width2, $height, $this->getDataSource()->getParameter('telefono2'), $white, 0, 'L', true, '', 0, false, 'T', 'C');        
-        $pdf->Ln();
-        $pdf->SetFont('', 'B');
-        $pdf->Cell($width1, $height, 'Ciudad:', 0, 0, 'L', false, '', 0, false, 'T', 'C');
-        $pdf->SetFont('', '');
-        $pdf->SetFillColor(192,192,192, true);
-        $pdf->Cell($width4+$width3+$width2, $height, $this->getDataSource()->getParameter('lugar_entrega'), $white, 0, 'L', true, '', 0, false, 'T', 'C');
-        $pdf->SetFont('', 'B');
-		$pdf->Cell(5, $height, '', 0, 0, 'L', false, '', 0, false, 'T', 'C');
-        $pdf->Cell($width1, $height, 'Celular:', 0, 0, 'L', false, '', 0, false, 'T', 'C');
-        $pdf->SetFont('', '');
-		$pdf->SetFillColor(192,192,192, true);
-        $pdf->Cell($width2, $height, $this->getDataSource()->getParameter('celular'), $white, 0, 'L', true, '', 0, false, 'T', 'C');
-        $pdf->Ln();
-        $pdf->SetFont('', 'B');
-        $pdf->Cell($width1, $height, 'Email:', 0, 0, 'L', false, '', 0, false, 'T', 'C');
-        $pdf->SetFont('', '');
-        $pdf->SetFillColor(192,192,192, true);
-        $pdf->Cell($width4+$width3+$width2, $height, $this->getDataSource()->getParameter('email'), $white, 0, 'L', true, '', 0, false, 'T', 'C');        
-        $pdf->Cell(5, $height, '', 0, 0, 'L', false, '', 0, false, 'T', 'C');
-        $pdf->SetFont('', 'B');
-        $pdf->Cell($width1, $height, 'Fax:', 0, 0, 'L', false, '', 0, false, 'T', 'C');
-        $pdf->SetFont('', '');
-        $pdf->SetFillColor(192,192,192, true);
-        $pdf->Cell($width2, $height, $this->getDataSource()->getParameter('fax'), $white, 0, 'L', true, '', 0, false, 'T', 'C');        
-        $pdf->Ln();
-        $pdf->Ln();
+        $pdf->Cell($width4+$width3+$width2, $height, $this->getDataSource()->getParameter('desc_proveedor'), $white, 1, 'L', true, '', 0, false, 'T', 'C');
+        //$pdf->SetFont('', 'B');
+		//$pdf->Cell(5, $height, '', 0, 0, 'L', false, '', 0, false, 'T', 'C');
+        
+		//$pdf->Ln();
+		        
+		if($this->getDataSource()->getParameter('direccion')!=''){
+			$pdf->SetFont('', 'B');
+			$pdf->Cell($width1, $height, 'Dirección:', 0, 0, 'L', false, '', 0, false, 'T', 'C');
+			$pdf->SetFont('', '');
+			$pdf->SetFillColor(192,192,192, true);
+			$pdf->Cell($width4+$width3+$width2, $height, $this->getDataSource()->getParameter('direccion'), $white, 1, 'L', true, '', 0, false, 'T', 'C');        
+			//$pdf->Cell(5, $height, '', 0, 0, 'L', false, '', 0, false, 'T', 'C');
+		}
+		//$pdf->Ln();
+		
+		if($this->getDataSource()->getParameter('telefono1')!=''){		
+			$pdf->SetFont('', 'B');
+			$pdf->Cell($width1, $height, 'Telefono:', 0, 0, 'L', false, '', 0, false, 'T', 'C');
+			$pdf->SetFont('', '');
+			$pdf->SetFillColor(192,192,192, true);
+			$pdf->Cell($width4+$width3+$width2, $height, $this->getDataSource()->getParameter('telefono1'), $white, 1, 'L', true, '', 0, false, 'T', 'C');
+        }
+		//$pdf->Ln();
+		
+		if($this->getDataSource()->getParameter('telefono2')!=''){
+			$pdf->SetFont('', 'B');
+			$pdf->Cell($width1, $height, 'Telf. 2:', 0, 0, 'L', false, '', 0, false, 'T', 'C');
+			$pdf->SetFont('', '');
+			$pdf->SetFillColor(192,192,192, true);
+			$pdf->Cell($width4+$width3+$width2, $height, $this->getDataSource()->getParameter('telefono2'), $white, 1, 'L', true, '', 0, false, 'T', 'C');        
+        }
+		//$pdf->Ln();
+        /*
+		if($this->getDataSource()->getParameter('lugar_entrega')==''){
+			$pdf->SetFont('', 'B');
+			$pdf->Cell($width1, $height, 'Ciudad:', 0, 0, 'L', false, '', 0, false, 'T', 'C');
+			$pdf->SetFont('', '');
+			$pdf->SetFillColor(192,192,192, true);
+			$pdf->Cell($width4+$width3+$width2, $height, $this->getDataSource()->getParameter('lugar_entrega'), $white, 0, 'L', true, '', 0, false, 'T', 'C');
+			$pdf->SetFont('', 'B');
+			$pdf->Cell(5, $height, '', 0, 0, 'L', false, '', 0, false, 'T', 'C');
+		}
+		$pdf->Ln();*/
+		if($this->getDataSource()->getParameter('celular')!=''){
+			$pdf->SetFont('', 'B');
+			$pdf->Cell($width1, $height, 'Celular:', 0, 0, 'L', false, '', 0, false, 'T', 'C');
+			$pdf->SetFont('', '');
+			$pdf->SetFillColor(192,192,192, true);
+			$pdf->Cell($width4+$width3+$width2, $height, $this->getDataSource()->getParameter('celular'), $white, 1, 'L', true, '', 0, false, 'T', 'C');
+        }
+		//$pdf->Ln();
+        
+		if($this->getDataSource()->getParameter('email')!=''){
+			$pdf->SetFont('', 'B');
+			$pdf->Cell($width1, $height, 'Email:', 0, 0, 'L', false, '', 0, false, 'T', 'C');
+			$pdf->SetFont('', '');
+			$pdf->SetFillColor(192,192,192, true);
+			$pdf->Cell($width4+$width3+$width2, $height, $this->getDataSource()->getParameter('email'), $white, 1, 'L', true, '', 0, false, 'T', 'C');        
+			//$pdf->Cell(5, $height, '', 0, 0, 'L', false, '', 0, false, 'T', 'C');
+		}
+		//$pdf->Ln();
+		if($this->getDataSource()->getParameter('fax')!=''){
+			$pdf->SetFont('', 'B');
+			$pdf->Cell($width1, $height, 'Fax:', 0, 0, 'L', false, '', 0, false, 'T', 'C');
+			$pdf->SetFont('', '');
+			$pdf->SetFillColor(192,192,192, true);
+			$pdf->Cell($width4+$width3+$width2, $height, $this->getDataSource()->getParameter('fax'), $white, 1, 'L', true, '', 0, false, 'T', 'C');        
+		}
+		$pdf->Ln();        
+		//$pdf->Ln();
+		
 		$pdf->SetFontSize(10);
 		$tipo=$this->getDataSource()->getParameter('tipo');
 		
@@ -185,7 +213,7 @@ Class ROrdenCompra extends Report {
 		  $tipo='Compra - Servicio'; 
 		
 		if($tipo=='Bien')						
-		    $pdf->MultiCell(0, $height, 'Agradeceremos entregarnos de acuerdo a su cotizacion, lo siguiente', 1,'L', false ,1);
+		    $pdf->MultiCell(0, $height, 'De acuerdo a su cotización en la que detalla especificaciones, por medio de la presente confirmamos orden para la provisión de:', 1,'L', false ,1);
 		
 		//escritura de los datalles de la cotizacion
 		$this->writeDetalles($this->getDataSource()->getParameter('detalleDataSource'), $pdf,$tipo, $this->getDataSource()->getParameter('codigo_moneda') );
@@ -206,32 +234,35 @@ Class ROrdenCompra extends Report {
         }
         else{
             $pdf->SetFont('', 'B');
-            $pdf->Cell($width3, $height, 'Plazo de Entrega:', 0, 0, 'L', false, '', 0, false, 'T', 'C');
+            $pdf->Cell($width3, $height, 'Tiempo de Entrega:', 0, 0, 'L', false, '', 0, false, 'T', 'C');
             $pdf->SetFont('', '');
             $pdf->SetFillColor(192,192,192, true);
             $pdf->Cell($width4+$width3+$width2, $height, $this->getDataSource()->getParameter('tiempo_entrega'), $white, 0, 'L', true, '', 0, false, 'T', 'C');        
             $pdf->Cell(5, $height, '', 0, 0, 'L', false, '', 0, false, 'T', 'C');
             $pdf->Ln();
-            $pdf->SetFont('', 'B');
        }
-        
-        
-        
-        
-        
+         
+		/*
         $pdf->Cell($width3, $height, 'Tipo de Entrega:', 0, 0, 'L', false, '', 0, false, 'T', 'C');
         $pdf->SetFont('', '');
         $pdf->SetFillColor(192,192,192, true);
         $pdf->Cell($width4+$width3+$width2, $height, $this->getDataSource()->getParameter('tipo_entrega'), $white, 0, 'L', true, '', 0, false, 'T', 'C');        
         $pdf->Ln();
         $pdf->SetFont('', 'B');
-        
-        
-        
+        */
+		
+		$pdf->SetFont('', 'B');
         $pdf->Cell($width3, $height, 'Lugar de Entrega:', 0, 0, 'L', false, '', 0, false, 'T', 'C');
         $pdf->SetFont('', '');
         $pdf->SetFillColor(192,192,192, true);
         $pdf->Cell($width4+$width3+$width2, $height, $this->getDataSource()->getParameter('lugar_entrega'), $white, 0, 'L', true, '', 0, false, 'T', 'C');        
+        $pdf->Ln();
+		
+		$pdf->SetFont('', 'B');
+		$pdf->Cell($width3, $height, 'Forma de Pago:', 0, 0, 'L', false, '', 0, false, 'T', 'C');
+        $pdf->SetFont('', '');
+        $pdf->SetFillColor(192,192,192, true);
+        $pdf->Cell($width4+$width3+$width2, $height, 'Total, una vez recibida la conformidad de la unidad solicitante', $white, 0, 'L', true, '', 0, false, 'T', 'C');        
         $pdf->Ln();
         
 		if($this->getDataSource()->getParameter('tipo')=='adjudicado'){	        
@@ -250,8 +281,16 @@ Class ROrdenCompra extends Report {
         $pdf->MultiCell(0, $height, 'La suma de dinero será cancelada de la forma establecida, debiendo ustedes emitir la factura respectiva a nombre de BOLIVIANA DE AVIACIÓN – BOA, NIT 154422029,  de no emitirse la misma, BOA se reserva del derecho de efectuar las retenciones impositivas respectivas.', 1,'L', false ,1);
 		$pdf->Ln($height);
 		//$pdf->MultiCell(0, $height, 'Firma Proveedor o Sello ', 1,'R', false ,1);							
-		$pdf->MultiCell(0, $height, 'El ítem deberá ser entregado en Almacenes de la Ciudad de Cochabamba, ubicado en la Calle JOrdnán esq. Nataniel Aguirre N° 202, conforme a lo solicitado, estipuladas en la cotización y la presente Orden, en coordinación con  el  Sr. Jaime Lazarte, celular 72249882,  ante cualquier demora BOLIVIANA DE AVIACIÓN – BOA se reserva el derecho de retener el UNO PORCIENTO (1%) del monto total por día de retraso hasta un 20%.', 1,'L', false ,1);
-		$pdf->Ln($height);
+		if($tipo=='Bien'){
+			
+			$mensaje = 'El ítem deberá ser entregado conforme a lo solicitado, estipuladas en la cotización y la presente Orden, en coordinación con  el  Sr(a).'.$this->getDataSource()->getParameter('contacto');
+			$mensaje = $mensaje.', celular '.$this->getDataSource()->getParameter('celular_contacto');
+			$mensaje = $mensaje.', correo '.$this->getDataSource()->getParameter('email_contacto');
+			$mensaje = $mensaje.', ante cualquier demora BOLIVIANA DE AVIACIÓN – BOA se reserva el derecho de retener el UNO PORCIENTO (1%) del monto total por día de retraso hasta un 20%.';
+			
+			$pdf->MultiCell(0, $height, $mensaje, 1,'L', false ,1);
+			$pdf->Ln($height);
+		}
 		$pdf->MultiCell(0, $height, 'Sin otro particular y agradeciendo su gentil atención, saludo a usted', 1,'L', false ,1);
         $pdf->Ln($height);
 		$pdf->MultiCell(0, $height, 'Atentamente.', 1,'L', false ,1);
