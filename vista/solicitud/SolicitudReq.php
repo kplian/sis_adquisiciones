@@ -189,6 +189,18 @@ Phx.vista.SolicitudReq = {
                else{
                    this.Cmp.tipo_concepto.store.loadData(this.arrayStore[rec.json[0]]);
                }
+                if(rec.json[0] == 'Bien' ||  rec.json[0] == 'Bien - Servicio'){
+                	this.Cmp.lugar_entrega.setValue('Alamcenes de Oficna Cochabamba');
+                	this.ocultarComponente(this.Cmp.fecha_inicio);
+                	this.mostrarComponente(this.Cmp.dias_plazo_entrega);
+                	
+                	
+                 }
+                else{
+                	this.Cmp.lugar_entrega.setValue('');
+                	this.mostrarComponente(this.Cmp.fecha_inicio);
+                	this.ocultarComponente(this.Cmp.dias_plazo_entrega);
+                }
               
            },this);
       
@@ -198,12 +210,9 @@ Phx.vista.SolicitudReq = {
        Phx.vista.SolicitudReq.superclass.onButtonNew.call(this); 
        
        this.cmpIdDepto.enable(); 
-         
        this.Cmp.id_categoria_compra.enable();
        this.cmpIdFuncionarioAprobador.disable();
        this.Cmp.id_funcionario_supervisor.disable();
-       
-       
        this.cmpIdUo.disable();
        this.Cmp.id_funcionario.disable();
        this.Cmp.fecha_soli.enable();
@@ -262,7 +271,16 @@ Phx.vista.SolicitudReq = {
        
        Phx.vista.SolicitudReq.superclass.onButtonEdit.call(this);
        this.Cmp.id_funcionario.store.baseParams.fecha = this.cmpFechaSoli.getValue().dateFormat(this.cmpFechaSoli.format);
-       //this.Cmp.fecha_soli.fireEvent('change');    
+       //this.Cmp.fecha_soli.fireEvent('change');  
+       
+           if(this.Cmp.tipo.getValue() == 'Bien' ||  this.Cmp.tipo.getValue() == 'Bien - Servicio'){
+                	this.ocultarComponente(this.Cmp.fecha_inicio);
+                	this.mostrarComponente(this.Cmp.dias_plazo_entrega);
+            }
+            else{
+            	this.mostrarComponente(this.Cmp.fecha_inicio);
+            	this.ocultarComponente(this.Cmp.dias_plazo_entrega);
+            }
     },
     
     onFinalizarSol:function(){

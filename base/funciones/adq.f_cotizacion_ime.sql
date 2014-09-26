@@ -1,3 +1,5 @@
+--------------- SQL ---------------
+
 CREATE OR REPLACE FUNCTION adq.f_cotizacion_ime (
   p_administrador integer,
   p_id_usuario integer,
@@ -222,7 +224,11 @@ BEGIN
 			id_usuario_mod = p_id_usuario,
             tiempo_entrega=v_parametros.tiempo_entrega,
             id_usuario_ai = v_parametros._id_usuario_ai,
-            usuario_ai = v_parametros._nombre_usuario_ai
+            usuario_ai = v_parametros._nombre_usuario_ai,
+            funcionario_contacto = v_parametros.funcionario_contacto,
+            telefono_contacto = v_parametros.telefono_contacto,
+            correo_contacto = v_parametros.correo_contacto,
+            forma_pago = v_parametros.forma_pago
 			where id_cotizacion=v_parametros.id_cotizacion;
                
 			--Definicion de la respuesta

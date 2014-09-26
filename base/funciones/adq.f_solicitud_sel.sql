@@ -184,7 +184,9 @@ BEGIN
                         sol.id_cargo_rpc,
                         sol.id_cargo_rpc_ai,
                         sol.tipo_concepto,
-                        sol.revisado_asistente
+                        sol.revisado_asistente,
+                        sol.fecha_inicio,
+                        sol.dias_plazo_entrega
                         	
 						from adq.tsolicitud sol
 						inner join segu.tusuario usu1 on usu1.id_usuario = sol.id_usuario_reg

@@ -192,7 +192,9 @@ BEGIN
             id_funcionario_supervisor,
             id_usuario_ai,
             usuario_ai,
-            tipo_concepto
+            tipo_concepto,
+            fecha_inicio,
+            dias_plazo_entrega
           	) values(
 			'activo',
 			--v_parametros.id_solicitud_ext,
@@ -226,7 +228,9 @@ BEGIN
             v_parametros.id_funcionario_supervisor,
             v_parametros._id_usuario_ai,
             v_parametros._nombre_usuario_ai,
-            v_parametros.tipo_concepto
+            v_parametros.tipo_concepto,
+            v_parametros.fecha_inicio,
+            v_parametros.dias_plazo_entrega
 							
 			)RETURNING id_solicitud into v_id_solicitud;
         
@@ -322,8 +326,10 @@ BEGIN
             id_funcionario_supervisor= v_parametros.id_funcionario_supervisor,
             id_usuario_ai= v_parametros._id_usuario_ai,
             usuario_ai = v_parametros._nombre_usuario_ai,
-            tipo_concepto =  v_parametros.tipo_concepto
-			where id_solicitud=v_parametros.id_solicitud;
+            tipo_concepto =  v_parametros.tipo_concepto,
+            fecha_inicio = v_parametros.fecha_inicio,
+            dias_plazo_entrega = v_parametros.dias_plazo_entrega
+			where id_solicitud = v_parametros.id_solicitud;
                
 			--Definicion de la respuesta
             v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Solicitud de Compras modificado(a)'); 
@@ -426,20 +432,21 @@ BEGIN
 
 		end;
      /*********************************    
- 	#TRANSACCION:  'ADQ_REVSOL_ELI'
+ 	#TRANSACCION:  'ADQ_REVSOL_IME'
  	#DESCRIPCION:	Marca la revision de las solicitudes de compra
  	#AUTOR:		RAC	
  	#FECHA:		23-09-2014 12:12:51
 	***********************************/
 
-	elsif(p_transaccion='ADQ_REVSOL_ELI')then
+	elsif(p_transaccion='ADQ_REVSOL_IME')then
 
 		begin
           
           
           --obtenemos datos basicos
             select 
-            	s.revisado_asistente
+            	s.revisado_asistente,
+                s.id_proceso_wf
             into
             	v_registros
             from adq.tsolicitud s 
@@ -458,6 +465,13 @@ BEGIN
                id_usuario_mod=p_id_usuario,
                fecha_mod=now()
              where id_solicitud  = v_parametros.id_solicitud;
+             
+             
+             --modifica el proeso wf para actulizar el mismo campo
+             update wf.tproceso_wf  set 
+               revisado_asistente = v_revisado
+             where id_proceso_wf  = v_registros.id_proceso_wf;
+             
                
             --Definicion de la respuesta
             v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Revision de solicitud de compra'); 

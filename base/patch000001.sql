@@ -417,7 +417,8 @@ ALTER TABLE adq.trpc_uo_log
 ALTER TABLE adq.tsolicitud
   ADD COLUMN tipo_concepto VARCHAR(50) DEFAULT 'normal' NOT NULL;
   
-
+ALTER TABLE adq.tcotizacion
+  ADD COLUMN forma_pago VARCHAR(500);
 /***********************************F-SCP-RAC-ADQ-0-08/08/2014****************************************/
 
 
@@ -433,3 +434,72 @@ COMMENT ON COLUMN adq.tsolicitud.revisado_asistente
 IS 'sirve para indicar si el asistente reviso la documentacion';
 
 /***********************************F-SCP-RAC-ADQ-0-23/09/2014****************************************/
+
+
+
+/***********************************I-SCP-RAC-ADQ-0-24/09/2014****************************************/
+
+--------------- SQL ---------------
+
+ALTER TABLE adq.tsolicitud
+  ADD COLUMN fecha_inicio DATE;
+
+COMMENT ON COLUMN adq.tsolicitud.fecha_inicio
+IS 'Fecha estimada de entrega de la compra o inicio del servicio';
+
+
+--------------- SQL ---------------
+
+ALTER TABLE adq.tsolicitud
+  ADD COLUMN dias_plazo_entrega INTEGER;
+
+COMMENT ON COLUMN adq.tsolicitud.dias_plazo_entrega
+IS 'Dias calendario para el plazo de entrega una vez emitida la orden de compra(solo se usa para bienes)';
+
+
+
+/***********************************F-SCP-RAC-ADQ-0-24/09/2014****************************************/
+
+/***********************************I-SCP-RAC-ADQ-0-26/09/2014****************************************/
+
+--------------- SQL ---------------
+
+ALTER TABLE adq.tcotizacion
+  ADD COLUMN funcionario_contacto VARCHAR(500);
+
+COMMENT ON COLUMN adq.tcotizacion.funcionario_contacto
+IS 'funcionario de contacto para el proveedor';
+
+
+--------------- SQL ---------------
+
+ALTER TABLE adq.tcotizacion
+  ADD COLUMN telefono_contacto VARCHAR(200);
+  
+  
+--------------- SQL ---------------
+
+ALTER TABLE adq.tcotizacion
+  ADD COLUMN correo_contacto VARCHAR(200);
+
+
+--------------- SQL ---------------
+
+ALTER TABLE adq.tcotizacion
+  ADD COLUMN prellenar_oferta VARCHAR(4) DEFAULT 'no' NOT NULL;
+
+COMMENT ON COLUMN adq.tcotizacion.prellenar_oferta
+IS 'si o no, cuando le damos si copia los precios y cantidad de la solicitud de compra';
+
+--------------- SQL ---------------
+
+
+
+/***********************************F-SCP-RAC-ADQ-0-26/09/2014****************************************/
+
+
+
+
+
+
+

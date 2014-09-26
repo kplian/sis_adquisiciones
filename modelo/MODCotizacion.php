@@ -54,15 +54,21 @@ class MODCotizacion extends MODbase{
 		$this->captura('id_estado_wf','integer');
 		$this->captura('id_proceso_wf','integer');
 		$this->captura('desc_moneda','varchar');
-		
 		$this->captura('tipo_cambio_conv','numeric');
-		
 		$this->captura('email','varchar');
 		$this->captura('numero','varchar');
 		$this->captura('num_tramite','varchar');
 		$this->captura('id_obligacion_pago','int4');
-		
 		$this->captura('tiempo_entrega','varchar');
+		$this->captura('funcionario_contacto','varchar');
+		$this->captura('telefono_contacto','varchar');
+		$this->captura('correo_contacto','varchar');
+		$this->captura('prellenar_oferta','varchar');
+		$this->captura('forma_pago','varchar');
+		
+		
+		
+		
 				
 		
 		//Ejecuta la instruccion
@@ -132,7 +138,6 @@ class MODCotizacion extends MODbase{
         $this->captura('numero_oc','varchar');
         $this->captura('id_proveedor','int4');
         $this->captura('desc_proveedor','varchar');
-        
         $this->captura('fecha_entrega','date');
         $this->captura('id_moneda','int4');
         $this->captura('moneda','varchar');
@@ -141,7 +146,6 @@ class MODCotizacion extends MODbase{
         $this->captura('obs','text');
         $this->captura('fecha_adju','date');
         $this->captura('nro_contrato','varchar');
-        
         $this->captura('fecha_reg','timestamp');
         $this->captura('id_usuario_reg','int4');
         $this->captura('fecha_mod','timestamp');
@@ -151,9 +155,7 @@ class MODCotizacion extends MODbase{
         $this->captura('id_estado_wf','integer');
         $this->captura('id_proceso_wf','integer');
         $this->captura('desc_moneda','varchar');
-        
         $this->captura('tipo_cambio_conv','numeric');
-        
         $this->captura('id_solicitud','integer');
 		$this->captura('id_categoria_compra','integer');
 		$this->captura('numero','varchar');
@@ -183,8 +185,7 @@ class MODCotizacion extends MODbase{
 		$this->setParametro('fecha_coti','fecha_coti','date');
 		$this->setParametro('numero_oc','numero_oc','int4');
 		$this->setParametro('id_proveedor','id_proveedor','int4');
-	
-		$this->setParametro('precio_total','precio_total','numeric');
+	    $this->setParametro('precio_total','precio_total','numeric');
 		$this->setParametro('fecha_entrega','fecha_entrega','date');
 		$this->setParametro('id_moneda','id_moneda','int4');
 		$this->setParametro('id_proceso_compra','id_proceso_compra','int4');
@@ -194,6 +195,14 @@ class MODCotizacion extends MODbase{
 		$this->setParametro('nro_contrato','nro_contrato','varchar');
 		$this->setParametro('tipo_cambio_conv','tipo_cambio_conv','numeric');
 		$this->setParametro('tiempo_entrega','tiempo_entrega','varchar');
+		$this->setParametro('funcionario_contacto','funcionario_contacto','varchar');
+		$this->setParametro('telefono_contacto','telefono_contacto','varchar');
+		$this->setParametro('correo_contacto','correo_contacto','varchar');
+		$this->setParametro('prellenar_oferta','prellenar_oferta','varchar');
+		
+		$this->setParametro('forma_pago','forma_pago','varchar');
+		
+		
 		
 		
 
@@ -214,13 +223,11 @@ class MODCotizacion extends MODbase{
 		//Define los parametros para la funcion
 		$this->setParametro('id_cotizacion','id_cotizacion','int4');
 		$this->setParametro('estado_reg','estado_reg','varchar');
-		
 		$this->setParametro('lugar_entrega','lugar_entrega','varchar');
 		$this->setParametro('tipo_entrega','tipo_entrega','varchar');
 		$this->setParametro('fecha_coti','fecha_coti','date');
 		$this->setParametro('numero_oc','numero_oc','int4');
 		$this->setParametro('id_proveedor','id_proveedor','int4');
-		
 		$this->setParametro('precio_total','precio_total','numeric');
 		$this->setParametro('fecha_entrega','fecha_entrega','date');
 		$this->setParametro('id_moneda','id_moneda','int4');
@@ -229,11 +236,13 @@ class MODCotizacion extends MODbase{
 		$this->setParametro('obs','obs','text');
 		$this->setParametro('fecha_adju','fecha_adju','date');
 		$this->setParametro('nro_contrato','nro_contrato','varchar');
-		
-		
-		
-        $this->setParametro('tipo_cambio_conv','tipo_cambio_conv','numeric');
+		$this->setParametro('tipo_cambio_conv','tipo_cambio_conv','numeric');
         $this->setParametro('tiempo_entrega','tiempo_entrega','varchar');
+		$this->setParametro('funcionario_contacto','funcionario_contacto','varchar');
+		$this->setParametro('telefono_contacto','telefono_contacto','varchar');
+		$this->setParametro('correo_contacto','correo_contacto','varchar');
+		$this->setParametro('prellenar_oferta','prellenar_oferta','varchar');
+		$this->setParametro('forma_pago','forma_pago','varchar');
         
         
 
@@ -465,9 +474,11 @@ class MODCotizacion extends MODbase{
 		$this->captura('codigo_moneda','varchar');
 		$this->captura('tiempo_entrega','varchar');
 		$this->captura('num_tramite','varchar');
-		$this->captura('nombre_completo1','text');
+		$this->captura('nombre_completo1','varchar');
 		$this->captura('celular1','varchar');
-		$this->captura('correo','varchar');
+		$this->captura('email_empresa','varchar');
+		$this->captura('codigo_proceso','varchar');		    
+		$this->captura('forma_pago','varchar');
 		
 		$this->armarConsulta();
 		$this->ejecutarConsulta();

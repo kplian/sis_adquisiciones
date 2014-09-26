@@ -217,11 +217,34 @@ Phx.vista.CotizacionAdq = {
             
             this.cmbMoneda.disable();
             this.cmpTipoCambioConv.disable();
-         
-            this.getComponente('id_proceso_compra').setValue(this.id_proceso_compra);           
+            this.getComponente('id_proceso_compra').setValue(this.id_proceso_compra); 
+            
+            this.ocultarComponente(this.Cmp.correo_contacto);
+            this.ocultarComponente(this.Cmp.telefono_contacto);
+            this.ocultarComponente(this.Cmp.funcionario_contacto);
+            this.ocultarComponente(this.Cmp.lugar_entrega); 
+            this.ocultarComponente(this.Cmp.fecha_entrega); 
+            this.ocultarComponente(this.Cmp.tiempo_entrega); 
+            this.mostrarComponente(this.Cmp.prellenar_oferta); 
+
+        
     },
     
-
+    onButtonEdit:function(){ 
+    	
+    	        
+            Phx.vista.CotizacionAdq.superclass.onButtonEdit.call(this);
+            this.mostrarComponente(this.Cmp.correo_contacto);
+            this.mostrarComponente(this.Cmp.telefono_contacto);
+            this.mostrarComponente(this.Cmp.funcionario_contacto);
+            this.mostrarComponente(this.Cmp.lugar_entrega); 
+            this.mostrarComponente(this.Cmp.fecha_entrega); 
+            this.mostrarComponente(this.Cmp.tiempo_entrega); 
+            this.ocultarComponente(this.Cmp.prellenar_oferta); 
+            
+            
+     
+    },
     
     iniciarEventos:function(){
           this.cmbMoneda= this.getComponente('id_moneda');

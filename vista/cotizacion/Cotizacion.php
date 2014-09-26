@@ -244,7 +244,7 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
             config:{
                 name: 'fecha_coti',
                 fieldLabel: 'Fecha Cotiz.',
-                allowBlank: true,
+                allowBlank: false,
                 anchor: '80%',
                 gwidth: 100,
                         format: 'd/m/Y', 
@@ -296,14 +296,31 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
 				allowBlank: true,
 				anchor: '80%',
 				gwidth: 100,
-				maxLength:500
+				maxLength:450
 			},
-			type:'TextField',
+			type:'TextArea',
 			filters:{pfiltro:'cot.lugar_entrega',type:'string'},
 			id_grupo:1,
 			grid:true,
 			form:true
 		},
+		{
+			config:{
+				name: 'forma_pago',
+				fieldLabel: 'Forma de pago',
+				allowBlank: true,
+				anchor: '80%',
+				gwidth: 100,
+				maxLength:450
+			},
+			type:'TextArea',
+			filters:{pfiltro:'cot.forma_pago',type:'string'},
+			id_grupo:1,
+			grid:true,
+			form:true
+		},
+		
+		
 		{
 			config:{
 				name: 'tipo_entrega',
@@ -331,7 +348,7 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
             },
             type:'TextField',
             filters:{pfiltro:'cot.tiempo_entrega',type:'string'},
-            valorInicial:'X días Hábiles de recibida la presente orden',
+            valorInicial:'5 días  de recibida la presente orden',
             id_grupo:1,
             grid:true,
             form:true
@@ -341,6 +358,7 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
 				name: 'fecha_venc',
 				gtipo:'Fechas estimada de vencimiento',
 				fieldLabel: 'Fecha Venc',
+				qtip:'Fecha de vencimiento de la cotizacion',
 				allowBlank: true,
 				
 				anchor: '80%',
@@ -354,6 +372,24 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
 			grid:true,
 			form:true
 		},
+    
+        {
+            config:{
+                name: 'fecha_entrega',
+                fieldLabel: 'Fecha Entrega/Inicio',
+                qtip:'Fecha de entrar o inicio de servicio segun el proveedor',
+                allowBlank: true,
+                anchor: '80%',
+                gwidth: 100,
+                        format: 'd/m/Y', 
+                        renderer:function (value,p,record){return value?value.dateFormat('d/m/Y'):''}
+            },
+            type:'DateField',
+            filters:{pfiltro:'cot.fecha_entrega',type:'date'},
+            id_grupo:1,
+            grid:true,
+            form:true
+        },
 		{
 			config:{
 				name: 'obs',
@@ -389,6 +425,7 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
 			config:{
 				name: 'nro_contrato',
 				fieldLabel: 'Nro Contrato',
+			
 				allowBlank: true,
 				anchor: '80%',
 				gwidth: 100,
@@ -400,23 +437,84 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
 			grid:true,
 			form:true
 		},
-    
-        {
-            config:{
-                name: 'fecha_entrega',
-                fieldLabel: 'Fecha Entrega/Inicio',
-                allowBlank: true,
-                anchor: '80%',
-                gwidth: 100,
-                        format: 'd/m/Y', 
-                        renderer:function (value,p,record){return value?value.dateFormat('d/m/Y'):''}
-            },
-            type:'DateField',
-            filters:{pfiltro:'cot.fecha_entrega',type:'date'},
-            id_grupo:1,
-            grid:true,
-            form:true
-        },
+		{
+			config:{
+				name: 'funcionario_contacto',
+				fieldLabel: 'Func Contacto',
+				qtip:'Funcionario de contacto para el proveedor',
+				allowBlank: true,
+				anchor: '100%',
+				gwidth: 300,
+				maxLength:50
+			},
+			type:'TextField',
+			filters:{pfiltro:'cot.funcionario_contacto',type:'string'},
+			id_grupo:1,
+			grid:true,
+			form:true
+		},
+		{
+			config:{
+				name: 'telefono_contacto',
+				fieldLabel: 'Telefono Contacto',
+				qtip:'Telefono de contacto para el proveedor',
+				allowBlank: true,
+				anchor: '100%',
+				gwidth: 300,
+				maxLength:50
+			},
+			type:'TextField',
+			filters:{pfiltro:'cot.telefono_contacto',type:'string'},
+			id_grupo:1,
+			grid:true,
+			form:true
+		},
+		{
+			config:{
+				name: 'correo_contacto',
+				fieldLabel: 'Correo de Contacto',
+				qtip:'Correo de contacto para el proveedor',
+				allowBlank: true,
+				anchor: '100%',
+				gwidth: 300,
+				maxLength:50
+			},
+			type:'TextField',
+			filters:{pfiltro:'cot.correo_contacto',type:'string'},
+			id_grupo:1,
+			grid:true,
+			form:true
+		},
+		{
+			config:{
+				name: 'prellenar_oferta',
+				fieldLabel: 'Prellenar Cotización',
+				qtip:'Copia los precios la cantidad y precio ofertado de la solicitud de compra',
+				allowBlank: true,
+				anchor: '40%',
+				gwidth: 50,
+				maxLength:2,
+				emptyText:'si/no...',       			
+       			typeAhead: true,
+       		    triggerAction: 'all',
+       		    lazyRender:true,
+       		    mode: 'local',
+       		    value:'no',
+       		    valueField: 'prellenar_oferta',       		    
+       		   // displayField: 'descestilo',
+       		    store: ['si','no']
+			},
+			type:  'ComboBox',
+			valorInicial: 'si',
+			id_grupo: 1,
+			filters: {	pfiltro:'cot.prellenar_oferta',
+	       		         type: 'list',
+	       				 //dataIndex: 'size',
+	       				 options: ['si','no'],	
+	       		 	},
+			grid:true,
+			form:true
+		},
 		{
 			config:{
 				name: 'estado_reg',
@@ -531,7 +629,11 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
 		{name:'usr_reg', type: 'string'},
 		{name:'usr_mod', type: 'string'},'email','desc_moneda','tipo_cambio_conv','id_estado_wf','id_proceso_wf','numero',
 		'num_tramite',
-		{name:'id_obligacion_pago', type: 'numeric'},'tiempo_entrega'
+		{name:'id_obligacion_pago', type: 'numeric'},'tiempo_entrega',
+		'funcionario_contacto',
+        'telefono_contacto',
+        'correo_contacto',
+        'prellenar_oferta','forma_pago'
 		
 	],
 

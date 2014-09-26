@@ -83,6 +83,11 @@ class MODSolicitud extends MODbase{
 		$this->captura('tipo_concepto','varchar');
 		$this->captura('revisado_asistente','varchar');
 		
+		$this->captura('fecha_inicio','date');
+		$this->captura('dias_plazo_entrega','integer');
+		
+		
+		
 		
 		
 		
@@ -136,6 +141,9 @@ class MODSolicitud extends MODbase{
 
 		$this->setParametro('tipo_concepto','tipo_concepto','varchar');
 		
+		$this->setParametro('fecha_inicio','fecha_inicio','date');
+		$this->setParametro('dias_plazo_entrega','dias_plazo_entrega','integer');
+		
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -181,9 +189,11 @@ class MODSolicitud extends MODbase{
 		$this->setParametro('id_proveedor','id_proveedor','int4');
 		$this->setParametro('id_funcionario_supervisor','id_funcionario_supervisor','int4');
 		$this->setParametro('tipo_concepto','tipo_concepto','varchar');
+		
+		$this->setParametro('fecha_inicio','fecha_inicio','date');
+		$this->setParametro('dias_plazo_entrega','dias_plazo_entrega','integer');
         
 		
-
 		//Ejecuta la instruccion
 		$this->armarConsulta();
 		$this->ejecutarConsulta();
@@ -212,7 +222,7 @@ class MODSolicitud extends MODbase{
 	function marcarRevisadoSol(){
 		//Definicion de variables para ejecucion del procedimiento
 		$this->procedimiento='adq.f_solicitud_ime';
-		$this->transaccion='ADQ_REVSOL_ELI';
+		$this->transaccion='ADQ_REVSOL_IME';
 		$this->tipo_procedimiento='IME';
 				
 		//Define los parametros para la funcion

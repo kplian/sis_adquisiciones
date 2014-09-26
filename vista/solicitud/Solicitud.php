@@ -17,12 +17,8 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
 		
 		Phx.vista.Solicitud.superclass.constructor.call(this,config);		
 		this.init();		
-		
-
 		this.addBotones();
 
-
-		
 		
         /*
 		this.addButton('btnReporte',{
@@ -207,8 +203,7 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
                 allowBlank: false,
                 emptyText:'Subtipo...',
                 renderer:function (value, p, record){
-                	   console.log('value',value);
-                        var dato='';
+                	    var dato='';
                         dato = (value=='alquiler_inmueble')?'Alquiler Inmuebles':dato;
                         dato = (dato==''&&value=='consultoria_empresa')?'Consultoria de Empresas':dato;
                         dato = (dato==''&&value=='consultoria_personal')?'Consultoria de Personas':dato;
@@ -518,6 +513,7 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
 			config:{
 				name: 'justificacion',
 				fieldLabel: 'Justificacion',
+				qtip:'Justifique, ¿por que la necesidad de esta compra?',
 				allowBlank: false,
 				anchor: '80%',
 				gwidth: 100,
@@ -533,7 +529,8 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
 			config:{
 				name: 'lugar_entrega',
 				fieldLabel: 'Lug. Entrega',
-				allowBlank: true,
+				qtip:'Proporcionar una buena descripcion para informar al proveedor, Ejm. Entrega en oficinas de aeropuerto Cochabamba, Jaime Rivera #28',
+				allowBlank: false,
 				anchor: '80%',
 				gwidth: 100,
 				maxLength:255
@@ -543,11 +540,48 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
 			id_grupo:1,
 			grid:true,
 			form:true
-		},
+		},	     
+		
+        {
+            config:{
+                name: 'fecha_inicio',
+                fieldLabel: 'Fecha Inicio Estimada.',
+                qtip:'En que se fecha se estima el inicio del servicio',
+                allowBlank: false,
+                disabled: false,
+                gwidth: 100,
+                        format: 'd/m/Y', 
+                        renderer:function (value,p,record){return value?value.dateFormat('d/m/Y'):''}
+            },
+            type:'DateField',
+            filters:{pfiltro:'sol.fecha_soli',type:'date'},
+            id_grupo:1,
+            grid:true,
+            form:true
+        },
+        {
+            config:{
+                name: 'dias_plazo_entrega',
+                fieldLabel: 'Dias entrga',
+                qtip:'Cuantos días después de emitida  la orden de compra se hara la entrega de los bienes. EJM. Quedara de esta forma en la orden de Compra:  (Tiempo de entraga: X días Hábiles de recibida la presente orden)',
+                allowBlank: false,
+                allowDecimals:false,
+                width: 100,
+                gwidth: 100,
+                minValue:1,
+                maxLength:10
+            },
+            type:'NumberField',
+            filters:{pfiltro:'sold.cantidad',type:'numeric'},
+            id_grupo:1,
+            grid:true,
+            form:true
+        },
 		{
 			config:{
 				name: 'posibles_proveedores',
 				fieldLabel: 'Otros Proveedores',
+				qtip:'Si tuvieramos que adicionar cotizaciones,  ¿Que proveedores podriamos consultar?',
 				allowBlank: true,
 				anchor: '80%',
 				gwidth: 100,
@@ -723,13 +757,12 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
 		'id_cargo_rpc_ai',
 		'ai_habilitado',
 		'tipo_concepto',
-		'revisado_asistente'
+		'revisado_asistente',
+		{name:'fecha_inicio', type: 'date',dateFormat:'Y-m-d'},'dias_plazo_entrega'
 		
 	],
 	
 	
-
-    
     loadCheckDocumentosSolWf:function() {
             var rec=this.sm.getSelected();
             rec.data.nombreVista = this.nombreVista;
@@ -788,8 +821,7 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
 	
 	onButtonRepOC: function(){
                 var rec=this.sm.getSelected();
-				//console.log(rec.data.id_cotizacion);
-                Ext.Ajax.request({
+				Ext.Ajax.request({
                     url:'../../sis_adquisiciones/control/Solicitud/reporteOC',
                     params:{'id_solicitud':rec.data.id_solicitud,'id_proveedor':rec.data.id_proveedor},
                     success: this.successExport,
@@ -801,7 +833,7 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
                     },
                     scope:this
                 });
-        },
+     },
 		
 	obtenerSolicitud:function(){
 	    var d= this.sm.getSelected();

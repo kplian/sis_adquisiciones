@@ -1,3 +1,5 @@
+--------------- SQL ---------------
+
 CREATE OR REPLACE FUNCTION adq.f_inserta_cotizacion (
   p_administrador integer,
   p_id_usuario integer,
@@ -70,6 +72,14 @@ DECLARE
    v_precio_unitario_mb_coti   numeric;
    v_tiempo_entrega   varchar;
    v_resp_doc  boolean;
+   
+   v_id_funcionario_sol integer;
+   
+   v_registros_fun record;
+   v_telefono varchar;
+   v_fecha_inicio_sol date;
+   v_dias_plazo_entrega_sol integer;
+   v_lugar_entrega_sol varchar;
  
     
     
@@ -130,7 +140,28 @@ BEGIN
             v_num_cotizacion
            from adq.tproceso_compra pc
            where pc.id_proceso_compra = (p_hstore_cotizacion->'id_proceso_compra')::integer;
+         
+            
            
+           --recupera datos de la solicitud      
+           select  
+             sol.id_proveedor,
+             sol.id_proceso_wf,
+             sol.id_funcionario,
+             sol.fecha_inicio,
+             sol.dias_plazo_entrega,
+             sol.lugar_entrega
+           into
+            v_id_proveedor_precoti,
+            v_id_proceso_wf_sol,
+            v_id_funcionario_sol,
+            v_fecha_inicio_sol,
+            v_dias_plazo_entrega_sol,
+            v_lugar_entrega_sol
+                    
+           from  adq.tsolicitud sol where sol.id_solicitud = v_id_solicitud;
+           
+         
            
            --recupera el nomber del proveedor
            
@@ -258,13 +289,47 @@ BEGIN
             --predefine tiempod de entrega sie s blanco o nulo
             v_tiempo_entrega = (p_hstore_cotizacion->'tiempo_entrega')::varchar;
             
+            
+            IF  v_dias_plazo_entrega_sol is  NULL  THEN
+               v_dias_plazo_entrega_sol = 5;
+            END IF;
+            
             IF  v_tiempo_entrega is NULL or v_tiempo_entrega = '' THEN
-               
-               v_tiempo_entrega  = 'X días Hábiles de recibida la presente orden';
+               v_tiempo_entrega  = v_dias_plazo_entrega_sol||' días de recibida la presente orden';
+             END IF;
+            
+            --lugar de entrega
+            
+            IF (p_hstore_cotizacion->'lugar_entrega') is not NULL   and   (p_hstore_cotizacion->'lugar_entrega') !='' THEN
+            
+              v_lugar_entrega_sol = (p_hstore_cotizacion->'lugar_entrega');
             
             END IF;
-           
-           
+            
+            IF (p_hstore_cotizacion->'fecha_entrega')::date is not NULL  THEN
+            
+              v_fecha_inicio_sol = (p_hstore_cotizacion->'lugar_entrega')::date;
+            
+            END IF;
+            
+            
+            
+            
+            
+            --Recupera datos del funcionario de contacto
+            
+            select
+              per.nombre_completo1 as desc_funcionario1,
+              fun.email_empresa,
+              fun.telefono_ofi,
+              per.celular1
+            into 
+              v_registros_fun
+            from orga.tfuncionario fun 
+            inner join segu.vpersona per on per.id_persona = fun.id_persona
+            where fun.id_funcionario = v_id_funcionario_sol;
+            
+            v_telefono = COALESCE(v_registros_fun.telefono_ofi||', ','')|| COALESCE(v_registros_fun.celular1,'');
         
         
         	--Sentencia de la insercion
@@ -296,18 +361,23 @@ BEGIN
             num_tramite,
             tiempo_entrega,
             id_usuario_ai,
-            usuario_ai
+            usuario_ai,
+            funcionario_contacto,
+            telefono_contacto,
+            correo_contacto,
+            prellenar_oferta,
+            forma_pago
           	) values(
 			'activo',
 			v_codigo_estado,
-			(p_hstore_cotizacion->'lugar_entrega')::varchar,
+			COALESCE(v_lugar_entrega_sol,'Almacen de Oficina Central'),
 			(p_hstore_cotizacion->'tipo_entrega')::varchar,
 			(p_hstore_cotizacion->'fecha_coti')::date,
 		
 			(p_hstore_cotizacion->'id_proveedor')::integer,
 			--v_parametros.porc_anticipo,
 			--v_parametros.precio_total,
-			(p_hstore_cotizacion->'fecha_entrega')::date,
+			v_fecha_inicio_sol,
 			(p_hstore_cotizacion->'id_moneda')::integer,
 			(p_hstore_cotizacion->'id_proceso_compra')::integer,
 			(p_hstore_cotizacion->'fecha_venc')::date,
@@ -325,14 +395,18 @@ BEGIN
             v_num_tramite,
             v_tiempo_entrega,
             (p_hstore_cotizacion->'_id_usuario_ai')::integer,
-            (p_hstore_cotizacion->'_nombre_usuario_ai')::varchar
+            (p_hstore_cotizacion->'_nombre_usuario_ai')::varchar,
+            v_registros_fun.desc_funcionario1::varchar,
+            v_telefono::varchar,
+            COALESCE(v_registros_fun.email_empresa,'')::varchar,
+            COALESCE((p_hstore_cotizacion->'prellenar_oferta')::varchar,'no'),
+            COALESCE((p_hstore_cotizacion->'forma_pago')::varchar,'')
+            
+            
             )RETURNING id_cotizacion into v_id_cotizacion;
             
             
-            
-            
-            
-            
+             
             
               --  si es la primera cotizacion (el proceso de compra esta en estado pendiente)
             
@@ -342,14 +416,6 @@ BEGIN
              
                    --  revisar si el proveedor es el mismo proveedor de la solicitud (precotizacion)
                    --  si es el mismo copiar las catidades y montos ofertadas de la solicitud de talle
-                 
-                   select  
-                     sol.id_proveedor,
-                     sol.id_proceso_wf
-                   into
-                    v_id_proveedor_precoti,
-                    v_id_proceso_wf_sol
-                   from  adq.tsolicitud sol where sol.id_solicitud = v_id_solicitud;
                      
                    IF v_id_proveedor_precoti = (p_hstore_cotizacion->'id_proveedor')::integer THEN
                    
@@ -408,6 +474,12 @@ BEGIN
                    
              
              END IF;
+             
+          --si se marca la cotizacion para prellenada forma
+          IF (p_hstore_cotizacion->'prellenar_oferta')::varchar = 'si'   THEN 
+              v_sw_precoti = TRUE;
+          END IF;
+             
             
            --recupera tipo de cambio 
            v_tipo_cambio_conv = (p_hstore_cotizacion->'tipo_cambio_conv')::numeric;

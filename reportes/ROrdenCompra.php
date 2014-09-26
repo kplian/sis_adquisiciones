@@ -45,11 +45,11 @@ include_once dirname(__FILE__)."/../../lib/lib_reporte/lang.es_AR.php";
 								$this->setXY($x,$y-4);
 								$this->SetFontSize(6);
 								$this->SetFont('', 'B');
-								$this->Cell(20, $height, 'Localidad', 0, 0, 'L', false, '', 1, false, 'T', 'C');
+								$this->Cell(20, $height, '', 0, 0, 'L', false, '', 1, false, 'T', 'C');
 								$this->setXY($x,$y-1);
 								$this->SetFontSize(7);
 								$this->setFont('','');
-								$this->Cell(20, $height, strtoupper($this->getDataSource()->getParameter('lugar_entrega')), 0, 0, 'L', false, '', 1, false, 'T', 'C');
+								$this->Cell(20, $height, '', 0, 0, 'L', false, '', 1, false, 'T', 'C');
 								$this->setXY($x,$y+11);
 								$this->setFont('','');
 								$this->Cell(6, $height/5, 'Dia', 1, 0, 'L', false, '', 1, false, 'T', 'C');
@@ -258,13 +258,15 @@ Class ROrdenCompra extends Report {
         $pdf->Cell($width4+$width3+$width2, $height, $this->getDataSource()->getParameter('lugar_entrega'), $white, 0, 'L', true, '', 0, false, 'T', 'C');        
         $pdf->Ln();
 		
-		$pdf->SetFont('', 'B');
-		$pdf->Cell($width3, $height, 'Forma de Pago:', 0, 0, 'L', false, '', 0, false, 'T', 'C');
-        $pdf->SetFont('', '');
-        $pdf->SetFillColor(192,192,192, true);
-        $pdf->Cell($width4+$width3+$width2, $height, 'Total, una vez recibida la conformidad de la unidad solicitante', $white, 0, 'L', true, '', 0, false, 'T', 'C');        
-        $pdf->Ln();
-        
+		if($this->getDataSource()->getParameter('forma_pago')!=''){
+			$pdf->SetFont('', 'B');
+			$pdf->Cell($width3, $height, 'Forma de Pago:', 0, 0, 'L', false, '', 0, false, 'T', 'C');
+			$pdf->SetFont('', '');
+			$pdf->SetFillColor(192,192,192, true);
+			$pdf->Cell($width4+$width3+$width2, $height, $this->getDataSource()->getParameter('forma_pago'), $white, 0, 'L', true, '', 0, false, 'T', 'C');        
+			$pdf->Ln();
+        }
+		
 		if($this->getDataSource()->getParameter('tipo')=='adjudicado'){	        
 	        $pdf->SetFont('', 'B');
 	        $pdf->Cell($width3, $height, 'Fecha Adjudicacion:', 0, 0, 'L', false, '', 0, false, 'T', 'C');
@@ -283,21 +285,45 @@ Class ROrdenCompra extends Report {
 		//$pdf->MultiCell(0, $height, 'Firma Proveedor o Sello ', 1,'R', false ,1);							
 		
 		if($tipo=='Bien')			
-			$mensaje = 'El ítem deberá ser entregado conforme a lo solicitado, estipuladas en la cotización y la presente Orden, en coordinación con  el  Sr(a).'.$this->getDataSource()->getParameter('contacto');			
+			$mensaje = 'El ítem deberá ser entregado conforme a lo solicitado, estipuladas en la cotización y la presente Orden, en coordinación con:';			
 		else
-			$mensaje = 'El servicio deberá ser entregado conforme a lo solicitado, estipuladas en la cotización y la presente Orden, en coordinación con  el  Sr(a).'.$this->getDataSource()->getParameter('contacto');			
-		if($this->getDataSource()->getParameter('celular_contacto')!='')
-			$mensaje = $mensaje.', celular '.$this->getDataSource()->getParameter('celular_contacto');
-		else
-			$mensaje = $mensaje.', celular 					';
-		if($this->getDataSource()->getParameter('email_contacto')!='')
-			$mensaje = $mensaje.', correo '.$this->getDataSource()->getParameter('email_contacto');
-		else
-			$mensaje = $mensaje.', correo 					';
-		$mensaje = $mensaje.', ante cualquier demora BOLIVIANA DE AVIACIÓN – BOA se reserva el derecho de retener el UNO PORCIENTO (1%) del monto total por día de retraso hasta un 20%.';
-		
+			$mensaje = 'El servicio deberá ser entregado conforme a lo solicitado, estipuladas en la cotización y la presente Orden, en coordinación con:';			
+				
 		$pdf->MultiCell(0, $height, $mensaje, 1,'L', false ,1);
 		$pdf->Ln($height);
+		
+		if($this->getDataSource()->getParameter('contacto')!=''){
+			$pdf->SetFontSize(7);
+			$pdf->SetFont('', 'B');
+			$pdf->Cell($width1, $height, 'Contacto:', 0, 0, 'L', false, '', 0, false, 'T', 'C');
+			$pdf->SetFont('', '');
+			$pdf->SetFillColor(192,192,192, true);
+			$pdf->Cell($width4+$width3+$width2, $height, $this->getDataSource()->getParameter('contacto'), $white, 1, 'L', true, '', 0, false, 'T', 'C');
+		}
+		
+		if($this->getDataSource()->getParameter('celular_contacto')!=''){
+			$pdf->SetFontSize(7);
+			$pdf->SetFont('', 'B');
+			$pdf->Cell($width1, $height, 'Telefono:', 0, 0, 'L', false, '', 0, false, 'T', 'C');
+			$pdf->SetFont('', '');
+			$pdf->SetFillColor(192,192,192, true);
+			$pdf->Cell($width4+$width3+$width2, $height, $this->getDataSource()->getParameter('celular_contacto'), $white, 1, 'L', true, '', 0, false, 'T', 'C');
+		}
+		
+		if($this->getDataSource()->getParameter('email_contacto')!=''){
+			$pdf->SetFontSize(7);
+			$pdf->SetFont('', 'B');
+			$pdf->Cell($width1, $height, 'Correo:', 0, 0, 'L', false, '', 0, false, 'T', 'C');
+			$pdf->SetFont('', '');
+			$pdf->SetFillColor(192,192,192, true);
+			$pdf->Cell($width4+$width3+$width2, $height, $this->getDataSource()->getParameter('email_contacto'), $white, 1, 'L', true, '', 0, false, 'T', 'C');
+		}
+		//$mensaje = $mensaje.', ante cualquier demora BOLIVIANA DE AVIACIÓN – BOA se reserva el derecho de retener el UNO PORCIENTO (1%) del monto total por día de retraso hasta un 20%.';
+		$pdf->Ln($height);
+		if($this->getDataSource()->getParameter('codigo_proceso')!='PROCINPD'){
+			$pdf->MultiCell(0, $height, 'Ante cualquier demora BOLIVIANA DE AVIACIÓN – BOA se reserva el derecho de retener el UNO PORCIENTO (1%) del monto total por día de retraso hasta un 20%.', 1,'L', false ,1);
+			$pdf->Ln($height);
+		}		
 		
 		$pdf->MultiCell(0, $height, 'Sin otro particular y agradeciendo su gentil atención, saludo a usted', 1,'L', false ,1);
         $pdf->Ln($height);

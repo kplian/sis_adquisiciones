@@ -89,7 +89,12 @@ BEGIN
                         sol.numero,
                         sol.num_tramite,
                         cot.id_obligacion_pago,
-                        cot.tiempo_entrega
+                        cot.tiempo_entrega,
+                        cot.funcionario_contacto,
+                        cot.telefono_contacto,
+                        cot.correo_contacto,
+                        cot.prellenar_oferta
+                        
 						from adq.tcotizacion cot
                         inner join adq.tproceso_compra proc on proc.id_proceso_compra = cot.id_proceso_compra
                         inner join adq.tsolicitud sol on sol.id_solicitud = proc.id_solicitud
@@ -561,7 +566,7 @@ BEGIN
                     ins.fax as fax_institucion,
                     cot.fecha_entrega,
                     (cot.fecha_entrega - cot.fecha_adju) as dias_entrega,
-                    sol.lugar_entrega,
+                    cot.lugar_entrega,
                     cot.numero_oc,
                     cot.tipo_entrega,
                     cot.id_proceso_compra,
@@ -571,9 +576,10 @@ BEGIN
                     mon.codigo as codigo_moneda,
                     cot.tiempo_entrega,
                     sol.num_tramite,
-                    persol.nombre_completo1,
-       				persol.celular1,
-       				persol.correo
+                    cot.funcionario_contacto,
+       				cot.telefono_contacto,
+       				cot.correo_contacto,
+                    tppc.codigo as codigo_proceso
               from adq.tcotizacion cot 
               inner join param.vproveedor pv on pv.id_proveedor=cot.id_proveedor
               left join segu.tpersona per on per.id_persona=pv.id_persona
@@ -583,6 +589,8 @@ BEGIN
 			  inner join param.tmoneda mon on mon.id_moneda=cot.id_moneda
               inner join orga.tfuncionario fun on fun.id_funcionario=sol.id_funcionario
 		      inner join segu.vpersona persol on persol.id_persona=fun.id_persona
+              inner join wf.tproceso_wf pcwf on pcwf.id_proceso_wf=pc.id_proceso_wf
+		      inner join wf.ttipo_proceso tppc on tppc.id_tipo_proceso=pcwf.id_tipo_proceso
               where '||v_filtro;
           
           --Definicion de la respuesta

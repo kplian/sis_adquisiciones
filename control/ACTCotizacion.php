@@ -184,7 +184,9 @@ class ACTCotizacion extends ACTbase{
                 $dataSource->putParameter('desc_proveedor', $datosOrdenCompra[0]['desc_proveedor']);
 				$dataSource->putParameter('contacto', $datosOrdenCompra[0]['nombre_completo1']);
 				$dataSource->putParameter('celular_contacto', $datosOrdenCompra[0]['celular1']);
-				$dataSource->putParameter('email_contacto', $datosOrdenCompra[0]['correo']);
+				$dataSource->putParameter('email_contacto', $datosOrdenCompra[0]['email_empresa']);
+				$dataSource->putParameter('codigo_proceso', $datosOrdenCompra[0]['codigo_proceso']);
+				$dataSource->putParameter('forma_pago', $datosOrdenCompra[0]['forma_pago']);
                 
                 if($datosOrdenCompra[0]['id_persona']!=''){
                     $dataSource->putParameter('direccion', $datosOrdenCompra[0]['dir_persona']);
