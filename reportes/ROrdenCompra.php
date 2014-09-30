@@ -329,7 +329,7 @@ Class ROrdenCompra extends Report {
 		//$mensaje = $mensaje.', ante cualquier demora BOLIVIANA DE AVIACIÓN – BOA se reserva el derecho de retener el UNO PORCIENTO (1%) del monto total por día de retraso hasta un 20%.';
 		$pdf->Ln($height);
 		if($this->getDataSource()->getParameter('codigo_proceso')!='PROCINPD'){
-			$pdf->MultiCell(0, $height, 'Ante cualquier demora BOLIVIANA DE AVIACIÓN – BOA se reserva el derecho de retener el UNO PORCIENTO (1%) del monto total por día de retraso hasta un 20%.', 1,'L', false ,1);
+			$pdf->MultiCell(0, $height, 'Ante cualquier demora BOLIVIANA DE AVIACIÓN – BOA se reserva el derecho de retener el UNO PORCIENTO (1%) del monto total por día de retraso hasta un 20%.', 0,'L', false ,1);
 			$pdf->Ln($height);
 		}		
 		
