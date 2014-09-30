@@ -93,7 +93,8 @@ BEGIN
                         cot.funcionario_contacto,
                         cot.telefono_contacto,
                         cot.correo_contacto,
-                        cot.prellenar_oferta
+                        cot.prellenar_oferta,
+                        cot.forma_pago
                         
 						from adq.tcotizacion cot
                         inner join adq.tproceso_compra proc on proc.id_proceso_compra = cot.id_proceso_compra
@@ -579,7 +580,8 @@ BEGIN
                     cot.funcionario_contacto,
        				cot.telefono_contacto,
        				cot.correo_contacto,
-                    tppc.codigo as codigo_proceso
+                    tppc.codigo as codigo_proceso,
+                    cot.forma_pago
               from adq.tcotizacion cot 
               inner join param.vproveedor pv on pv.id_proveedor=cot.id_proveedor
               left join segu.tpersona per on per.id_persona=pv.id_persona
