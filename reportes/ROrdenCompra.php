@@ -213,7 +213,7 @@ Class ROrdenCompra extends Report {
 		  $tipo='Compra - Servicio'; 
 		
 		if($tipo=='Bien')						
-		    $pdf->MultiCell(0, $height, 'De acuerdo a su cotización en la que detalla especificaciones, por medio de la presente confirmamos orden para la provisión de:', 1,'L', false ,1);
+		    $pdf->MultiCell(0, $height, 'De acuerdo a su cotización en la que detalla especificaciones, por medio de la presente confirmamos orden para la provisión de:', 0,'L', false ,1);
 		
 		//escritura de los datalles de la cotizacion
 		$this->writeDetalles($this->getDataSource()->getParameter('detalleDataSource'), $pdf,$tipo, $this->getDataSource()->getParameter('codigo_moneda') );
@@ -227,7 +227,7 @@ Class ROrdenCompra extends Report {
             $pdf->Cell($width3, $height, 'Fecha de Entrega:', 0, 0, 'L', false, '', 0, false, 'T', 'C');
             $pdf->SetFont('', '');
             $pdf->SetFillColor(192,192,192, true);
-            $pdf->Cell($width4+$width3+$width2, $height, $this->getDataSource()->getParameter('fecha_entrega'), $white, 0, 'L', true, '', 0, false, 'T', 'C');        
+            $pdf->Cell($width4+$width3+$width2+$width1, $height, $this->getDataSource()->getParameter('fecha_entrega'), $white, 0, 'L', true, '', 0, false, 'T', 'C');        
             $pdf->Cell(5, $height, '', 0, 0, 'L', false, '', 0, false, 'T', 'C');
             $pdf->Ln();
             $pdf->SetFont('', 'B');
@@ -237,7 +237,8 @@ Class ROrdenCompra extends Report {
             $pdf->Cell($width3, $height, 'Tiempo de Entrega:', 0, 0, 'L', false, '', 0, false, 'T', 'C');
             $pdf->SetFont('', '');
             $pdf->SetFillColor(192,192,192, true);
-            $pdf->Cell($width4+$width3+$width2, $height, $this->getDataSource()->getParameter('tiempo_entrega'), $white, 0, 'L', true, '', 0, false, 'T', 'C');        
+            //$pdf->Cell($width4+$width3+$width2+$width1, $height, $this->getDataSource()->getParameter('tiempo_entrega'), $white, 0, 'L', true, '', 0, false, 'T', 'C');        
+			$pdf->MultiCell(0, $height, $this->getDataSource()->getParameter('tiempo_entrega'), 0,'L', true ,1);        
             $pdf->Cell(5, $height, '', 0, 0, 'L', false, '', 0, false, 'T', 'C');
             $pdf->Ln();
        }
@@ -255,15 +256,15 @@ Class ROrdenCompra extends Report {
         $pdf->Cell($width3, $height, 'Lugar de Entrega:', 0, 0, 'L', false, '', 0, false, 'T', 'C');
         $pdf->SetFont('', '');
         $pdf->SetFillColor(192,192,192, true);
-        $pdf->Cell($width4+$width3+$width2, $height, $this->getDataSource()->getParameter('lugar_entrega'), $white, 0, 'L', true, '', 0, false, 'T', 'C');        
+		$pdf->MultiCell(0, $height, $this->getDataSource()->getParameter('lugar_entrega'), 0,'L', true ,1);        
         $pdf->Ln();
 		
 		if($this->getDataSource()->getParameter('forma_pago')!=''){
 			$pdf->SetFont('', 'B');
 			$pdf->Cell($width3, $height, 'Forma de Pago:', 0, 0, 'L', false, '', 0, false, 'T', 'C');
 			$pdf->SetFont('', '');
-			$pdf->SetFillColor(192,192,192, true);
-			$pdf->Cell($width4+$width3+$width2, $height, $this->getDataSource()->getParameter('forma_pago'), $white, 0, 'L', true, '', 0, false, 'T', 'C');        
+			$pdf->SetFillColor(192,192,192, true);			
+			$pdf->MultiCell(0, $height, $this->getDataSource()->getParameter('forma_pago'), 0,'L', true ,1);
 			$pdf->Ln();
         }
 		
@@ -272,7 +273,8 @@ Class ROrdenCompra extends Report {
 	        $pdf->Cell($width3, $height, 'Fecha Adjudicacion:', 0, 0, 'L', false, '', 0, false, 'T', 'C');
 	        $pdf->SetFont('', '');
 	        $pdf->SetFillColor(192,192,192, true);
-	        $pdf->Cell($width3+$width2, $height, $this->getDataSource()->getParameter('fecha_adju'), $white, 0, 'L', true, '', 0, false, 'T', 'C');        
+	        $pdf->MultiCell(0, $height, $this->getDataSource()->getParameter('fecha_adju'), 0,'L', true ,1);
+			//$pdf->Cell($width3+$width2, $height, $this->getDataSource()->getParameter('fecha_adju'), $white, 0, 'L', true, '', 0, false, 'T', 'C');        
 		}	
 		
 		$pdf->Ln();
@@ -280,16 +282,22 @@ Class ROrdenCompra extends Report {
 		//$pdf->Cell($width1, $height, 'NOTA:', 0, 0, 'L', false, '', 0, false, 'T', 'C');							 
         $pdf->SetFont('','');
 		$pdf->setFontSize(7);								
-        $pdf->MultiCell(0, $height, 'La suma de dinero será cancelada de la forma establecida, debiendo ustedes emitir la factura respectiva a nombre de BOLIVIANA DE AVIACIÓN – BOA, NIT 154422029,  de no emitirse la misma, BOA se reserva del derecho de efectuar las retenciones impositivas respectivas.', 1,'L', false ,1);
+        
+		if($this->getDataSource()->getParameter('codigo_proceso')!='PROCINPD'){
+			$pdf->MultiCell(0, $height, 'La suma de dinero será cancelada de la forma establecida, debiendo ustedes emitir la factura respectiva a nombre de BOLIVIANA DE AVIACIÓN – BOA, NIT 154422029,  de no emitirse la misma, BOA se reserva del derecho de efectuar las retenciones impositivas respectivas.', 0,'L', false ,1);
+		}else{
+			$pdf->MultiCell(0, $height, 'La suma de dinero será cancelada de acuerdo a su oferta, el pedido deberá cumplir con todas las especificaciones solicitadas por Boliviana de Aviación, asimismo, solicitamos nos remita la nota fiscal correspondiente o similar de su país de origen.', 0,'L', false ,1);
+		}
+		
 		$pdf->Ln($height);
 		//$pdf->MultiCell(0, $height, 'Firma Proveedor o Sello ', 1,'R', false ,1);							
 		
 		if($tipo=='Bien')			
-			$mensaje = 'El ítem deberá ser entregado conforme a lo solicitado, estipuladas en la cotización y la presente Orden, en coordinación con:';			
+			$mensaje = 'El ítem deberá ser entregado conforme a lo solicitado, estipuladas en la cotización y la presente Orden.';			
 		else
-			$mensaje = 'El servicio deberá ser entregado conforme a lo solicitado, estipuladas en la cotización y la presente Orden, en coordinación con:';			
+			$mensaje = 'El servicio deberá ser entregado conforme a lo solicitado, estipuladas en la cotización y la presente Orden.';			
 				
-		$pdf->MultiCell(0, $height, $mensaje, 1,'L', false ,1);
+		$pdf->MultiCell(0, $height, $mensaje, 0,'L', false ,1);
 		$pdf->Ln($height);
 		
 		if($this->getDataSource()->getParameter('contacto')!=''){
@@ -325,9 +333,9 @@ Class ROrdenCompra extends Report {
 			$pdf->Ln($height);
 		}		
 		
-		$pdf->MultiCell(0, $height, 'Sin otro particular y agradeciendo su gentil atención, saludo a usted', 1,'L', false ,1);
+		$pdf->MultiCell(0, $height, 'Sin otro particular y agradeciendo su gentil atención, saludo a usted', 0,'L', false ,1);
         $pdf->Ln($height);
-		$pdf->MultiCell(0, $height, 'Atentamente.', 1,'L', false ,1);
+		$pdf->MultiCell(0, $height, 'Atentamente.', 0,'L', false ,1);
         
 		//$pdf->MultiCell(0, $height, 'El proveedor se compromete a entregar el suministro en el plazo de '.$this->getDataSource()->getParameter('dias_entrega').' dias calendarios que seran computables a partir de la fecha de elaboracion de la presente orden de '.$tipo.'. El incumplimiento se sancionara con una multa del 0,1% del monto de contrato por cada dia calendario de retraso, multa que no debe exceder del 2%.', 1,'L', false ,1);
         $pdf->Output($fileName, 'F');
