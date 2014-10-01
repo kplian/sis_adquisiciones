@@ -356,6 +356,7 @@ Phx.vista.Proveedor=Ext.extend(Phx.gridInterfaz,{
 				queryDelay:500,
 				anchor:"100%",
 				gwidth:220,
+				forceSelection:true,
 				minChars:2,
 				renderer:function (value, p, record){return String.format('{0}', record.data['lugar']);}
 			},
