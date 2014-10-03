@@ -55,10 +55,11 @@ BEGIN
          where id_solicitud = v_registros.id_solicitud;
                  
                  
-          -- cuando el estado al que regresa es pendiente revierte presusupesto comprometido
-          IF p_codigo_estado = 'borrador' and v_registros.presu_comprometido ='si' THEN
+          --  cuando el estado al que regresa es boorador  o vbpresupuestos, si tiene la bandera de comprometido activada entocnes
+          --  revierte presusupesto comprometido
+          IF (p_codigo_estado = 'borrador' or p_codigo_estado = 'vbpresupuestos') and v_registros.presu_comprometido ='si'    THEN
                          
-               --  llamar a funciond erevertir presupuesto
+               --  llamar a funciond revertir  presupuesto
                             
                IF not adq.f_gestionar_presupuesto_solicitud(v_registros.id_solicitud, p_id_usuario, 'revertir')  THEN
                  

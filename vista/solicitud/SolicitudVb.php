@@ -502,10 +502,10 @@ Phx.vista.SolicitudVb = {
 	
 	south:
           { 
-          url:'../../../sis_adquisiciones/vista/solicitud_det/SolicitudVbDet.php',
+          url:'../../../sis_adquisiciones/vista/solicitud_det/SolicitudReqDet.php',
           title:'Detalle', 
           height:'50%',
-          cls:'SolicitudVbDet'
+          cls:'SolicitudReqDet'
          }
 };
 </script>

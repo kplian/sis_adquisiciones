@@ -65,7 +65,7 @@ Phx.vista.SolicitudReqDet = {
      preparaMenu:function(n){
          
          Phx.vista.SolicitudReqDet.superclass.preparaMenu.call(this,n); 
-          if(this.maestro.estado ==  'borrador' || this.maestro.estado==  'Borrador'){
+          if(this.maestro.estado ==  'borrador' || this.maestro.estado ==  'vbpresupuestos' ||this.maestro.estado==  'Borrador'){
                this.getBoton('edit').enable();
                this.getBoton('new').enable();
                this.getBoton('del').enable();

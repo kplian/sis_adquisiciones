@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION adq.f_cotizacion_ime (
   p_administrador integer,
   p_id_usuario integer,
@@ -1558,7 +1556,7 @@ BEGIN
                           
                           END IF;
                     
-                    ELSIF v_codigo_llave = 'contrato' THEN
+                    ELSIF v_codigo_llave = 'CON' THEN
                        
                           IF NOT adq.f_genera_contrato(
                                                         p_id_usuario,

@@ -414,7 +414,7 @@ function SolicitarPresupuesto(){
         //cuerpo mensaje
         $body = $this->objParam->getParametro('body');
         $correo->setMensaje($body);
-        $correo->setTitulo('Solicitud de contrato');
+        $correo->setTitulo('Solicitud de traspaso presupuestario');
 		
 		 //genera archivo adjunto
         $file = $this->reporteSolicitud(true);
@@ -520,8 +520,9 @@ function SolicitarPresupuesto(){
 	 	//solo verificar si el estado es borrador o pendiente 
 	 	//suma y verifica el presupuesto
 	 	
-
-	 	if ($estado_sol == 'borrador'){
+	 	$estado_sin_presupuesto = array("borrador", "pendiente", "vbgerencia", "vbpresupuestos");
+	 	
+         if (in_array($estado_sol, $estado_sin_presupuesto)){
 
     	 	    $cont_grup = 0;
     	 	foreach($arrayResp as $value2)

@@ -275,8 +275,8 @@ p_hstore->'id_solicitud'
                                                          
 
                                                          
-           --si el estado  anteriro es borrador  comprometemos                                            
-           IF v_codigo_estado =  'borrador' THEN 
+           --si el estado  anteriro es vbpresupuestos  entonces comprometemos                                            
+           IF v_codigo_estado =  'vbpresupuestos' THEN 
               
                -- Comprometer Presupuesto
               

@@ -497,9 +497,15 @@ IS 'si o no, cuando le damos si copia los precios y cantidad de la solicitud de 
 
 /***********************************F-SCP-RAC-ADQ-0-26/09/2014****************************************/
 
+/***********************************I-SCP-JRR-ADQ-0-01/10/2014****************************************/
 
-
-
+ALTER TABLE adq.tcotizacion
+  ADD COLUMN requiere_contrato VARCHAR(2) DEFAULT 'no' NOT NULL;
+  
+ALTER TABLE adq.tcotizacion
+  ALTER COLUMN nro_contrato SET DEFAULT '0';
+  
+/***********************************F-SCP-JRR-ADQ-0-01/10/2014****************************************/
 
 
 

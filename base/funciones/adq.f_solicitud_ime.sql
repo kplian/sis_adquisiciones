@@ -524,7 +524,7 @@ BEGIN
                   END IF;
                   
                   
-                  --obtiene parametros para definir aprobador
+                  -- obtiene parametros para definir aprobador
                   
                    select 
                       s.id_subsistema
@@ -638,12 +638,7 @@ BEGIN
                   
                   END IF;
                   
-                  
-                
-                  
-                  
-                 
-                  
+               
                 --Definicion de la respuesta
                 v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Verificacionde finalizacion)'); 
                 v_resp = pxp.f_agrega_clave(v_resp,'total',v_total_soli::varchar);

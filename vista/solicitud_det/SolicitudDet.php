@@ -95,7 +95,7 @@ Phx.vista.SolicitudDet=Ext.extend(Phx.gridInterfaz,{
                                     direction: 'ASC'
                             },
                             totalProperty: 'total',
-                            fields: ['id_concepto_ingas','tipo','movimiento','desc_ingas'],
+                            fields: ['id_concepto_ingas','tipo','movimiento','desc_ingas','desc_partida'],
                             remoteSort: true,
                             baseParams:{par_filtro:'desc_ingas#par.codigo#par.nombre_partida',movimiento:'gasto'}
                 }),
@@ -104,7 +104,7 @@ Phx.vista.SolicitudDet=Ext.extend(Phx.gridInterfaz,{
                gdisplayField: 'desc_concepto_ingas',
                hiddenName: 'id_concepto_ingas',
                forceSelection:true,
-               typeAhead: true,
+               typeAhead: false,
                triggerAction: 'all',
                 listWidth:350,
                resizable:true,
@@ -115,7 +115,8 @@ Phx.vista.SolicitudDet=Ext.extend(Phx.gridInterfaz,{
                width:350,
                gwidth:200,
                minChars:2,
-               tpl: '<tpl for="."><div class="x-combo-list-item"><p>{desc_ingas}</p><strong>{tipo}</strong><p>PARTIDA:{desc_partida}</p></div></tpl>',
+               qtip:'Si el conceto de gasto que necesita no existe por favor  comuniquese con el área de presupuestos para solictar la creación',
+               tpl: '<tpl for="."><div class="x-combo-list-item"><p><b>{desc_ingas}</b></p><strong>{tipo}</strong><p>PARTIDA: {desc_partida}</p></div></tpl>',
                renderer:function(value, p, record){return String.format('{0}', record.data['desc_concepto_ingas']);}
             },
             type:'ComboBox',

@@ -61,11 +61,10 @@ BEGIN
              where id_proceso_wf = p_id_proceso_wf;
     
 
-      -- comprometer presupuesto cuando el estado anterior es el vbgerencia)
-             IF p_codigo_estado =  'borrador' THEN 
+      -- comprometer presupuesto cuando el estado anterior es el vbpresupuestos)
+             IF p_codigo_estado =  'vbpresupuestos' THEN 
 
-              
-               -- Comprometer Presupuesto
+              -- Comprometer Presupuesto
               
               
                  IF not adq.f_gestionar_presupuesto_solicitud(v_registros.id_solicitud, p_id_usuario, 'comprometer')  THEN
