@@ -62,6 +62,7 @@ DECLARE
     v_num_estados  integer;
     v_fecha_soli date;
     v_num_funcionarios integer;
+    presu_comprometido varchar;
     
     
    
@@ -91,7 +92,8 @@ p_hstore->'id_solicitud'
             s.id_funcionario_aprobador,
             s.id_funcionario_supervisor,
             s.numero,
-            s.fecha_soli
+            s.fecha_soli,
+            s.presu_comprometido
           into 
           
             v_id_proceso_wf,
@@ -100,7 +102,8 @@ p_hstore->'id_solicitud'
             v_id_funcionario_aprobador,
             v_id_funcionario_supervisor,
             v_numero_sol,
-            v_fecha_soli
+            v_fecha_soli,
+            presu_comprometido
             
           from adq.tsolicitud s
           where s.id_solicitud=p_id_solicitud;
@@ -272,33 +275,32 @@ p_hstore->'id_solicitud'
                                                          v_parametros_ad,
                                                          v_tipo_noti,
                                                          v_titulo);
-                                                         
 
                                                          
            --si el estado  anteriro es vbpresupuestos  entonces comprometemos                                            
-           IF v_codigo_estado =  'vbpresupuestos' THEN 
+           IF v_codigo_estado =  'vbpresupuestos'  and presu_comprometido = 'no' THEN 
               
-               -- Comprometer Presupuesto
-              
-              IF not adq.f_gestionar_presupuesto_solicitud(p_id_solicitud, p_id_usuario, 'comprometer')  THEN
-                 
-                   raise exception 'Error al comprometer el presupeusto';
-                 
-              END IF;
+                   -- Comprometer Presupuesto
+                  
+                  IF not adq.f_gestionar_presupuesto_solicitud(p_id_solicitud, p_id_usuario, 'comprometer')  THEN
+                     
+                       raise exception 'Error al comprometer el presupeusto';
+                     
+                  END IF;
 
-              
-              
-              --modifca bandera de comprometido  
-           
-                   update adq.tsolicitud  s set 
-                     presu_comprometido =  'si',
-                     fecha_apro = now(),
-                     id_usuario_ai = p_id_usuario_ai,
-                     usuario_ai = p_usuario_ai,
-                     id_cargo_rpc = p_id_cargo,
-                     id_cargo_rpc_ai = p_id_cargo_ai,
-                     ai_habilitado = p_ai_habilitado
-                   where id_solicitud = p_id_solicitud;
+                  
+                  
+                  --modifca bandera de comprometido  
+               
+                       update adq.tsolicitud  s set 
+                         presu_comprometido =  'si',
+                         fecha_apro = now(),
+                         id_usuario_ai = p_id_usuario_ai,
+                         usuario_ai = p_usuario_ai,
+                         id_cargo_rpc = p_id_cargo,
+                         id_cargo_rpc_ai = p_id_cargo_ai,
+                         ai_habilitado = p_ai_habilitado
+                       where id_solicitud = p_id_solicitud;
             
             
 
