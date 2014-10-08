@@ -14,6 +14,26 @@ Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
 
 	constructor:function(config){
 		this.maestro=config.maestro;
+		
+		this.tbarItems = ['-',{
+            text: 'Ver todos los procesos',
+            enableToggle: true,
+            pressed: false,
+            toggleHandler: function(btn, pressed) {
+               
+                if(pressed){
+                    this.store.baseParams.pendientes = 0;
+                     
+                }
+                else{
+                   this.store.baseParams.pendientes = 1;
+                }
+                
+                this.onButtonAct();
+             },
+            scope: this
+           }];
+		
     	//llama al constructor de la clase padre
 		Phx.vista.ProcesoCompra.superclass.constructor.call(this,config);
 		this.init();
@@ -37,6 +57,7 @@ Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
            this.store.baseParams.filtro_valor = config.filtro_directo.valor;
            this.store.baseParams.filtro_campo = config.filtro_directo.campo;
         }
+        this.store.baseParams={pendientes:1}
         this.load({params:{start:0, limit:this.tam_pag}});
 	    this.iniciarEventos();
 	
@@ -88,7 +109,19 @@ Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
                 allowBlank: true,
                 anchor: '80%',
                 gwidth: 150,
-                maxLength:200
+                maxLength:200,
+                renderer:function (value, p, record){  
+            	   
+                    if (record.data['desc_cotizacion']&&record.data['desc_cotizacion'].indexOf('S/N[borrador]')!=-1) {
+                    	 return  String.format('<b><font color="orange">{0}</font></b>',value);
+                    }
+                    else{
+                    	if(!record.data['desc_cotizacion']){
+                    		 return  String.format('<b><font color="orange">{0}</font></b>',value);
+                    	}
+                    	 return String.format('{0}', value);
+                    }
+               }
             },
             type:'TextField',
             filters:{pfiltro:'num_tramite',type:'string'},

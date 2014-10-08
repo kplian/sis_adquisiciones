@@ -22,6 +22,10 @@ class ACTProcesoCompra extends ACTbase{
             $this->objParam->addFiltro($this->objParam->getParametro('filtro_campo')." = ".$this->objParam->getParametro('filtro_valor'));  
         }
 		
+		if($this->objParam->getParametro('pendientes')=='1'){
+             $this->objParam->addFiltro("(estado in (''pendiente'',''proceso'')) and desc_cotizacion not like''%pago_habilitado%''");
+        }
+		
 		if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
 			$this->objReporte = new Reporte($this->objParam,$this);
 			$this->res = $this->objReporte->generarReporteListado('MODProcesoCompra','listarProcesoCompra');

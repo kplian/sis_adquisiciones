@@ -204,102 +204,7 @@ class ACTSolicitud extends ACTbase{
 
 
     
-   function reporteSolicitud($create_file=false){
-    $dataSource = new DataSource();
-    
-    $idSolicitud = $this->objParam->getParametro('id_solicitud');
-    $id_proceso_wf= $this->objParam->getParametro('id_proceso_wf');
-    $estado = $this->objParam->getParametro('estado');
-    
-    $this->objParam->addParametroConsulta('ordenacion','id_solicitud');
-    $this->objParam->addParametroConsulta('dir_ordenacion','ASC');
-    $this->objParam->addParametroConsulta('cantidad',1000);
-    $this->objParam->addParametroConsulta('puntero',0);
-    
-    $this->objFunc = $this->create('MODSolicitud');
-    
-    $resultSolicitud = $this->objFunc->reporteSolicitud();
-    
-    $datosSolicitud = $resultSolicitud->getDatos();
-            
-    //armamos el array parametros y metemos ahi los data sets de las otras tablas
-    $dataSource->putParameter('estado', $datosSolicitud[0]['estado']);
-    $dataSource->putParameter('id_solicitud', $datosSolicitud[0]['id_solicitud']);
-    $dataSource->putParameter('numero', $datosSolicitud[0]['numero']);
-	$dataSource->putParameter('num_tramite', $datosSolicitud[0]['num_tramite']);
-    $dataSource->putParameter('fecha_apro', $datosSolicitud[0]['fecha_apro']);
-    $dataSource->putParameter('desc_moneda', $datosSolicitud[0]['desc_moneda']);
-    $dataSource->putParameter('tipo', $datosSolicitud[0]['tipo']);
-    $dataSource->putParameter('desc_gestion', $datosSolicitud[0]['desc_gestion']);
-    $dataSource->putParameter('fecha_soli', $datosSolicitud[0]['fecha_soli']);
-    $dataSource->putParameter('desc_categoria_compra', $datosSolicitud[0]['desc_categoria_compra']);
-    $dataSource->putParameter('desc_proceso_macro', $datosSolicitud[0]['desc_proceso_macro']);
-    $dataSource->putParameter('desc_funcionario', $datosSolicitud[0]['desc_funcionario']);
-    $dataSource->putParameter('desc_uo', $datosSolicitud[0]['desc_uo']);
-    $dataSource->putParameter('desc_depto', $datosSolicitud[0]['desc_depto']);
-                
-    $dataSource->putParameter('justificacion', $datosSolicitud[0]['justificacion']);
-    $dataSource->putParameter('lugar_entrega', $datosSolicitud[0]['lugar_entrega']);
-    $dataSource->putParameter('comite_calificacion', $datosSolicitud[0]['comite_calificacion']);
-    $dataSource->putParameter('posibles_proveedores', $datosSolicitud[0]['posibles_proveedores']);
-    $dataSource->putParameter('desc_funcionario_rpc', $datosSolicitud[0]['desc_funcionario_rpc']);
-    $dataSource->putParameter('desc_funcionario_apro', $datosSolicitud[0]['desc_funcionario_apro']);
-    $dataSource->putParameter('nombre_usuario_ai', $datosSolicitud[0]['nombre_usuario_ai']);
-                
-    //get detalle
-    //Reset all extra params:
-    $this->objParam->defecto('ordenacion', 'id_solicitud_det');
-    $this->objParam->defecto('cantidad', 1000);
-    $this->objParam->defecto('puntero', 0);
-    
-    $this->objParam->addParametro('id_solicitud', $datosSolicitud[0]['id_solicitud'] );
    
-    
-    $modSolicitudDet = $this->create('MODSolicitudDet');
-    //lista el detalle de la solicitud
-    $resultSolicitudDet = $modSolicitudDet->listarSolicitudDet();
-    
-    //agrupa el detalle de la solcitud por centros de costos y partidas
-    
-    $solicitudDetAgrupado = $this->groupArray($resultSolicitudDet->getDatos(), 'codigo_partida','desc_centro_costo', $datosSolicitud[0]['id_moneda'],$datosSolicitud[0]['estado']);
-    
-    $solicitudDetDataSource = new DataSource();
-    
-    $solicitudDetDataSource->setDataSet($solicitudDetAgrupado);
-    
-    //inserta el detalle de la colistud como origen de datos
-    
-    $dataSource->putParameter('detalleDataSource', $solicitudDetDataSource);
-            
-    //build the report
-    $reporte = new RSolicitudCompra();
-    
-    $reporte->setDataSource($dataSource);
-    $nombreArchivo = 'SolicitudCompra.pdf';
-    $reportWriter = new ReportWriter($reporte, dirname(__FILE__).'/../../reportes_generados/'.$nombreArchivo);
-    $reportWriter->writeReport(ReportWriter::PDF);
-    
-    
-	
-		if(!$create_file){
-	                $mensajeExito = new Mensaje();
-				    $mensajeExito->setMensaje('EXITO','Reporte.php','Reporte generado',
-				                                    'Se generó con éxito el reporte: '.$nombreArchivo,'control');
-				    $mensajeExito->setArchivoGenerado($nombreArchivo);
-				    $this->res = $mensajeExito;
-				    $this->res->imprimirRespuesta($this->res->generarJson());
-					//exit;
-	
-        }
-        else{
-                    
-            return dirname(__FILE__).'/../../reportes_generados/'.$nombreArchivo;  
-            
-        }
-	
-	
-
-    } 
 
 	function reporteOC($create_file=false){
 		$dataSource = new DataSource();
@@ -389,80 +294,107 @@ class ACTSolicitud extends ACTbase{
 		}
      }
 
-function SolicitarPresupuesto(){
-         
-        //acer el contrato exigible  
-      
-                    
-       
-		//exit;  
-        
-	    
-        $correo=new CorreoExterno();
-        //destinatario
-        $email = $this->objParam->getParametro('email');
-        $correo->addDestinatario($email);
-        
-        $email_cc = $this->objParam->getParametro('email_cc');
-        $correo->addCC($email_cc);
-        
-        
-        
-        //asunto
-        $asunto = $this->objParam->getParametro('asunto');
-        $correo->setAsunto($asunto);
-        //cuerpo mensaje
-        $body = $this->objParam->getParametro('body');
-        $correo->setMensaje($body);
-        $correo->setTitulo('Solicitud de traspaso presupuestario');
-		
-		 //genera archivo adjunto
-        $file = $this->reporteSolicitud(true);
-        $correo->addAdjunto($file);
-        
-        $correo->setDefaultPlantilla();
-        $resp=$correo->enviarCorreo();           
-        
-        if($resp=='OK'){
-                $mensajeExito = new Mensaje();
-                $mensajeExito->setMensaje('EXITO','Solicitud.php','Correo enviado',
-                'Se mando el correo con exito: OK','control' );
-                $this->res = $mensajeExito;
-                $this->res->imprimirRespuesta($this->res->generarJson());
+  function reporteSolicitud($create_file=false, $onlyData = false){
+    $dataSource = new DataSource();
+    
+    $idSolicitud = $this->objParam->getParametro('id_solicitud');
+    $id_proceso_wf= $this->objParam->getParametro('id_proceso_wf');
+    $estado = $this->objParam->getParametro('estado');
+    
+    $this->objParam->addParametroConsulta('ordenacion','id_solicitud');
+    $this->objParam->addParametroConsulta('dir_ordenacion','ASC');
+    $this->objParam->addParametroConsulta('cantidad',1000);
+    $this->objParam->addParametroConsulta('puntero',0);
+    
+    $this->objFunc = $this->create('MODSolicitud');
+    
+    $resultSolicitud = $this->objFunc->reporteSolicitud();
+    
+    $datosSolicitud = $resultSolicitud->getDatos();
             
-        }  
+    //armamos el array parametros y metemos ahi los data sets de las otras tablas
+    $dataSource->putParameter('estado', $datosSolicitud[0]['estado']);
+    $dataSource->putParameter('id_solicitud', $datosSolicitud[0]['id_solicitud']);
+    $dataSource->putParameter('numero', $datosSolicitud[0]['numero']);
+	$dataSource->putParameter('num_tramite', $datosSolicitud[0]['num_tramite']);
+    $dataSource->putParameter('fecha_apro', $datosSolicitud[0]['fecha_apro']);
+    $dataSource->putParameter('desc_moneda', $datosSolicitud[0]['desc_moneda']);
+    $dataSource->putParameter('tipo', $datosSolicitud[0]['tipo']);
+    $dataSource->putParameter('desc_gestion', $datosSolicitud[0]['desc_gestion']);
+    $dataSource->putParameter('fecha_soli', $datosSolicitud[0]['fecha_soli']);
+    $dataSource->putParameter('desc_categoria_compra', $datosSolicitud[0]['desc_categoria_compra']);
+    $dataSource->putParameter('desc_proceso_macro', $datosSolicitud[0]['desc_proceso_macro']);
+    $dataSource->putParameter('desc_funcionario', $datosSolicitud[0]['desc_funcionario']);
+    $dataSource->putParameter('desc_uo', $datosSolicitud[0]['desc_uo']);
+    $dataSource->putParameter('desc_depto', $datosSolicitud[0]['desc_depto']);
+                
+    $dataSource->putParameter('justificacion', $datosSolicitud[0]['justificacion']);
+    $dataSource->putParameter('lugar_entrega', $datosSolicitud[0]['lugar_entrega']);
+    $dataSource->putParameter('comite_calificacion', $datosSolicitud[0]['comite_calificacion']);
+    $dataSource->putParameter('posibles_proveedores', $datosSolicitud[0]['posibles_proveedores']);
+    $dataSource->putParameter('desc_funcionario_rpc', $datosSolicitud[0]['desc_funcionario_rpc']);
+    $dataSource->putParameter('desc_funcionario_apro', $datosSolicitud[0]['desc_funcionario_apro']);
+    $dataSource->putParameter('nombre_usuario_ai', $datosSolicitud[0]['nombre_usuario_ai']);
+                
+    //get detalle
+    //Reset all extra params:
+    $this->objParam->defecto('ordenacion', 'id_solicitud_det');
+    $this->objParam->defecto('cantidad', 1000);
+    $this->objParam->defecto('puntero', 0);
+    
+    $this->objParam->addParametro('id_solicitud', $datosSolicitud[0]['id_solicitud'] );
+   
+    
+    $modSolicitudDet = $this->create('MODSolicitudDet');
+    //lista el detalle de la solicitud
+    $resultSolicitudDet = $modSolicitudDet->listarSolicitudDet();
+    
+    //agrupa el detalle de la solcitud por centros de costos y partidas
+    
+    $solicitudDetAgrupado = $this->groupArray($resultSolicitudDet->getDatos(), 'codigo_partida','desc_centro_costo', $datosSolicitud[0]['id_moneda'],$datosSolicitud[0]['estado'],$onlyData);
+    
+    $solicitudDetDataSource = new DataSource();
+    
+    $solicitudDetDataSource->setDataSet($solicitudDetAgrupado);
+	
+	
+	
+    
+    //inserta el detalle de la colistud como origen de datos
+    
+    $dataSource->putParameter('detalleDataSource', $solicitudDetDataSource);
+    
+    
+    if ($onlyData){
+    	
+		return $dataSource;
+	}      
+    //build the report
+    $reporte = new RSolicitudCompra();
+    
+    $reporte->setDataSource($dataSource);
+    $nombreArchivo = 'SolicitudCompra.pdf';
+    $reportWriter = new ReportWriter($reporte, dirname(__FILE__).'/../../reportes_generados/'.$nombreArchivo);
+    $reportWriter->writeReport(ReportWriter::PDF);
+    
+    
+	
+		if(!$create_file){
+	                $mensajeExito = new Mensaje();
+				    $mensajeExito->setMensaje('EXITO','Reporte.php','Reporte generado',
+				                                    'Se generó con éxito el reporte: '.$nombreArchivo,'control');
+				    $mensajeExito->setArchivoGenerado($nombreArchivo);
+				    $this->res = $mensajeExito;
+				    $this->res->imprimirRespuesta($this->res->generarJson());
+		}
         else{
-              //echo $resp;      
-              echo "{\"ROOT\":{\"error\":true,\"detalle\":{\"mensaje\":\" Error al enviar correo\"}}}";  
-              
-        }  
-        
-		
-        
-		//echo $file; 
-		
-       // unlink($file);
-        exit;
-           
-       
-   }
+                    
+            return dirname(__FILE__).'/../../reportes_generados/'.$nombreArchivo;  
+            
+        }
+  } 
 
-
-
-    
-    /*
-    
-    Autor: GSS
-    DESCRIPTION:  Agrupa los detalles de la solcitud
-    $solicitudDetAgrupado = $this->groupArray(
-        $resultSolicitudDet->getDatos(), 
-        'codigo_partida',
-        'desc_centro_costo');
-    
-    */
-    
-   function groupArray($array,$groupkey,$groupkeyTwo,$id_moneda,$estado_sol)
-	{
+function groupArray($array,$groupkey,$groupkeyTwo,$id_moneda,$estado_sol, $onlyData){
 	 if (count($array)>0)
 	 {
 	 	//recupera las llaves del array    
@@ -522,7 +454,7 @@ function SolicitarPresupuesto(){
 	 	
 	 	$estado_sin_presupuesto = array("borrador", "pendiente", "vbgerencia", "vbpresupuestos");
 	 	
-         if (in_array($estado_sol, $estado_sin_presupuesto)){
+         if (in_array($estado_sol, $estado_sin_presupuesto) ||  $onlyData){
 
     	 	    $cont_grup = 0;
     	 	foreach($arrayResp as $value2)
@@ -549,7 +481,8 @@ function SolicitarPresupuesto(){
                  $this->objFunc = $this->create('sis_presupuestos/MODPresupuesto');
                  $resultSolicitud = $this->objFunc->verificarPresupuesto();
                  
-                $arrayResp[$cont_grup]["presu_verificado"] = $resultSolicitud->datos["presu_verificado"];
+                 $arrayResp[$cont_grup]["presu_verificado"] = $resultSolicitud->datos["presu_verificado"];
+				 $arrayResp[$cont_grup]["total_presu_verificado"] =  $total_pre;
                  $cont_grup++;
                  
                  
@@ -569,7 +502,174 @@ function SolicitarPresupuesto(){
 	 }
 	 else
 	 	return array();
-	}			
+	}	
+
+
+  /*
+   * 
+   * Author: RAC (KPLIAN)
+   * DESC:   Verifica el presupuesto y en caso de necesitar un traspado mando un correo con el detalle al area de presupuests
+   * DATE:   07/10/2014
+   * */
+  function checkPresupuesto(){
+  	
+	     //obtiene direcciones de envio
+	     $this->objFunSeguridad=$this->create('sis_organigrama/MODFuncionario'); 
+         $this->res=$this->objFunSeguridad->getEmailEmpresa($this->objParam);
+	     $array = $this->res->getDatos();
+	     
+	     
+  	     //obtiene los datos de la solicitud de compras
+		 $dataSoruce =  $this->reporteSolicitud(false, true);
+		 
+		 
+		 
+		 ////////////////////////////////////////
+		 //arma el texto del correo electronico
+		 ///////////////////////////////////////
+		 
+		 $data_mail = '';
+		 $data_mail.=' <br><b>Funcionario:&emsp;&emsp; '.$dataSoruce->getParameter('desc_funcionario').'</b> ('.$array['email_empresa'].')
+		               <br>Unidad Solicitante:&emsp; '.$dataSoruce->getParameter('desc_uo').'
+		               <br>Tramite:&emsp;&emsp;&emsp; '.$dataSoruce->getParameter('num_tramite').'
+		               <br>Numero:&emsp;&emsp;&emsp; '.$dataSoruce->getParameter('numero').'
+		               <br>Fecha Solicitud:&emsp; '.$dataSoruce->getParameter('fecha_soli').'
+		               <br> Moneda:&emsp;&emsp;'.$dataSoruce->getParameter('desc_moneda').'
+		               <br><b> Detalle de Partidas, Conceptos de Gastos  y los montos necesarios para la compra</b>
+		               <br>';
+		 
+		 
+		
+		 $sw = false;
+		 //recorre la partidas agrupadas
+		 $detSoruce = $dataSoruce->getParameter('detalleDataSource')->getDataset(); 
+		 $count_grupo = 1;
+		 
+		 foreach($detSoruce as $row) {
+		    //si no tiene presupuesto lo agregamos al mensaje de correo	
+			if($row['presu_verificado']!="true"){
+				
+				$data_mail.='<br>('.$count_grupo.')
+				             <br><b>Partida:</b>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp; '. $row['groupeddata'][0]['codigo_partida'].' - '.$row['groupeddata'][0]['nombre_partida'].'
+				             <br><b>Presupuestos:</b>&emsp;&emsp;&emsp; '.$row['groupeddata'][0]['desc_centro_costo'].' 
+				             <br><b>Total Monto Partida:</b>&emsp; '. $row['total_presu_verificado'].' '.$dataSoruce->getParameter('desc_moneda').'';
+							 
+				
+				  //recorre los concepto de la partida	
+				  $count = 1;		 
+				 foreach ($row['groupeddata'] as $solicitudDetalle) {
+                    
+	                 $data_mail.='<br>&emsp; ('.$count_grupo.'.'.$count.')
+	                 			  <br>&emsp;&emsp;<b>Concepto:</b>&emsp;'. $solicitudDetalle['desc_concepto_ingas'].'  
+					              <br>&emsp;&emsp; <b>Detalle:</b>&emsp;'.$solicitudDetalle['descripcion'].'
+					              <br>&emsp;&emsp; <b>Total Det:</b>&emsp;'.$solicitudDetalle['precio_total'].' '.$dataSoruce->getParameter('desc_moneda').'
+					              ';
+	                 $count ++;
+	              }			 
+				$sw = true;
+				$count_grupo++;
+			}
+
+		 }
+		 
+		 //si no existen partidas sin presupuestos ...
+		 if(!$sw){
+		 	echo "{\"ROOT\":{\"error\":false,\"detalle\":{\"mensaje\":\"No existen partidas sin presupuesto\"}}}"; 
+			exit;
+		 }
+		 
+		 ///////////////////////////////////////////////////
+		 //manda el correo electronicos al rea de presupeustos
+		 ///////////////////////////////////////////////////
+		   
+		   
+		    $correo=new CorreoExterno();
+		    $correo->addDestinatario($_SESSION['_MAIL_NITIFICACIONES_2']); //  este mail esta destinado al area de presupuestos
+	        $correo->addDestinatario($array['email_empresa']);
+		    //asunto
+       		$correo->setAsunto('Solicitud de traspaso presupuestario');
+            //cuerpo mensaje
+            $correo->setMensaje($data_mail);
+            $correo->setTitulo('Solicitud de traspaso presupuestario');
+			
+			$correo->setDefaultPlantilla();
+            $resp=$correo->enviarCorreo();           
+        
+            if($resp=='OK'){
+                $mensajeExito = new Mensaje();
+                $mensajeExito->setMensaje('EXITO','Solicitud.php','Correo enviado',
+                'Se mando el correo con exito: OK','control' );
+                $this->res = $mensajeExito;
+                $this->res->imprimirRespuesta($this->res->generarJson());
+            
+           }  
+            else{
+              //echo $resp;      
+              echo "{\"ROOT\":{\"error\":true,\"detalle\":{\"mensaje\":\" Error al enviar correo\"}}}";  
+              
+           } 
+		 
+		   exit;
+	   
+  }
+
+  function SolicitarPresupuesto(){
+         
+        $correo=new CorreoExterno();
+        //destinatario
+        $email = $this->objParam->getParametro('email');
+        $correo->addDestinatario($email);
+        $email_cc = $this->objParam->getParametro('email_cc');
+        $correo->addCC($email_cc);
+        
+        
+		
+		//genera archivo adjunto
+        $file = $this->reporteSolicitud(true);
+        $correo->addAdjunto($file);
+        
+        $correo->setDefaultPlantilla();
+        $resp=$correo->enviarCorreo();           
+        
+        if($resp=='OK'){
+                $mensajeExito = new Mensaje();
+                $mensajeExito->setMensaje('EXITO','Solicitud.php','Correo enviado',
+                'Se mando el correo con exito: OK','control' );
+                $this->res = $mensajeExito;
+                $this->res->imprimirRespuesta($this->res->generarJson());
+            
+        }  
+        else{
+              //echo $resp;      
+              echo "{\"ROOT\":{\"error\":true,\"detalle\":{\"mensaje\":\" Error al enviar correo\"}}}";  
+              
+        }  
+        
+		
+        
+		//echo $file; 
+		
+        //unlink($file);
+        exit;
+           
+       
+   }
+
+
+
+    
+    /*
+    
+    Autor: GSS
+    DESCRIPTION:  Agrupa los detalles de la solcitud
+    $solicitudDetAgrupado = $this->groupArray(
+        $resultSolicitudDet->getDatos(), 
+        'codigo_partida',
+        'desc_centro_costo');
+    
+    */
+    
+   		
 }
 
 ?>

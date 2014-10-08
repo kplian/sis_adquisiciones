@@ -258,7 +258,7 @@ Phx.vista.SolicitudVb = {
 	confSigEstado :function() {                   
             var d= this.sm.getSelected().data;
             
-           
+           alert('manda....')
            
             if ( this.formEstado.getForm().isValid()){
                  Phx.CP.loadingShow();
@@ -275,7 +275,7 @@ Phx.vista.SolicitudVb = {
                             instruc_rpc:this.cmbIntrucRPC.getValue()
                             },
                         success:this.successSinc,
-                        failure: this.conexionFailure,
+                        failure: this.failureCheck,
                         timeout:this.timeout,
                         scope:this
                     }); 
@@ -310,6 +310,16 @@ Phx.vista.SolicitudVb = {
                 scope:this
             });     
         },
+       
+       failureCheck:function(resp1,resp2,resp3){
+       	  
+       	   this.conexionFailure(resp1,resp2,resp3);
+       	   var d= this.sm.getSelected().data;
+       	   if(d.estado == 'vbpresupuestos'){
+       	   	 this.checkPresupuesto();
+       	   }
+       	  
+       },
        
       antEstado:function(res,eve) {                   
             this.wEstado.buttons[0].hide();
@@ -378,7 +388,7 @@ Phx.vista.SolicitudVb = {
                             instruc_rpc:this.cmbIntrucRPC.getValue()
                             },
                         success:this.successSinc,
-                        failure: this.conexionFailure,
+                        failure: this.failureCheck,
                         timeout:this.timeout,
                         scope:this
                     }); 
@@ -497,9 +507,32 @@ Phx.vista.SolicitudVb = {
            
         }
         return tb
-    },    
-       
-	
+    },  
+    
+    checkPresupuesto:function(){
+    	var d = this.getSelectedData();
+	    Phx.CP.loadingShow();
+        Ext.Ajax.request({
+            // form:this.form.getForm().getEl(),
+            url:'../../sis_adquisiciones/control/Solicitud/checkPresupuesto',
+            params:{id_solicitud:d.id_solicitud, id_funcionario:d.id_funcionario},
+            success:this.successCheck,
+            failure: this.conexionFailure,
+            timeout:this.timeout,
+            scope:this
+        }); 
+    	
+    },  
+    
+    successCheck:function(resp){
+            
+            Phx.CP.loadingHide();
+            var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
+            if(!reg.ROOT.error){
+            	this.reload();
+            }
+    },
+    
 	south:
           { 
           url:'../../../sis_adquisiciones/vista/solicitud_det/SolicitudReqDet.php',

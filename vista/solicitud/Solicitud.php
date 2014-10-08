@@ -34,7 +34,7 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
 	 
         this.addButton('btnChequeoDocumentosWf',
             {
-                text: 'Chequear Documentos',
+                text: 'Documentos',
                 iconCls: 'bchecklist',
                 disabled: true,
                 handler: this.loadCheckDocumentosSolWf,

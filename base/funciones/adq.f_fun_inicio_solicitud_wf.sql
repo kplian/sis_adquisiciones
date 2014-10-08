@@ -27,6 +27,8 @@ DECLARE
     
     v_registros record;
     v_monto_ejecutar_mo  numeric;
+    v_estado_anterior varchar;
+    v_sw_presu_comprometido varchar;
    
 	
     
@@ -38,7 +40,9 @@ BEGIN
             s.id_solicitud,
             s.id_proceso_wf,
             s.fecha_soli,
-            s.numero
+            s.numero,
+            s.estado,
+            s.presu_comprometido
           into 
             v_registros
             
@@ -60,9 +64,23 @@ BEGIN
                
              where id_proceso_wf = p_id_proceso_wf;
     
-
+          
+             select 
+               te.codigo
+             into
+               v_estado_anterior
+             from wf.testado_wf ew 
+             inner join wf.testado_wf eant on ew.id_estado_anterior = eant.id_estado_wf
+             inner join wf.ttipo_estado te on te.id_tipo_estado = eant.id_tipo_estado
+             where ew.id_estado_wf = p_id_estado_wf;
+             
+      
+             v_sw_presu_comprometido = 'no';
+             
+             
+      
       -- comprometer presupuesto cuando el estado anterior es el vbpresupuestos)
-             IF p_codigo_estado =  'vbpresupuestos' THEN 
+             IF v_estado_anterior =  'vbpresupuestos'  and v_registros.presu_comprometido = 'no' THEN 
 
               -- Comprometer Presupuesto
               
@@ -80,9 +98,19 @@ BEGIN
                      presu_comprometido =  'si',
                      fecha_apro = now()
                    where id_solicitud = v_registros.id_solicitud;
+                   
+                   v_sw_presu_comprometido = 'si';
             
             
             END IF; 
+            
+           
+            
+            IF  p_codigo_estado = 'vbrpc' and  ( v_registros.presu_comprometido !=  'si' and  v_sw_presu_comprometido != 'si') THEN
+            
+                raise exception 'No puede pasar al VoBo del RPC si el presupuesto no esta comprometido, comuniquese con el administrador de sistemas';
+            
+            END IF;
      
    
    

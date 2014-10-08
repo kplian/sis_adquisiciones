@@ -1,7 +1,9 @@
 <?php
 include_once dirname(__FILE__)."/../../lib/lib_reporte/lang.es_AR.php";
+require_once dirname(__FILE__).'/../../pxp/lib/lib_reporte/mypdf.php';
+require_once dirname(__FILE__).'/../../pxp/pxpReport/Report.php';
 
- class CustomReportOC extends TCPDF {
+ class CustomReportOC extends MYPDF {
     
     private $dataSource;
     
@@ -15,7 +17,7 @@ include_once dirname(__FILE__)."/../../lib/lib_reporte/lang.es_AR.php";
     
     public function Header() {
         $height = 20;
-		$this->Image(dirname(__FILE__).'/../../pxp/lib'.$_SESSION['_DIR_LOGO'], $x+10, $y+10, 36);
+		$this->Image(dirname(__FILE__).'/../../pxp/lib'.$_SESSION['_DIR_LOGO'], $x+15, $y+10, 36);
 		$this->Cell(20, $height, '', 0, 0, 'C', false, '', 1, false, 'T', 'C');
 								
         $this->SetFontSize(16);
@@ -354,47 +356,43 @@ Class ROrdenCompra extends Report {
         $height = 5;
         $pdf->SetFillColor(255,255,255, true);
         $pdf->setTextColor(0,0,0); 
-
-		$pdf->Cell($width1-5, $height, 'Cantidad', $blackAll, 0, 'L', true, '', 1, false, 'T', 'C');
-		if($tipo=='Bien')        
-        	$pdf->Cell($width2, $height, 'Item', $blackAll, 0, 'l', true, '', 1, false, 'T', 'C');
-		else{
-			if($tipo=='Bien - Servicio')
-				$pdf->Cell($width2, $height, 'Compra-Servicio', $blackAll, 0, 'l', true, '', 1, false, 'T', 'C');
-		    else
-				$pdf->Cell($width2, $height, 'Servicio', $blackAll, 0, 'l', true, '', 1, false, 'T', 'C');
-		}
 		
-		
-		$pdf->Cell($width1, $height, 'Precio Unitario', $blackAll, 0, 'C', true, '', 1, false, 'T', 'C');
-        $pdf->Cell($width1, $height, 'Total '.$tipo_moneda, $blackAll, 0, 'C', true, '', 1, false, 'T', 'C');
-        $pdf->Ln();
-        $pdf->SetFontSize(6.5);
+		$pdf->SetFontSize(6.5);
 		$totalOrdenCompra=0.00;
-        
+		
+		$conf_par_tablewidths=array($width1-5,$width2,$width1,$width1);
+        $conf_par_tablealigns=array('L','L','L','R');
+        $conf_par_tablenumbers=array(0,0,0,0);
+        $conf_tableborders=array($blackAll,$blackAll,$blackAll,$blackAll);
+        $conf_tabletextcolor=array();
+				
+		$pdf->tablewidths=$conf_par_tablewidths;
+		$pdf->tablealigns=$conf_par_tablealigns;
+		$pdf->tablenumbers=$conf_par_tablenumbers;
+		$pdf->tableborders=$conf_tableborders;
+		
+		$RowArray = array(
+					'cantidad'  => 'Cantidad',
+					'item'  => 'Item',
+					'precio_unitario' => 'Precio Unitario',
+					'total' => 'Total'
+				);     
+					 
+		 $pdf-> MultiRow($RowArray,false,1); 
+		 
         foreach($dataSource->getDataset() as $row) {
-        	     
-        	   //Solo se muestra si la cantidad adjudicada es mayor a cero    
-              if($row['cantidad_adju']>0){
-            	       
-            	$pdf->SetFont('', '');												
-    			$xAntesMultiCell = $pdf->getX();
-    			$yAntesMultiCell = $pdf->getY();		
-                //$totalItem
-                $pdf->setX($pdf->getX()+$width1-5);
-    			$pdf->MultiCell($width2, $height, $row['desc_solicitud_det']."\r\n".'  - '.$row['descripcion_sol'], 1,'L', false ,1);
-    			$yDespuesMultiCell= $pdf->getY();
-    			$height = $pdf->getY()-$yAntesMultiCell;
-    			$pdf->setX($xAntesMultiCell);
-    			$pdf->setY($yAntesMultiCell);
-    			$pdf->Cell($width1-5, $height, $row['cantidad_adju'], 1, 0, 'L', false, '', 1, false, 'T', 'C');
-                $pdf->setX($xAntesMultiCell+$width2+$width1-5);
-                $pdf->Cell($width1, $height, number_format($row['precio_unitario'],2), 1, 0, 'R', false, '', 1, false, 'T', 'C');
-    			$totalItem =$row['cantidad_adju']*$row['precio_unitario'];
-    			$pdf->Cell($width1, $height, number_format($totalItem,2), 1, 0, 'R', false, '', 1, false, 'T', 'C');
-    			$pdf->Ln();
-    			$totalOrdenCompra=$totalOrdenCompra + $totalItem;
-    		  }																																														        
+			            
+			 if($row['cantidad_adju']>0){
+				 $RowArray = array(
+							'cantidad'  => $row['cantidad_adju'],
+							'item'  => $row['desc_solicitud_det']."\r\n".'  - '.$row['descripcion_sol'],
+							'precio_unitario'    => number_format($row['precio_unitario'],2),                       
+							'total' =>  ($row['cantidad_adju']*$row['precio_unitario'])
+						);     
+				$totalOrdenCompra=$totalOrdenCompra + ($row['cantidad_adju']*$row['precio_unitario']);			 
+				$pdf-> MultiRow($RowArray,false,1) ; 
+			}
+						  
         }
     	$height=5;		 								
     	$obj = new Numbers_Words_es_AR;
