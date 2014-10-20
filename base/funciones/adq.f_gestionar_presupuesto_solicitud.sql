@@ -1,9 +1,8 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION adq.f_gestionar_presupuesto_solicitud (
   p_id_solicitud_compra integer,
   p_id_usuario integer,
-  p_operacion varchar
+  p_operacion varchar,
+  p_conexion varchar = NULL::character varying
 )
 RETURNS boolean AS
 $body$
@@ -124,7 +123,9 @@ BEGIN
                                                                va_momento, 
                                                                NULL,--  p_id_partida_ejecucion 
                                                                va_columna_relacion, 
-                                                               va_fk_llave);
+                                                               va_fk_llave,
+                                                               NULL,
+                                                               p_conexion);
                  
                 
                  
@@ -235,7 +236,9 @@ BEGIN
                                                              va_momento, 
                                                              va_id_partida_ejecucion,--  p_id_partida_ejecucion 
                                                              va_columna_relacion, 
-                                                             va_fk_llave);
+                                                             va_fk_llave,
+                                                             NULL,
+                                                             p_conexion);
                END IF;
              
        ELSEIF p_operacion = 'revertir_sobrante' THEN
@@ -359,7 +362,9 @@ BEGIN
                                                                    va_momento, 
                                                                    va_id_partida_ejecucion,--  p_id_partida_ejecucion 
                                                                    va_columna_relacion, 
-                                                                   va_fk_llave);
+                                                                   va_fk_llave,
+                                                                   NULL,
+                                                                   p_conexion);
                       END IF;
        
        

@@ -59,6 +59,52 @@ Phx.vista.SolicitudDet=Ext.extend(Phx.gridInterfaz,{
             grid:true,
             form:true
         },
+		
+        {
+            config:{
+                name: 'id_concepto_ingas',
+                fieldLabel: 'Concepto',
+                allowBlank: false,
+                emptyText : 'Concepto...',
+                store : new Ext.data.JsonStore({
+                            url:'../../sis_parametros/control/ConceptoIngas/listarConceptoIngasMasPartida',
+                            id : 'id_concepto_ingas',
+                            root: 'datos',
+                            sortInfo:{
+                                    field: 'desc_ingas',
+                                    direction: 'ASC'
+                            },
+                            totalProperty: 'total',
+                            fields: ['id_concepto_ingas','tipo','desc_ingas','movimiento','desc_partida','id_grupo_ots','filtro_ot','requiere_ot'],
+                            remoteSort: true,
+                            baseParams:{par_filtro:'desc_ingas#par.codigo#par.nombre_partida',movimiento:'gasto'}
+                }),
+                valueField: 'id_concepto_ingas',
+               displayField: 'desc_ingas',
+               gdisplayField: 'desc_concepto_ingas',
+               hiddenName: 'id_concepto_ingas',
+               forceSelection:true,
+               typeAhead: false,
+               triggerAction: 'all',
+                listWidth:500,
+               resizable:true,
+               lazyRender:true,
+               mode:'remote',
+               pageSize:10,
+               queryDelay:1000,
+               width:350,
+               gwidth:200,
+               minChars:2,
+               qtip:'Si el conceto de gasto que necesita no existe por favor  comuniquese con el área de presupuestos para solictar la creación',
+               tpl: '<tpl for="."><div class="x-combo-list-item"><p><b>{desc_ingas}</b></p><strong>{tipo}</strong><p>PARTIDA: {desc_partida}</p></div></tpl>',
+               renderer:function(value, p, record){return String.format('{0}', record.data['desc_concepto_ingas']);}
+            },
+            type:'ComboBox',
+            filters:{pfiltro:'cig.desc_ingas',type:'string'},
+            id_grupo:1,
+            grid:true,
+            form:true
+        },
         
         {
             config:{
@@ -76,52 +122,6 @@ Phx.vista.SolicitudDet=Ext.extend(Phx.gridInterfaz,{
             type:'ComboRec',
             id_grupo:1,
             filters:{pfiltro:'ot.motivo_orden#ot.desc_orden',type:'string'},
-            grid:true,
-            form:true
-        },
-		
-        {
-            config:{
-                name: 'id_concepto_ingas',
-                fieldLabel: 'Concepto',
-                allowBlank: false,
-                emptyText : 'Concepto...',
-                store : new Ext.data.JsonStore({
-                            url:'../../sis_parametros/control/ConceptoIngas/listarConceptoIngasMasPartida',
-                            id : 'id_concepto_ingas',
-                            root: 'datos',
-                            sortInfo:{
-                                    field: 'desc_ingas',
-                                    direction: 'ASC'
-                            },
-                            totalProperty: 'total',
-                            fields: ['id_concepto_ingas','tipo','movimiento','desc_ingas','desc_partida'],
-                            remoteSort: true,
-                            baseParams:{par_filtro:'desc_ingas#par.codigo#par.nombre_partida',movimiento:'gasto'}
-                }),
-                valueField: 'id_concepto_ingas',
-               displayField: 'desc_ingas',
-               gdisplayField: 'desc_concepto_ingas',
-               hiddenName: 'id_concepto_ingas',
-               forceSelection:true,
-               typeAhead: false,
-               triggerAction: 'all',
-                listWidth:350,
-               resizable:true,
-               lazyRender:true,
-               mode:'remote',
-               pageSize:10,
-               queryDelay:1000,
-               width:350,
-               gwidth:200,
-               minChars:2,
-               qtip:'Si el conceto de gasto que necesita no existe por favor  comuniquese con el área de presupuestos para solictar la creación',
-               tpl: '<tpl for="."><div class="x-combo-list-item"><p><b>{desc_ingas}</b></p><strong>{tipo}</strong><p>PARTIDA: {desc_partida}</p></div></tpl>',
-               renderer:function(value, p, record){return String.format('{0}', record.data['desc_concepto_ingas']);}
-            },
-            type:'ComboBox',
-            filters:{pfiltro:'cig.desc_ingas',type:'string'},
-            id_grupo:1,
             grid:true,
             form:true
         },

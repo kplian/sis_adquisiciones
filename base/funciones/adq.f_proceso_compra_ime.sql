@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION adq.f_proceso_compra_ime (
   p_administrador integer,
   p_id_usuario integer,
@@ -599,7 +597,7 @@ BEGIN
              into
               v_coun_num_cot 
              from adq.tcotizacion c
-             where c.id_proceso_compra = v_parametros.id_proceso_compra; 
+             where c.id_proceso_compra = v_parametros.id_proceso_compra and c.estado_reg = 'activo'; 
             
              IF v_coun_num_cot > 0 THEN 
              
@@ -621,7 +619,7 @@ BEGIN
                into
                 v_coun_num_cot 
                from adq.tcotizacion c
-               where c.id_proceso_compra = v_parametros.id_proceso_compra and c.estado !='anulado' and c.estado !='finalizada'; 
+               where c.id_proceso_compra = v_parametros.id_proceso_compra and c.estado_reg = 'activo' and c.estado !='anulado' and c.estado !='finalizada'; 
             
             
                  IF v_coun_num_cot >0 THEN
@@ -642,7 +640,7 @@ BEGIN
              from wf.tproceso_wf pw 
              inner join wf.ttipo_proceso tp on pw.id_tipo_proceso = tp.id_tipo_proceso
              inner join wf.ttipo_estado te on te.id_tipo_proceso = tp.id_tipo_proceso and te.codigo = v_estado               
-             where pw.id_proceso_wf = v_id_proceso_wf;
+             where pw.id_proceso_wf = v_id_proceso_wf and te.estado_reg = 'activo' and tp.estado_reg = 'activo';
                
               
               
@@ -694,7 +692,7 @@ BEGIN
              from wf.tproceso_wf pw 
              inner join wf.ttipo_proceso tp on pw.id_tipo_proceso = tp.id_tipo_proceso
              inner join wf.ttipo_estado te on te.id_tipo_proceso = tp.id_tipo_proceso and te.codigo = 'finalizado'               
-             where pw.id_proceso_wf = v_id_proceso_wf;
+             where pw.id_proceso_wf = v_id_proceso_wf and te.estado_reg = 'activo' and tp.estado_reg = 'activo';
              
              
              IF v_id_tipo_estado is NULL THEN
@@ -706,7 +704,7 @@ BEGIN
              -- registra nuevo estado
              
             
-                      
+                     
               v_id_estado_actual = wf.f_registra_estado_wf(
                                                             v_id_tipo_estado, 
                                                             v_id_funcionario, 

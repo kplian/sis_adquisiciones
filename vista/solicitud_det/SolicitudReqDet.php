@@ -25,6 +25,7 @@ Phx.vista.SolicitudReqDet = {
 	    Phx.vista.SolicitudReqDet.superclass.constructor.call(this,config);
     },
 	onReloadPage:function(m){
+		
        this.maestro=m;
        
        this.store.baseParams={id_solicitud:this.maestro.id_solicitud};
@@ -34,7 +35,15 @@ Phx.vista.SolicitudReqDet = {
        this.Cmp.id_centro_costo.store.baseParams.id_depto =this.maestro.id_depto;
        this.Cmp.id_centro_costo.modificado=true;
        
-       this.Cmp.id_concepto_ingas.store.baseParams.tipo=this.maestro.tipo;
+       //cuando esta el la inteface de presupeustos no filtra por bienes o servicios
+       if(this.maestro.estado == 'vbpresupuestos'){
+       	delete this.Cmp.id_concepto_ingas.store.baseParams.tipo;
+       }
+       else{
+       	this.Cmp.id_concepto_ingas.store.baseParams.tipo=this.maestro.tipo;
+       }
+       
+       
        this.Cmp.id_concepto_ingas.store.baseParams.id_gestion=this.maestro.id_gestion;
        this.Cmp.id_concepto_ingas.modificado = true;
        
@@ -65,7 +74,7 @@ Phx.vista.SolicitudReqDet = {
      preparaMenu:function(n){
          
          Phx.vista.SolicitudReqDet.superclass.preparaMenu.call(this,n); 
-          if(this.maestro.estado ==  'borrador' || this.maestro.estado ==  'vbpresupuesto' ||this.maestro.estado==  'Borrador'){
+          if(this.maestro.estado ==  'borrador' || this.maestro.estado ==  'vbpresupuestos' ||this.maestro.estado==  'Borrador'){
                this.getBoton('edit').enable();
                this.getBoton('new').enable();
                this.getBoton('del').enable();
@@ -90,6 +99,22 @@ Phx.vista.SolicitudReqDet = {
                this.getBoton('del').disable();
          }
     },
+    
+    onButtonEdit:function(){
+	    
+	  Phx.vista.SolicitudReqDet.superclass.onButtonEdit.call(this);
+	  this.Cmp.id_orden_trabajo.allowBlank = true;
+	  this.Cmp.id_orden_trabajo.disable();
+	},
+	
+	onButtonNew:function(){
+	    
+	  Phx.vista.SolicitudReqDet.superclass.onButtonNew.call(this);
+	  this.Cmp.id_orden_trabajo.allowBlank = true;
+	  this.Cmp.id_orden_trabajo.disable();  
+	  
+	},
+    
     
 	iniciarEventos:function(){
          this.cmpPrecioUnitario= this.getComponente('precio_unitario');
@@ -119,6 +144,33 @@ Phx.vista.SolicitudReqDet = {
             this.cmpPrecioGa.setValue(this.cmpPrecioTotal.getValue() -this.cmpPrecioSg.getValue());
             
         } ,this);
+        
+        
+         this.Cmp.id_concepto_ingas.on('change',function( cmb, rec, ind){
+	        	    this.Cmp.id_orden_trabajo.reset();
+	           },this);
+	        
+	     this.Cmp.id_concepto_ingas.on('select',function( cmb, rec, ind){
+	        	
+	        	      this.Cmp.id_orden_trabajo.store.baseParams = {
+			        		                                           filtro_ot:rec.data.filtro_ot,
+			        		 										   requiere_ot:rec.data.requiere_ot,
+			        		 										   id_grupo_ots:rec.data.id_grupo_ots
+			        		 										 };
+			        this.Cmp.id_orden_trabajo.modificado = true;
+			        this.Cmp.id_orden_trabajo.enable();
+			        if(rec.data.requiere_ot =='obligatorio'){
+			        	this.Cmp.id_orden_trabajo.allowBlank = false;
+			        }
+			        else{
+			        	this.Cmp.id_orden_trabajo.allowBlank = true;
+			        }
+			        this.Cmp.id_orden_trabajo.reset();
+			        this.Cmp.id_orden_trabajo.enable();
+        	
+             },this);
+	    
+        
      }
    
 };

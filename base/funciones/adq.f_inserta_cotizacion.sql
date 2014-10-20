@@ -322,14 +322,21 @@ BEGIN
               per.nombre_completo1 as desc_funcionario1,
               fun.email_empresa,
               fun.telefono_ofi,
-              per.celular1
+              per.celular1,
+              per.celular2
             into 
               v_registros_fun
             from orga.tfuncionario fun 
             inner join segu.vpersona per on per.id_persona = fun.id_persona
             where fun.id_funcionario = v_id_funcionario_sol;
             
-            v_telefono = COALESCE(v_registros_fun.telefono_ofi||', ','')|| COALESCE(v_registros_fun.celular1,'');
+            
+            IF  v_registros_fun.celular2 != '' and v_registros_fun.celular2 is NULL THEN
+                v_telefono = COALESCE(v_registros_fun.telefono_ofi||', ','')|| COALESCE(v_registros_fun.celular2,'');
+            ELSE    
+                v_telefono = COALESCE(v_registros_fun.telefono_ofi||', ','')|| COALESCE(v_registros_fun.celular1,'');
+            END IF;
+            
         
         
         	--Sentencia de la insercion

@@ -174,7 +174,7 @@ p_hstore->'id_solicitud'
         -- 22/09/2014  RAC,   se comenta  este if por que ahora se lo puede hacer dinamicamente 
         -- con reglas en el WF
         
-        /*
+        
          v_id_funcionario_estado_sig = v_id_funcionario_supervisor;
         
         --verifica si tiene un supervisor
@@ -212,7 +212,7 @@ p_hstore->'id_solicitud'
             
       
         END IF;
-        */
+        
        
           
           --cambiamos estado de la solicitud

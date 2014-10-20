@@ -1,3 +1,5 @@
+--------------- SQL ---------------
+
 CREATE OR REPLACE FUNCTION adq.f_fun_inicio_solicitud_wf (
   p_id_usuario integer,
   p_id_usuario_ai integer,
@@ -78,7 +80,7 @@ BEGIN
              
       
       -- comprometer presupuesto cuando el estado anterior es el vbpresupuestos)
-             IF v_estado_anterior =  'vbpresupuesto'  and v_registros.presu_comprometido = 'no' THEN 
+             IF v_estado_anterior =  'vbpresupuestos'  and v_registros.presu_comprometido = 'no' THEN 
 
               -- Comprometer Presupuesto
               
