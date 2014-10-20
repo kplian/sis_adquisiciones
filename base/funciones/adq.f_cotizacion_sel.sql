@@ -545,7 +545,7 @@ BEGIN
              
                   v_filtro = 'cot.id_cotizacion='||v_parametros.id_cotizacion||' and ';
             ELSE
-                  v_filtro = 'pc.id_proceso_wf='||v_parametros.id_proceso_wf||' and ';
+                  v_filtro = 'cot.id_proceso_wf='||v_parametros.id_proceso_wf||' and ';
             
             END IF;
             
