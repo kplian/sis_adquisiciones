@@ -520,3 +520,39 @@ COMMENT ON COLUMN param.tconcepto_ingas.id_grupo_ots
 IS 'lamacena las ot que pueden relacionarce con este el concepto de gasto';
 
 /***********************************F-SCP-RAC-ADQ-0-05/10/2014****************************************/
+
+/***********************************I-SCP-RAC-ADQ-0-21/10/2014****************************************/
+
+--------------- SQL ---------------
+
+DROP VIEW adq.vcotizacion;
+--------------- SQL ---------------
+
+DROP VIEW adq.vproceso_compra;
+--------------- SQL ---------------
+
+DROP VIEW adq.vproceso_compra_wf;
+--------------- SQL ---------------
+
+DROP VIEW adq.vsolicitud_compra;
+
+ALTER TABLE adq.tcotizacion_det
+  ALTER COLUMN precio_unitario TYPE NUMERIC(19,3);
+  
+--------------- SQL ---------------
+
+ALTER TABLE adq.tcotizacion_det
+  ALTER COLUMN precio_unitario_mb TYPE NUMERIC(19,3);
+
+--------------- SQL ---------------
+
+ALTER TABLE adq.tsolicitud_det
+  ALTER COLUMN precio_unitario TYPE NUMERIC(19,3);
+
+--------------- SQL ---------------
+
+ALTER TABLE adq.tsolicitud_det
+  ALTER COLUMN precio_unitario_mb TYPE NUMERIC(19,3);
+
+/***********************************F-SCP-RAC-ADQ-0-21/10/2014****************************************/
+

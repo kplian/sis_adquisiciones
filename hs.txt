@@ -1,0 +1,1000 @@
+   20  git add sis_organigrama/*
+   21  git commit -m 'prorrateo'
+   22  git push origin master
+   23  cd ..
+   24  cd sis_gestion_comunicacion/
+   25  git status
+   26  git add .
+   27  git commit -m 'eliminacion de numero'
+   28  git push origin master
+   29  cd ..
+   30  cd sis_gestion_comunicacion/
+   31  git push origin master
+   32  cd ..
+   33  cd kerp
+   34  cd sis_gestion_comunicacion/
+   35  ls
+   36  git pull origin master
+   37  cd ..
+   38  cd pxp/
+   39  git pull origin maste
+   40  git pull origin master
+   41  git checkout sis_organigrama/vista/interinato/AplicarInterino.php 
+   42  git pull origin master
+   43  git checkout sis_organigrama/vista/interinato/Interinato.php 
+   44  git pull origin master
+   45  cd ..
+   46  cd sis_tesoreria/
+   47  git pull origin master
+   48  cd ..
+   49  cd pxp/utilidades/restaurar_bd/
+   50  su postgres -
+   51  cd ..
+   52  cd kerp_capacitacion/
+   53  cd sis_tesoreria/
+   54  git status
+   55  git add .
+   56  git commit -m 'ff'
+   57  git push origin master
+   58  cd ..
+   59  cd kerp/sis_teq
+   60  cd kerp/sis_tesoreria/
+   61  git pull origin master
+   62  cd /var/www/html/kerp_capacitacion/sis_tesoreria/
+   63  git status
+   64  cd ..
+   65  cd pxp
+   66  git status
+   67  git add  sis_organigrama/*
+   68  git commit -m 'validacion de si existen funcionarios en el prorrateo'
+   69  git push origin master
+   70  cd ..
+   71  cd kerp/pxp/
+   72  git pull origin master
+   73  cd utilidades/restaurar_bd/
+   74  su postgres -
+   75  cd ..
+   76  cd kerp_capacitacion/
+   77  cd ..
+   78  cd kerp_capacitacion/
+   79  git status
+   80  cd sis_adquisiciones/
+   81  git status
+   82  git add .
+   83  git commit -m 'forzando seleccion en lugar'
+   84  git push origin master
+   85  cd ..
+   86  cd kerp/sis_adquisiciones/
+   87  git pull origin master
+   88  cd ..
+   89  cd sis_contabilidad/
+   90  git status
+   91  cd /var/www/html/kerp_capacitacion/
+   92  cd sis_tesoreria/
+   93  git status
+   94  git branch
+   95  git status
+   96  df -h
+   97  cd /var/www/html/
+   98  df .
+   99  df -h
+  100  pwd
+  101  df .
+  102  cd /var/www/html/kerp_capacitacion/
+  103  cd sis_tesoreria/
+  104  git status
+  105  git add .
+  106  git commit -m 'cambios para validacion presupuestaria'
+  107  git push origin master
+  108  cd ..
+  109  cd sis_migracion/
+  110  git status
+  111  git add .
+  112  git commit -m 'nuevas funciones y cambio en funciona para migrar comprobante que incluye forma de pago'
+  113  git push origin master
+  114  cd ..
+  115  cd sis_contabilidad/
+  116  git status
+  117  git add .
+  118  git commit -m 'adicion de tipo de pago al comprobante de endesis'
+  119  git push origin master
+  120  git pull origin master
+  121  git push origin master
+  122  cd ..
+  123  cd sis_presupuestos/
+  124  git branch
+  125  git status
+  126  git add .
+  127  git commit -m 'anadiendo un nombre de conexion para poder gestionar presupuesto con una sola conexion y transacciones'
+  128  git push origin master
+  129  git push origin develop
+  130  cd ..
+  131  cd sis_adquisiciones/
+  132  git status
+  133  git add .
+  134  git commit -m 'cambio en estado de ejecucion presupuestaria'
+  135  git push origin master
+  136  cd ..
+  137  cd kerp_capacitacion/
+  138  cd sis_gestion_comunicacion/
+  139  git status
+  140  git add .
+  141  git commit -m 'anadiendo el tipo en la asignacion'
+  142  git push origin master
+  143  cd ..
+  144  cd kerp/sis_gestion_comunicacion/
+  145  git pull origin master
+  146  cd ..
+  147  cd pxp/utilidades/restaurar_bd/
+  148  su postgres -
+  149  ssh 162.144.53.106
+  150  cd /var/www/html/kerp_capacitacion/
+  151  cd sis_adquisiciones/
+  152  ls
+  153  cd reportes/
+  154  ls
+  155  git status
+  156  pwd
+  157  git status
+  158  cd /var/www/html/kerp_capacitacion/
+  159  cd pxp
+  160  git status
+  161  git checkout lib/lib_vista/gridInterfaz.js 
+  162  git checkout lib/lib_vista/baseInterfaz.js 
+  163  ls
+  164  c
+  165  pwd
+  166  cd /var/www/html/
+  167  ls
+  168  cd kerp_capacitacion/
+  169  git status
+  170  ls
+  171  cd sis_adquisiciones/
+  172  cd ..
+  173  cd pxp
+  174  git status
+  175  cd ..
+  176  ls
+  177  cd sis_adquisiciones/
+  178  git status
+  179  cd ..
+  180  cd pxp
+  181  git status
+  182  cd lib/
+  183  git status
+  184  git diff lib_reporte/mypdf.php 
+  185  git checkout --help
+  186  git checkout -- lib_reporte/mypdf.php 
+  187  exit
+  188  cd /var/www/html/kerp_capacitacion/
+  189  cd pxp
+  190  git status
+  191  cd ..
+  192  cd sis_tesoreria/
+  193  git status
+  194  git add .
+  195  git commit -m 'quitando la adicion de acta de conformidad'
+  196  git push origin master
+  197  cd ..
+  198  ls
+  199  cd pxp
+  200  ls
+  201  git status
+  202  git add base/*
+  203  git add lib/*
+  204  git add sis_seguridad/*
+  205  git add sis_workflow/*
+  206  git status
+  207  git commit -m 'varios cambios en el sistema'
+  208  git push origin master
+  209  cd ..
+  210  cd sis_adquisiciones/
+  211  git status
+  212  cd ..
+  213  cd pxp
+  214  git status
+  215  cd ..
+  216  cd kerp
+  217  cd ..
+  218  cd kerp
+  219  ls
+  220  cd sis_adquisiciones/
+  221  git pull origin master
+  222  git checkout control/ACTProcesoCompra.php 
+  223  git pull origin master
+  224  git checkout control/ACTSolicitud.php 
+  225  git pull origin master
+  226  git checkout reportes/ROrdenCompra.php 
+  227  git pull origin master
+  228  cd ..
+  229  cd sis_tesoreria/
+  230  git pull origin master
+  231  cd ..
+  232  cd sis_contabilidad/
+  233  git pull origin master
+  234  cd ..
+  235  cd pxp/utilidades/
+  236  cd restaurar_bd/
+  237  su postgres -
+  238  cd ..
+  239  cd sis_migracion/
+  240  git pull origin master
+  241  cd ..
+  242  cd pxp/utilidades/restaurar_bd/
+  243  su postgres -
+  244  cd ..
+  245  cd kerp_capacitacion/
+  246  git status
+  247  cd pxp
+  248  git status
+  249  git add lib/*
+  250  git add lib/imagenes/icono_dibu/menus.css
+  251  git add lib/lib_modelo/driver.php
+  252  git add lib/lib_reporte/MostrarReporte.php
+  253  git add lib/lib_vista/baseInterfaz.js
+  254  git add lib/rest/test_rest.php
+  255  git add .sis_seguridad/base/funciones/ft_menu_sel.sql
+  256  git add sis_seguridad/base/funciones/ft_menu_sel.sql
+  257  git status
+  258  git add lib/imagenes/icono_dibu/dibu_search.png
+  259  git commit -m 'en menu sel'
+  260  git push origin master
+  261  git pull origin master
+  262  cd ..
+  263  cd pxp
+  264  git push origin master
+  265  cd ..
+  266  cd kerp
+  267  cd ..
+  268  cd kerp_capacitacion/
+  269  cd ..
+  270  cd kerp
+  271  cd pxp/
+  272  git pull origin master
+  273  cd utilidades/restaurar_bd/
+  274  ./restaurar_todo.py 
+  275  ls
+  276  su psotgres
+  277  cd /var/www/html/kerp
+  278  cd pxp/utilidades/restaurar_bd/
+  279  ./restaurar_todo.py 
+  280  cd /var/www/html/kerp
+  281  cd pxp/utilidades/restaurar_bd/
+  282  su postgres -
+  283  cd /var/www/html/kerp_capacitacion/
+  284  cd pxp
+  285  git status
+  286  cd /var/www/html/kerp_capacitacion/
+  287  git status
+  288  cd sis_adquisiciones/
+  289  git status
+  290  git add .
+  291  git commit -m"orden de compra, filtro en proceso de compra, correo de traspasos presupuestarios, cambio en el orden de ejecucionde presupuestos"
+  292  sudo git push origin master
+  293  cd ..
+  294  cd sis_tesoreria/
+  295  git status
+  296  git add .
+  297  git commit -m"interface para editar centor de cotos y partida en la vista de contabilidad"
+  298  sudo git push origin master
+  299  cd ..
+  300  cd sis_migracion/
+  301  git status
+  302  cd ..
+  303  cd sis_contabilidad/
+  304  git status
+  305  git add .
+  306  git commit -m"grupo OT"
+  307  sudo git push origin master
+  308  cd ..
+  309  cd sis_adquisiciones/
+  310  git status
+  311  cd ..
+  312  cd sis_presupuestos/
+  313  git status
+  314  cd ..
+  315  cd pxp
+  316  git status
+  317  git add modified:   base/aggregates.sql
+  318  git add  lib/lib_control/CTOpenFile.php
+  319  git add lib/lib_vista/addcmp/ComboRec.js
+  320  git add sis_parametros*
+  321  git status
+  322  clear
+  323  git status
+  324  git diff sis_parametros/vista/asistente/Asistente.php
+  325  git diff  base/aggregates.sql
+  326  git diff  sis_workflow/base/patch000001.sql
+  327  sudo git push origin master
+  328  git status
+  329  git add sis_parametros/base/funciones/param.f_concepto_ingas_ime.sql
+  330  git add sis_parametros/base/funciones/param.f_concepto_ingas_sel.sql
+  331  git add sis_parametros/control/ACTConceptoIngas.php
+  332  git add sis_parametros/modelo/MODAsistente.php
+  333  git add sis_parametros/modelo/MODConceptoIngas.php
+  334  git add sis_parametros/vista/asistente/Asistente.php
+  335  git add sis_parametros/vista/concepto_ingas/ConceptoIngas.php
+  336  git add lib/lib_vista/addcmp/ComboRec.js
+  337  git commit -m"cambios de concepto de gasto"
+  338  sudo git push origin master
+  339  git status
+  340  cd ..
+  341  cd sis_adquisiciones/
+  342  git status
+  343  git add .
+  344  git commit -m"funcion de finalizar solicitud y compromiso presupeustario"
+  345  sudo git push origin mastetr
+  346  sudo git push origin master
+  347  cd .
+  348  cd ..
+  349  cd kerp
+  350  cd pxp/
+  351  git pull origin master
+  352  git checkout -f
+  353  git pull origin master
+  354  git checkoput -f
+  355  git pull origin master
+  356  git checkout -f
+  357  git pull origin master
+  358  git add .
+  359  git commit -m"problea en listado"
+  360  sudo git psuh origin master
+  361  sudo git push origin master
+  362  git pull origin amster
+  363  git pull origin master
+  364  cd ..
+  365  ls
+  366  cd sis_migracion/
+  367  git pull origin amster
+  368  git pull origin master
+  369  cd ..
+  370  cd sis_contabilidad/
+  371  git pull origin master
+  372  cd ..
+  373  cd pxp/utilidades/restaurar_bd/
+  374  vim /tmp/log_restaurar_bd.log 
+  375  service postgresql-9.3 restart
+  376  ls
+  377  service postgresql-9.3 restart
+  378  cd /var/www/html/kerp
+  379  cd pxp/
+  380  git pull origin master
+  381  cd ..
+  382  cd kerp_capacitacion/
+  383  cd pxp
+  384  git pull origin master
+  385  git status
+  386  git add  sis_workflow/vista/documento_wf/DocumentoWf.php
+  387  git commit -m 'solucionando problemas con documentowf'
+  388  git push origin master
+  389  cd ..
+  390  cd sis_tesoreria/
+  391  git status
+  392  git add vista/plan_pago/PlanPagoVb.php 
+  393  git commit -m 'resolviendo problema con historico'
+  394  git push origin master
+  395  cd ..
+  396  cd kerp/pxp/
+  397  git pull origin master
+  398  git checkout sis_workflow/vista/documento_wf/DocumentoWf.php 
+  399  git pull origin master
+  400  cd ..
+  401  cd sis_tesoreria/
+  402  git status
+  403  git pull origin master
+  404  top
+  405  kill -9 4871
+  406  top
+  407  /etc/init.d/postgresql-9.3 start
+  408  pwd
+  409  cd ..
+  410  cd pxp/utilidades/restaurar_bd/
+  411  su postgres -
+  412  cd ..
+  413  cd sis_tesoreria/
+  414  git status
+  415  vim base/funciones/tes.f_gestionar_presupuesto_tesoreria.
+  416  vim base/funciones/tes.f_gestionar_presupuesto_tesoreria.sql 
+  417  cd ..
+  418  cd sis_presupuestos/
+  419  git status
+  420  git pull origin develo
+  421  git pull origin develop
+  422  cd ..
+  423  cd kerp_capacitacion/sis_presupuestos/
+  424  git status
+  425  cd ..
+  426  cd kerp/sis_presupuestos/
+  427  cd ..
+  428  cd pxp/utilidades/restaurar_bd/
+  429  su postgres -
+  430  top
+  431  netstat -rn
+  432  cd /etc/sysconfig/network-scripts
+  433  ls
+  434  route add -net 192.168.17.0 netmask 255.255.255.0 gw 172.17.45.128 dev eth0
+  435  vim route-eth0 
+  436  exit
+  437  cd /var/www/html/kerp_capacitacion/
+  438  cd sis_tesoreria/
+  439  git status
+  440  git diff base/funciones/tes.f_gestionar_presupuesto_tesoreria.sql 
+  441  git add base/funciones/*
+  442  cd commit -m 'mejorando funcionalidades de pago variable'
+  443  git commit -m 'mejorando funcionalidades de pago variable'
+  444  git push origin master
+  445  cd ..
+  446  cd kerp/sis_tesoreria/
+  447  git pull origin master
+  448  cd ..
+  449  cd pxp/utilidades/restaurar_bd/
+  450  su postgres -
+  451  top
+  452  /etc/init.d/postgresql-9.3 restart
+  453  top
+  454  /etc/init.d/postgresql-9.3 restart
+  455  cd ..
+  456  cd /var/www/html/kerp_capacitacion/
+  457  cd pxp
+  458  git status
+  459  git add sis_organigrama/vista/interinato/AsignarInterino.php 
+  460  git commit -m 'Resolviendo problema con listado de interinatos'
+  461  git push origin master
+  462  cd ..
+  463  cd kerp/pxp/
+  464  git pull origin master
+  465  cd ..
+  466  cd kerp_capacitacion/
+  467  cd pxp
+  468  git status
+  469  git checkout lib/tcpdf/cache/*
+  470  git status
+  471  git add .
+  472  git commit -m 'varias mejoras al workflow'
+  473  git push origin master
+  474  cd ..
+  475  cd kerp
+  476  cd pxp/
+  477  git pull origin master
+  478  cd utilidades/restaurar_bd/
+  479  su postgres -
+  480  cd ..
+  481  cd kerp_capacitacion/
+  482  cd pxp
+  483  git status
+  484  git add sis_organigrama/vista/interinato/AsignarInterino.php 
+  485  git commit -m 'arreglando problema con interinato'
+  486  git puhs origin master
+  487  git push origin master
+  488  cd ..
+  489  cd kerp/pxp/
+  490  git pull origin master
+  491  git status
+  492  cd ..
+  493  cd kerp_capacitacion/
+  494  cd pxp
+  495  git status
+  496  git add sis_organigrama/vista/interinato/*
+  497  git commit -m 'cambios en interinato'
+  498  git push origin master
+  499  cd ..
+  500  cd kerp/pxp/
+  501  git pull origin master
+  502  cd /var/www/html/kerp_capacitacion/
+  503  cd pxp
+  504  git status
+  505  git add sis_parametros/base/funciones/param.ft_alarma_sel.sql 
+  506  git commit -m 'para que no mande correos'
+  507  git push origin master
+  508  cd ..
+  509  cd kerp
+  510  cd pxp/
+  511  git pull origin master
+  512  cd ..
+  513  cd kerp
+  514  cd pxp/utilidades/restaurar_bd/
+  515  su postgres -
+  516  ping 192.168.225.10
+  517  service httpd restart
+  518  ping 192.168.17.33
+  519  cd /var/www/html/kerp_capacitacion/sis_adquisiciones/
+  520  git status
+  521  git add base/funciones/adq.f_fun_inicio_solicitud_wf.sql 
+  522  git commit -m 'Cambio en fun_inicio_solicitud por error en el codigo de vbpresupuesto'
+  523  git push origin master
+  524  cd ..
+  525  cd kerp/sis_adquisiciones/
+  526  git pull origin master
+  527  cd ..
+  528  cd  kerp_capacitacion/
+  529  cd sis_adquisiciones/
+  530  git status
+  531  git add vista/solicitud_det/SolicitudReqDet.php 
+  532  git commit -m 'cambiando codigo de estado para habilitacion de menu solicitud_det'
+  533  git push origin master
+  534  cd ..
+  535  cd kerp/sis_adquisiciones/
+  536  git status
+  537  git pull origin master
+  538  pwd
+  539  cd ..
+  540  cd kerp_capacitacion/
+  541  cd sis_tesoreria/
+  542  git status
+  543  cd ..
+  544  cd kerp/sis_tesoreria/
+  545  git status
+  546  git branch
+  547  git pull origin master
+  548  history
+  549  ifconfig
+  550  cd /etc/sysconfig/network-scripts/
+  551  vim ifcfg-eth0
+  552  cd /var/www/html/kerp_capacitacion/
+  553  cd pxp
+  554  git status
+  555  git add sis_organigrama/vista/interinato/Interinato.php 
+  556  git commit -m 'llamada a iniciareventos'
+  557  git push origin master
+  558  cd ..
+  559  cd kerp/pxp/
+  560  git pull origin master
+  561  cd ..
+  562  cd kerp_capacitacion/sis_tesoreria/
+  563  git status
+  564  git add base/funciones/tes.f_fun_inicio_plan_pago_wf.sql 
+  565  git commit -m 'resolviendo problema de validacion por monto'
+  566  git branch
+  567  git push origin master
+  568  cd ..
+  569  cd kerp
+  570  cd sis_tesoreria/
+  571  git pull origin master
+  572  vim /var/lib/pgsql/9.3/data/pg_hba.conf 
+  573  /etc/init.d/postgresql-9.3 reload
+  574  vim /etc/sysconfig/network-scripts/
+  575  vim /etc/sysconfig/network-scripts/route-eth0 
+  576  /etc/init.d/postgresql-9.3 restart
+  577  ping 192.168.17.33
+  578  cd /var/lib/pgsql/9.3/data/
+  579  ls
+  580  more pg_hba.conf 
+  581  exit
+  582  cd /var/www/html/
+  583  ls
+  584  cd kerp_capacitacion/
+  585  ls
+  586  cd sis_parametros/
+  587  ls
+  588  cd sis_parametros 
+  589  cd control/
+  590  ls
+  591  mv ACT
+  592  LS
+  593  ls
+  594  mv ACTCategoriaProveedor.php ../../sis_proveedores/control 
+  595  mv ACTCategoriaProveedor.php ../../sis_proveedores/control/
+  596  mv ACTCategoriaProveedor.php ../../sis_proveedores/control
+  597  cp ACTCategoriaProveedor.php ../../sis_proveedores/control
+  598  mv --help
+  599  cp ACTCategoriaProveedor.php ../../sis_proveedores/control
+  600  cp ACTCategoriaProveedor.php ../../sis_proveedores/control/ACTCategoriaProveedor.ph
+  601  cp ACTCategoriaProveedor.php ../../sis_proveedores/control/ACTCategoriaProveedor.php
+  602  mv ACTCategoriaProveedor.php ../../sis_proveedores/control/ACTCategoriaProveedor.php
+  603  mv ./ACTCategoriaProveedor.php ../../sis_proveedores/control/ACTCategoriaProveedor.php
+  604  mc
+  605  mv ACTCategoriaProveedor.php ../
+  606  ls
+  607  cd ..
+  608  ls
+  609  mv ACTCategoriaProveedor.php ../
+  610  ls
+  611  cd ..
+  612  ls
+  613  cd sis_parametros/
+  614  ls
+  615  cd ..
+  616  ls
+  617  cd ..
+  618  ls
+  619  cd ..
+  620  ls
+  621  cd html/
+  622  ls
+  623  cd kerp_capacitacion/
+  624  ls
+  625  cd sis_parametros/
+  626  ls
+  627  cd control/
+  628  ls
+  629  cd ..
+  630  find ACTCategoriaProveedor.php 
+  631  cd /
+  632  find ACTCategoriaProveedor.php 
+  633  cd /
+  634  ls
+  635  cd var/
+  636  ls
+  637  cd www/
+  638  ls
+  639  cd html/
+  640  ls
+  641  cd kerp_capacitacion/
+  642  ls
+  643  cd sis_parametros/
+  644  ls
+  645  cd ..
+  646  find -name ACTCategoriaProveedor.php 
+  647  cd ..
+  648  ls
+  649  find -name ACTCategoriaProveedor.php 
+  650  cd kerp_capacitacion/
+  651  find -name ACTCategoriaProveedor.php 
+  652  cd pxp
+  653  ls
+  654  mv ACTCategoriaProveedor.php ../
+  655  LS
+  656  ls
+  657  cd ..
+  658  ls
+  659  mv ACTCategoriaProveedor.php sis_proveedores/
+  660  ls
+  661  cd sis_proveedores/
+  662  ls
+  663  mv ACTCategoriaProveedor.php control/
+  664  ls
+  665  cd control/
+  666  ls
+  667  cd ..
+  668  cd pxp/sis_parametros/control/
+  669  ls
+  670  mv ACTClasificacionProveedor.php ../../../sis_proveedores/control/
+  671  ls
+  672  mv ACTDocumentoCategoriaClasificacion.php ../../../sis_proveedores/control/
+  673  lsa
+  674  ls
+  675  cd ..
+  676  cd vista/
+  677  ls
+  678  mv categoria_proveedor/ ../../../sis_proveedores/vista/
+  679  ls
+  680  mv clasificacion_proveedor/ ../../../sis_proveedores/vista/
+  681  mv documento_categoria_clasificacion/ ../../../sis_proveedores/vista/
+  682  ls
+  683  cd ..
+  684  cd modelo/
+  685  ls
+  686  mv MODCategoriaProveedor.php ../../../sis_proveedores/modelo/
+  687  mv MODClasificacionProveedor.php ../../../sis_proveedores/modelo/
+  688  mv MODDocumentoCategoriaClasificacion.php ../../../sis_proveedores/modelo/
+  689  ls
+  690  cd ..
+  691  ls
+  692  cd ..
+  693  ls
+  694  cd ..
+  695  ls
+  696  cd sis_proveedores/
+  697  ls
+  698  cd control/
+  699  ls
+  700  cd ..
+  701  ls
+  702  cd modelo/
+  703  ls
+  704  cd ..
+  705  cd vista/
+  706  ls
+  707  cd ..
+  708  ls
+  709  cd sis_parametros/
+  710  ls
+  711  cd base/
+  712  ls
+  713  cd funciones/
+  714  ls
+  715  mv param.ft_categoria_proveedor_ime.sql ../../../sis_proveedores/base 
+  716  mv param.ft_categoria_proveedor_ime.sql ../../../sis_proveedores/base/
+  717  mv param.ft_categoria_proveedor_ime.sql ../../../sis_proveedores/base 
+  718  ls
+  719  mv param.ft_documento_categoria_clasificacion_ime.sql ../../../sis_proveedores/base 
+  720  ls
+  721  cd ..
+  722  ls
+  723  cd ..
+  724  ls
+  725  cd ..
+  726  ls
+  727  cd pxp/sis_parametros/
+  728  ls
+  729  cd base/
+  730  ls
+  731  cd funciones/
+  732  ls
+  733  mv param.ft_categoria_proveedor_ime.sql ../../../../sis_proveedores/base/
+  734  mv param.ft_categoria_proveedor_sel.sql ../../../../sis_proveedores/base/
+  735  mv param.ft_documento_categoria_clasificacion_ime.sql ../../../../sis_proveedores/base/
+  736  mv param.ft_documento_categoria_clasificacion_sel.sql ../../../../sis_proveedores/base/
+  737  ls
+  738  mv param.ft_clasificacion_proveedor_ime.sql ../../../../sis_proveedores/base/
+  739  mv param.ft_clasificacion_proveedor_sel.sql ../../../../sis_proveedores/base/
+  740  ls
+  741  exit
+  742  cd /var/www/html/kerp_capacitacion/sis_tesoreria/
+  743  git status
+  744  git add base/funciones/tes.f_prorrateo_plan_pago.sql 
+  745  git commit -m 'actualizando el total prorrateo cuando se inserta un nuevo prorrateo'
+  746  git push origin master
+  747  cd /var/www/html/
+  748  ls
+  749  cd kerp_capacitacion/
+  750  ls
+  751  setfacl -Rm u:apache:rwx sis_proveedores/
+  752  exit
+  753  cd /var/www/html/kerp_capacitacion/
+  754  ls
+  755  cd sis_proveedores/
+  756  ls
+  757  cd base/
+  758  ls
+  759  mv param.ft_categoria_proveedor_ime.sql funciones/
+  760  mv param.ft_categoria_proveedor_sel.sql funciones/
+  761  mv param.ft_clasificacion_proveedor_ime.sql funciones/
+  762  mv param.ft_clasificacion_proveedor_sel.sql funciones/
+  763  mv param.ft_documento_categoria_clasificacion_ime.sql funciones/
+  764  mv param.ft_documento_categoria_clasificacion_sel.sql funciones/
+  765  ls
+  766  exit
+  767  du -h
+  768  cd /var/www/html/
+  769  df -h
+  770  du -sh kerp/uploaded_files/
+  771  cd /tmp/
+  772  ls
+  773  cd /var/www/html/kerp_capacitacion/
+  774  cd sis_adquisiciones/
+  775  git status
+  776  git diff vista/solicitud_det/SolicitudDet.php 
+  777  git diff vista/solicitud_det/SolicitudReqDet.php 
+  778  cd ..
+  779  cd kerp
+  780  cd sis_adquisiciones/
+  781  git status
+  782  vim vista/solicitud_det/SolicitudReqDet.php 
+  783  ls
+  784  netstat -rq
+  785  netstat -rm
+  786  netstat -rn
+  787  route add -net 192.168.9.0 netmask 255.255.255.0 gw 172.17.45.128
+  788  netstat -rn
+  789  vim /etc/sysconfig/network-scripts/route-eth0 
+  790  cd /bk_bd/
+  791  ls
+  792  pg_dump dbkerp_capacitacion -U postgres -F c -v -b -f /bk_bd/bk_dbkerp_capacitacion_17102014_1757
+  793  exit
+  794  cd /var/www/html/kerp_capacitacion/
+  795  ls
+  796  mv sis_proveedores sis_proveedores2
+  797  ls
+  798  git pull
+  799  mkdir sis_proveedores
+  800  ls
+  801  cd sis_proveedores
+  802  ls
+  803  git pull
+  804  cd ..
+  805  ls
+  806  rmdir sis_proveedores
+  807  ls
+  808  git pull
+  809  git clone https://github.com/kplian/sis_proveedores.git
+  810  ls
+  811  cd sis_proveedores
+  812  ls
+  813  git pull
+  814  ls -all
+  815  cd ..
+  816  cd sis_proveedores2
+  817  ls
+  818  mv base/ ../sis_proveedores
+  819  mv control/ ../sis_proveedores
+  820  mv modelo/ ../sis_proveedores
+  821  mv vista/ ../sis_proveedores
+  822  ls
+  823  cd ..
+  824  ls
+  825  cd sis_proveedores
+  826  ls
+  827  cd ..
+  828  rmdir sis_proveedores2
+  829  ls
+  830  cd sis_proveedores/
+  831  ls
+  832  git push
+  833  git status
+  834  git add .
+  835  git status
+  836  git push
+  837  ls
+  838  ls --all
+  839  cd .git/
+  840  ls
+  841  more refs/
+  842  more config 
+  843  cd ..
+  844  ls
+  845  cd ..
+  846  ls
+  847  cd sis_adquisiciones/
+  848  cd .git/
+  849  more config 
+  850  cd ..
+  851  cd sis_proveedores/
+  852  ls
+  853  cd .git/
+  854  more config 
+  855  vim config 
+  856  cd ..
+  857  git push
+  858  cd ..
+  859  ls
+  860  cd sis_proveedores/
+  861  cd .git/
+  862  more config 
+  863  cd ..
+  864  git pusj
+  865  git push
+  866  git push origin master
+  867  git commit -m "primer commit"
+  868  git status
+  869  git push
+  870  git push origin master
+  871  git status
+  872  exit
+  873  cd /var/www/html/kerp_capacitacion/
+  874  cd pxp
+  875  git status
+  876  git diff  lib/lib_control/CTIntermediario.php
+  877  git status
+  878  cd ..
+  879  cd sis_adquisiciones/
+  880  git status
+  881  cd ..
+  882  cd pxp
+  883  git status
+  884  cd ..
+  885  cd sis_adquisiciones/
+  886  git status
+  887  git add .
+  888  git commit -m"orden de compra en solicitud de adquisiciones con filtros"
+  889  cd ..
+  890  cd sis_tesoreria/
+  891  git status
+  892  git add .
+  893  git commit -m""mejoras en filtro de OT
+  894  sudo git push origin master
+  895  cd ..
+  896  cd pxp
+  897  git status
+  898  git add -A
+  899  git commit -m"cambios ne proveedor"
+  900  sudo git push origin master
+  901  git status
+  902  cd ..
+  903  cd kerp_capacitacion/
+  904  git status
+  905  cd sis_contabilidad/
+  906  git status
+  907  git add .
+  908  git commit -m"ordenes de trabajo"
+  909  sudo git push origin master
+  910  cd ..
+  911  cd sis_migracion/
+  912  git status
+  913  git add .
+  914  git commit -m"problemas con caracteres especiales al generar comprobante"
+  915  sudo git push origin master
+  916  cd ..
+  917  cd sis_presupuestos/
+  918  git status
+  919  git add .
+  920  git commit -m"cambios listado de presupeustos"
+  921  sudo git push origin master
+  922  git branch
+  923  sudo git push origin develop
+  924  cd ..
+  925  cd kerp
+  926  cd pxp/
+  927  git pull origin master
+  928  git checkout -f
+  929  git pull origin master
+  930  cd ..
+  931  cd sis_tesoreria/
+  932  git checkout -f
+  933  git pull origin master
+  934  cd .
+  935  cd ..
+  936  cd sis_adquisiciones/
+  937  git checkout -f
+  938  git pull origin master
+  939  cd ..
+  940  cd sis_presupuestos/
+  941  git pull origin develop
+  942  cd ..
+  943  cd sis_contabilidad/
+  944  git pull origin master
+  945  git checkout -f
+  946  git pull origin master
+  947  cd ..
+  948  cd sis_migracion/
+  949  git checkout -f
+  950  git pull origin master
+  951  cd ..
+  952  cd pxp/utilidades/restaurar_bd/
+  953  su postgres -
+  954  cd ..
+  955  cd ,,
+  956  cd ..
+  957  cd sis_adquisiciones/
+  958  git pull origin master
+  959  cd ..
+  960  cd kerp_capacitacion/
+  961  git status
+  962  cd sis_adquisiciones/
+  963  git status
+  964  git push origin master
+  965  cd ..
+  966  cd kerp/sis_adquisiciones/
+  967  git pull origin master
+  968  cd ..
+  969  cd pxp/utilidades/restaurar_bd/
+  970  sudo git push origin master
+  971  su postgres -
+  972  cd ..
+  973  cd kerp_capacitacion/
+  974  cd sis_tesoreria/
+  975  git status
+  976  git add .
+  977  git commit -m"mejoras en boligaciones de pago"
+  978  sudo git push origin master
+  979  cd ..
+  980  cd kerp
+  981  cd sis_tesoreria/
+  982  git pull origin master
+  983  cd ..
+  984  cd pxp/utilidades/restaurar_bd/
+  985  su postgres -
+  986  cd /var/www/html/kerp_capacitacion/pxp
+  987  git status
+  988  pwd
+  989  git status
+  990  pwd
+  991  git status
+  992  cd sis_parametros/
+  993  cd ..
+  994  ls
+  995  cd pxp
+  996  cd sis_parametros/
+  997  cd ..
+  998  cd sis_proveedores/
+  999  ls
+ 1000  cd /var/www/html/kerp_capacitacion/
+ 1001  cd sis_adquisiciones/
+ 1002  git status
+ 1003  git add .
+ 1004  git commit -m"bug en ordenes de compra generadas desde el WF"
+ 1005  sudo git push origin master
+ 1006  ifconfig
+ 1007  fdisk
+ 1008  df -h
+ 1009  c d.
+ 1010  ls ---help
+ 1011  ls -h
+ 1012  ls --help
+ 1013  ls -lsa
+ 1014  ls -lsap
+ 1015  history | grep ls
+ 1016  lsa
+ 1017  ls -all
+ 1018  history
+ 1019  history >> hs.txt
