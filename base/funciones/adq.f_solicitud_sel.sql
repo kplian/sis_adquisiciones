@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION adq.f_solicitud_sel (
   p_administrador integer,
   p_id_usuario integer,
@@ -64,6 +62,17 @@ BEGIN
             if (v_parametros.id_funcionario_usu is null) then
               	v_parametros.id_funcionario_usu = -1;
             end if;
+            
+            IF  pxp.f_existe_parametro(p_tabla,'historico') THEN
+             
+             v_historico =  v_parametros.historico;
+            
+            ELSE
+            
+            v_historico = 'no';
+            
+            END IF;
+            
             IF p_administrador !=1  and lower(v_parametros.tipo_interfaz) = 'solicitudreq' THEN
                                         
               v_filtro = '(ew.id_funcionario='||v_parametros.id_funcionario_usu::varchar||'  or sol.id_usuario_reg='||p_id_usuario||' or sol.id_funcionario = '||v_parametros.id_funcionario_usu::varchar||') and ';
@@ -92,20 +101,13 @@ BEGIN
             
                        
                 v_filtro = ' (ew.id_funcionario  IN (select * FROM orga.f_get_funcionarios_x_usuario_asistente(now()::date,'||p_id_usuario||') AS (id_funcionario INTEGER))) and ';
-                
-                
+                IF v_historico =  'no' THEN
+                	v_filtro = v_filtro || ' lower(sol.estado)=''vbgerencia'' and ';
+                END IF;
             END IF;  
            
           
-           IF  pxp.f_existe_parametro(p_tabla,'historico') THEN
-             
-             v_historico =  v_parametros.historico;
-            
-            ELSE
-            
-            v_historico = 'no';
-            
-            END IF;
+           
             
             IF v_historico =  'si' THEN
             
@@ -232,6 +234,16 @@ BEGIN
 		begin
             v_filtro='';
             
+            IF  pxp.f_existe_parametro(p_tabla,'historico') THEN
+             
+             v_historico =  v_parametros.historico;
+            
+            ELSE
+            
+            v_historico = 'no';
+            
+            END IF;
+            
             if (v_parametros.id_funcionario_usu is null) then
             	v_parametros.id_funcionario_usu = -1;
             end if;
@@ -258,20 +270,15 @@ BEGIN
             END IF;
             
             IF  lower(v_parametros.tipo_interfaz) = 'solicitudvbasistente' THEN
+            
+                       
                 v_filtro = ' (ew.id_funcionario  IN (select * FROM orga.f_get_funcionarios_x_usuario_asistente(now()::date,'||p_id_usuario||') AS (id_funcionario INTEGER))) and ';
-            END IF;
-            
-            
-            IF  pxp.f_existe_parametro(p_tabla,'historico') THEN
-             
-             v_historico =  v_parametros.historico;
-            
-            ELSE
-            
-            v_historico = 'no';
-            
-            END IF;
-            
+                IF v_historico =  'no' THEN
+                	v_filtro = v_filtro || ' lower(sol.estado)=''vbgerencia'' and ';
+                END IF;
+            END IF;  
+                        
+                        
             IF v_historico =  'si' THEN
             
                v_inner =  'inner join wf.testado_wf ew on ew.id_proceso_wf = sol.id_proceso_wf';
