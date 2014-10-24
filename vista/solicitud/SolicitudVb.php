@@ -258,8 +258,6 @@ Phx.vista.SolicitudVb = {
 	confSigEstado :function() {                   
             var d= this.sm.getSelected().data;
             
-           alert('manda....')
-           
             if ( this.formEstado.getForm().isValid()){
                  Phx.CP.loadingShow();
                     Ext.Ajax.request({
