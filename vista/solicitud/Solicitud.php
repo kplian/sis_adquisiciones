@@ -496,7 +496,7 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
                 hiddenName: 'id_proveedor',
                 origen:'PROVEEDOR',
                 fieldLabel:'Proveedor Precotizacion',
-                allowBlank:true,
+                allowBlank:false,
                 tinit:false,
                 gwidth:200,
                 valueField: 'id_proveedor',
