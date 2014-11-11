@@ -288,18 +288,15 @@ p_hstore->'id_solicitud'
                      
                   END IF;
 
-                  
-                  
                   --modifca bandera de comprometido  
+                  
+               
                
                        update adq.tsolicitud  s set 
                          presu_comprometido =  'si',
-                         fecha_apro = now(),
-                         id_usuario_ai = p_id_usuario_ai,
-                         usuario_ai = p_usuario_ai,
-                         id_cargo_rpc = p_id_cargo,
-                         id_cargo_rpc_ai = p_id_cargo_ai,
-                         ai_habilitado = p_ai_habilitado
+                         fecha_apro = now()
+                         
+                         
                        where id_solicitud = p_id_solicitud;
             
             
@@ -307,9 +304,6 @@ p_hstore->'id_solicitud'
             END IF;
 
         
-          
-          
-          
           
            -- actualiza estado en la solicitud
           
@@ -319,8 +313,11 @@ p_hstore->'id_solicitud'
              id_funcionario_rpc=p_id_funcionario_rpc,
              id_usuario_mod=p_id_usuario,
              fecha_mod=now(),
+             id_cargo_rpc = p_id_cargo,
+             id_cargo_rpc_ai = p_id_cargo_ai,
              id_usuario_ai= p_id_usuario_ai,
-             usuario_ai = p_usuario_ai
+             usuario_ai = p_usuario_ai,
+             ai_habilitado = p_ai_habilitado
            where id_solicitud = p_id_solicitud;
            
       --Definicion de la respuesta

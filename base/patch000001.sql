@@ -525,16 +525,16 @@ IS 'lamacena las ot que pueden relacionarce con este el concepto de gasto';
 
 --------------- SQL ---------------
 
-DROP VIEW adq.vcotizacion;
+DROP VIEW IF EXISTS adq.vcotizacion;
 --------------- SQL ---------------
 
-DROP VIEW adq.vproceso_compra;
+DROP VIEW IF EXISTS adq.vproceso_compra;
 --------------- SQL ---------------
 
-DROP VIEW adq.vproceso_compra_wf;
+DROP VIEW IF EXISTS adq.vproceso_compra_wf;
 --------------- SQL ---------------
 
-DROP VIEW adq.vsolicitud_compra;
+DROP VIEW IF EXISTS adq.vsolicitud_compra;
 
 ALTER TABLE adq.tcotizacion_det
   ALTER COLUMN precio_unitario TYPE NUMERIC(19,3);

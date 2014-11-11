@@ -205,7 +205,9 @@ BEGIN
                sol.ai_habilitado,
                sol.id_uo,
                sol.id_categoria_compra,
-               sol.fecha_soli
+               sol.fecha_soli,
+               sol.estado,
+               sol.id_estado_wf
               
              INTO
                v_registros_sol
@@ -290,6 +292,11 @@ BEGIN
                       where id_solicitud = v_parametros.id_solicitud;
                   
                   --TODO segun el estado de la solicitud, si el RPC tiene un estado activo, cambiar el estado
+                  IF v_registros_sol.estado = 'vbrpc' THEN
+                       update  wf.testado_wf  set
+                           id_funcionario =  v_registros.id_funcionario
+                      where id_estado_wf = v_registros_sol.id_estado_wf;
+                  END IF;
                   
                   --TODO segun el estado de la cotizacion, si el RPC tiene un estado activo, cambiar el estado
                   else
