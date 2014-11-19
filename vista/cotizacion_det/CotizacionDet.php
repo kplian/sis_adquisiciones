@@ -336,7 +336,7 @@ Phx.vista.CotizacionDet=Ext.extend(Phx.gridInterfaz,{
 				allowBlank: true,
 				allowDecimals: true,
                 allowNegative:false,
-                decimalPrecision:3,
+                decimalPrecision:2,
 				anchor: '80%',
 				gwidth: 120,
 				maxLength:1245186

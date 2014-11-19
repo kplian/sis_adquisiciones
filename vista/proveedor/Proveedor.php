@@ -418,7 +418,7 @@ Phx.vista.Proveedor=Ext.extend(Phx.gridInterfaz,{
 				allowBlank: true,
 				anchor: '100%',
 				gwidth: 100,
-				maxLength:8
+				maxLength:18
 			},
 			type:'NumberField',
 			filters:{pfiltro:'per.ci',type:'string'},

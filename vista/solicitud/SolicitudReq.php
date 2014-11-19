@@ -192,15 +192,17 @@ Phx.vista.SolicitudReq = {
                 if(rec.json[0] == 'Bien' ||  rec.json[0] == 'Bien - Servicio'){
                 	this.Cmp.lugar_entrega.setValue('Alamcenes de Oficna Cochabamba');
                 	this.ocultarComponente(this.Cmp.fecha_inicio);
-                	this.mostrarComponente(this.Cmp.dias_plazo_entrega);
+                	this.Cmp.dias_plazo_entrega.allowBlank = false;
+                	
                 	
                 	
                  }
                 else{
                 	this.Cmp.lugar_entrega.setValue('');
                 	this.mostrarComponente(this.Cmp.fecha_inicio);
-                	this.ocultarComponente(this.Cmp.dias_plazo_entrega);
+                	this.Cmp.dias_plazo_entrega.allowBlank = true;
                 }
+                this.mostrarComponente(this.Cmp.dias_plazo_entrega);
               
            },this);
       
@@ -275,12 +277,13 @@ Phx.vista.SolicitudReq = {
        
            if(this.Cmp.tipo.getValue() == 'Bien' ||  this.Cmp.tipo.getValue() == 'Bien - Servicio'){
                 	this.ocultarComponente(this.Cmp.fecha_inicio);
-                	this.mostrarComponente(this.Cmp.dias_plazo_entrega);
+                	this.Cmp.dias_plazo_entrega.allowBlank = false;
             }
             else{
             	this.mostrarComponente(this.Cmp.fecha_inicio);
-            	this.ocultarComponente(this.Cmp.dias_plazo_entrega);
+            	this.Cmp.dias_plazo_entrega.allowBlank = true;
             }
+            this.mostrarComponente(this.Cmp.dias_plazo_entrega);
     },
     
     onFinalizarSol:function(){
