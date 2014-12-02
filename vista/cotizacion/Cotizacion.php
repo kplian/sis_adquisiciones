@@ -6,7 +6,6 @@
 *@date 21-03-2013 14:48:35
 *@description Archivo con la interfaz de usuario que permite la ejecucion de todas las funcionalidades del sistema
 */
-
 header("content-type: text/javascript; charset=UTF-8");
 ?>
 <script>
@@ -39,11 +38,10 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
                 tooltip: '<b>Documentos de la Solicitud</b><br/>Subir los documetos requeridos en la solicitud seleccionada.'
             }
         );
-          
-          this.Cmp.id_moneda.store.baseParams.id_moneda = this.maestro.id_moneda;
-								
-		 
-    },
+    
+        this.Cmp.id_moneda.store.baseParams.id_moneda = this.maestro.id_moneda;
+	
+	},
     
     addBotones: function() {
         this.menuAdq = new Ext.Toolbar.SplitButton({

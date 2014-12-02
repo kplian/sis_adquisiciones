@@ -528,7 +528,7 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
 		{
 			config:{
 				name: 'lugar_entrega',
-				fieldLabel: 'Lug. Entrega',
+				fieldLabel: 'Lugar Entrega',
 				qtip:'Proporcionar una buena descripcion para informar al proveedor, Ejm. Entrega en oficinas de aeropuerto Cochabamba, Jaime Rivera #28',
 				allowBlank: false,
 				anchor: '80%',

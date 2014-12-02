@@ -66,6 +66,13 @@ Phx.vista.CotizacionAdq = {
                     tooltip : '<b>Preingreso</b><br/><b>Generación del Preingreso</b>'
           });
           
+          this.addButton('btnObs',{
+                    text :'Obs Wf',
+                    iconCls : 'bchecklist',
+                    disabled: true,
+                    handler : this.onOpenObs,
+                    tooltip : '<b>OBservaciones</b><br/><b>Observaciones del WF</b>'
+          });
 		//RCM
         //this.addButton('btnObPag',{text :'Obligación Pago',iconCls:'bdocuments',disabled: true, handler : this.onButtonObPag,tooltip : '<b>Obligación de Pago</b><br/><b>Formulario para el registro de la Obligación de Pago</b>'});
            
@@ -572,6 +579,8 @@ Phx.vista.CotizacionAdq = {
                    this.getBoton('btnSolCon').disable();
                }
                
+               
+            this.getBoton('btnObs').enable();    
             this.getBoton('btnChequeoDocumentosWf').enable(); 
            
               
@@ -591,6 +600,7 @@ Phx.vista.CotizacionAdq = {
             this.getBoton('btnSendMail').disable(); 
             this.getBoton('btnPreing').disable();
             this.getBoton('btnRepOC').disable();
+            this.getBoton('btnObs').disable();  
            
             this.getBoton('btnChequeoDocumentosWf').disable();
             this.menuAdq.disable();
@@ -688,7 +698,28 @@ Phx.vista.CotizacionAdq = {
         resp.argument.wizard.panel.destroy()
         this.reload();
      },
-    
+     
+     onOpenObs:function() {
+            var rec=this.sm.getSelected();
+            
+            var data = {
+            	id_proceso_wf: rec.data.id_proceso_wf,
+            	id_estado_wf: rec.data.id_estado_wf,
+            	num_tramite: rec.data.num_tramite
+            }
+            
+            console.log(rec.data)
+            Phx.CP.loadWindows('../../../sis_workflow/vista/obs/Obs.php',
+                    'Observaciones del WF',
+                    {
+                        width:'80%',
+                        height:'70%'
+                    },
+                    data,
+                    this.idContenedor,
+                    'Obs'
+        )
+    },
     
 };
 </script>

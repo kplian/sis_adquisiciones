@@ -190,7 +190,7 @@ Phx.vista.SolicitudReq = {
                    this.Cmp.tipo_concepto.store.loadData(this.arrayStore[rec.json[0]]);
                }
                 if(rec.json[0] == 'Bien' ||  rec.json[0] == 'Bien - Servicio'){
-                	this.Cmp.lugar_entrega.setValue('Alamcenes de Oficna Cochabamba');
+                	this.Cmp.lugar_entrega.setValue('Almacenes de Oficina Cochabamba');
                 	this.ocultarComponente(this.Cmp.fecha_inicio);
                 	this.Cmp.dias_plazo_entrega.allowBlank = false;
                 	

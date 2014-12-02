@@ -63,9 +63,36 @@ Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
 	
 	},
 	
-	diagramGantt:function(){           
-            var data=this.sm.getSelected().data.id_proceso_wf;
+	diagramGantt:function(){  
+		
+		//window.open("../../../sis_workflow/vista/gantt/wfGantt.php");         
+            /*
+           var data = this.sm.getSelected().data.id_proceso_wf;
+           var rec = this.sm.getSelected();
+            Phx.CP.loadWindows('../../../sis_workflow/vista/gannt/gannt.php',
+                    'Diagrama Gannt',
+                    {
+                        width:'98%',
+                        height:'98%',
+                        bodyStyle:{"background-color":"white"},
+                    },
+                    rec.data,
+                    this.idContenedor,
+                    'DinamicGannt');*/
+                    
+                    
+          /* Phx.CP.openEmptyWindows('../../../sis_workflow/vista/gannt/repo.html',
+                    'Diagrama Gannt',
+                    {
+                        width:'98%',
+                        height:'98%'
+                    },
+                    { 'id_proceso_wf' : data },
+                    this.idContenedor);*/
+           
+           
             Phx.CP.loadingShow();
+            var data = this.sm.getSelected().data.id_proceso_wf;
             Ext.Ajax.request({
                 url:'../../sis_workflow/control/ProcesoWf/diagramaGanttTramite',
                 params:{'id_proceso_wf':data},
@@ -73,7 +100,11 @@ Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
                 failure: this.conexionFailure,
                 timeout:this.timeout,
                 scope:this
-            });         
+            });  
+            
+       
+            
+                   
     },
     
     onButtonSolicitud:function(){
@@ -594,8 +625,7 @@ Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
                     },
                     rec.data,
                     this.idContenedor,
-                    'CotizacionAdq'
-        )
+                    'CotizacionAdq');
     },
     
 	onCuadroComparativo: function(){
