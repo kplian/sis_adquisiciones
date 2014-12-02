@@ -225,7 +225,7 @@ Phx.vista.CotizacionDet=Ext.extend(Phx.gridInterfaz,{
 	    				}),
         	    valueField: 'id_solicitud_det',
         	    displayField: 'desc_concepto_ingas',
-        	    gdisplayField: 'desc_solicitud_det',
+        	    gdisplayField: 'descripcion_sol',
         	    hiddenName: 'id_solicitud_det',
         	    triggerAction: 'all',
         	    //queryDelay:1000,
