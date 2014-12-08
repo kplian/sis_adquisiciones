@@ -42,6 +42,7 @@ DECLARE
     v_monto_sg_mb numeric;
     v_precio_unitario_mb numeric;
     v_id_gestion integer;
+    v_registros_cig record;
     
     
 			    
@@ -74,12 +75,22 @@ BEGIN
             from adq.tsolicitud s
             where  s.id_solicitud = v_parametros.id_solicitud;
         
-        
-            --obtener partida, cuenta auxiliar del concepto de gasto
-             --recueprar la partida de la parametrizacion
-          v_id_partida = NULL;
+           --recupera el nombre del concepto de gasto
+           
+            select
+            cig.desc_ingas
+            into
+            v_registros_cig
+            from param.tconcepto_ingas cig
+            where cig.id_concepto_ingas =  v_parametros.id_concepto_ingas;
+         
+             --obtener partida, cuenta auxiliar del concepto de gasto
+             
+             v_id_partida = NULL;
           
-          SELECT 
+            --recueprar la partida de la parametrizacion
+        
+            SELECT 
               ps_id_partida ,
               ps_id_cuenta,
               ps_id_auxiliar
@@ -87,7 +98,7 @@ BEGIN
               v_id_partida,
               v_id_cuenta, 
               v_id_auxiliar
-          FROM conta.f_get_config_relacion_contable('CUECOMP', v_id_gestion, v_parametros.id_concepto_ingas, v_parametros.id_centro_costo);
+           FROM conta.f_get_config_relacion_contable('CUECOMP', v_id_gestion, v_parametros.id_concepto_ingas, v_parametros.id_centro_costo,  'No se encontro relación contable para el conceto de gasto: '||v_registros_cig.desc_ingas||'. <br> Mensaje: ');
           
         
         
@@ -207,11 +218,19 @@ BEGIN
             from adq.tsolicitud s
             where  s.id_solicitud = v_parametros.id_solicitud;
         
-             --obtener partida, cuenta auxiliar del concepto de gasto
+           
             
-        
-          
-          SELECT 
+           --recupera el nombre del concepto de gasto
+           
+            select
+            cig.desc_ingas
+            into
+            v_registros_cig
+            from param.tconcepto_ingas cig
+            where cig.id_concepto_ingas =  v_parametros.id_concepto_ingas;
+           
+            --obtener partida, cuenta auxiliar del concepto de gasto    
+            SELECT 
               ps_id_partida ,
               ps_id_cuenta,
               ps_id_auxiliar
@@ -219,7 +238,8 @@ BEGIN
               v_id_partida,
               v_id_cuenta, 
               v_id_auxiliar
-          FROM conta.f_get_config_relacion_contable('CUECOMP', v_id_gestion, v_parametros.id_concepto_ingas, v_parametros.id_centro_costo);
+          FROM conta.f_get_config_relacion_contable('CUECOMP', v_id_gestion, v_parametros.id_concepto_ingas, v_parametros.id_centro_costo,  'No se encontro relación contable para el conceto de gasto: '||v_registros_cig.desc_ingas||'. <br> Mensaje: ');
+          
           
         
         IF  v_id_partida  is NULL  THEN

@@ -86,11 +86,6 @@ class MODSolicitud extends MODbase{
 		$this->captura('fecha_inicio','date');
 		$this->captura('dias_plazo_entrega','integer');
 		
-		
-		
-		
-		
-		
 		//Ejecuta la instruccion
 		$this->armarConsulta();
 		$this->ejecutarConsulta();
@@ -246,6 +241,9 @@ class MODSolicitud extends MODbase{
         $this->setParametro('id_solicitud','id_solicitud','int4');
         $this->setParametro('id_funcionario_rpc','id_funcionario_rpc','int4');
         $this->setParametro('operacion','operacion','varchar');
+		$this->setParametro('id_estado_wf','id_estado_wf','int4');
+		
+		
 
         //Ejecuta la instruccion
         $this->armarConsulta();

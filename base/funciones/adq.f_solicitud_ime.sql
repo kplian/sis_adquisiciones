@@ -599,7 +599,7 @@ BEGIN
                                   
                      
                        v_cont = v_cont +1;
-                      
+                       
                        IF v_cont = 1 THEN
                  
                          v_resp =  adq.f_finalizar_reg_solicitud(
@@ -609,6 +609,7 @@ BEGIN
                                             v_parametros._nombre_usuario_ai,
                                             v_registros.id_funcionario, 
                                             v_parametros.id_solicitud,
+                                            v_parametros.id_estado_wf,
                                             v_registros.id_cargo,
                                             v_registros.id_cargo_ai,
                                             v_registros.ai_habilitado);
@@ -646,9 +647,13 @@ BEGIN
           
           ELSEIF  v_parametros.operacion = 'finalizar' THEN
           
-          
+           raise exception 'fin';
         
-             v_resp =  adq.f_finalizar_reg_solicitud(p_administrador, p_id_usuario, v_parametros.id_solicitud.v_parametros.id_funcionario_rpc, v_parametros.id_solicitud);
+             v_resp =  adq.f_finalizar_reg_solicitud(p_administrador, 
+                                           p_id_usuario, 
+                                           v_parametros.id_solicitud,
+                                           v_parametros.id_funcionario_rpc, 
+                                           v_parametros.id_solicitud);
         
         
          ELSE

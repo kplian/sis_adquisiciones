@@ -17,8 +17,8 @@ Phx.vista.SolicitudReq = {
 	
 	constructor: function(config) {
     		Phx.vista.SolicitudReq.superclass.constructor.call(this,config);
-    		this.addButton('fin_requerimiento',{text:'Finalizar',iconCls: 'badelante',disabled:true,handler:this.fin_requerimiento,tooltip: '<b>Finalizar</b>'});
-            this.addButton('btnSolpre',{text:'Sol Pre.',iconCls: 'bemail',disabled:true,handler:this.onSolModPresupuesto,tooltip: '<b>Solicitar Presuuesto</b><p>Emite un correo para solicitar traspaso presupuestario</p>'});
+    		this.addButton('fin_requerimiento',{ text:'Finalizar', iconCls: 'badelante', disabled: true, handler: this.fin_requerimiento, tooltip: '<b>Finalizar</b>'});
+            this.addButton('btnSolpre',{ text:'Sol Pre.',iconCls: 'bemail', disabled: true, handler: this.onSolModPresupuesto, tooltip: '<b>Solicitar Presuuesto</b><p>Emite un correo para solicitar traspaso presupuestario</p>'});
        
         
             this.iniciarEventos();
@@ -294,11 +294,11 @@ Phx.vista.SolicitudReq = {
                    Ext.Ajax.request({
                     // form:this.form.getForm().getEl(),
                     url:'../../sis_adquisiciones/control/Solicitud/finalizarSolicitud',
-                    params:{id_solicitud:d.id_solicitud,operacion:'finalizar',id_funcionario_rpc:this.cmbRPC.getValue()},
-                    success:this.successFinSol,
+                    params: { id_solicitud: d.id_solicitud, operacion:'finalizar', id_estado_wf: d.id_estado_wf, id_funcionario_rpc: this.cmbRPC.getValue() },
+                    success: this.successFinSol,
                     failure: this.conexionFailure,
-                    timeout:this.timeout,
-                    scope:this
+                    timeout: this.timeout,
+                    scope: this
                 }); 
             } 
      },
@@ -321,7 +321,7 @@ Phx.vista.SolicitudReq = {
         },
     
     
-    fin_requerimiento:function()
+       fin_requerimiento:function()
         {                   
             var d= this.sm.getSelected().data;
            
@@ -334,11 +334,11 @@ Phx.vista.SolicitudReq = {
             Ext.Ajax.request({
                 // form:this.form.getForm().getEl(),
                 url:'../../sis_adquisiciones/control/Solicitud/finalizarSolicitud',
-                params:{id_solicitud:d.id_solicitud,operacion:'verificar'},
-                success:this.successSinc,
+                params: { id_solicitud: d.id_solicitud, operacion:'verificar', id_estado_wf: d.id_estado_wf },
+                success: this.successSinc,
                 failure: this.conexionFailure,
-                timeout:this.timeout,
-                scope:this
+                timeout: this.timeout,
+                scope: this
             });     
         },
        successSinc:function(resp){

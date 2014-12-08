@@ -42,6 +42,14 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
             }
         );
         
+        this.addButton('btnObs',{
+                    text :'Obs Wf',
+                    iconCls : 'bchecklist',
+                    disabled: true,
+                    handler : this.onOpenObs,
+                    tooltip : '<b>Observaciones</b><br/><b>Observaciones del WF</b>'
+          });
+        
         
         
         
@@ -788,6 +796,7 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
         Phx.vista.Solicitud.superclass.preparaMenu.call(this,n);
         //this.getBoton('btnReporte').setDisabled(false); 
         this.getBoton('diagrama_gantt').enable();
+        this.getBoton('btnObs').enable(); 
         
         
         
@@ -801,6 +810,7 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
             //this.getBoton('btnChequeoDocumentos').setDisabled(true);
             this.getBoton('btnChequeoDocumentosWf').setDisabled(true);
             this.getBoton('diagrama_gantt').disable();  
+            this.getBoton('btnObs').disable(); 
               
                     
         }
@@ -872,8 +882,28 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
                         width:700,
                         height:500
                     },data ,this.idContenedor,'SolModPresupuesto');
-         },
-    
+     },
+    onOpenObs:function() {
+            var rec=this.sm.getSelected();
+            
+            var data = {
+            	id_proceso_wf: rec.data.id_proceso_wf,
+            	id_estado_wf: rec.data.id_estado_wf,
+            	num_tramite: rec.data.num_tramite
+            }
+            
+            console.log(rec.data)
+            Phx.CP.loadWindows('../../../sis_workflow/vista/obs/Obs.php',
+                    'Observaciones del WF',
+                    {
+                        width:'80%',
+                        height:'70%'
+                    },
+                    data,
+                    this.idContenedor,
+                    'Obs'
+        )
+    },
 
 	sortInfo:{
 		field: 'fecha_reg',

@@ -7,6 +7,7 @@ CREATE OR REPLACE FUNCTION adq.f_finalizar_reg_solicitud (
   p_usuario_ai varchar,
   p_id_funcionario_rpc integer,
   p_id_solicitud integer,
+  p_id_estado_wf_act integer,
   p_id_cargo integer = NULL::integer,
   p_id_cargo_ai integer = NULL::integer,
   p_ai_habilitado varchar = 'no'::character varying
@@ -263,7 +264,7 @@ p_hstore->'id_solicitud'
           
            v_id_estado_actual =  wf.f_registra_estado_wf(va_id_tipo_estado[1], 
                                                          v_id_funcionario_estado_sig, 
-                                                         v_id_estado_wf, 
+                                                         p_id_estado_wf_act, 
                                                          v_id_proceso_wf,
                                                          p_id_usuario,
                                                          p_id_usuario_ai,

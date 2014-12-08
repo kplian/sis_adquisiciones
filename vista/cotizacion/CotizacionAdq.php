@@ -71,7 +71,7 @@ Phx.vista.CotizacionAdq = {
                     iconCls : 'bchecklist',
                     disabled: true,
                     handler : this.onOpenObs,
-                    tooltip : '<b>OBservaciones</b><br/><b>Observaciones del WF</b>'
+                    tooltip : '<b>Observaciones</b><br/><b>Observaciones del WF</b>'
           });
 		//RCM
         //this.addButton('btnObPag',{text :'Obligación Pago',iconCls:'bdocuments',disabled: true, handler : this.onButtonObPag,tooltip : '<b>Obligación de Pago</b><br/><b>Formulario para el registro de la Obligación de Pago</b>'});
@@ -719,7 +719,7 @@ Phx.vista.CotizacionAdq = {
                     this.idContenedor,
                     'Obs'
         )
-    },
+    }
     
 };
 </script>
