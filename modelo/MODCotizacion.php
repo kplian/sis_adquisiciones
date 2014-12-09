@@ -442,7 +442,7 @@ class MODCotizacion extends MODbase{
 		$this->procedimiento='adq.f_cotizacion_sel';
 		$this->transaccion='ADQ_COTOC_REP';
 		$this->tipo_procedimiento='SEL';
-		
+		$this->setCount(false);	
 		$this->setParametro('id_cotizacion','id_cotizacion','int4');
 		$this->setParametro('id_proveedor','id_proveedor','int4');
 		$this->setParametro('id_proceso_wf','id_proceso_wf','int4');

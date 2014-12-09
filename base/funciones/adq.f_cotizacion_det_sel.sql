@@ -114,7 +114,73 @@ BEGIN
 			return v_consulta;
 
 		end;
+	/*********************************    
+ 	#TRANSACCION:  'ADQ_CTDAGR_SEL'
+ 	#DESCRIPCION:	Consulta de datos agrupados
+ 	#AUTOR:		Gonzalo Sarmiento Sejas	
+ 	#FECHA:		21-03-2013 21:44:43
+	***********************************/
+
+	elseif(p_transaccion='ADQ_CTDAGR_SEL')then
+     				
+    	begin
+    		--Sentencia de la consulta
+			v_consulta:='select
+						
+						ctd.estado_reg,
+						ctd.id_cotizacion,
+						ctd.precio_unitario,
+						sum(ctd.cantidad_adju) as cantidad_adju,
+						sum(ctd.cantidad_coti) as cantidad_coti,
+						ctd.obs,
+						cig.desc_ingas, 
+						sum(sold.cantidad) as cantidad_sol,
+                        sold.precio_unitario as precio_unitario_sol,
+                        sold.descripcion as descripcion_sol,
+                        ctd.precio_unitario_mb ,
+                        sold.precio_unitario_mb as precio_unitario_mb_sol,
+                        sold.revertido_mb,
+                        sold.revertido_mo		
+						from adq.tcotizacion_det ctd
+						inner join segu.tusuario usu1 on usu1.id_usuario = ctd.id_usuario_reg
+						left join segu.tusuario usu2 on usu2.id_usuario = ctd.id_usuario_mod
+				        inner join adq.tsolicitud_det sold on sold.id_solicitud_det=  ctd.id_solicitud_det
+				        inner join param.tconcepto_ingas cig on cig.id_concepto_ingas = sold.id_concepto_ingas
+						inner join param.vcentro_costo cc on cc.id_centro_costo = sold.id_centro_costo
+                        WHERE ctd.id_cotizacion = '||v_parametros.id_cotizacion||' 
+                         ';
+			
+			--Definicion de la respuesta
+			
+			v_consulta:=v_consulta||' GROUP BY
+                       
+                                          ctd.estado_reg,
+                                          ctd.id_cotizacion,
+                                          ctd.precio_unitario,
+                  						  ctd.obs,
+                  						  cig.desc_ingas, 
+                                          ctd.fecha_reg,
+                                          ctd.id_usuario_reg,
+                                          ctd.fecha_mod,
+                                          ctd.id_usuario_mod,
+                                          usu1.cuenta ,
+                                          usu2.cuenta ,
+                                          sold.precio_unitario,
+                                          sold.descripcion,
+                                          ctd.precio_unitario_mb ,
+                                          sold.precio_unitario_mb ,
+                                          sold.revertido_mb,
+                                          sold.revertido_mo
+                                    ORDER BY descripcion_sol asc';
+
+            raise notice '%',v_consulta;
+			--Devuelve la respuesta
+			return v_consulta;
+						
+		end;
+
 					
+	
 	else
 					     
 		raise exception 'Transaccion inexistente';
