@@ -390,6 +390,21 @@ Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
         },
         {
             config:{
+                name: 'objeto',
+                fieldLabel: 'Objeto',
+                allowBlank: true,
+                anchor: '80%',
+                gwidth: 100,
+                maxLength:500
+            },
+            type:'TextArea',
+            filters:{pfiltro:'objeto',type:'string'},
+            id_grupo:1,
+            grid:true,
+            form:true
+        },
+        {
+            config:{
                 name: 'num_cotizacion',
                 fieldLabel: 'num_cotizacion',
                 allowBlank: true,
@@ -526,7 +541,7 @@ Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
 		{name:'usr_mod', type: 'string'},
 		'desc_moneda','desc_funcionario',
 		'desc_uo','desc_depto','desc_solicitud','instruc_rpc',
-		'usr_aux','id_moneda','id_funcionario','desc_cotizacion'
+		'usr_aux','id_moneda','id_funcionario','desc_cotizacion','objeto'
 		
 	],
 	

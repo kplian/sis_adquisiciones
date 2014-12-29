@@ -581,7 +581,8 @@ BEGIN
        				cot.telefono_contacto,
        				cot.correo_contacto,
                     tppc.codigo as codigo_proceso,
-                    cot.forma_pago
+                    cot.forma_pago,
+                    pc.objeto
               from adq.tcotizacion cot 
               inner join param.vproveedor pv on pv.id_proveedor=cot.id_proveedor
               left join segu.tpersona per on per.id_persona=pv.id_persona

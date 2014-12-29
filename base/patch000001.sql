@@ -556,3 +556,16 @@ ALTER TABLE adq.tsolicitud_det
 
 /***********************************F-SCP-RAC-ADQ-0-21/10/2014****************************************/
 
+
+
+/***********************************I-SCP-RAC-ADQ-0-29/12/2014****************************************/
+
+--------------- SQL ---------------
+
+ALTER TABLE adq.tproceso_compra
+  ADD COLUMN objeto VARCHAR;
+
+COMMENT ON COLUMN adq.tproceso_compra.objeto
+IS 'Campo opcional para resumir el objeto del contrato, este campo se  refleja en la carta de adjudicacion';
+
+/***********************************F-SCP-RAC-ADQ-0-29/12/2014****************************************/

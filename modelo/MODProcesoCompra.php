@@ -51,6 +51,9 @@ class MODProcesoCompra extends MODbase{
 		$this->captura('id_funcionario','integer');
 		$this->captura('id_usuario_auxiliar','integer');
 		$this->captura('desc_cotizacion','text');
+		$this->captura('objeto','varchar');
+		
+		
 	 
 		
 		//Ejecuta la instruccion
@@ -170,6 +173,8 @@ function listarProcesoCompraPedido(){
 		$this->setParametro('estado','estado','varchar');
 		$this->setParametro('num_cotizacion','num_cotizacion','varchar');
 		$this->setParametro('id_depto_usuario','id_depto_usuario','integer');
+		$this->setParametro('objeto','objeto','varchar');
+		
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -199,6 +204,11 @@ function listarProcesoCompraPedido(){
 		$this->setParametro('estado_reg','estado_reg','varchar');
 		$this->setParametro('estado','estado','varchar');
 		$this->setParametro('num_cotizacion','num_cotizacion','varchar');
+		
+		
+		$this->setParametro('objeto','objeto','varchar');
+		
+		
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();

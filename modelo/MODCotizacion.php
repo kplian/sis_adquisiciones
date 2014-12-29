@@ -479,6 +479,7 @@ class MODCotizacion extends MODbase{
 		$this->captura('email_empresa','varchar');
 		$this->captura('codigo_proceso','varchar');		    
 		$this->captura('forma_pago','varchar');
+		$this->captura('objeto','varchar');
 		
 		$this->armarConsulta();
 		$this->ejecutarConsulta();

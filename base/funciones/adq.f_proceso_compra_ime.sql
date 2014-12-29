@@ -1,3 +1,5 @@
+--------------- SQL ---------------
+
 CREATE OR REPLACE FUNCTION adq.f_proceso_compra_ime (
   p_administrador integer,
   p_id_usuario integer,
@@ -239,7 +241,8 @@ BEGIN
 			fecha_mod,
 			id_usuario_mod,
             id_usuario_ai,
-            usuario_ai
+            usuario_ai,
+            objeto
           	) values(
 			v_parametros.id_depto,
 			'1',
@@ -258,7 +261,8 @@ BEGIN
 			null,
 			null,
             v_parametros._id_usuario_ai,
-            v_parametros._nombre_usuario_ai
+            v_parametros._nombre_usuario_ai,
+            v_parametros.objeto
 							
 			)RETURNING id_proceso_compra into v_id_proceso_compra;
             
@@ -367,15 +371,16 @@ BEGIN
 		begin
 			--Sentencia de la modificacion
 			update adq.tproceso_compra set
-			num_convocatoria = v_parametros.num_convocatoria,
-			fache_ini_proc = v_parametros.fache_ini_proc,
+			
+			fecha_ini_proc = v_parametros.fecha_ini_proc,
 			obs_proceso = v_parametros.obs_proceso,
 			codigo_proceso = v_parametros.codigo_proceso,
-		    num_cotizacion = v_parametros.num_cotizacion,
+		   
 			fecha_mod = now(),
 			id_usuario_mod = p_id_usuario,
             id_usuario_ai = v_parametros._id_usuario_ai,
-            usuario_ai =  v_parametros._nombre_usuario_ai
+            usuario_ai =  v_parametros._nombre_usuario_ai,
+            objeto = v_parametros.objeto
 			where id_proceso_compra=v_parametros.id_proceso_compra;
                
 			--Definicion de la respuesta

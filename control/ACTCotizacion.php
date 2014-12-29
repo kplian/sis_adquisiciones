@@ -9,6 +9,8 @@
 require_once(dirname(__FILE__).'/../../pxp/pxpReport/ReportWriter.php');
 require_once(dirname(__FILE__).'/../reportes/RCotizacion.php');
 require_once(dirname(__FILE__).'/../reportes/ROrdenCompra.php');
+require_once(dirname(__FILE__).'/../reportes/RCartaAdjudicacion.php');
+
 require_once(dirname(__FILE__).'/../../pxp/pxpReport/DataSource.php');
 
 include_once(dirname(__FILE__).'/../../lib/PHPMailer/class.phpmailer.php');
@@ -80,6 +82,119 @@ class ACTCotizacion extends ACTbase{
         $this->res=$this->objFunc->eliminarCotizacion($this->objParam);
         $this->res->imprimirRespuesta($this->res->generarJson());
     }
+	
+	function reporteCartaAdjudicacion( $create_file = false){
+		
+		        $dataSource = new DataSource();
+				$idSolicitud = $this->objParam->getParametro('id_solicitud');
+				$id_proceso_wf= $this->objParam->getParametro('id_proceso_wf');				
+                $this->objParam->addParametroConsulta('ordenacion','id_cotizacion');
+                $this->objParam->addParametroConsulta('dir_ordenacion','ASC');
+                $this->objParam->addParametroConsulta('cantidad',1000);
+                $this->objParam->addParametroConsulta('puntero',0);
+                $this->objFunc = $this->create('MODCotizacion');
+                $resultOrdenCompra = $this->objFunc->reporteOrdenCompra();
+				
+				if($resultOrdenCompra->getTipo()=='EXITO'){
+				 	
+					    $datosOrdenCompra = $resultOrdenCompra->getDatos();
+						
+		                //armamos el array parametros y metemos ahi los data sets de las otras tablas
+		                $dataSource->putParameter('id_proceso_compra', $datosOrdenCompra[0]['id_proceso_compra']);
+		                $dataSource->putParameter('desc_proveedor', $datosOrdenCompra[0]['desc_proveedor']);
+						$dataSource->putParameter('contacto', $datosOrdenCompra[0]['nombre_completo1']);
+						$dataSource->putParameter('celular_contacto', $datosOrdenCompra[0]['celular1']);
+						$dataSource->putParameter('email_contacto', $datosOrdenCompra[0]['email_empresa']);
+						$dataSource->putParameter('codigo_proceso', $datosOrdenCompra[0]['codigo_proceso']);
+						$dataSource->putParameter('forma_pago', $datosOrdenCompra[0]['forma_pago']);
+						$dataSource->putParameter('objeto', $datosOrdenCompra[0]['objeto']);
+		                
+		                if($datosOrdenCompra[0]['id_persona']!=''){
+		                    $dataSource->putParameter('direccion', $datosOrdenCompra[0]['dir_persona']);
+		                    $dataSource->putParameter('telefono1', $datosOrdenCompra[0]['telf1_persona']);
+		                    $dataSource->putParameter('telefono2', $datosOrdenCompra[0]['telf2_persona']);
+		                    $dataSource->putParameter('celular', $datosOrdenCompra[0]['cel_persona']);
+		                    $dataSource->putParameter('email', $datosOrdenCompra[0]['correo_persona']);
+		                     $dataSource->putParameter('fax', '');
+		                }
+		                
+		                if($datosOrdenCompra[0]['id_institucion']!=''){
+		                    $dataSource->putParameter('direccion', $datosOrdenCompra[0]['dir_institucion']);
+		                    $dataSource->putParameter('telefono1', $datosOrdenCompra[0]['telf1_institucion']);
+		                    $dataSource->putParameter('telefono2', $datosOrdenCompra[0]['telf2_institucion']);
+		                    $dataSource->putParameter('celular', $datosOrdenCompra[0]['cel_institucion']);
+		                    $dataSource->putParameter('email', $datosOrdenCompra[0]['email_institucion']);
+		                    $dataSource->putParameter('fax', $datosOrdenCompra[0]['fax_institucion']);
+		                  }
+		                $dataSource->putParameter('fecha_entrega', $datosOrdenCompra[0]['fecha_entrega']);
+		                $dataSource->putParameter('tiempo_entrega', $datosOrdenCompra[0]['tiempo_entrega']);
+		                $dataSource->putParameter('dias_entrega', $datosOrdenCompra[0]['dias_entrega']);
+		                $dataSource->putParameter('lugar_entrega', $datosOrdenCompra[0]['lugar_entrega']);
+		                $dataSource->putParameter('numero_oc', $datosOrdenCompra[0]['numero_oc']);
+		                $dataSource->putParameter('tipo_entrega', $datosOrdenCompra[0]['tipo_entrega']);
+		                $dataSource->putParameter('tipo', $datosOrdenCompra[0]['tipo']);
+		                $dataSource->putParameter('fecha_oc', $datosOrdenCompra[0]['fecha_oc']);
+		                $dataSource->putParameter('moneda', $datosOrdenCompra[0]['moneda']);
+		                $dataSource->putParameter('codigo_moneda', $datosOrdenCompra[0]['codigo_moneda']);
+						$dataSource->putParameter('num_tramite', $datosOrdenCompra[0]['num_tramite']);
+		
+		                //get detalle
+		                //Reset all extra params:
+		                $this->objParam->defecto('ordenacion', 'id_solicitud_det');
+		                $this->objParam->defecto('cantidad', 1000);
+		                $this->objParam->defecto('puntero', 0);
+						
+						$this->objParam->addParametro('id_cotizacion', $datosOrdenCompra[0]['id_cotizacion'] );
+		
+		                $modCotizacionDet = $this->create('MODCotizacionDet');
+		                $resultCotizacionDet = $modCotizacionDet->listarCotizacionDetReporte();
+						
+						if($resultCotizacionDet->getTipo() == 'EXITO'){
+					                //$solicitudDetAgrupado = $this->groupArray($resultSolicitudDet->getDatos(), 'codigo_partida','desc_centro_costo');
+					                $cotizacionDetDataSource = new DataSource();
+					                $cotizacionDetDataSource->setDataSet($resultCotizacionDet->getDatos());
+					                $dataSource->putParameter('detalleDataSource', $cotizacionDetDataSource);
+					
+					                //build the report
+					                $reporte = new ROrdenCompra();
+					                $reporte->setDataSource($dataSource);
+					                if($datosOrdenCompra[0]['tipo']=='Bien')
+					                    $nombreArchivo = 'OrdenCompra.pdf';
+					                else
+					                if($datosOrdenCompra[0]['tipo']=='Servicio')
+					                    $nombreArchivo = 'OrdenServicio.pdf';
+					                else
+					                $nombreArchivo = 'OrdenCompraServicio.pdf';
+					
+					                //build the report
+						            $reporte = new RCartaAdjudicacion();
+						            $reporte->setDataSource($dataSource);
+						            $nombreArchivo = 'carta.docx';
+						            $reporte->write(dirname(__FILE__).'/../../reportes_generados/'.$nombreArchivo);
+						    
+						            
+					                $mensajeExito = new Mensaje();
+					                $mensajeExito->setMensaje('EXITO','Reporte.php','Reporte generado',
+					                'Se generó con éxito el reporte: '.$nombreArchivo,'control');
+					                $mensajeExito->setArchivoGenerado($nombreArchivo);
+					                $this->res = $mensajeExito;
+					                $this->res->imprimirRespuesta($this->res->generarJson());
+						            
+						}
+				       else{
+				            $resultCotizacionDet->imprimirRespuesta($resultCotizacionDet->generarJson());
+				       }
+			   }
+		       else{
+		                
+		             $resultOrdenCompra->imprimirRespuesta($resultOrdenCompra->generarJson());
+		       }
+            
+    
+           
+            
+
+        }
 
    function reporteCotizacion($create_file=false){
             $dataSource = new DataSource();

@@ -98,7 +98,8 @@ BEGIN
                               id_moneda,
                               id_funcionario,
                               id_usuario_auxiliar,
-                              desc_cotizacion 
+                              desc_cotizacion,
+                              objeto 
                          
                    from adq.vproceso_compra  
                    where  '||v_filadd||'  ';

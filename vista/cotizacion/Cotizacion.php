@@ -63,6 +63,12 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
                 tooltip: '<b>Reporte de Orden de Compra</b>',
                 handler:this.onButtonRepOC,
                 scope: this
+            }, {
+                id:'b-btnRepCarta-' + this.idContenedor,
+                text: 'Carta de Adjudicación',
+                tooltip: '<b>Plantilla de la carta de adjudicación</b>',
+                handler:this.onButtonCartaAdj,
+                scope: this
             }
         ]}
         });
@@ -640,6 +646,22 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
 		direction: 'ASC'
 	},
 	
+	onButtonCartaAdj: function(){
+                var rec=this.sm.getSelected();
+                Ext.Ajax.request({
+                    url:'../../sis_adquisiciones/control/Cotizacion/reporteCartaAdjudicacion',
+                    params: {'id_proceso_wf':rec.data.id_proceso_wf},
+                    success: this.successExport,
+                    failure: function() {
+                        alert("fail");
+                    },
+                    timeout: function() {
+                        alert("timeout");
+                    },
+                    scope:this
+                });
+        },
+	
 	onButtonRepOC: function(){
                 var rec=this.sm.getSelected();
                 Ext.Ajax.request({
@@ -727,5 +749,3 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
 	}
 )
 </script>
-		
-		
