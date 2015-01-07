@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION adq.f_lista_depto_tesoreria_wf_sel (
   p_id_usuario integer,
   p_id_tipo_estado integer,
@@ -70,31 +68,61 @@ DECLARE
     v_uos_eps varchar;
     v_size    integer;
     v_i       integer;
+    v_codigo_subsistema	varchar;
+    v_id_tabla		integer;
 
 BEGIN
   v_nombre_funcion ='adq.f_lista_depto_tesoreria_wf_sel';
 
     --recuperamos la cotizacion a partir del id_estado_wf
+    select sub.codigo into v_codigo_subsistema
+    from wf.testado_wf e
+    inner join wf.tproceso_wf p on p.id_proceso_wf = e.id_proceso_wf
+    inner join wf.ttipo_proceso tp on tp.id_tipo_proceso = p.id_tipo_proceso
+    inner join wf.tproceso_macro pm on pm.id_proceso_macro = tp.id_proceso_macro
+    inner join segu.tsubsistema sub on sub.id_subsistema = pm.id_subsistema
+    where e.id_estado_wf = p_id_estado_wf;
     
-    select 
-      c.id_cotizacion
-    into
-      v_id_cotizacion
-    from adq.tcotizacion c
-    where c.id_estado_wf = p_id_estado_wf;
-    
-    --recuperamos las uo y ep de items adjudicados de la cotizacion 
-    select 
+    if (v_codigo_subsistema = 'ADQ') then
+          select 
+            c.id_cotizacion
+          into
+            v_id_cotizacion
+          from adq.tcotizacion c
+          where c.id_estado_wf = p_id_estado_wf;
+          
+          --recuperamos las uo y ep de items adjudicados de la cotizacion 
+          select 
+                  pxp.list(cc.id_uo::text),
+                  pxp.list(cc.id_ep::text)
+                into
+                  v_cad_uo,
+                  v_cad_ep
+                from adq.tcotizacion_det cd
+                inner join adq.tsolicitud_det sd on sd.id_solicitud_det = cd.id_solicitud_det
+                inner join param.tcentro_costo cc on sd.id_centro_costo = cc.id_centro_costo
+                where cd.id_cotizacion = v_id_cotizacion 
+                and cd.estado_reg = 'activo' and cd.cantidad_adju > 0;
+        ELSE
+        	select 
+              p.id_planilla
+            into
+              v_id_tabla
+            from plani.tplanilla p
+            where p.id_estado_wf = p_id_estado_wf;
+            
+            --recuperamos las uo y ep de items adjudicados de la cotizacion 
+            select 
               pxp.list(cc.id_uo::text),
               pxp.list(cc.id_ep::text)
             into
               v_cad_uo,
               v_cad_ep
-            from adq.tcotizacion_det cd
-            inner join adq.tsolicitud_det sd on sd.id_solicitud_det = cd.id_solicitud_det
-            inner join param.tcentro_costo cc on sd.id_centro_costo = cc.id_centro_costo
-            where cd.id_cotizacion = v_id_cotizacion 
-            and cd.estado_reg = 'activo' and cd.cantidad_adju > 0;
+            from plani.tplanilla p
+            inner join plani.tconsolidado c on c.id_planilla = p.id_planilla
+            inner join param.tcentro_costo cc on c.id_presupuesto = cc.id_centro_costo
+            where p.id_planilla = v_id_tabla;
+        end if;
     
           raise notice '>>>> %,%',v_cad_uo,v_cad_ep;
    
