@@ -77,7 +77,7 @@ Phx.vista.SolicitudDet=Ext.extend(Phx.gridInterfaz,{
                             totalProperty: 'total',
                             fields: ['id_concepto_ingas','tipo','desc_ingas','movimiento','desc_partida','id_grupo_ots','filtro_ot','requiere_ot'],
                             remoteSort: true,
-                            baseParams:{par_filtro:'desc_ingas#par.codigo#par.nombre_partida',movimiento:'gasto', autorizacion: 'pago_directo'}
+                            baseParams:{par_filtro:'desc_ingas#par.codigo#par.nombre_partida',movimiento:'gasto', autorizacion: 'adquisiciones'}
                 }),
                 valueField: 'id_concepto_ingas',
                displayField: 'desc_ingas',
