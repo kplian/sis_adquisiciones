@@ -634,6 +634,23 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
 		},
 		{
 			config:{
+				name: 'obs_presupuestos',
+				fieldLabel: 'Obs Presupuestos',
+				allowBlank: true,
+				anchor: '80%',
+				gwidth: 200,
+				maxLength:500
+			},
+			type:'Field',
+			filters:{pfiltro:'sol.obs_presupuestos',type:'string'},
+			id_grupo:1,
+			grid:true,
+			form:false
+		},
+		
+		
+		{
+			config:{
 				name: 'estado_reg',
 				fieldLabel: 'Estado Reg.',
 				allowBlank: true,
@@ -766,7 +783,7 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
 		'ai_habilitado',
 		'tipo_concepto',
 		'revisado_asistente',
-		{name:'fecha_inicio', type: 'date',dateFormat:'Y-m-d'},'dias_plazo_entrega'
+		{name:'fecha_inicio', type: 'date',dateFormat:'Y-m-d'},'dias_plazo_entrega', 'obs_presupuestos'
 		
 	],
 	

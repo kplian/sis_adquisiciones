@@ -569,3 +569,15 @@ COMMENT ON COLUMN adq.tproceso_compra.objeto
 IS 'Campo opcional para resumir el objeto del contrato, este campo se  refleja en la carta de adjudicacion';
 
 /***********************************F-SCP-RAC-ADQ-0-29/12/2014****************************************/
+
+/***********************************I-SCP-RAC-ADQ-0-11/01/2015****************************************/
+
+--------------- SQL ---------------
+
+ALTER TABLE adq.tsolicitud
+  ADD COLUMN obs_presupuestos VARCHAR;
+
+COMMENT ON COLUMN adq.tsolicitud.obs_presupuestos
+IS 'Observaciones del area de presupuesto que se van concatenando cada vez que pasa por el estado vbpresupeustos del WF';
+
+/***********************************F-SCP-RAC-ADQ-0-11/01/2015****************************************/

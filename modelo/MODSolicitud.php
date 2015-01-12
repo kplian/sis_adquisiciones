@@ -81,10 +81,12 @@ class MODSolicitud extends MODbase{
 		$this->captura('id_cargo_rpc','integer');
 		$this->captura('id_cargo_rpc_ai','integer');
 		$this->captura('tipo_concepto','varchar');
-		$this->captura('revisado_asistente','varchar');
-		
+		$this->captura('revisado_asistente','varchar');		
 		$this->captura('fecha_inicio','date');
 		$this->captura('dias_plazo_entrega','integer');
+		$this->captura('obs_presupuestos','varchar');
+		
+		  
 		
 		//Ejecuta la instruccion
 		$this->armarConsulta();

@@ -683,11 +683,13 @@ BEGIN
           select
             s.id_proceso_wf,
             s.fecha_soli,
-            s.numero
+            s.numero,
+            s.estado
           into 
             v_id_proceso_wf,
             v_fecha_soli,
-            v_numero_sol
+            v_numero_sol,
+            v_estado_actual
             
           from adq.tsolicitud s
           where s.id_solicitud=v_parametros.id_solicitud;
@@ -830,7 +832,7 @@ BEGIN
                --------------------------------------------------
            ELSEIF  v_parametros.operacion = 'cambiar' THEN
           
-          
+           
                     
                     -- obtener datos tipo estado
                     
@@ -921,7 +923,15 @@ BEGIN
                                                                    v_tipo_noti,
                                                                    v_titulo);
                     
+                  
                    
+                     IF v_estado_actual = 'vbpresupuestos' THEN
+                           update adq.tsolicitud  s set 
+                            obs_presupuestos = v_parametros.obs ||COALESCE(',('||obs_presupuestos||')','')
+                           where id_solicitud = v_parametros.id_solicitud;
+                     
+                     END IF;
+                  
                      IF  not adq.f_fun_inicio_solicitud_wf(p_id_usuario, 
                                                    v_parametros._id_usuario_ai, 
                                                    v_parametros._nombre_usuario_ai, 
