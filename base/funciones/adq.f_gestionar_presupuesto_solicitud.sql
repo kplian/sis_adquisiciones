@@ -1,3 +1,5 @@
+--------------- SQL ---------------
+
 CREATE OR REPLACE FUNCTION adq.f_gestionar_presupuesto_solicitud (
   p_id_solicitud_compra integer,
   p_id_usuario integer,
@@ -49,6 +51,8 @@ DECLARE
   
   v_men_presu			varchar;
   v_monto_a_revertir_mb  numeric;
+  v_ano_1 integer;
+  v_ano_2 integer;
   
 
   
@@ -76,7 +80,8 @@ BEGIN
                               p.id_presupuesto,
                               s.presu_comprometido,
                               s.id_moneda,
-                              sd.precio_ga
+                              sd.precio_ga,
+                              s.fecha_soli
                               
                               FROM  adq.tsolicitud s 
                               INNER JOIN adq.tsolicitud_det sd on s.id_solicitud = sd.id_solicitud
@@ -107,7 +112,24 @@ BEGIN
                     va_columna_relacion[v_i]= 'id_solicitud_compra';
                     va_fk_llave[v_i] = v_registros.id_solicitud;
                     va_id_solicitud_det[v_i]= v_registros.id_solicitud_det;
-                    va_fecha[v_i]=now()::date;
+                    
+                    
+                   
+                    -- la fecha de solictud es la fecha de compromiso 
+                    IF  now()  < v_registros.fecha_soli THEN
+                      va_fecha[v_i] = v_registros.fecha_soli::date;
+                    ELSE
+                       -- la fecha de reversion como maximo puede ser el 31 de diciembre   
+                       va_fecha[v_i] = now()::date;
+                       v_ano_1 =  EXTRACT(YEAR FROM  now()::date);
+                       v_ano_2 =  EXTRACT(YEAR FROM  v_registros.fecha_soli::date);
+                       
+                       IF  v_ano_1  >  v_ano_2 THEN
+                         va_fecha[v_i] = ('31-12-'|| v_ano_2::varchar)::date;
+                       END IF;
+                    END IF;
+                    
+                   
              
              
              END LOOP;
@@ -168,7 +190,8 @@ BEGIN
                               sd.revertido_mb,
                               sd.revertido_mo,
                               s.id_moneda,
-                              sd.precio_ga
+                              sd.precio_ga,
+                              s.fecha_soli
                               
                               FROM  adq.tsolicitud s 
                               INNER JOIN adq.tsolicitud_det sd on s.id_solicitud = sd.id_solicitud and sd.estado_reg = 'activo'
@@ -214,7 +237,22 @@ BEGIN
                         va_columna_relacion[v_i]= 'id_solicitud_compra';
                         va_fk_llave[v_i] = v_registros.id_solicitud;
                         va_id_solicitud_det[v_i]= v_registros.id_solicitud_det;
-                        va_fecha[v_i]=now()::date;
+                        
+                        
+                         -- la fecha de solictud es la fecha de compromiso 
+                        IF  now()  < v_registros.fecha_soli THEN
+                          va_fecha[v_i] = v_registros.fecha_soli::date;
+                        ELSE
+                           -- la fecha de reversion como maximo puede ser el 31 de diciembre   
+                           va_fecha[v_i] = now()::date;
+                           v_ano_1 =  EXTRACT(YEAR FROM  now()::date);
+                           v_ano_2 =  EXTRACT(YEAR FROM  v_registros.fecha_soli::date);
+                           
+                           IF  v_ano_1  >  v_ano_2 THEN
+                             va_fecha[v_i] = ('31-12-'|| v_ano_2::varchar)::date;
+                           END IF;
+                        END IF;
+                    
                         
                     END IF;
                     
@@ -324,7 +362,22 @@ BEGIN
                                 va_columna_relacion[v_i]= 'id_solicitud_compra';
                                 va_fk_llave[v_i] = v_registros.id_solicitud;
                                 va_id_solicitud_det[v_i]= v_registros.id_solicitud_det;
-                                va_fecha[v_i]=now()::date;
+                                
+                                
+                                
+                                 -- la fecha de solictud es la fecha de compromiso 
+                                IF  now()  < v_registros.fecha_soli THEN
+                                  va_fecha[v_i] = v_registros.fecha_soli::date;
+                                ELSE
+                                   -- la fecha de reversion como maximo puede ser el 31 de diciembre   
+                                   va_fecha[v_i] = now()::date;
+                                   v_ano_1 =  EXTRACT(YEAR FROM  now()::date);
+                                   v_ano_2 =  EXTRACT(YEAR FROM  v_registros.fecha_soli::date);
+                                   
+                                   IF  v_ano_1  >  v_ano_2 THEN
+                                     va_fecha[v_i] = ('31-12-'|| v_ano_2::varchar)::date;
+                                   END IF;
+                                END IF;
                                 
                                  -- actualizamos  el total revertido
                                  

@@ -412,6 +412,16 @@ Phx.vista.SolicitudApro = {
                         width: 350,
                         maxLength:500   
                         
+                    },
+					 {
+                        xtype: 'textarea',
+                        name: 'objeto',
+                        fieldLabel: 'Objeto',
+                        allowBlank: true,
+                        anchor: '90%',
+                        width: 350,
+                        maxLength:500   
+                        
                     }
                     
                     ]
