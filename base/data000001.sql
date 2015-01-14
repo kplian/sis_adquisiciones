@@ -820,3 +820,12 @@ select pxp.f_delete_trol ('OP - VoBo Plan de PAgos');
 
 
 
+/***********************************I-DAT-RAC-ADQ-0-14/01/2015*****************************************/
+
+select pxp.f_insert_tgui ('Visto Bueno Solicitud (Presupuestos)', 'Visto Bueno Solicitud (Presupuestos)', 'VBSOLP', 'si', 7, 'sis_adquisiciones/vista/solicitud/SolicitudVbPresupuesto.php', 2, '', 'SolicitudVbPresupuesto', 'ADQ');
+select pxp.f_insert_testructura_gui ('VBSOLP', 'ADQ');
+
+/***********************************F-DAT-RAC-ADQ-0-14/01/2015*****************************************/
+
+
+

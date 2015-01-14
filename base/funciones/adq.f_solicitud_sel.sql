@@ -1,3 +1,5 @@
+--------------- SQL ---------------
+
 CREATE OR REPLACE FUNCTION adq.f_solicitud_sel (
   p_administrador integer,
   p_id_usuario integer,
@@ -95,6 +97,11 @@ BEGIN
                 
             END IF;
             
+            --la interface de vbpresupuestos mustra todas las solcitudes no importa el funcionario asignado
+            IF  lower(v_parametros.tipo_interfaz) = 'solicitudvbpresupuestos' THEN
+                 v_filtro = ' (lower(sol.estado)=''vbpresupuestos'' ) and ';
+            END IF;
+            
             
             
             IF  lower(v_parametros.tipo_interfaz) = 'solicitudvbasistente' THEN
@@ -132,7 +139,7 @@ BEGIN
              END IF;
            
         
-        
+       
         
     		--Sentencia de la consulta
 			v_consulta:='select
@@ -188,7 +195,8 @@ BEGIN
                         sol.tipo_concepto,
                         sol.revisado_asistente,
                         sol.fecha_inicio,
-                        sol.dias_plazo_entrega
+                        sol.dias_plazo_entrega,
+                        sol.obs_presupuestos
                         	
 						from adq.tsolicitud sol
 						inner join segu.tusuario usu1 on usu1.id_usuario = sol.id_usuario_reg
@@ -213,7 +221,7 @@ BEGIN
 			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;
 			v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
-
+ 
              raise notice '%',v_consulta;
 			--Devuelve la respuesta
 			return v_consulta;
@@ -325,7 +333,7 @@ BEGIN
 			
 			--Definicion de la respuesta		   
 			v_consulta:=v_consulta||v_parametros.filtro;
-
+            -- 
 			--Devuelve la respuesta
 			return v_consulta;
 

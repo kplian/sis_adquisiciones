@@ -215,6 +215,26 @@ class MODSolicitud extends MODbase{
 		//Devuelve la respuesta
 		return $this->respuesta;
 	}
+
+    function modificarObsPresupuestos(){
+		//Definicion de variables para ejecucion del procedimiento
+		$this->procedimiento='adq.f_solicitud_ime';
+		$this->transaccion='ADQ_MODOBS_MOD';
+		$this->tipo_procedimiento='IME';
+				
+		//Define los parametros para la funcion
+		$this->setParametro('id_solicitud','id_solicitud','int4');
+		$this->setParametro('obs','obs','varchar');
+
+		//Ejecuta la instruccion
+		$this->armarConsulta();
+		$this->ejecutarConsulta();
+
+		//Devuelve la respuesta
+		return $this->respuesta;
+	}
+
+
 	
 	function marcarRevisadoSol(){
 		//Definicion de variables para ejecucion del procedimiento

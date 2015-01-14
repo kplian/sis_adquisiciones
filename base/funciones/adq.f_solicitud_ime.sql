@@ -927,7 +927,7 @@ BEGIN
                    
                      IF v_estado_actual = 'vbpresupuestos' THEN
                            update adq.tsolicitud  s set 
-                            obs_presupuestos = v_parametros.obs ||COALESCE(',('||obs_presupuestos||')','')
+                            obs_presupuestos = v_parametros.obs
                            where id_solicitud = v_parametros.id_solicitud;
                      
                      END IF;
@@ -1172,6 +1172,31 @@ BEGIN
         
         end;
     
+    /*********************************    
+ 	#TRANSACCION:  'ADQ_MODOBS_MOD'
+ 	#DESCRIPCION:	Modificar observacion de área de presupuestos
+ 	#AUTOR:		RAC	
+ 	#FECHA:		19-02-2013 12:12:51
+	***********************************/
+
+	elsif(p_transaccion='ADQ_MODOBS_MOD')then
+
+		begin
+			--Sentencia de la modificacion
+			update adq.tsolicitud set
+			obs_presupuestos = v_parametros.obs
+			where id_solicitud = v_parametros.id_solicitud;
+               
+			--Definicion de la respuesta
+            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','obs de presupuestos modificada'); 
+            v_resp = pxp.f_agrega_clave(v_resp,'id_solicitud',v_parametros.id_solicitud::varchar);
+               
+            --Devuelve la respuesta
+            return v_resp;
+            
+		end;
+        
+        
     else
      
     	raise exception 'Transaccion inexistente: %',p_transaccion;
