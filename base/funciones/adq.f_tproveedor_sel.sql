@@ -76,11 +76,16 @@ BEGIN
                         	person.nombre_completo1
                         end):: varchar as nombre_proveedor,
                         provee.rotulo_comercial,
-                        person.ci
-						from param.tproveedor provee
+                        person.ci,
+                        (case when person.id_persona is null then
+                        	instit.direccion
+                        else
+                        	person.direccion
+                        end):: varchar as desc_dir_proveedor
+                        from param.tproveedor provee
 						inner join segu.tusuario usu1 on usu1.id_usuario = provee.id_usuario_reg
 						left join segu.tusuario usu2 on usu2.id_usuario = provee.id_usuario_mod   
-                        left join segu.vpersona person on person.id_persona=provee.id_persona
+                        left join segu.vpersona2 person on person.id_persona=provee.id_persona
                         left join param.tinstitucion instit on instit.id_institucion=provee.id_institucion
                         left join param.tlugar lug on lug.id_lugar = provee.id_lugar
 				        where '||v_where||' and ';
@@ -109,7 +114,7 @@ BEGIN
 					    from param.tproveedor provee
 						inner join segu.tusuario usu1 on usu1.id_usuario = provee.id_usuario_reg
 						left join segu.tusuario usu2 on usu2.id_usuario = provee.id_usuario_mod   
-                        left join segu.vpersona person on person.id_persona=provee.id_persona
+                        left join segu.vpersona2 person on person.id_persona=provee.id_persona
                         left join param.tinstitucion instit on instit.id_institucion=provee.id_institucion
                         left join param.tlugar lug on lug.id_lugar = provee.id_lugar
 				        where '||v_where||' and ';

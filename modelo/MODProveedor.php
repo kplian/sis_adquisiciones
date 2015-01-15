@@ -44,6 +44,9 @@ class MODProveedor extends MODbase{
 		$this->captura('nombre_proveedor','varchar');
 		$this->captura('rotulo_comercial','varchar');
 		$this->captura('ci','varchar');
+		$this->captura('desc_dir_proveedor','varchar');
+		
+		
 				
 		//Ejecuta la instruccion
 		$this->armarConsulta();

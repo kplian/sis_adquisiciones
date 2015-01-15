@@ -365,6 +365,21 @@ Phx.vista.Proveedor=Ext.extend(Phx.gridInterfaz,{
 			id_grupo:0,
 			grid:true,
 			form:true
+		},		
+		{
+			config:{
+				name: 'desc_dir_proveedor',
+				fieldLabel: 'Dirección',
+				allowBlank: true,
+				anchor: '100%',
+				gwidth: 200,
+				maxLength:50
+			},
+			type:'Field',
+			filters:{pfiltro:'instit.direccion#person.direccion',type:'string'},
+			id_grupo:2,
+			grid:true,
+			form:false
 		},
 		{
 			config:{
@@ -784,6 +799,8 @@ Phx.vista.Proveedor=Ext.extend(Phx.gridInterfaz,{
 			grid:false,
 			form:true
 		}
+		
+		
 	],
 	title:'Proveedores',
 	ActSave:'../../sis_adquisiciones/control/Proveedor/insertarProveedor',
@@ -811,7 +828,7 @@ Phx.vista.Proveedor=Ext.extend(Phx.gridInterfaz,{
 		{name:'lugar', type: 'string'},
 		{name:'pais', type: 'string'},
 		{name:'rotulo_comercial', type: 'string'},
-		{name:'nombre_proveedor', type: 'string'},'ci'
+		{name:'nombre_proveedor', type: 'string'},'ci', 'desc_dir_proveedor'
 	],
 	
 	cmbProveedor:new Ext.form.ComboBox({
