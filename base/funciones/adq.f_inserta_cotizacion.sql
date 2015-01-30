@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION adq.f_inserta_cotizacion (
   p_administrador integer,
   p_id_usuario integer,
@@ -295,7 +293,7 @@ BEGIN
             END IF;
             
             IF  v_tiempo_entrega is NULL or v_tiempo_entrega = '' THEN
-               v_tiempo_entrega  = v_dias_plazo_entrega_sol||' días de recibida la presente orden';
+               v_tiempo_entrega  = v_dias_plazo_entrega_sol||' días de emitida la presente orden';
              END IF;
             
             --lugar de entrega

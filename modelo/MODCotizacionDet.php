@@ -95,7 +95,8 @@ class MODCotizacionDet extends MODbase{
 		$this->setParametro('cantidad_coti','cantidad_coti','numeric');
 		$this->setParametro('obs','obs','varchar');
 		$this->setParametro('id_solicitud_det','id_solicitud_det','int4');
-
+		$this->setParametro('descripcion_sol','descripcion_sol','text');
+		
 		//Ejecuta la instruccion
 		$this->armarConsulta();
 		$this->ejecutarConsulta();
