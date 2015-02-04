@@ -276,6 +276,7 @@ Phx.vista.CotizacionDet=Ext.extend(Phx.gridInterfaz,{
             filters:{pfiltro:'sold.descripcion',type:'string'},
             id_grupo:1,
             grid:true,
+            egrid:true,
             form:true
         },
         {
@@ -529,7 +530,7 @@ Phx.vista.CotizacionDet=Ext.extend(Phx.gridInterfaz,{
         this.cmbSolicitudDet=this.getComponente('id_solicitud_det');
         
          this.cmpDescripcionSol=this.getComponente('descripcion_sol');
-         this.cmpDescripcionSol.disable();
+         //this.cmpDescripcionSol.disable();
        
          
           this.cmbSolicitudDet.on('select',function(c,d){

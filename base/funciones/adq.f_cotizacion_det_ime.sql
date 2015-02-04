@@ -255,7 +255,12 @@ BEGIN
             id_usuario_ai = v_parametros._id_usuario_ai,
             usuario_ai = v_parametros._nombre_usuario_ai
 			where id_cotizacion_det=v_parametros.id_cotizacion_det;
-               
+			
+			
+			update adq.tsolicitud_det 
+			set descripcion = v_parametros.descripcion_sol
+            where id_solicitud_det = v_parametros.id_solicitud_det;
+              
 			--Definicion de la respuesta
             v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Detalle cotizacion modificado(a)'); 
             v_resp = pxp.f_agrega_clave(v_resp,'id_cotizacion_det',v_parametros.id_cotizacion_det::varchar);
