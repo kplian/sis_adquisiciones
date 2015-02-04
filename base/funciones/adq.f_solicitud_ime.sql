@@ -96,6 +96,7 @@ DECLARE
        v_id_categoria_compra   integer;
        v_resp_doc boolean;
        v_revisado varchar;
+       va_id_funcionario_gerente   INTEGER[];
 
 			    
 BEGIN
@@ -105,16 +106,16 @@ BEGIN
 
 	/*********************************    
  	#TRANSACCION:  'ADQ_SOL_INS'
- 	#DESCRIPCION:	Insercion de registros
+ 	#DESCRIPCION:	Insercion de la cabecera de las solicitudes de compra ....
  	#AUTOR:		RAC	
  	#FECHA:		19-02-2013 12:12:51
 	***********************************/
 
-	if(p_transaccion='ADQ_SOL_INS')then
+	if (p_transaccion='ADQ_SOL_INS') then
 					
         begin
         
-        --determina la fecha del periodo
+        -- determina la fecha del periodo
         
          select id_periodo into v_id_periodo from
                         param.tperiodo per 
@@ -123,7 +124,7 @@ BEGIN
                          limit 1 offset 0;
         
         
-        --obtener correlativo
+        -- obtener correlativo
          v_num_sol =   param.f_obtener_correlativo(
                   'SOLC', 
                    v_id_periodo,-- par_id, 
@@ -157,6 +158,34 @@ BEGIN
         
         END IF;
         
+        -- recupera la uo gerencia del funcionario
+        v_id_uo =   orga.f_get_uo_gerencia(NULL, v_parametros.id_funcionario, v_parametros.fecha_soli::Date);
+        
+        --------------------------------------
+        -- recuepra el funcionario aprobador
+        -------------------------------------
+        
+        -- si el funcionario que solicita es un gerente .... es el mimso encargado de aprobar
+                
+                 IF exists(select 1 from orga.tuo_funcionario uof 
+                           inner join orga.tuo uo on uo.id_uo = uof.id_uo and uo.estado_reg = 'activo'
+                           inner join orga.tnivel_organizacional no on no.id_nivel_organizacional = uo.id_nivel_organizacional and no.numero_nivel in (1,2)
+                           where  uof.estado_reg = 'activo' and  uof.id_funcionario = v_parametros.id_funcionario ) THEN
+                  
+                      va_id_funcionario_gerente[1] = v_parametros.id_funcionario;
+                 
+                 ELSE
+                    --si tiene funcionario identificar el gerente correspondientes
+                    IF v_parametros.id_funcionario is not NULL THEN
+                    
+                        SELECT  
+                           pxp.aggarray(id_funcionario) 
+                         into
+                           va_id_funcionario_gerente
+                         FROM orga.f_get_aprobadores_x_funcionario(v_parametros.fecha_soli, v_parametros.id_funcionario , 'todos', 'si', 'todos', 'ninguno') AS (id_funcionario integer);      
+                        --NOTA el valor en la primera posicion del array es el gerente  de menor nivel
+                    END IF;  
+                END IF;
         
         --inserta solicitud
         insert into adq.tsolicitud(
@@ -175,9 +204,9 @@ BEGIN
 			lugar_entrega,
 			extendida,
 			numero,
-			posibles_proveedores,
+			--posibles_proveedores,
 			--id_proceso_wf,
-			comite_calificacion,
+			--comite_calificacion,
 			id_categoria_compra,
 			id_funcionario,
 			--id_estado_wf,
@@ -201,7 +230,7 @@ BEGIN
 			--v_parametros.presu_revertido,
 			--v_parametros.fecha_apro,
 			--v_codigo_estado,
-			v_parametros.id_funcionario_aprobador,
+			va_id_funcionario_gerente[1],   --v_parametros.id_funcionario_aprobador,
 			v_parametros.id_moneda,
 			v_parametros.id_gestion,
 			v_parametros.tipo,
@@ -211,9 +240,9 @@ BEGIN
 			v_parametros.lugar_entrega,
 			'no',
 			v_num_sol,--v_parametros.numero,
-			v_parametros.posibles_proveedores,
+			--v_parametros.posibles_proveedores,
 			--v_id_proceso_wf,
-			v_parametros.comite_calificacion,
+			--v_parametros.comite_calificacion,
 			v_parametros.id_categoria_compra,
 			v_parametros.id_funcionario,
 			--v_id_estado_wf,
@@ -222,10 +251,10 @@ BEGIN
 			p_id_usuario,
 			null,
 			null,
-            v_parametros.id_uo,
+            v_id_uo,
             v_id_proceso_macro,
             v_parametros.id_proveedor,
-            v_parametros.id_funcionario_supervisor,
+            NULL,  --  .id_funcionario_supervisor  ya nose maneja funcionarios pre aprobadores ....  04022015
             v_parametros._id_usuario_ai,
             v_parametros._nombre_usuario_ai,
             v_parametros.tipo_concepto,
@@ -280,6 +309,9 @@ BEGIN
 		   --Definicion de la respuesta
 		   v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Solicitud de Compras almacenado(a) con exito (id_solicitud'||v_id_solicitud||')'); 
            v_resp = pxp.f_agrega_clave(v_resp,'id_solicitud',v_id_solicitud::varchar);
+           v_resp = pxp.f_agrega_clave(v_resp,'id_proceso_wf',v_id_proceso_wf::varchar);
+           v_resp = pxp.f_agrega_clave(v_resp,'num_tramite',v_num_tramite::varchar);
+           v_resp = pxp.f_agrega_clave(v_resp,'estado',v_codigo_estado::varchar);
 
             --Devuelve la respuesta
             return v_resp;
@@ -296,34 +328,64 @@ BEGIN
 	elsif(p_transaccion='ADQ_SOL_MOD')then
 
 		begin
+        
+            select
+             s.estado,
+             s.num_tramite
+            into
+             v_registros
+            from 
+            adq.tsolicitud  s
+            where id_solicitud = v_parametros.id_solicitud;
+            
+            
+            -- recupera la uo gerencia del funcionario
+            v_id_uo =   orga.f_get_uo_gerencia(NULL, v_parametros.id_funcionario, v_parametros.fecha_soli::Date);
+        
+          --------------------------------------
+          -- recuepra el funcionario aprobador
+          -------------------------------------
+          
+           -- si el funcionario que solicita es un gerente .... es el mimso encargado de aprobar
+                  
+             IF exists(select 1 from orga.tuo_funcionario uof 
+                       inner join orga.tuo uo on uo.id_uo = uof.id_uo and uo.estado_reg = 'activo'
+                       inner join orga.tnivel_organizacional no on no.id_nivel_organizacional = uo.id_nivel_organizacional and no.numero_nivel in (1,2)
+                       where  uof.estado_reg = 'activo' and  uof.id_funcionario = v_parametros.id_funcionario ) THEN
+                    
+                  va_id_funcionario_gerente[1] = v_parametros.id_funcionario;
+                   
+             ELSE
+                --si tiene funcionario identificar el gerente correspondientes
+                IF v_parametros.id_funcionario is not NULL THEN
+                      
+                    SELECT  
+                       pxp.aggarray(id_funcionario) 
+                     into
+                       va_id_funcionario_gerente
+                     FROM orga.f_get_aprobadores_x_funcionario(v_parametros.fecha_soli, v_parametros.id_funcionario , 'todos', 'si', 'todos', 'ninguno') AS (id_funcionario integer);      
+                    --NOTA el valor en la primera posicion del array es el gerente  de menor nivel
+                END IF;  
+            END IF;
+            
 			--Sentencia de la modificacion
 			update adq.tsolicitud set
-			--id_solicitud_ext = v_parametros.id_solicitud_ext,
-			--presu_revertido = v_parametros.presu_revertido,
-			--fecha_apro = v_parametros.fecha_apro,
-			--estado = v_parametros.estado,
-			id_funcionario_aprobador = v_parametros.id_funcionario_aprobador,
+			id_funcionario_aprobador = va_id_funcionario_gerente[1],
 			id_moneda = v_parametros.id_moneda,
 			id_gestion = v_parametros.id_gestion,
 			tipo = v_parametros.tipo,
-			--num_tramite = v_parametros.num_tramite,
 			justificacion = v_parametros.justificacion,
 			id_depto = v_parametros.id_depto,
 			lugar_entrega = v_parametros.lugar_entrega,
-			--extendida = v_parametros.extendida,
-			--numero = v_parametros.numero,
-			posibles_proveedores = v_parametros.posibles_proveedores,
-			--id_proceso_wf = v_parametros.id_proceso_wf,
-			comite_calificacion = v_parametros.comite_calificacion,
+			--posibles_proveedores = v_parametros.posibles_proveedores,
+			--comite_calificacion = v_parametros.comite_calificacion,
 			id_funcionario = v_parametros.id_funcionario,
-			--id_estado_wf = v_parametros.id_estado_wf,
 			fecha_soli = v_parametros.fecha_soli,
 			fecha_mod = now(),
 			id_usuario_mod = p_id_usuario,
-            id_uo = v_parametros.id_uo,
+            id_uo = v_id_uo,
             id_proceso_macro=id_proceso_macro,
             id_proveedor=v_parametros.id_proveedor,
-            id_funcionario_supervisor= v_parametros.id_funcionario_supervisor,
             id_usuario_ai= v_parametros._id_usuario_ai,
             usuario_ai = v_parametros._nombre_usuario_ai,
             tipo_concepto =  v_parametros.tipo_concepto,
@@ -334,6 +396,8 @@ BEGIN
 			--Definicion de la respuesta
             v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Solicitud de Compras modificado(a)'); 
             v_resp = pxp.f_agrega_clave(v_resp,'id_solicitud',v_parametros.id_solicitud::varchar);
+            v_resp = pxp.f_agrega_clave(v_resp,'num_tramite',v_registros.num_tramite);
+            v_resp = pxp.f_agrega_clave(v_resp,'estado',v_registros.estado);
                
             --Devuelve la respuesta
             return v_resp;
