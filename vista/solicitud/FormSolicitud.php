@@ -16,8 +16,15 @@ Phx.vista.FormSolicitud=Ext.extend(Phx.frmInterfaz,{
     //layoutType: 'wizard',
     layout: 'fit',
     autoScroll: false,
+    breset: false,
     constructor:function(config)
-    {   this.buildComponentesDetalle();
+    {   
+    	
+    	//declaracion de eventos
+        this.addEvents('beforesave');
+        this.addEvents('successsave');
+    	
+    	this.buildComponentesDetalle();
         this.buildDetailGrid();
         this.buildGrupos();
         
@@ -236,6 +243,10 @@ Phx.vista.FormSolicitud=Ext.extend(Phx.frmInterfaz,{
         this.detCmp.id_centro_costo.store.baseParams.codigo_subsistema = 'ADQ';
         this.detCmp.id_centro_costo.store.baseParams.id_depto = this.Cmp.id_depto.getValue();
         this.detCmp.id_centro_costo.modificado = true;
+        //cuando esta el la inteface de presupeustos no filtra por bienes o servicios
+        this.detCmp.id_concepto_ingas.store.baseParams.tipo=this.Cmp.tipo.getValue();
+        this.detCmp.id_concepto_ingas.store.baseParams.id_gestion=this.Cmp.id_gestion.getValue();
+        this.detCmp.id_concepto_ingas.modificado = true;
     	
     },
     
@@ -888,25 +899,24 @@ Phx.vista.FormSolicitud=Ext.extend(Phx.frmInterfaz,{
         this.mostrarComponente(this.Cmp.dias_plazo_entrega);
     },
     
-    onNew:function(){
+    onNew: function(){
     	
     	
         this.form.getForm().reset();
         this.loadValoresIniciales();
         if(this.getValidComponente(0)){
-        	this.getValidComponente(0).focus(false,100);
+        	this.getValidComponente(0).focus(false, 100);
         }
-       this.cmpIdDepto.enable(); 
-       this.Cmp.id_categoria_compra.enable();
+        this.cmpIdDepto.enable(); 
+        this.Cmp.id_categoria_compra.enable();
        
-       this.Cmp.id_funcionario.disable();
-       this.Cmp.fecha_soli.enable();
-       this.Cmp.fecha_soli.setValue(new Date());
-       this.Cmp.fecha_soli.fireEvent('change');
-       
-       this.Cmp.tipo.enable();
-       this.Cmp.tipo_concepto.enable();
-       this.Cmp.id_moneda.enable();
+        this.Cmp.id_funcionario.disable();
+        this.Cmp.fecha_soli.enable();
+        this.Cmp.fecha_soli.setValue(new Date());
+        this.Cmp.fecha_soli.fireEvent('change');
+        this.Cmp.tipo.enable();
+        this.Cmp.tipo_concepto.enable();
+        this.Cmp.id_moneda.enable();
        
        
        this.Cmp.id_categoria_compra.store.load({params:{start:0,limit:this.tam_pag}, 
@@ -966,18 +976,9 @@ Phx.vista.FormSolicitud=Ext.extend(Phx.frmInterfaz,{
    	
       	Phx.CP.loadingHide();
    	    var objRes = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
-	    //muestra la ventana de documentos para este proceso wf
-	    this.loadCheckDocumentosSolWf({
-	    	id_proceso_wf: objRes.ROOT.datos.id_proceso_wf,
-	    	num_tramite: objRes.ROOT.datos.num_tramite,
-	    	estao: objRes.ROOT.datos.estado,
-	    	nombreVista: 'Formulario de solicitud de compra'
-	    	
-	    });
-	   
-		
-		
-	},
+   	    this.fireEvent('successsave',this,objRes);
+   	    
+   	},
 	
 	loadCheckDocumentosSolWf:function(data) {
 		   //TODO Eventos para cuando ce cierre o destruye la interface de documentos
@@ -989,7 +990,7 @@ Phx.vista.FormSolicitud=Ext.extend(Phx.frmInterfaz,{
                     },
                     data,
                     this.idContenedor,
-                    'DocumentoWf'
+                   'DocumentoWf'
        );
        
     }

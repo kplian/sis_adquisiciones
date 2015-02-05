@@ -122,94 +122,121 @@ Phx.vista.SolicitudReq = {
     
     iniciarEventos:function(){
         
+        this.cmpFechaSoli = this.getComponente('fecha_soli');
+        this.cmpIdDepto = this.getComponente('id_depto');
+        this.cmpIdGestion = this.getComponente('id_gestion');
+     
+        //inicio de eventos 
+        this.cmpFechaSoli.on('change',function(f){
+        	
+             this.obtenerGestion(this.cmpFechaSoli);
+             this.Cmp.id_funcionario.enable();             
+             this.Cmp.id_funcionario.store.baseParams.fecha = this.cmpFechaSoli.getValue().dateFormat(this.cmpFechaSoli.format);
+             
+             },this);
         
+        
+           
+           this.Cmp.tipo.on('select',function(cmp,rec){
+               console.log('rec..',rec)
+               if(rec.json[0]=='Bien - Servicio'){
+                   
+                  this.Cmp.tipo_concepto.store.loadData(this.arrayStore['Bien'].concat(this.arrayStore['Servicio']));
+               }
+               else{
+                   this.Cmp.tipo_concepto.store.loadData(this.arrayStore[rec.json[0]]);
+               }
+                if(rec.json[0] == 'Bien' ||  rec.json[0] == 'Bien - Servicio'){
+                	this.Cmp.lugar_entrega.setValue('Almacenes de Oficina Cochabamba');
+                	this.ocultarComponente(this.Cmp.fecha_inicio);
+                	this.Cmp.dias_plazo_entrega.allowBlank = false;
+                	
+                	
+                	
+                 }
+                else{
+                	this.Cmp.lugar_entrega.setValue('');
+                	this.mostrarComponente(this.Cmp.fecha_inicio);
+                	this.Cmp.dias_plazo_entrega.allowBlank = true;
+                }
+                this.mostrarComponente(this.Cmp.dias_plazo_entrega);
+              
+           },this);
       
     },
          
     onButtonNew:function(){
-	       //abrir formulario de solicitud
-	       var me = this;
-		   me.objSolForm = Phx.CP.loadWindows('../../../sis_adquisiciones/vista/solicitud/FormSolicitud.php',
-	                                'Formulario de Solicitud de Compra',
-	                                {
-	                                    modal:true,
-	                                    width:'90%',
-	                                    height:'90%'
-	                                }, {data:{objPadre: me}
-	                                }, 
-	                                this.idContenedor,
-	                                'FormSolicitud',
-	                                {
-	                                    config:[{
-	                                              event:'successsave',
-	                                              delegate: this.onSaveForm,
-	                                              
-	                                            }],
-	                                    
-	                                    scope:this
-	                                 });    
+       Phx.vista.SolicitudReq.superclass.onButtonNew.call(this); 
+       
+       this.cmpIdDepto.enable(); 
+       this.Cmp.id_categoria_compra.enable();
+       
+       this.Cmp.id_funcionario.disable();
+       this.Cmp.fecha_soli.enable();
+       this.Cmp.fecha_soli.setValue(new Date());
+       this.Cmp.fecha_soli.fireEvent('change');
+       
+       this.Cmp.tipo.enable();
+       this.Cmp.tipo_concepto.enable();
+       this.Cmp.id_moneda.enable();
+       
+       
+       this.Cmp.id_categoria_compra.store.load({params:{start:0,limit:this.tam_pag}, 
+	       callback : function (r) {
+	       		if (r.length == 1 ) {	       				
+	    			this.Cmp.id_categoria_compra.setValue(r[0].data.id_categoria_compra);
+	    		}    
+	    			    		
+	    	}, scope : this
+	    });
+	    
+	    
+	    this.Cmp.id_depto.store.load({params:{start:0,limit:this.tam_pag}, 
+           callback : function (r) {
+                if (r.length == 1 ) {                       
+                    this.Cmp.id_depto.setValue(r[0].data.id_depto);
+                }    
+                                
+            }, scope : this
+        });
+	    
+	    
+	    this.Cmp.id_funcionario.store.load({params:{start:0,limit:this.tam_pag}, 
+	       callback : function (r) {
+	       		if (r.length == 1 ) {	       				
+	    			this.Cmp.id_funcionario.setValue(r[0].data.id_funcionario);
+	    			this.Cmp.id_funcionario.fireEvent('select', r[0]);
+	    		}    
+	    			    		
+	    	}, scope : this
+	    });
+	    
 	    
 		
            
     },
-    
-    onSaveForm: function(form,  objRes){
-    	var me = this;
-    	console.log('RESP....', objRes )
-    	//muestra la ventana de documentos para este proceso wf
-	    Phx.CP.loadWindows('../../../sis_workflow/vista/documento_wf/DocumentoWf.php',
-                    'Chequear documento del WF',
-                    {
-                        width:'90%',
-                        height:500
-                    },
-                    {
-				    	id_solicitud: objRes.ROOT.datos.id_solicitud,
-				    	id_proceso_wf: objRes.ROOT.datos.id_proceso_wf,
-				    	num_tramite: objRes.ROOT.datos.num_tramite,
-				    	estao: objRes.ROOT.datos.estado,
-				    	nombreVista: 'Formulario de solicitud de compra',
-				    	tipo: 'solcom'  //para crear un boton de guardar directamente en la ventana de documentos
-				    	
-				    },
-                    this.idContenedor,
-                    'DocumentoWf',
-                    {
-                        config:[{
-                                  event:'finalizarsol',
-                                  delegate: this.onCloseDocuments,
-                                  
-                                }],
-                        
-                        scope:this
-                     }
-        )
-    	
-    	form.panel.destroy()
-        me.reload();
-    	
-    },
-    
-    onCloseDocuments: function(paneldoc, data, directo){
-    	console.log('al cerrar la interface de docuemntos.....', paneldoc, data, directo)
-    	var newrec = this.store.getById(data.id_solicitud);
-    	if(newrec){
-	    	this.sm.selectRecords([newrec]);
-	    	if(directo === true){
-	    		 this.fin_requerimiento();
-	    	}
-	    	else{
-		    	if(confirm("¿Desea mandar la solictud para aprobación?")){
-		    		this.fin_requerimiento();
-		    	}	
-	    	}
-	    		
-    	}
-    	
-		    	
-    },
     onButtonEdit:function(){
+       this.cmpFechaSoli.disable();
+       this.cmpIdDepto.disable();        
+       this.Cmp.id_categoria_compra.disable();
       
+       this.Cmp.tipo.disable();
+       this.Cmp.tipo_concepto.disable();
+       this.Cmp.id_moneda.disable();
+       
+       Phx.vista.SolicitudReq.superclass.onButtonEdit.call(this);
+       this.Cmp.id_funcionario.store.baseParams.fecha = this.cmpFechaSoli.getValue().dateFormat(this.cmpFechaSoli.format);
+       //this.Cmp.fecha_soli.fireEvent('change');  
+       
+           if(this.Cmp.tipo.getValue() == 'Bien' ||  this.Cmp.tipo.getValue() == 'Bien - Servicio'){
+                	this.ocultarComponente(this.Cmp.fecha_inicio);
+                	this.Cmp.dias_plazo_entrega.allowBlank = false;
+            }
+            else{
+            	this.mostrarComponente(this.Cmp.fecha_inicio);
+            	this.Cmp.dias_plazo_entrega.allowBlank = true;
+            }
+            this.mostrarComponente(this.Cmp.dias_plazo_entrega);
     },
     
     onFinalizarSol:function(){

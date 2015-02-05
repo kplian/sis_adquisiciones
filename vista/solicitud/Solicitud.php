@@ -200,7 +200,7 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
 	       				 options: ['Bien','Servicio','Bien - Servicio'],	
 	       		 	},
 	       		grid:true,
-	       		form:true
+	       		form:false
 	       	},
        
         
@@ -240,7 +240,7 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
             filters:{pfiltro:'sol.tipo_concepto',type:'string'},
             id_grupo:0,
             grid:true,
-            form:true
+            form:false
         },
            
        {
@@ -260,7 +260,7 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
                 type:'string'
             },
             grid:true,
-            form:true
+            form:false
           },	     
 		
         {
@@ -277,7 +277,7 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
             filters:{pfiltro:'sol.fecha_soli',type:'date'},
             id_grupo:1,
             grid:true,
-            form:true
+            form:false
         },
 		{
    			config:{
@@ -298,7 +298,7 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
    			id_grupo:0,
    			filters:{pfiltro:'depto.nombre',type:'string'},
    		    grid:false,
-   			form:true
+   			form:false
        	},
 		{
 			config:{
@@ -332,7 +332,7 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
    			id_grupo:0,
    			filters:{pfiltro:'fun.desc_funcionario1',type:'string'},
    		    grid:true,
-   			form:true
+   			form:false
 		 },
       	   {
    			config:{
@@ -476,7 +476,7 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
 				type: 'string'
 			},
 			grid: true,
-			form: true
+			form: false
 		},
          {
             config:{
@@ -495,7 +495,7 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
             id_grupo:0,
             filters:{pfiltro:'pro.desc_proveedor',type:'string'},
             grid:true,
-            form:true
+            form:false
         },
 		{
 			config:{
@@ -511,7 +511,7 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
 			filters:{pfiltro:'sol.justificacion',type:'string'},
 			id_grupo:1,
 			grid:true,
-			form:true
+			form:false
 		},
 		{
 			config:{
@@ -527,7 +527,7 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
 			filters:{pfiltro:'sol.lugar_entrega',type:'string'},
 			id_grupo:1,
 			grid:true,
-			form:true
+			form:false
 		},	     
 		
         {
@@ -545,7 +545,7 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
             filters:{pfiltro:'sol.fecha_soli',type:'date'},
             id_grupo:1,
             grid:true,
-            form:true
+            form:false
         },
         {
             config:{
@@ -563,7 +563,7 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
             filters: { pfiltro: 'sold.cantidad', type: 'numeric' },
             id_grupo: 1,
             grid: true,
-            form: true
+            form: false
         },
 		{
 			config:{
