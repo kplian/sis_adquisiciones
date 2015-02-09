@@ -17,6 +17,23 @@ Phx.vista.SolicitudReq = {
 	//layoutType: 'wizard',
 	
 	constructor: function(config) {
+		
+		    this.Atributos[this.getIndAtributo('tipo')].form=true; 
+            this.Atributos[this.getIndAtributo('tipo_concepto')].form=true; 
+            this.Atributos[this.getIndAtributo('id_moneda')].form=true;
+            this.Atributos[this.getIndAtributo('fecha_soli')].form=true; 
+            this.Atributos[this.getIndAtributo('id_depto')].form=true; 
+            this.Atributos[this.getIndAtributo('id_funcionario')].form=true;  
+            this.Atributos[this.getIndAtributo('id_categoria_compra')].form=true;
+            this.Atributos[this.getIndAtributo('id_proveedor')].form=true; 
+            this.Atributos[this.getIndAtributo('justificacion')].form=true; 
+            this.Atributos[this.getIndAtributo('lugar_entrega')].form=true; 
+            this.Atributos[this.getIndAtributo('fecha_inicio')].form=true; 
+            this.Atributos[this.getIndAtributo('dias_plazo_entrega')].form=true;
+            
+             
+		
+		
     		Phx.vista.SolicitudReq.superclass.constructor.call(this,config);
     		this.addButton('fin_requerimiento',{ text:'Finalizar', iconCls: 'badelante', disabled: true, handler: this.fin_requerimiento, tooltip: '<b>Finalizar</b>'});
             this.addButton('btnSolpre',{ text:'Sol Pre.',iconCls: 'bemail', disabled: true, handler: this.onSolModPresupuesto, tooltip: '<b>Solicitar Presuuesto</b><p>Emite un correo para solicitar traspaso presupuestario</p>'});
@@ -120,11 +137,7 @@ Phx.vista.SolicitudReq = {
 		
 	},
     
-    iniciarEventos:function(){
-        
-        
-      
-    },
+    
          
     onButtonNew:function(){
 	       //abrir formulario de solicitud
@@ -155,7 +168,7 @@ Phx.vista.SolicitudReq = {
     
     onSaveForm: function(form,  objRes){
     	var me = this;
-    	console.log('RESP....', objRes )
+    	
     	//muestra la ventana de documentos para este proceso wf
 	    Phx.CP.loadWindows('../../../sis_workflow/vista/documento_wf/DocumentoWf.php',
                     'Chequear documento del WF',
@@ -191,16 +204,15 @@ Phx.vista.SolicitudReq = {
     },
     
     onCloseDocuments: function(paneldoc, data, directo){
-    	console.log('al cerrar la interface de docuemntos.....', paneldoc, data, directo)
     	var newrec = this.store.getById(data.id_solicitud);
     	if(newrec){
 	    	this.sm.selectRecords([newrec]);
 	    	if(directo === true){
-	    		 this.fin_requerimiento();
+	    		 this.fin_requerimiento(paneldoc);
 	    	}
 	    	else{
 		    	if(confirm("¿Desea mandar la solictud para aprobación?")){
-		    		this.fin_requerimiento();
+		    		this.fin_requerimiento(paneldoc);
 		    	}	
 	    	}
 	    		
@@ -209,6 +221,66 @@ Phx.vista.SolicitudReq = {
 		    	
     },
     onButtonEdit:function(){
+       this.cmpFechaSoli.disable();
+       this.cmpIdDepto.disable();        
+       this.Cmp.id_categoria_compra.disable();
+      
+       this.Cmp.tipo.disable();
+       this.Cmp.tipo_concepto.disable();
+       this.Cmp.id_moneda.disable();
+       
+       Phx.vista.SolicitudReq.superclass.onButtonEdit.call(this);
+       this.Cmp.id_funcionario.store.baseParams.fecha = this.cmpFechaSoli.getValue().dateFormat(this.cmpFechaSoli.format);
+       //this.Cmp.fecha_soli.fireEvent('change');  
+       
+           if(this.Cmp.tipo.getValue() == 'Bien' ||  this.Cmp.tipo.getValue() == 'Bien - Servicio'){
+                	this.ocultarComponente(this.Cmp.fecha_inicio);
+                	this.Cmp.dias_plazo_entrega.allowBlank = false;
+            }
+            else{
+            	this.mostrarComponente(this.Cmp.fecha_inicio);
+            	this.Cmp.dias_plazo_entrega.allowBlank = true;
+            }
+            this.mostrarComponente(this.Cmp.dias_plazo_entrega);
+    },
+    
+    iniciarEventos:function(){
+        
+	        this.cmpFechaSoli = this.getComponente('fecha_soli');
+	        this.cmpIdDepto = this.getComponente('id_depto');
+	        this.cmpIdGestion = this.getComponente('id_gestion');
+     
+	        //inicio de eventos 
+	        this.cmpFechaSoli.on('change',function(f){
+	        	
+	             this.obtenerGestion(this.cmpFechaSoli);
+	             this.Cmp.id_funcionario.enable();             
+	             this.Cmp.id_funcionario.store.baseParams.fecha = this.cmpFechaSoli.getValue().dateFormat(this.cmpFechaSoli.format);
+	             
+	             },this);
+             
+           this.Cmp.tipo.on('select',function(cmp,rec){
+               console.log('rec..',rec)
+               if(rec.json[0]=='Bien - Servicio'){
+                   
+                  this.Cmp.tipo_concepto.store.loadData(this.arrayStore['Bien'].concat(this.arrayStore['Servicio']));
+               }
+               else{
+                   this.Cmp.tipo_concepto.store.loadData(this.arrayStore[rec.json[0]]);
+               }
+                if(rec.json[0] == 'Bien' ||  rec.json[0] == 'Bien - Servicio'){
+                	this.Cmp.lugar_entrega.setValue('Almacenes de Oficina Cochabamba');
+                	this.ocultarComponente(this.Cmp.fecha_inicio);
+                	this.Cmp.dias_plazo_entrega.allowBlank = false;
+                }
+                else{
+                	this.Cmp.lugar_entrega.setValue('');
+                	this.mostrarComponente(this.Cmp.fecha_inicio);
+                	this.Cmp.dias_plazo_entrega.allowBlank = true;
+                }
+                this.mostrarComponente(this.Cmp.dias_plazo_entrega);
+              
+           },this);
       
     },
     
@@ -247,7 +319,7 @@ Phx.vista.SolicitudReq = {
         },
     
     
-       fin_requerimiento:function()
+       fin_requerimiento:function(paneldoc)
         {                   
             var d= this.sm.getSelected().data;
            
@@ -261,6 +333,7 @@ Phx.vista.SolicitudReq = {
                 // form:this.form.getForm().getEl(),
                 url:'../../sis_adquisiciones/control/Solicitud/finalizarSolicitud',
                 params: { id_solicitud: d.id_solicitud, operacion:'verificar', id_estado_wf: d.id_estado_wf },
+                argument: { paneldoc: paneldoc},
                 success: this.successSinc,
                 failure: this.conexionFailure,
                 timeout: this.timeout,
@@ -282,7 +355,10 @@ Phx.vista.SolicitudReq = {
                  this.cmbRPC.modificado=true;
                  this.wRPC.show();
                 */
-               
+              
+                 if(resp.argument.paneldoc){
+                 	resp.argument.paneldoc.panel.destroy();
+                 }
                  this.reload();
             }else{
                 

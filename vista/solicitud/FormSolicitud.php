@@ -169,7 +169,7 @@ Phx.vista.FormSolicitud=Ext.extend(Phx.frmInterfaz,{
     },
     
     onInitAdd: function(){
-    	console.log('onInitAdd')
+    	
     	
     },
     onCancelAdd: function(re,save){
@@ -181,7 +181,6 @@ Phx.vista.FormSolicitud=Ext.extend(Phx.frmInterfaz,{
     	this.evaluaGrilla();
     },
     onUpdateRegister: function(){
-    	console.log('onUpdateRegister')
     	this.sw_init_add = false;
     },
     
@@ -218,7 +217,7 @@ Phx.vista.FormSolicitud=Ext.extend(Phx.frmInterfaz,{
     		i++;
     	}
     	
-    	console.log('SW....', sw)
+   
     	
     	return sw
     },
@@ -253,8 +252,6 @@ Phx.vista.FormSolicitud=Ext.extend(Phx.frmInterfaz,{
     evaluaGrilla: function(){
     	//al eliminar si no quedan registros en la grilla desbloquea los requisitos en el maestro
     	var  count = this.mestore.getCount();
-    	console.log('total registros ...', count)
-    	
     	if(count == 0){
     		this.bloqueaRequisitos(false);
     	} 
@@ -822,7 +819,6 @@ Phx.vista.FormSolicitud=Ext.extend(Phx.frmInterfaz,{
        
            
            this.Cmp.tipo.on('select',function(cmp,rec){
-               console.log('rec..',rec)
                if(rec.json[0]=='Bien - Servicio'){
                    
                   this.Cmp.tipo_concepto.store.loadData(this.arrayStore['Bien'].concat(this.arrayStore['Servicio']));
@@ -844,7 +840,7 @@ Phx.vista.FormSolicitud=Ext.extend(Phx.frmInterfaz,{
                 	this.Cmp.dias_plazo_entrega.allowBlank = true;
                 }
                 this.mostrarComponente(this.Cmp.dias_plazo_entrega);
-              
+                this.Cmp.tipo_concepto.reset();
            },this);
       
     },

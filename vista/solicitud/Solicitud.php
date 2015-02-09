@@ -889,7 +889,6 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
             	num_tramite: rec.data.num_tramite
             }
             
-            console.log(rec.data)
             Phx.CP.loadWindows('../../../sis_workflow/vista/obs/Obs.php',
                     'Observaciones del WF',
                     {
