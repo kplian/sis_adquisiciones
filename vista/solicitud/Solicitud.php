@@ -200,7 +200,7 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
 	       				 options: ['Bien','Servicio','Bien - Servicio'],	
 	       		 	},
 	       		grid:true,
-	       		form:true
+	       		form:false
 	       	},
        
         
@@ -240,7 +240,7 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
             filters:{pfiltro:'sol.tipo_concepto',type:'string'},
             id_grupo:0,
             grid:true,
-            form:true
+            form:false
         },
            
        {
@@ -260,7 +260,7 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
                 type:'string'
             },
             grid:true,
-            form:true
+            form:false
           },	     
 		
         {
@@ -277,7 +277,7 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
             filters:{pfiltro:'sol.fecha_soli',type:'date'},
             id_grupo:1,
             grid:true,
-            form:true
+            form:false
         },
 		{
    			config:{
@@ -298,7 +298,7 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
    			id_grupo:0,
    			filters:{pfiltro:'depto.nombre',type:'string'},
    		    grid:false,
-   			form:true
+   			form:false
        	},
 		{
 			config:{
@@ -332,7 +332,7 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
    			id_grupo:0,
    			filters:{pfiltro:'fun.desc_funcionario1',type:'string'},
    		    grid:true,
-   			form:true
+   			form:false
 		 },
       	   {
    			config:{
@@ -352,8 +352,8 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
 		        pfiltro:'uo.codigo#uo.nombre_unidad',
 				type:'string'
 			},
-   		     grid:true,
-   			form:true
+   		    grid:true,
+   			form:false
    	      },
         {
             config:{
@@ -380,27 +380,7 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
             form:false
         },
           
-         {
-            config:{
-                name:'id_funcionario_supervisor',
-                hiddenName: 'id_funcionario_supervisor',
-                origen:'FUNCIONARIOCAR',
-                fieldLabel:'Supervisor',
-                allowBlank:true,
-                disabled:true,
-                gwidth:200,
-                valueField: 'id_funcionario',
-                gdisplayField: 'desc_funcionario_supervisor',
-                renderer:function(value, p, record){return String.format('{0}', record.data['desc_funcionario_supervisor']);}
-             },
-            type:'ComboRec',//ComboRec
-            filters:{pfiltro:'funs.desc_funcionario1',type:'string'},
-            id_grupo:0,
-            grid:true,
-            form:true
-         },
-   	      
-         {
+        {
             config:{
                 name:'id_funcionario_aprobador',
                 hiddenName: 'id_funcionario_aprobador',
@@ -417,7 +397,7 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
             filters:{pfiltro:'funa.desc_funcionario1',type:'string'},
             id_grupo:0,
             grid:true,
-            form:true
+            form:false
          },
         {
             config:{
@@ -496,7 +476,7 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
 				type: 'string'
 			},
 			grid: true,
-			form: true
+			form: false
 		},
          {
             config:{
@@ -515,7 +495,7 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
             id_grupo:0,
             filters:{pfiltro:'pro.desc_proveedor',type:'string'},
             grid:true,
-            form:true
+            form:false
         },
 		{
 			config:{
@@ -531,7 +511,7 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
 			filters:{pfiltro:'sol.justificacion',type:'string'},
 			id_grupo:1,
 			grid:true,
-			form:true
+			form:false
 		},
 		{
 			config:{
@@ -547,7 +527,7 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
 			filters:{pfiltro:'sol.lugar_entrega',type:'string'},
 			id_grupo:1,
 			grid:true,
-			form:true
+			form:false
 		},	     
 		
         {
@@ -565,25 +545,25 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
             filters:{pfiltro:'sol.fecha_soli',type:'date'},
             id_grupo:1,
             grid:true,
-            form:true
+            form:false
         },
         {
             config:{
                 name: 'dias_plazo_entrega',
                 fieldLabel: 'Dias entrga',
-                qtip:'Cuantos días después de emitida  la orden de compra se hara la entrega de los bienes. EJM. Quedara de esta forma en la orden de Compra:  (Tiempo de entraga: X días Hábiles de recibida la presente orden)',
+                qtip: 'Cuantos días después de emitida  la orden de compra se hara la entrega de los bienes. EJM. Quedara de esta forma en la orden de Compra:  (Tiempo de entrega: X días Hábiles de emitida la presente orden)',
                 allowBlank: true,
                 allowDecimals: false,
                 width: 100,
                 gwidth: 100,
-                minValue:1,
-                maxLength:10
+                minValue: 1,
+                maxLength: 10
             },
-            type:'NumberField',
-            filters:{pfiltro:'sold.cantidad',type:'numeric'},
-            id_grupo:1,
-            grid:true,
-            form:true
+            type: 'NumberField',
+            filters: { pfiltro: 'sold.cantidad', type: 'numeric' },
+            id_grupo: 1,
+            grid: true,
+            form: false
         },
 		{
 			config:{
@@ -599,7 +579,7 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
 			filters:{pfiltro:'sol.posibles_proveedores',type:'string'},
 			id_grupo:1,
 			grid:true,
-			form:true
+			form:false
 		},
 		{
 			config:{
@@ -614,7 +594,7 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
 			filters:{pfiltro:'sol.comite_calificacion',type:'string'},
 			id_grupo:1,
 			grid:true,
-			form:true
+			form:false
 		},
 		
 		{
@@ -792,7 +772,7 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
             var rec=this.sm.getSelected();
             rec.data.nombreVista = this.nombreVista;
             Phx.CP.loadWindows('../../../sis_workflow/vista/documento_wf/DocumentoWf.php',
-                    'Chequear documento del WF',
+                    'Documentos del porceso',
                     {
                         width:'90%',
                         height:500
@@ -909,7 +889,6 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
             	num_tramite: rec.data.num_tramite
             }
             
-            console.log(rec.data)
             Phx.CP.loadWindows('../../../sis_workflow/vista/obs/Obs.php',
                     'Observaciones del WF',
                     {

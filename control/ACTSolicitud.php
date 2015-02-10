@@ -80,6 +80,22 @@ class ACTSolicitud extends ACTbase{
 		}
 		$this->res->imprimirRespuesta($this->res->generarJson());
 	}
+	/*
+	 * Author:  		 RAC - KPLIAN
+	 * Date:   			 04/02/2015
+	 * Description		 insertar solicitus y detalle de compra 
+	 * */
+	
+	function insertarSolicitudCompleta(){
+		$this->objFunc=$this->create('MODSolicitud');	
+		if($this->objParam->insertar('id_solicitud')){
+			$this->res=$this->objFunc->insertarSolicitudCompleta($this->objParam);			
+		} else{			
+			//$this->res=$this->objFunc->modificarSolicitud($this->objParam);
+			//trabajar en la modificacion compelta de solicitud ....
+		}
+		$this->res->imprimirRespuesta($this->res->generarJson());
+	}
 						
 	function eliminarSolicitud(){
 			$this->objFunc=$this->create('MODSolicitud');	
