@@ -302,7 +302,16 @@ class ACTSolicitud extends ACTbase{
 
   function reporteSolicitud($create_file=false, $onlyData = false){
     $dataSource = new DataSource();
-    
+    //captura datos de firma
+    if ($this->objParam->getParametro('firmar') == 'si') {
+    	$firmar = 'si';
+		$fecha_firma = $this->objParam->getParametro('fecha_firma');
+		$usuario_firma = $this->objParam->getParametro('usuario_firma');
+    } else {
+    	$firmar = 'no';
+		$fecha_firma = '';
+		$usuario_firma = '';
+    }
     $idSolicitud = $this->objParam->getParametro('id_solicitud');
     $id_proceso_wf= $this->objParam->getParametro('id_proceso_wf');
     $estado = $this->objParam->getParametro('estado');
@@ -374,22 +383,31 @@ class ACTSolicitud extends ACTbase{
     if ($onlyData){
     	
 		return $dataSource;
-	}      
+	} 
+	$nombreArchivo = uniqid(md5(session_id()).'SolicitudCompra') . '.pdf'; 
+	$this->objParam->addParametro('orientacion','P');
+	$this->objParam->addParametro('tamano','LETTER');		
+	$this->objParam->addParametro('titulo_archivo','SOLICITUD DE COMPRA');
+	$this->objParam->addParametro('nombre_archivo',$nombreArchivo);  
+	$this->objParam->addParametro('firmar',$firmar); 
+	$this->objParam->addParametro('fecha_firma',$fecha_firma); 
+	$this->objParam->addParametro('usuario_firma',$usuario_firma);   
     //build the report
-    $reporte = new RSolicitudCompra();
+    $reporte = new RSolicitudCompra($this->objParam);
     
     $reporte->setDataSource($dataSource);
-    $nombreArchivo = 'SolicitudCompra.pdf';
-    $reportWriter = new ReportWriter($reporte, dirname(__FILE__).'/../../reportes_generados/'.$nombreArchivo);
-    $reportWriter->writeReport(ReportWriter::PDF);
     
-    
+	$datos_firma = $reporte->write();
 	
 		if(!$create_file){
 	                $mensajeExito = new Mensaje();
 				    $mensajeExito->setMensaje('EXITO','Reporte.php','Reporte generado',
 				                                    'Se generó con éxito el reporte: '.$nombreArchivo,'control');
 				    $mensajeExito->setArchivoGenerado($nombreArchivo);
+					//anade los datos de firma a la respuesta
+					if ($firmar == 'si') {
+						$mensajeExito->setDatos($datos_firma);
+					}
 				    $this->res = $mensajeExito;
 				    $this->res->imprimirRespuesta($this->res->generarJson());
 		}

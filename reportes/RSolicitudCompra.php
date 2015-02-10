@@ -1,7 +1,7 @@
 <?php
-require_once dirname(__FILE__).'/../../pxp/lib/lib_reporte/mypdf.php';
+require_once dirname(__FILE__).'/../../pxp/lib/lib_reporte/ReportePDFFormulario.php';
 require_once dirname(__FILE__).'/../../pxp/pxpReport/Report.php';
- class CustomReport extends MYPDF{
+ class CustomReport extends ReportePDFFormulario{
     
     private $dataSource;
     
@@ -14,44 +14,29 @@ require_once dirname(__FILE__).'/../../pxp/pxpReport/Report.php';
     }
     
     public function Header() {
-        $height = 20;
-        $this->Cell(40, $height, '', 0, 0, 'C', false, '', 0, false, 'T', 'C');
-        
+        $height = 20;        
+        		
+		$this->Cell(40, $height, '', 0, 0, 'C', false, '', 0, false, 'T', 'C');
         $this->SetFontSize(16);
         $this->SetFont('','B');        
-        $this->Cell(105, $height, 'SOLICITUD DE COMPRA', 0, 0, 'C', false, '', 0, false, 'T', 'C');        
+        $this->Cell(105, $height, 'SOLICITUD DE COMPRA', 0, 0, 'C', false, '', 0, false, 'T', 'C');								
+		$this->firmar();
+		/*jrr:cambio para firmas*/
+        //$this->Image(dirname(__FILE__).'/../../pxp/lib'.$_SESSION['_DIR_LOGO'], $x, $y, 36);
         
-								$x=$this->getX();
-								$y=$this->getY();
-        $this->Image(dirname(__FILE__).'/../../pxp/lib'.$_SESSION['_DIR_LOGO'], $x, $y, 36);
-        
-    }
+    }  
     
-    public function Footer() {
-        $this->SetFontSize(5.5);
-								$this->setY(-10);
-								$ormargins = $this->getOriginalMargins();
-								$this->SetTextColor(0, 0, 0);
-								//set style for cell border
-								$line_width = 0.85 / $this->getScaleFactor();
-								$this->SetLineStyle(array('width' => $line_width, 'cap' => 'butt', 'join' => 'miter', 'dash' => 0, 'color' => array(0, 0, 0)));
-								$ancho = round(($this->getPageWidth() - $ormargins['left'] - $ormargins['right']) / 3);
-								$this->Ln(2);
-								$cur_y = $this->GetY();
-								//$this->Cell($ancho, 0, 'Generado por XPHS', 'T', 0, 'L');
-								$this->Cell($ancho, 0, 'Usuario: '.$_SESSION['_LOGIN'], '', 1, 'L');
-								$pagenumtxt = 'Página'.' '.$this->getAliasNumPage().' de '.$this->getAliasNbPages();
-								//$this->Cell($ancho, 0, '', '', 0, 'C');
-								$fecha_rep = date("d-m-Y H:i:s");
-								$this->Cell($ancho, 0, "Fecha impresión: ".$fecha_rep, '', 0, 'L');
-								$this->Ln($line_width);
-			 }
 }
 
 
 Class RSolicitudCompra extends Report {
-    function write($fileName) {
-        $pdf = new CustomReport('P', PDF_UNIT, "LETTER", true, 'UTF-8', false);
+	var $objParam;
+	function __construct(CTParametro $objParam) {
+		$this->objParam = $objParam;
+	}
+    function write() {
+    	
+        $pdf = new CustomReport($this->objParam);
         $pdf->setDataSource($this->getDataSource());
         // set document information
         $pdf->SetCreator(PDF_CREATOR);
@@ -69,10 +54,13 @@ Class RSolicitudCompra extends Report {
         
         //set image scale factor
         $pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
+		/*jrr: Cambio para firmas*/
+		$pdf->firma['datos_documento']['numero'] = $this->getDataSource()->getParameter('numero');
+		$pdf->firma['datos_documento']['numero_tramite'] = $this->getDataSource()->getParameter('num_tramite');
+		$pdf->firma['datos_documento']['tipo'] = $this->getDataSource()->getParameter('tipo');
+		$pdf->firma['datos_documento']['justificacion'] = $this->getDataSource()->getParameter('justificacion');		
         
-        //set some language-dependent strings
-        
-        // add a page
+		// add a page
         $pdf->AddPage();
         
         $height = 5;
@@ -212,17 +200,24 @@ Class RSolicitudCompra extends Report {
         
         $pdf->Ln();
         $pdf->Ln();
-        if($this->getDataSource()->getParameter('estado')!='borrador' && $this->getDataSource()->getParameter('estado')!='pendiente'){
+        /*if($this->getDataSource()->getParameter('estado')!='borrador' && $this->getDataSource()->getParameter('estado')!='pendiente'){
+        	
+					$this->firmar(35);
                     $pdf->Cell($width4-8, $height, '', 0, 0, 'L', false, '', 0, false, 'T', 'C');
+					
                     $pdf->Cell($width3+$width1, $height, $this->getDataSource()->getParameter('desc_funcionario_rpc'), $black, 0, 'C', false, '', 0, false, 'T', 'C');
                     $pdf->Cell($width4-8, $height, '', 0, 0, 'L', false, '', 0, false, 'T', 'C');
                     $pdf->Ln();
                     $pdf->Cell($width4-8, $height, '', 0, 0, 'L', false, '', 0, false, 'T', 'C');
                     $pdf->Cell($width3+$width1, $height, 'Firma Autorizada', 0, 0, 'C', false, '', 0, false, 'T', 'C');
                     $pdf->Cell($width4-8, $height, '', 0, 0, 'L', false, '', 0, false, 'T', 'C');
-        }                           
+        } */                          
         $pdf->Ln();
-        $pdf->Output($fileName, 'F');
+		/*jrr: Cambio para firmas*/
+		$res =$pdf->firma;
+		
+		$pdf->Output($pdf->url_archivo, 'F');			
+		return $res;
     }
    
     function writeDetalles (DataSource $dataSource, TCPDF $pdf) {
