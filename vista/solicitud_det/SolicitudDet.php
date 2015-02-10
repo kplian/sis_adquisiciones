@@ -158,13 +158,13 @@ Phx.vista.SolicitudDet=Ext.extend(Phx.gridInterfaz,{
             id_grupo:0,
             grid:true,
             form:true
-        }
-		,
+        },
         {
             config:{
                 name: 'cantidad',
                 fieldLabel: 'cantidad',
                 allowBlank: false,
+                allowDecimals: false,
                 width: 100,
                 gwidth: 100,
                 maxLength:10
@@ -175,8 +175,6 @@ Phx.vista.SolicitudDet=Ext.extend(Phx.gridInterfaz,{
             grid:true,
             form:true
         },
-        
-       
         {
             config:{
                 name: 'precio_total',
@@ -231,8 +229,6 @@ Phx.vista.SolicitudDet=Ext.extend(Phx.gridInterfaz,{
             grid:true,
             form:true
         },
-        
-        
         
         {
             config:{
@@ -336,8 +332,6 @@ Phx.vista.SolicitudDet=Ext.extend(Phx.gridInterfaz,{
             grid:true,
             form:false
         },
-		 
-		 
 		 
 		{
 			config:{
@@ -463,8 +457,7 @@ Phx.vista.SolicitudDet=Ext.extend(Phx.gridInterfaz,{
 		direction: 'ASC'
 	},
 	
-    loadValoresIniciales:function()
-    {
+    loadValoresIniciales:function(){
         this.Cmp.id_solicitud.setValue(this.maestro.id_solicitud);
        
         Phx.vista.SolicitudDet.superclass.loadValoresIniciales.call(this);
@@ -475,12 +468,8 @@ Phx.vista.SolicitudDet=Ext.extend(Phx.gridInterfaz,{
         this.Cmp.id_orden_trabajo.modificado = true;
     },
     
-    
-    
-	bdel: true,
+    bdel: true,
 	bsave: false
 	}
 )
 </script>
-		
-		

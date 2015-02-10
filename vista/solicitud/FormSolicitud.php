@@ -104,6 +104,7 @@ Phx.vista.FormSolicitud=Ext.extend(Phx.frmInterfaz,{
 										msgTarget: 'title',
 						                fieldLabel: 'cantidad',
 						                allowBlank: false,
+						                allowDecimals: false,
 						                maxLength:10
 								}),
 					'precio_unitario': new Ext.form.NumberField({
@@ -127,7 +128,7 @@ Phx.vista.FormSolicitud=Ext.extend(Phx.frmInterfaz,{
 			  }
     		
     		
-    },
+    }, 
     iniciarEventosDetalle: function(){
     	
         
