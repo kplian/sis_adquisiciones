@@ -19,7 +19,15 @@ Phx.vista.SolReporteEje=Ext.extend(Phx.frmInterfaz,{
         this.init();    
         this.loadValoresIniciales();
         
-        
+        this.Cmp.id_gestion.on('select', function(cmp){
+        	this.Cmp.id_centro_costo.reset();
+        	this.Cmp.id_centro_costo.store.baseParams.id_gestion  = cmp.getValue();
+        	this.Cmp.id_centro_costo.modificado = true;
+        	this.Cmp.id_partida.reset();
+        	this.Cmp.id_partida.store.baseParams.id_gestion = cmp.getValue();
+        	this.Cmp.id_partida.modificado = true;
+        	
+        },this);
         
     },
     
@@ -44,6 +52,19 @@ Phx.vista.SolReporteEje=Ext.extend(Phx.frmInterfaz,{
                 
     
     Atributos:[
+         {
+            config:{
+                    name:'id_gestion',
+                    origen:'GESTION',
+                    fieldLabel: 'Gestión',
+                    emptyText : 'Gestión',
+                    allowBlank:false
+                },
+            type:'ComboRec',
+            id_grupo:0,
+            form:true
+        },
+    
    		 {
             config:{
                     name:'id_centro_costo',
@@ -51,16 +72,12 @@ Phx.vista.SolReporteEje=Ext.extend(Phx.frmInterfaz,{
                     fieldLabel: 'Centro de Costos',
                     emptyText : 'Centro Costo...',
                     allowBlank:false,
-                    gdisplayField:'desc_centro_costo',//mapea al store del grid
-                    gwidth:200,
                     baseParams:{filtrar:'grupo_ep', _adicionar:'Todos'},
                     tpl: '<tpl for="."><div class="x-combo-list-item"><p><b>{codigo_cc}</b></p><p>Gestion: {gestion}</p><p>Reg: {nombre_regional}</p><p>Fin.: {nombre_financiador}</p><p>Proy.: {nombre_programa}</p><p>Act.: {nombre_actividad}</p><p>UO: {nombre_uo}</p></div></tpl>'  				
 		    		
                 },
             type:'ComboRec',
             id_grupo:0,
-            filters:{pfiltro:'cc.codigo_cc',type:'string'},
-            grid:true,
             form:true
         },
 	   	{
@@ -70,8 +87,6 @@ Phx.vista.SolReporteEje=Ext.extend(Phx.frmInterfaz,{
    				origen:'PARTIDA',
    				allowBlank:false,
    				fieldLabel:'Partida',
-   				gdisplayField:'desc_partida',//mapea al store del grid
-   				gwidth:200,
    				width: 350,
    				listWidth: 350,
    				baseParams:{_adicionar:'Todos'},
@@ -79,12 +94,6 @@ Phx.vista.SolReporteEje=Ext.extend(Phx.frmInterfaz,{
        	     },
    			type:'ComboRec',
    			id_grupo:0,
-   			filters:{	
-		        pfiltro: 'par.codigo_partida#au.nombre_partida',
-				type: 'string'
-			},
-   		   
-   			grid:false,
    			form:true
 	   	},
            
@@ -93,9 +102,7 @@ Phx.vista.SolReporteEje=Ext.extend(Phx.frmInterfaz,{
                 name:'id_moneda',
                 origen:'MONEDA',
                  allowBlank:false,
-                fieldLabel:'Moneda',
-                gdisplayField:'desc_moneda',//mapea al store del grid
-                gwidth:50
+                fieldLabel:'Moneda'
               },
             type:'ComboRec',
             form:true
@@ -112,12 +119,14 @@ Phx.vista.SolReporteEje=Ext.extend(Phx.frmInterfaz,{
     onSubmit: function(){
     	    var me = this;
 			if (me.form.getForm().isValid()) {
-				var arg =  'id_centro_costo=' + me.Cmp.id_centro_costo.getValue();
+				var arg =  'id_presupuesto=' + me.Cmp.id_centro_costo.getValue();
 				arg = arg + "&id_partida=" + me.Cmp.id_partida.getValue();
 				arg = arg + "&id_moneda=" + me.Cmp.id_moneda.getValue();
 				arg = arg + "&id_usuario=" + Phx.CP.config_ini.id_usuario;
 				
-				window.open('/reports/print/delivery/?pdf=1&'+arg, '_blank');
+				window.open('http://sms.obairlines.bo/ReporteERP/Presto/DetalleEjecucionPartida?'+arg, '_blank');
+				
+				
 				
 			}
 		}

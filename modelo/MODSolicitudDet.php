@@ -19,7 +19,11 @@ class MODSolicitudDet extends MODbase{
 		$this->transaccion='ADQ_SOLD_SEL';
 		$this->tipo_procedimiento='SEL';//tipo de transaccion
 		
-		$this->setParametro('id_solicitud','id_solicitud','int4');		
+		$this->setParametro('id_solicitud','id_solicitud','int4');	
+		
+		//captura parametros adicionales para el count
+		$this->capturaCount('precio_total','numeric');
+		
 		//Definicion de la lista del resultado del query
 		$this->captura('id_solicitud_det','int4');
 		$this->captura('id_centro_costo','int4');

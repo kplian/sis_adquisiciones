@@ -735,7 +735,8 @@ Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
           cls:'SolicitudVbDet'
          },
 	bdel:true,
-	bsave:false
+	bsave:false,
+	bnew:false
     
 })
 </script>

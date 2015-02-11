@@ -31,7 +31,8 @@ DECLARE
 	v_resp		            varchar;
 	v_nombre_funcion        text;
 	v_mensaje_error         text;
-	v_id_proceso_compra	integer;
+	v_id_proceso_compra		integer;
+    v_id_funcionario_aux	integer;
     
     
     v_num_cot varchar;
@@ -78,7 +79,7 @@ BEGIN
 
 	/*********************************    
  	#TRANSACCION:  'ADQ_PROC_INS'
- 	#DESCRIPCION:	Insercion de registros
+ 	#DESCRIPCION:	Inicia procesos de compra
  	#AUTOR:		admin	
  	#FECHA:		19-03-2013 12:55:29
 	***********************************/
@@ -189,6 +190,18 @@ BEGIN
              fecha_mod=now()
            where id_solicitud = v_parametros.id_solicitud; 
            
+           -- recupera el funcionario responsable del proceso segun auxiliar asginado ...
+           
+           SELECT 
+           	fun.id_funcionario
+           into
+           	v_id_funcionario_aux
+           FROM param.tdepto_usuario du
+           INNER JOIN segu.tusuario u on u.id_usuario = du.id_usuario 
+           INNER JOIN orga.tfuncionario fun on fun.id_persona = u.id_persona
+           WHERE du.id_depto_usuario =  v_parametros.id_depto_usuario
+           OFFSET 0 LIMIT 1;
+           
            
            --iniciar el proceso WF
            
@@ -207,7 +220,7 @@ BEGIN
                      v_parametros._id_usuario_ai,
                      v_parametros._nombre_usuario_ai,
                      v_id_estado_actual, 
-                     NULL, 
+                     v_id_funcionario_aux, 
                      v_parametros.id_depto,
                      'Proceso de Compra '||v_parametros.codigo_proceso,
                      '',
@@ -216,6 +229,7 @@ BEGIN
             
             
            --registra el estado del WF para el proceso
+           
            
            
            
@@ -311,11 +325,15 @@ BEGIN
                 
             END IF;
             
+            --registra el auxiliar en adquisiciones
+            
             IF  pxp.f_existe_parametro(p_tabla,'id_depto_usuario') THEN
                IF adq.f_registrar_auxiliar_adq(p_id_usuario,  v_parametros.id_depto_usuario, v_parametros.id_solicitud ) != 'true' THEN
                  raise exception 'No se pudo asignar el usuario';
                END IF;
             END IF;
+            
+            
             
              
 			

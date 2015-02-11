@@ -300,8 +300,8 @@ Phx.vista.FormSolicitud=Ext.extend(Phx.frmInterfaz,{
                 name: 'btn_editor'
                
             });
-        
-        var summary = new Ext.ux.grid.GridSummary();
+            
+        this.summary = new Ext.ux.grid.GridSummary();
         // al iniciar la edicion
         this.editorDetail.on('beforeedit', this.onInitAdd , this);
         
@@ -327,7 +327,7 @@ Phx.vista.FormSolicitud=Ext.extend(Phx.frmInterfaz,{
                     border: false,
                     plain: true,
                     //autoHeight: true,
-                    plugins: [this.editorDetail],
+                    plugins: [ this.editorDetail, this.summary ],
                     stripeRows: true,
                     tbar: [{
                         /*iconCls: 'badd',*/
@@ -414,6 +414,7 @@ Phx.vista.FormSolicitud=Ext.extend(Phx.frmInterfaz,{
                         dataIndex: 'cantidad_sol',
                         align: 'center',
                         width: 50,
+                        summaryType: 'sum',
                         editor: this.detCmp.cantidad_sol 
                     },
                     

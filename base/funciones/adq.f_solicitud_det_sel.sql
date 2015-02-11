@@ -119,7 +119,8 @@ BEGIN
 
 		begin
 			--Sentencia de la consulta de conteo de registros
-			v_consulta:='select count(id_solicitud_det)
+			v_consulta:='select count(id_solicitud_det) as total,
+                        sum(sold.precio_total) as precio_total
 					    from adq.tsolicitud_det sold
                         inner join param.tconcepto_ingas cig on cig.id_concepto_ingas = sold.id_concepto_ingas
 						inner join segu.tusuario usu1 on usu1.id_usuario = sold.id_usuario_reg

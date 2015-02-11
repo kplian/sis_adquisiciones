@@ -26,6 +26,16 @@ class ACTSolicitudDet extends ACTbase{
 			
 			$this->res=$this->objFunc->listarSolicitudDet($this->objParam);
 		}
+		
+		//adicionar una fila al resultado con el summario
+		$temp = Array();
+		$temp['precio_total'] = $this->res->extraData['precio_total'];
+		$temp['tipo_reg'] = 'summary';
+		$temp['id_solicitud_det'] = 0;
+		
+		$this->res->total++;
+		
+		$this->res->addLastRecDatos($temp);
 		$this->res->imprimirRespuesta($this->res->generarJson());
 	}
 				
