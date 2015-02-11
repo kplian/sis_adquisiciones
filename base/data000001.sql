@@ -835,3 +835,14 @@ INSERT INTO pxp.variable_global ("id_variable_global", "variable", "valor", "des
 VALUES (15, E'adq_aprobacion', E'gerencia', E'aprobaciones: gerencia o presupuesto,  para determinar si aprueban solo genretens o dueños de presupeustos');
 
 /***********************************F-DAT-RAC-ADQ-0-04/02/2015*****************************************/
+
+
+/***********************************I-DAT-RAC-ADQ-0-12/02/2015*****************************************/
+
+select pxp.f_insert_tgui ('Reportes', 'Reportes', 'REPADQ', 'si', 45, '', 2, '', '', 'ADQ');
+select pxp.f_insert_tgui ('Ejecución presupuestaria', 'Ejecución presupuestaria', 'ADQELEPRE', 'si', 1, 'sis_adquisiciones/vista/solicitud/SolReporteEje.php', 3, '', 'SolReporteEje', 'ADQ');
+select pxp.f_insert_testructura_gui ('REPADQ', 'ADQ')
+select pxp.f_insert_testructura_gui ('ADQELEPRE', 'REPADQ')
+
+
+/***********************************F-DAT-RAC-ADQ-0-12/02/2015*****************************************/
