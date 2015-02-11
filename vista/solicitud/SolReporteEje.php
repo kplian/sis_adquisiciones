@@ -86,7 +86,20 @@ Phx.vista.SolReporteEje=Ext.extend(Phx.frmInterfaz,{
    		   
    			grid:false,
    			form:true
-	   	}
+	   	},
+           
+       {
+            config:{
+                name:'id_moneda',
+                origen:'MONEDA',
+                 allowBlank:false,
+                fieldLabel:'Moneda',
+                gdisplayField:'desc_moneda',//mapea al store del grid
+                gwidth:50
+              },
+            type:'ComboRec',
+            form:true
+       }
         
    ],
     title: 'Reporte de ejeucuión presupeustaria por tramite',
@@ -99,8 +112,11 @@ Phx.vista.SolReporteEje=Ext.extend(Phx.frmInterfaz,{
     onSubmit: function(){
     	    var me = this;
 			if (me.form.getForm().isValid()) {
-				var arg =  'id_ceotro_costo=' + me.Cmp.id_centro_costo.getValue();
+				var arg =  'id_centro_costo=' + me.Cmp.id_centro_costo.getValue();
 				arg = arg + "&id_partida=" + me.Cmp.id_partida.getValue();
+				arg = arg + "&id_moneda=" + me.Cmp.id_moneda.getValue();
+				arg = arg + "&id_usuario=" + Phx.CP.config_ini.id_usuario;
+				
 				window.open('/reports/print/delivery/?pdf=1&'+arg, '_blank');
 				
 			}
