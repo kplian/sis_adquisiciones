@@ -162,6 +162,46 @@ Phx.vista.SolicitudReq = {
                 this.mostrarComponente(this.Cmp.dias_plazo_entrega);
               
            },this);
+           
+           this.Cmp.id_funcionario.on('select',function(rec){ 
+        	
+        	//Aprobador  
+            this.cmpIdFuncionarioAprobador.store.baseParams.id_funcionario_dependiente=this.Cmp.id_funcionario.getValue();
+            this.cmpIdFuncionarioAprobador.store.baseParams.gerencia='si';
+            this.cmpIdFuncionarioAprobador.store.baseParams.fecha = this.cmpFechaSoli.getValue().dateFormat(this.cmpFechaSoli.format);
+            this.cmpIdFuncionarioAprobador.modificado=true;
+            
+            //Supervisor  
+            this.Cmp.id_funcionario_supervisor.store.baseParams.id_funcionario_dependiente=this.Cmp.id_funcionario.getValue();
+            this.Cmp.id_funcionario_supervisor.store.baseParams.presupuesto='todos';  //no se filtar solo las unidades que presupeustan
+            this.Cmp.id_funcionario_supervisor.store.baseParams.gerencia='no';  //no se aplica el filtro de gerencia de area
+            this.Cmp.id_funcionario_supervisor.store.baseParams.filter_rpc='si'; //se excluye a los rpc de esta lista
+            this.Cmp.id_funcionario_supervisor.store.baseParams.lista_blanca='4'; //solo se lista jefes de departamento
+            
+            this.Cmp.id_funcionario_supervisor.store.baseParams.fecha = this.cmpFechaSoli.getValue().dateFormat(this.cmpFechaSoli.format);
+            this.Cmp.id_funcionario_supervisor.modificado=true;
+            
+            
+            
+            //Unidad
+            this.Cmp.id_uo.store.baseParams.id_funcionario_uo_presupuesta=this.Cmp.id_funcionario.getValue();
+            this.Cmp.id_uo.store.baseParams.fecha = this.cmpFechaSoli.getValue().dateFormat(this.cmpFechaSoli.format);
+            this.Cmp.id_uo.store.load({params:{start:0,limit:this.tam_pag}, 
+		       callback : function (r) {	       				
+		    		if (r.length > 0 ) {	       				
+	    				this.Cmp.id_uo.setValue(r[0].data.id_uo);
+	    			}     
+		    			    		
+		    	}, scope : this
+		    });
+            
+            this.cmpIdUo.enable();
+            this.cmpIdFuncionarioAprobador.reset();
+            this.cmpIdFuncionarioAprobador.enable();
+            this.Cmp.id_funcionario_supervisor.reset();
+            this.Cmp.id_funcionario_supervisor.enable();
+            
+           },this);
       
     },
          

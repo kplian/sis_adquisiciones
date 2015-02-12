@@ -222,7 +222,8 @@ Phx.vista.SolicitudReq = {
     },
     onButtonEdit:function(){
        this.cmpFechaSoli.disable();
-       this.cmpIdDepto.disable();        
+       this.cmpIdDepto.disable();   
+       this.Cmp.id_funcionario.disable();     
        this.Cmp.id_categoria_compra.disable();
       
        this.Cmp.tipo.disable();
@@ -233,15 +234,15 @@ Phx.vista.SolicitudReq = {
        this.Cmp.id_funcionario.store.baseParams.fecha = this.cmpFechaSoli.getValue().dateFormat(this.cmpFechaSoli.format);
        //this.Cmp.fecha_soli.fireEvent('change');  
        
-           if(this.Cmp.tipo.getValue() == 'Bien' ||  this.Cmp.tipo.getValue() == 'Bien - Servicio'){
-                	this.ocultarComponente(this.Cmp.fecha_inicio);
-                	this.Cmp.dias_plazo_entrega.allowBlank = false;
-            }
-            else{
-            	this.mostrarComponente(this.Cmp.fecha_inicio);
-            	this.Cmp.dias_plazo_entrega.allowBlank = true;
-            }
-            this.mostrarComponente(this.Cmp.dias_plazo_entrega);
+       if(this.Cmp.tipo.getValue() == 'Bien' ||  this.Cmp.tipo.getValue() == 'Bien - Servicio'){
+            	this.ocultarComponente(this.Cmp.fecha_inicio);
+            	this.Cmp.dias_plazo_entrega.allowBlank = false;
+        }
+        else{
+        	this.mostrarComponente(this.Cmp.fecha_inicio);
+        	this.Cmp.dias_plazo_entrega.allowBlank = true;
+        }
+        this.mostrarComponente(this.Cmp.dias_plazo_entrega);
     },
     
     iniciarEventos:function(){

@@ -628,18 +628,34 @@ Phx.vista.FormSolicitud=Ext.extend(Phx.frmInterfaz,{
         },
 		{
    			config:{
+       		    name:'id_funcionario',
+       		    hiddenName: 'id_funcionario',
+   				origen: 'FUNCIONARIOCAR',
+   				fieldLabel:'Funcionario',
+   				allowBlank: false,
+                valueField: 'id_funcionario',
+                width: '80%',
+   			    baseParams: { es_combo_solicitud : 'si' }
+       	     },
+   			type: 'ComboRec',//ComboRec
+   			id_grupo: 1,
+   			form: true
+		 },
+		{
+   			config:{
 			    name:'id_depto',
 			    hiddenName: 'id_depto',
 			    url: '../../sis_parametros/control/Depto/listarDeptoFiltradoXUsuario',
    				origen: 'DEPTO',
    				allowBlank: false,
    				fieldLabel: 'Depto',
+   				disabled: true,
    				width: '80%',
 		        baseParams: { estado:'activo', codigo_subsistema: 'ADQ' },
    			},
    			//type:'TrigguerCombo',
    			type:'ComboRec',
-   			id_grupo: 0,
+   			id_grupo: 1,
    			form:true
        	},
            
@@ -741,21 +757,6 @@ Phx.vista.FormSolicitud=Ext.extend(Phx.frmInterfaz,{
             id_grupo: 2,
             form:true
         },
-		{
-   			config:{
-       		    name:'id_funcionario',
-       		    hiddenName: 'id_funcionario',
-   				origen: 'FUNCIONARIOCAR',
-   				fieldLabel:'Funcionario',
-   				allowBlank: false,
-                valueField: 'id_funcionario',
-                width: '80%',
-   			    baseParams: { es_combo_solicitud : 'si' }
-       	     },
-   			type: 'ComboRec',//ComboRec
-   			id_grupo: 1,
-   			form: true
-		 },
          {
             config:{
                 name:'id_proveedor',
@@ -768,7 +769,7 @@ Phx.vista.FormSolicitud=Ext.extend(Phx.frmInterfaz,{
                 valueField: 'id_proveedor'
             },
             type:'ComboRec',//ComboRec
-            id_grupo: 1,
+            id_grupo: 0,
             form:true
         },
 		{
@@ -843,6 +844,20 @@ Phx.vista.FormSolicitud=Ext.extend(Phx.frmInterfaz,{
                 this.mostrarComponente(this.Cmp.dias_plazo_entrega);
                 this.Cmp.tipo_concepto.reset();
            },this);
+           
+           this.Cmp.id_funcionario.on('select', function(combo, record, index){ 
+            	
+            	if(!record.data.id_lugar){
+            		alert('El funcionario no tiene oficina definida');
+            	}
+            	
+            	this.Cmp.id_depto.reset();
+            	this.Cmp.id_depto.store.baseParams.id_lugar = record.data.id_lugar;
+            	this.Cmp.id_depto.modificado = true;
+            	this.Cmp.id_depto.enable();
+            	
+            	
+            }, this);
       
     },
     
@@ -898,13 +913,13 @@ Phx.vista.FormSolicitud=Ext.extend(Phx.frmInterfaz,{
     
     onNew: function(){
     	
-    	
+    	this.cmpIdDepto.disable();
         this.form.getForm().reset();
         this.loadValoresIniciales();
         if(this.getValidComponente(0)){
         	this.getValidComponente(0).focus(false, 100);
         }
-        this.cmpIdDepto.enable(); 
+       
         this.Cmp.id_categoria_compra.enable();
        
         this.Cmp.id_funcionario.disable();

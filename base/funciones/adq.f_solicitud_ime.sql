@@ -1,14 +1,17 @@
+--------------- SQL ---------------
+
 CREATE OR REPLACE FUNCTION adq.f_solicitud_ime (
   p_administrador integer,
   p_id_usuario integer,
   p_tabla varchar,
   p_transaccion varchar
 )
-RETURNS varchar AS'
+RETURNS varchar AS
+$body$
 /**************************************************************************
  SISTEMA:		Adquisiciones
  FUNCION: 		adq.f_solicitud_ime
- DESCRIPCION:   Funcion que gestiona las operaciones basicas (inserciones, modificaciones, eliminaciones de la tabla ''adq.tsolicitud''
+ DESCRIPCION:   Funcion que gestiona las operaciones basicas (inserciones, modificaciones, eliminaciones de la tabla 'adq.tsolicitud'
  AUTOR: 		 (RAC)
  FECHA:	        19-02-2013 12:12:51
  COMENTARIOS:	
@@ -98,27 +101,22 @@ DECLARE
 			    
 BEGIN
 
-    v_nombre_funcion = ''adq.f_solicitud_ime'';
+    v_nombre_funcion = 'adq.f_solicitud_ime';
     v_parametros = pxp.f_get_record(p_tabla);
 
 	/*********************************    
-
  	#TRANSACCION:  'ADQ_SOL_INS'
  	#DESCRIPCION:	Insercion de la cabecera de las solicitudes de compra ....
  	#AUTOR:		RAC	
  	#FECHA:		19-02-2013 12:12:51
 	***********************************/
 
-
-	if(p_transaccion=''ADQ_SOL_INS'')then
+	if (p_transaccion='ADQ_SOL_INS') then
 					
         begin
         
-        --determina la fecha del periodo
-         if (v_parametros.fecha_soli < ''01-01-2015'' and p_administrador = 0) then
-            raise exception ''No se puede hacer una solicitud con gestion 2014, porfavor consulte con el administrador'';
-        end if;
-
+        -- determina la fecha del periodo
+        
          select id_periodo into v_id_periodo from
                         param.tperiodo per 
                        where per.fecha_ini <= v_parametros.fecha_soli 
@@ -128,17 +126,17 @@ BEGIN
         
         -- obtener correlativo
          v_num_sol =   param.f_obtener_correlativo(
-                  ''SOLC'', 
+                  'SOLC', 
                    v_id_periodo,-- par_id, 
                    NULL, --id_uo 
                    v_parametros.id_depto,    -- id_depto
                    p_id_usuario, 
-                   ''ADQ'', 
+                   'ADQ', 
                    NULL);
       
         
-        IF (v_num_sol is NULL or v_num_sol ='''') THEN
-           raise exception ''No se pudo obtener un numero correlativo para la solicitud consulte con el administrador'';
+        IF (v_num_sol is NULL or v_num_sol ='') THEN
+           raise exception 'No se pudo obtener un numero correlativo para la solicitud consulte con el administrador';
         END IF;
         
         -- obtener el codigo del tipo_proceso
@@ -151,12 +149,12 @@ BEGIN
         inner join wf.ttipo_proceso tp
         	on tp.id_proceso_macro = pm.id_proceso_macro
         where   cc.id_categoria_compra = v_parametros.id_categoria_compra
-                and tp.estado_reg = ''activo'' and tp.inicio = ''si'';
+                and tp.estado_reg = 'activo' and tp.inicio = 'si';
             
          
         IF v_codigo_tipo_proceso is NULL THEN
         
-           raise exception ''No existe un proceso inicial para el proceso macro indicado (Revise la configuración)'';
+           raise exception 'No existe un proceso inicial para el proceso macro indicado (Revise la configuración)';
         
         END IF;
         
@@ -227,7 +225,7 @@ BEGIN
             fecha_inicio,
             dias_plazo_entrega
           	) values(
-			''activo'',
+			'activo',
 			--v_parametros.id_solicitud_ext,
 			--v_parametros.presu_revertido,
 			--v_parametros.fecha_apro,
@@ -240,7 +238,7 @@ BEGIN
 			v_parametros.justificacion,
 			v_parametros.id_depto,
 			v_parametros.lugar_entrega,
-			''no'',
+			'no',
 			v_num_sol,--v_parametros.numero,
 			--v_parametros.posibles_proveedores,
 			--v_id_proceso_wf,
@@ -287,7 +285,7 @@ BEGIN
              v_codigo_tipo_proceso, 
              v_parametros.id_funcionario,
              NULL,
-             ''Solicitud de Compra ''||v_num_sol,
+             'Solicitud de Compra '||v_num_sol,
              v_num_sol);
         
         -- UPDATE DATOS wf
@@ -309,13 +307,11 @@ BEGIN
         
         	
 		   --Definicion de la respuesta
-
 		   v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Solicitud de Compras almacenado(a) con exito (id_solicitud'||v_id_solicitud||')'); 
            v_resp = pxp.f_agrega_clave(v_resp,'id_solicitud',v_id_solicitud::varchar);
            v_resp = pxp.f_agrega_clave(v_resp,'id_proceso_wf',v_id_proceso_wf::varchar);
            v_resp = pxp.f_agrega_clave(v_resp,'num_tramite',v_num_tramite::varchar);
            v_resp = pxp.f_agrega_clave(v_resp,'estado',v_codigo_estado::varchar);
-
 
             --Devuelve la respuesta
             return v_resp;
@@ -323,13 +319,13 @@ BEGIN
 		end;
 
 	/*********************************    
- 	#TRANSACCION:  ''ADQ_SOL_MOD''
+ 	#TRANSACCION:  'ADQ_SOL_MOD'
  	#DESCRIPCION:	Modificacion de registros
  	#AUTOR:		RAC	
  	#FECHA:		19-02-2013 12:12:51
 	***********************************/
 
-	elsif(p_transaccion=''ADQ_SOL_MOD'')then
+	elsif(p_transaccion='ADQ_SOL_MOD')then
 
 		begin
         
@@ -398,12 +394,10 @@ BEGIN
 			where id_solicitud = v_parametros.id_solicitud;
                
 			--Definicion de la respuesta
-
             v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Solicitud de Compras modificado(a)'); 
             v_resp = pxp.f_agrega_clave(v_resp,'id_solicitud',v_parametros.id_solicitud::varchar);
             v_resp = pxp.f_agrega_clave(v_resp,'num_tramite',v_registros.num_tramite);
             v_resp = pxp.f_agrega_clave(v_resp,'estado',v_registros.estado);
-
                
             --Devuelve la respuesta
             return v_resp;
@@ -411,13 +405,13 @@ BEGIN
 		end;
 
 	/*********************************    
- 	#TRANSACCION:  ''ADQ_SOL_ELI''
+ 	#TRANSACCION:  'ADQ_SOL_ELI'
  	#DESCRIPCION:	Eliminacion de registros
  	#AUTOR:		RAC	
  	#FECHA:		19-02-2013 12:12:51
 	***********************************/
 
-	elsif(p_transaccion=''ADQ_SOL_ELI'')then
+	elsif(p_transaccion='ADQ_SOL_ELI')then
 
 		begin
           
@@ -443,9 +437,9 @@ BEGIN
             from adq.tsolicitud s 
             where s.id_solicitud = v_parametros.id_solicitud;
         
-            IF v_codigo_estado !=''borrador'' THEN
+            IF v_codigo_estado !='borrador' THEN
             
-               raise exception ''Solo pueden anularce solicitud de en borrador'';
+               raise exception 'Solo pueden anularce solicitud de en borrador';
               
             
             END IF;
@@ -460,13 +454,13 @@ BEGIN
               v_id_tipo_estado
              from wf.tproceso_wf pw 
              inner join wf.ttipo_proceso tp on pw.id_tipo_proceso = tp.id_tipo_proceso
-             inner join wf.ttipo_estado te on te.id_tipo_proceso = tp.id_tipo_proceso and te.codigo = ''anulado''               
+             inner join wf.ttipo_estado te on te.id_tipo_proceso = tp.id_tipo_proceso and te.codigo = 'anulado'               
              where pw.id_proceso_wf = v_id_proceso_wf;
                
               
              IF v_id_tipo_estado is NULL  THEN
              
-                raise exception ''No se parametrizo es estado "anulado" para la solicitud de compra'';
+                raise exception 'No se parametrizo es estado "anulado" para la solicitud de compra';
              
              END IF;
              
@@ -481,34 +475,34 @@ BEGIN
                                                            v_parametros._id_usuario_ai,
                                                            v_parametros._nombre_usuario_ai,
                                                            v_id_depto,
-                                                           ''Eliminacion de la solicitud ''|| COALESCE(v_numero_sol,''SN'')::text);
+                                                           'Eliminacion de la solicitud '|| COALESCE(v_numero_sol,'SN')::text);
             
             
                -- actualiza estado en la solicitud
               
                update adq.tsolicitud  set 
                  id_estado_wf =  v_id_estado_actual,
-                 estado = ''anulado'',
+                 estado = 'anulado',
                  id_usuario_mod=p_id_usuario,
                  fecha_mod=now()
                where id_solicitud  = v_parametros.id_solicitud;
                
             --Definicion de la respuesta
-            v_resp = pxp.f_agrega_clave(v_resp,''mensaje'',''Solicitud de Compras anulada'' ||COALESCE(v_numero_sol,''SN'')); 
-            v_resp = pxp.f_agrega_clave(v_resp,''id_solicitud'',v_parametros.id_solicitud::varchar);
+            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Solicitud de Compras anulada' ||COALESCE(v_numero_sol,'SN')); 
+            v_resp = pxp.f_agrega_clave(v_resp,'id_solicitud',v_parametros.id_solicitud::varchar);
               
             --Devuelve la respuesta
             return v_resp;
 
 		end;
      /*********************************    
- 	#TRANSACCION:  ''ADQ_REVSOL_IME''
+ 	#TRANSACCION:  'ADQ_REVSOL_IME'
  	#DESCRIPCION:	Marca la revision de las solicitudes de compra
  	#AUTOR:		RAC	
  	#FECHA:		23-09-2014 12:12:51
 	***********************************/
 
-	elsif(p_transaccion=''ADQ_REVSOL_IME'')then
+	elsif(p_transaccion='ADQ_REVSOL_IME')then
 
 		begin
           
@@ -522,10 +516,10 @@ BEGIN
             from adq.tsolicitud s 
             where s.id_solicitud = v_parametros.id_solicitud;
         
-            IF v_registros.revisado_asistente = ''si'' THEN
-               v_revisado = ''no'';
+            IF v_registros.revisado_asistente = 'si' THEN
+               v_revisado = 'no';
             ELSE
-               v_revisado = ''si'';
+               v_revisado = 'si';
             END IF;
             
              -- actualiza estado en la solicitud
@@ -544,24 +538,24 @@ BEGIN
              
                
             --Definicion de la respuesta
-            v_resp = pxp.f_agrega_clave(v_resp,''mensaje'',''Revision de solicitud de compra''); 
-            v_resp = pxp.f_agrega_clave(v_resp,''id_solicitud'',v_parametros.id_solicitud::varchar);
+            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Revision de solicitud de compra'); 
+            v_resp = pxp.f_agrega_clave(v_resp,'id_solicitud',v_parametros.id_solicitud::varchar);
               
             --Devuelve la respuesta
             return v_resp;
 
 		end;   
      /*********************************    
- 	#TRANSACCION:  ''ADQ_FINSOL_IME''
+ 	#TRANSACCION:  'ADQ_FINSOL_IME'
  	#DESCRIPCION:	Finalizar solicitud de Compras
  	#AUTOR:		RAC	
  	#FECHA:		19-02-2013 12:12:51
 	***********************************/
 
-	elseif(p_transaccion=''ADQ_FINSOL_IME'')then   
+	elseif(p_transaccion='ADQ_FINSOL_IME')then   
         begin
         
-          IF  v_parametros.operacion = ''verificar'' THEN
+          IF  v_parametros.operacion = 'verificar' THEN
           
           --  29/01/2014  RAC
           --  Se quita la opcion de que el solcitante eescoja un RPC en un combo
@@ -575,21 +569,21 @@ BEGIN
                   v_total_soli
                   from adq.tsolicitud_det sd
                   where sd.id_solicitud = v_parametros.id_solicitud
-                  and sd.estado_reg = ''activo'';
+                  and sd.estado_reg = 'activo';
                   
                   v_total_soli =  COALESCE(v_total_soli,0);
                   
                   
                   IF  v_total_soli = 0  THEN
-                    raise exception '' La Solicitud  tiene que ser por un valor mayor a 0'';
+                    raise exception ' La Solicitud  tiene que ser por un valor mayor a 0';
                   END IF;
                 --  
                  IF exists ( select 1
                   from adq.tsolicitud_det sd
                   where sd.id_solicitud = v_parametros.id_solicitud
-                  and sd.estado_reg = ''activo'' and (COALESCE( sd.precio_ga_mb,0)  + COALESCE(sd.precio_sg_mb,0)=0)) THEN
+                  and sd.estado_reg = 'activo' and (COALESCE( sd.precio_ga_mb,0)  + COALESCE(sd.precio_sg_mb,0)=0)) THEN
                     
-                      raise exception ''Al menos uno del los items tiene un precio total de 0, verifique e intentelo nuevamente'';
+                      raise exception 'Al menos uno del los items tiene un precio total de 0, verifique e intentelo nuevamente';
                   
                   END IF;
                   
@@ -601,8 +595,8 @@ BEGIN
                     into 
                       v_id_subsistema
                     from segu.tsubsistema s
-                    where s.codigo = ''ADQ''
-                    and s.estado_reg = ''activo'' 
+                    where s.codigo = 'ADQ'
+                    and s.estado_reg = 'activo' 
                     limit 1 offset 0; 
                     
                     --obener UO, id_proceso_macro y fecha de la solictud
@@ -621,7 +615,7 @@ BEGIN
                   
                   
                    v_cont = 0;
-                   v_mensaje_resp = '''';
+                   v_mensaje_resp = '';
                     --  obtener listado de RPC
                     
                     /*
@@ -686,7 +680,7 @@ BEGIN
                   
                        END IF;
                        
-                       v_mensaje_resp = v_mensaje_resp||'' - ''||v_registros.desc_funcionario||'' <br>'';
+                       v_mensaje_resp = v_mensaje_resp||' - '||v_registros.desc_funcionario||' <br>';
                    
                    
                    
@@ -696,7 +690,7 @@ BEGIN
                   -- si existe mas de un posible aprobador lanzamos un error
                   IF v_cont > 1 THEN
                   
-                      raise exception ''Existe mas de un aprobador para el monto (%), revice la configuracion para los funcionarios: <br> %'',v_total_soli,v_mensaje_resp;
+                      raise exception 'Existe mas de un aprobador para el monto (%), revice la configuracion para los funcionarios: <br> %',v_total_soli,v_mensaje_resp;
                   
                   
                   END IF;
@@ -704,20 +698,20 @@ BEGIN
                   -- si existe mas de un posible aprobador lanzamos un error
                   IF v_cont = 0 THEN
                   
-                      raise exception ''No se encontro RPC para esta solicitud'';
+                      raise exception 'No se encontro RPC para esta solicitud';
                   
                   
                   END IF;
                   
                
                 --Definicion de la respuesta
-                v_resp = pxp.f_agrega_clave(v_resp,''mensaje'',''Verificacionde finalizacion)''); 
-                v_resp = pxp.f_agrega_clave(v_resp,''total'',v_total_soli::varchar);
+                v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Verificacionde finalizacion)'); 
+                v_resp = pxp.f_agrega_clave(v_resp,'total',v_total_soli::varchar);
               
           
-          ELSEIF  v_parametros.operacion = ''finalizar'' THEN
+          ELSEIF  v_parametros.operacion = 'finalizar' THEN
           
-           raise exception ''fin'';
+           raise exception 'fin';
         
              v_resp =  adq.f_finalizar_reg_solicitud(p_administrador, 
                                            p_id_usuario, 
@@ -728,7 +722,7 @@ BEGIN
         
          ELSE
           
-            raise exception ''operacion no identificada %'',COALESCE( v_parametros.operacion,''--'');
+            raise exception 'operacion no identificada %',COALESCE( v_parametros.operacion,'--');
           
           END IF;
         
@@ -739,13 +733,13 @@ BEGIN
         end;   
     
       /*********************************    
- 	#TRANSACCION:  ''ADQ_SIGESOL_IME''
+ 	#TRANSACCION:  'ADQ_SIGESOL_IME'
  	#DESCRIPCION:	funcion que controla el cambio al Siguiente esado de la solicitud, integrado con el WF
  	#AUTOR:		RAC	
  	#FECHA:		19-02-2013 12:12:51
 	***********************************/
 
-	elseif(p_transaccion=''ADQ_SIGESOL_IME'')then   
+	elseif(p_transaccion='ADQ_SIGESOL_IME')then   
         begin
         
         --obtenermos datos basicos
@@ -781,7 +775,7 @@ BEGIN
          ------------------------------------------------------------------------------ 
          -- Verifica  los posibles estados siguientes para que desde la interfza se tome la decision si es necesario
          --------------------------------------------------------------------------------
-          IF  v_parametros.operacion = ''verificar'' THEN
+          IF  v_parametros.operacion = 'verificar' THEN
           
                         --buscamos siguiente estado correpondiente al proceso del WF
                        
@@ -810,7 +804,7 @@ BEGIN
                       
                       v_num_estados= array_length(va_id_tipo_estado, 1);
                       
-                       IF v_perdir_obs = ''no'' THEN
+                       IF v_perdir_obs = 'no' THEN
                       
                           IF v_num_estados = 1 then
                                 -- si solo hay un estado,  verificamos si tiene mas de un funcionario por este estado
@@ -886,21 +880,21 @@ BEGIN
                      END IF;
                       
                       -- si hay mas de un estado disponible  preguntamos al usuario
-                      v_resp = pxp.f_agrega_clave(v_resp,''mensaje'',''Verificacion para el siguiente estado)''); 
-                      v_resp = pxp.f_agrega_clave(v_resp,''estados'', array_to_string(va_id_tipo_estado, '',''));
-                      v_resp = pxp.f_agrega_clave(v_resp,''operacion'',''preguntar_todo'');
-                      v_resp = pxp.f_agrega_clave(v_resp,''num_estados'',v_num_estados::varchar);
-                      v_resp = pxp.f_agrega_clave(v_resp,''num_funcionarios'',v_num_funcionarios::varchar);
-                      v_resp = pxp.f_agrega_clave(v_resp,''num_deptos'',v_num_deptos::varchar);
-                      v_resp = pxp.f_agrega_clave(v_resp,''id_funcionario_estado'',v_id_funcionario_estado::varchar);
-                      v_resp = pxp.f_agrega_clave(v_resp,''id_depto_estado'',v_id_depto_estado::varchar);
-                      v_resp = pxp.f_agrega_clave(v_resp,''id_tipo_estado'', va_id_tipo_estado[1]::varchar);
+                      v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Verificacion para el siguiente estado)'); 
+                      v_resp = pxp.f_agrega_clave(v_resp,'estados', array_to_string(va_id_tipo_estado, ','));
+                      v_resp = pxp.f_agrega_clave(v_resp,'operacion','preguntar_todo');
+                      v_resp = pxp.f_agrega_clave(v_resp,'num_estados',v_num_estados::varchar);
+                      v_resp = pxp.f_agrega_clave(v_resp,'num_funcionarios',v_num_funcionarios::varchar);
+                      v_resp = pxp.f_agrega_clave(v_resp,'num_deptos',v_num_deptos::varchar);
+                      v_resp = pxp.f_agrega_clave(v_resp,'id_funcionario_estado',v_id_funcionario_estado::varchar);
+                      v_resp = pxp.f_agrega_clave(v_resp,'id_depto_estado',v_id_depto_estado::varchar);
+                      v_resp = pxp.f_agrega_clave(v_resp,'id_tipo_estado', va_id_tipo_estado[1]::varchar);
                 
                 
                -------------------------------------------------
                --Se se solicita cambiar de estado a la solicitud
                --------------------------------------------------
-           ELSEIF  v_parametros.operacion = ''cambiar'' THEN
+           ELSEIF  v_parametros.operacion = 'cambiar' THEN
           
            
                     
@@ -913,7 +907,7 @@ BEGIN
                     from wf.ttipo_estado te
                     where te.id_tipo_estado = v_parametros.id_tipo_estado;
                     
-                    IF  pxp.f_existe_parametro(p_tabla,''id_depto'') THEN
+                    IF  pxp.f_existe_parametro(p_tabla,'id_depto') THEN
                      
                      v_id_depto = v_parametros.id_depto;
                     
@@ -922,7 +916,7 @@ BEGIN
                     
                     v_obs=v_parametros.obs;
                     
-                    IF v_codigo_estado_siguiente =  ''aprobado'' THEN
+                    IF v_codigo_estado_siguiente =  'aprobado' THEN
                         --si el siguient estado es aprobado obtenemos el depto que le correponde de la solictud de compra
                         
                           select 
@@ -937,20 +931,20 @@ BEGIN
                           inner join orga.tuo uo on uo.id_uo = s.id_uo 
                           where s.id_solicitud = v_parametros.id_solicitud;
                           
-                          v_obs =  ''La solicitud ''||v_num_sol||'' fue aprobada para la uo ''||v_uo_sol||'' (''||v_parametros.obs||'')'';
+                          v_obs =  'La solicitud '||v_num_sol||' fue aprobada para la uo '||v_uo_sol||' ('||v_parametros.obs||')';
                     END IF;
                     
                      
-                     --v_acceso_directo = ''../../../sis_adquisiciones/vista/solicitud/SolicitudVb.php'';
-                     --v_clases_acceso_directo = ''SolicitudVb'';
+                     --v_acceso_directo = '../../../sis_adquisiciones/vista/solicitud/SolicitudVb.php';
+                     --v_clases_acceso_directo = 'SolicitudVb';
                     
-                   if v_obs ='''' THEN
+                   if v_obs ='' THEN
                    
-                      v_obs = '' Cambio de estado de la solicitud ''||COALESCE(v_numero_sol,''S/N'')||''  de  la uo ''||COALESCE(v_uo_sol,''-'');
+                      v_obs = ' Cambio de estado de la solicitud '||COALESCE(v_numero_sol,'S/N')||'  de  la uo '||COALESCE(v_uo_sol,'-');
                    
                    ELSE
                    
-                      v_obs = ''Solicitud  de compra ''||COALESCE(v_numero_sol,''S/N'')||''  para  la uo OBS:''||COALESCE(v_uo_sol,''-'')||'' (''|| COALESCE(v_obs,''S/O'')||'')'';
+                      v_obs = 'Solicitud  de compra '||COALESCE(v_numero_sol,'S/N')||'  para  la uo OBS:'||COALESCE(v_uo_sol,'-')||' ('|| COALESCE(v_obs,'S/O')||')';
                    
                    
                    END IF;
@@ -958,19 +952,19 @@ BEGIN
                    
                    
                    --configurar acceso directo para la alarma   
-                   v_acceso_directo = '''';
-                   v_clase = '''';
-                   v_parametros_ad = '''';
-                   v_tipo_noti = ''notificacion'';
-                   v_titulo  = ''Visto Bueno'';
+                   v_acceso_directo = '';
+                   v_clase = '';
+                   v_parametros_ad = '';
+                   v_tipo_noti = 'notificacion';
+                   v_titulo  = 'Visto Bueno';
                                
                              
-                   IF  v_codigo_estado_siguiente not in(''borrador'',''aprobado'',''en_proceso'',''finalizado'',''anulado'')   THEN
-                       v_acceso_directo = ''../../../sis_adquisiciones/vista/solicitud/SolicitudVb.php'';
-                       v_clase = ''SolicitudVb'';
-                       v_parametros_ad = ''{filtro_directo:{campo:"sol.id_proceso_wf",valor:"''||v_id_proceso_wf::varchar||''"}}'';
-                       v_tipo_noti = ''notificacion'';
-                       v_titulo  = ''Visto Bueno'';
+                   IF  v_codigo_estado_siguiente not in('borrador','aprobado','en_proceso','finalizado','anulado')   THEN
+                       v_acceso_directo = '../../../sis_adquisiciones/vista/solicitud/SolicitudVb.php';
+                       v_clase = 'SolicitudVb';
+                       v_parametros_ad = '{filtro_directo:{campo:"sol.id_proceso_wf",valor:"'||v_id_proceso_wf::varchar||'"}}';
+                       v_tipo_noti = 'notificacion';
+                       v_titulo  = 'Visto Bueno';
                                
                     END IF;
                     
@@ -995,7 +989,7 @@ BEGIN
                     
                   
                    
-                     IF v_estado_actual = ''vbpresupuestos'' THEN
+                     IF v_estado_actual = 'vbpresupuestos' THEN
                            update adq.tsolicitud  s set 
                             obs_presupuestos = v_parametros.obs
                            where id_solicitud = v_parametros.id_solicitud;
@@ -1010,14 +1004,14 @@ BEGIN
                                                    v_codigo_estado_siguiente,
                                                    v_parametros.instruc_rpc) THEN
             
-                             raise exception ''Error al retroceder estado'';
+                             raise exception 'Error al retroceder estado';
             
                     END IF;
                     
                   
                      -- si hay mas de un estado disponible  preguntamos al usuario
-                    v_resp = pxp.f_agrega_clave(v_resp,''mensaje'',''Se realizo el cambio de estado)''); 
-                    v_resp = pxp.f_agrega_clave(v_resp,''operacion'',''cambio_exitoso'');
+                    v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Se realizo el cambio de estado)'); 
+                    v_resp = pxp.f_agrega_clave(v_resp,'operacion','cambio_exitoso');
                   
           
           END IF;
@@ -1029,14 +1023,14 @@ BEGIN
         end;
     
     /*********************************    
- 	#TRANSACCION:  ''ADQ_ANTESOL_IME''
+ 	#TRANSACCION:  'ADQ_ANTESOL_IME'
  	#DESCRIPCION:	Trasaacion utilizada  pasar a  estados anterior es de la solicitud
                     segun la operacion definida
  	#AUTOR:		RAC	
  	#FECHA:		19-02-2013 12:12:51
 	***********************************/
 
-	elseif(p_transaccion=''ADQ_ANTESOL_IME'')then   
+	elseif(p_transaccion='ADQ_ANTESOL_IME')then   
         begin
         
 
@@ -1058,11 +1052,11 @@ BEGIN
        WHERE  sol.id_solicitud = v_parametros.id_solicitud;
        
        --configurar acceso directo para la alarma   
-       v_acceso_directo = '''';
-       v_clase = '''';
-       v_parametros_ad = '''';
-       v_tipo_noti = ''notificacion'';
-       v_titulo  = ''Visto Bueno''; 
+       v_acceso_directo = '';
+       v_clase = '';
+       v_parametros_ad = '';
+       v_tipo_noti = 'notificacion';
+       v_titulo  = 'Visto Bueno'; 
        
        
       
@@ -1070,7 +1064,7 @@ BEGIN
         --------------------------------------------------
         --Retrocede al estado inmediatamente anterior
         -------------------------------------------------
-         IF  v_parametros.operacion = ''cambiar'' THEN
+         IF  v_parametros.operacion = 'cambiar' THEN
                
               
               
@@ -1103,23 +1097,23 @@ BEGIN
                       
                        
                      
-                       IF  v_codigo_estado not in(''borrador'',''aprobado'',''en_proceso'',''finalizado'',''anulado'')   THEN
+                       IF  v_codigo_estado not in('borrador','aprobado','en_proceso','finalizado','anulado')   THEN
                            
-                           v_acceso_directo = ''../../../sis_adquisiciones/vista/solicitud/SolicitudVb.php'';
-                           v_clase = ''SolicitudVb'';
-                           v_parametros_ad = ''{filtro_directo:{campo:"sol.id_proceso_wf",valor:"''||v_id_proceso_wf::varchar||''"}}'';
-                           v_tipo_noti = ''notificacion'';
-                           v_titulo  = ''Visto Bueno'';
+                           v_acceso_directo = '../../../sis_adquisiciones/vista/solicitud/SolicitudVb.php';
+                           v_clase = 'SolicitudVb';
+                           v_parametros_ad = '{filtro_directo:{campo:"sol.id_proceso_wf",valor:"'||v_id_proceso_wf::varchar||'"}}';
+                           v_tipo_noti = 'notificacion';
+                           v_titulo  = 'Visto Bueno';
                        
                         END IF;
                         
-                        IF v_codigo_estado  in(''borrador'')   THEN
+                        IF v_codigo_estado  in('borrador')   THEN
                            
-                           v_acceso_directo = ''../../../sis_adquisiciones/vista/solicitud/SolicitudReq.php'';
-                           v_clase = ''SolicitudReq'';
-                           v_parametros_ad = ''{filtro_directo:{campo:"sol.id_proceso_wf",valor:"''||v_id_proceso_wf::varchar||''"}}'';
-                           v_tipo_noti = ''notificacion'';
-                           v_titulo  = ''Solicitud de Compra'';
+                           v_acceso_directo = '../../../sis_adquisiciones/vista/solicitud/SolicitudReq.php';
+                           v_clase = 'SolicitudReq';
+                           v_parametros_ad = '{filtro_directo:{campo:"sol.id_proceso_wf",valor:"'||v_id_proceso_wf::varchar||'"}}';
+                           v_tipo_noti = 'notificacion';
+                           v_titulo  = 'Solicitud de Compra';
                        
                         END IF;
                         
@@ -1137,7 +1131,7 @@ BEGIN
                           v_parametros._id_usuario_ai,
                           v_parametros._nombre_usuario_ai,
                           v_id_depto,
-                          ''[RETROCEDE]: #''|| COALESCE(v_numero_sol,''S/N'')||'' - ''||v_parametros.obs,
+                          '[RETROCEDE]: #'|| COALESCE(v_numero_sol,'S/N')||' - '||v_parametros.obs,
                            v_acceso_directo ,
                            v_clase,
                            v_parametros_ad,
@@ -1145,12 +1139,12 @@ BEGIN
                            v_titulo);
                       
                     
-               -- raise exception ''test'';
+               -- raise exception 'test';
                         
            ----------------------------------------------------------------------
            -- PAra retornar al estado borrador de la solicitud de manera directa
            ---------------------------------------------------------------------
-           ELSEIF  v_parametros.operacion = ''inicio'' THEN
+           ELSEIF  v_parametros.operacion = 'inicio' THEN
              
              -- recuperamos el estado inicial segun tipo_proceso
              
@@ -1163,7 +1157,7 @@ BEGIN
              FROM wf.f_obtener_tipo_estado_inicial_del_tipo_proceso(v_id_tipo_proceso);
              
              --recupera el funcionario segun ultimo log borrador
-             raise notice ''CODIGO ESTADO BUSCADO %'',v_codigo_estado ;
+             raise notice 'CODIGO ESTADO BUSCADO %',v_codigo_estado ;
              
              SELECT 
                ps_id_funcionario,
@@ -1177,15 +1171,15 @@ BEGIN
                 
              FROM wf.f_obtener_estado_segun_log_wf(v_id_estado_wf, v_id_tipo_estado);
             
-              raise notice ''CODIGO ESTADO ENCONTRADO %'',v_codigo_estado ;
+              raise notice 'CODIGO ESTADO ENCONTRADO %',v_codigo_estado ;
               
               
-              IF   v_codigo_estado  = ''borrador''  THEN
-                           v_acceso_directo = ''../../../sis_adquisiciones/vista/solicitud/SolicitudReq.php'';
-                           v_clase = ''SolicitudReq'';
-                           v_parametros_ad = ''{filtro_directo:{campo:"sol.id_proceso_wf",valor:"''||v_id_proceso_wf::varchar||''"}}'';
-                           v_tipo_noti = ''notificacion'';
-                           v_titulo  = ''Visto Bueno'';
+              IF   v_codigo_estado  = 'borrador'  THEN
+                           v_acceso_directo = '../../../sis_adquisiciones/vista/solicitud/SolicitudReq.php';
+                           v_clase = 'SolicitudReq';
+                           v_parametros_ad = '{filtro_directo:{campo:"sol.id_proceso_wf",valor:"'||v_id_proceso_wf::varchar||'"}}';
+                           v_tipo_noti = 'notificacion';
+                           v_titulo  = 'Visto Bueno';
                        
               END IF;
               
@@ -1200,7 +1194,7 @@ BEGIN
                   v_parametros._id_usuario_ai,
                   v_parametros._nombre_usuario_ai,
                   v_id_depto,
-                  ''RETRO: #''|| COALESCE(v_numero_sol,''S/N'')||'' - ''||v_parametros.obs,
+                  'RETRO: #'|| COALESCE(v_numero_sol,'S/N')||' - '||v_parametros.obs,
                   v_acceso_directo ,
                   v_clase,
                   v_parametros_ad,
@@ -1210,7 +1204,7 @@ BEGIN
              
            ELSE
            
-           		raise exception ''Operacion no reconocida %'',v_parametros.operacion;
+           		raise exception 'Operacion no reconocida %',v_parametros.operacion;
            
            END IF;
            
@@ -1223,7 +1217,7 @@ BEGIN
                                                    v_id_proceso_wf, 
                                                    v_codigo_estado) THEN
             
-               raise exception ''Error al retroceder estado'';
+               raise exception 'Error al retroceder estado';
             
             END IF;
            
@@ -1232,8 +1226,8 @@ BEGIN
            
            
               -- si hay mas de un estado disponible  preguntamos al usuario
-             v_resp = pxp.f_agrega_clave(v_resp,''mensaje'',''Se regresoa borrador con exito)''); 
-             v_resp = pxp.f_agrega_clave(v_resp,''operacion'',''cambio_exitoso'');
+             v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Se regresoa borrador con exito)'); 
+             v_resp = pxp.f_agrega_clave(v_resp,'operacion','cambio_exitoso');
                         
                               
              --Devuelve la respuesta
@@ -1243,13 +1237,13 @@ BEGIN
         end;
     
     /*********************************    
- 	#TRANSACCION:  ''ADQ_MODOBS_MOD''
+ 	#TRANSACCION:  'ADQ_MODOBS_MOD'
  	#DESCRIPCION:	Modificar observacion de área de presupuestos
  	#AUTOR:		RAC	
  	#FECHA:		19-02-2013 12:12:51
 	***********************************/
 
-	elsif(p_transaccion=''ADQ_MODOBS_MOD'')then
+	elsif(p_transaccion='ADQ_MODOBS_MOD')then
 
 		begin
 			--Sentencia de la modificacion
@@ -1258,8 +1252,8 @@ BEGIN
 			where id_solicitud = v_parametros.id_solicitud;
                
 			--Definicion de la respuesta
-            v_resp = pxp.f_agrega_clave(v_resp,''mensaje'',''obs de presupuestos modificada''); 
-            v_resp = pxp.f_agrega_clave(v_resp,''id_solicitud'',v_parametros.id_solicitud::varchar);
+            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','obs de presupuestos modificada'); 
+            v_resp = pxp.f_agrega_clave(v_resp,'id_solicitud',v_parametros.id_solicitud::varchar);
                
             --Devuelve la respuesta
             return v_resp;
@@ -1269,21 +1263,22 @@ BEGIN
         
     else
      
-    	raise exception ''Transaccion inexistente: %'',p_transaccion;
+    	raise exception 'Transaccion inexistente: %',p_transaccion;
 
 	end if;
 
 EXCEPTION
 				
 	WHEN OTHERS THEN
-		v_resp='''';
-		v_resp = pxp.f_agrega_clave(v_resp,''mensaje'',SQLERRM);
-		v_resp = pxp.f_agrega_clave(v_resp,''codigo_error'',SQLSTATE);
-		v_resp = pxp.f_agrega_clave(v_resp,''procedimientos'',v_nombre_funcion);
-		raise exception ''%'',v_resp;
+		v_resp='';
+		v_resp = pxp.f_agrega_clave(v_resp,'mensaje',SQLERRM);
+		v_resp = pxp.f_agrega_clave(v_resp,'codigo_error',SQLSTATE);
+		v_resp = pxp.f_agrega_clave(v_resp,'procedimientos',v_nombre_funcion);
+		raise exception '%',v_resp;
 				        
 END;
-'LANGUAGE 'plpgsql'
+$body$
+LANGUAGE 'plpgsql'
 VOLATILE
 CALLED ON NULL INPUT
 SECURITY INVOKER
