@@ -100,6 +100,29 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
         },
         {
             config:{
+                name: 'require_contrato',
+                fieldLabel: 'Contrato',
+                allowBlank: true,
+                anchor: '80%',
+                gwidth: 70,
+                maxLength:200,
+                renderer: function(value,p,record){
+                         if(record.data.requiere_contrato=='si'){
+                             return String.format('<b><font color="green"><i class="fa fa-file-o  fa-2x"></i> Si</font></b>', value);
+                         }
+                        else {
+                             return String.format('<b><i class="fa fa-file  fa-2x"></i> No</b>', value);
+                        }
+                 }
+            },
+            type:'TextField',
+            filters:{pfiltro:'sol.num_tramite',type:'string'},
+            id_grupo:1,
+            grid:true,
+            form:false
+        },
+        {
+            config:{
                 name: 'num_tramite',
                 fieldLabel: 'N# Tramite',
                 allowBlank: true,
@@ -637,7 +660,7 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
 		'funcionario_contacto',
         'telefono_contacto',
         'correo_contacto',
-        'prellenar_oferta','forma_pago'
+        'prellenar_oferta', 'forma_pago', 'requiere_contrato'
 		
 	],
 
@@ -738,6 +761,46 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
                     'DocumentoWf'
         )
     },
+    
+    onSolContrato:function(){                   
+            var rec=this.sm.getSelected();
+            var data = {id_funcionario:this.id_funcionario}
+            Ext.apply(data,rec.data)
+            //pop pup confirmacion contrato
+            if(confirm('Intrucciones RPC: ' + this.instruc_rpc + '\nDesea Continuar?' )){
+            	
+            	/*  25/02/2015, deshabilitar formualri ode correo electronico
+                 Phx.CP.loadWindows('../../../sis_adquisiciones/vista/cotizacion/SolContrato.php',
+                    'Solicitar Contrato',
+                    {
+                        modal:true,
+                        width:700,
+                        height:500
+                    },data ,this.idContenedor,'SolContrato')
+                 */ 
+                 
+                 Phx.CP.loadingShow();
+	              Ext.Ajax.request({
+	                url:'../../sis_adquisiciones/control/Cotizacion/habilitarContrato',
+	                params: { id_cotizacion: rec.data.id_cotizacion },
+	                success: this.successSimple,
+	                failure: this.conexionFailure,
+	                timeout: this.timeout,
+	                scope: this
+	              });
+             } 
+    },
+    
+    successSimple:function(resp){
+            Phx.CP.loadingHide();
+            var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
+            if(!reg.ROOT.error){
+                 this.reload();
+             }
+             else{
+                alert('ocurrio un error durante el proceso')
+            }
+     },
 	
 	bdel:true,
 	bsave:false,
