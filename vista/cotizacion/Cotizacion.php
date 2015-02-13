@@ -754,9 +754,11 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
                     'Chequear documento del WF',
                     {
                         width:'90%',
-                        height:500
+                        height:500,
+                        check_fisico:'si'
                     },
                     rec.data,
+                   
                     this.idContenedor,
                     'DocumentoWf'
         )

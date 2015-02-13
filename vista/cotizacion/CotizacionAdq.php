@@ -160,7 +160,7 @@ Phx.vista.CotizacionAdq = {
         }); 
         
       
-        this.store.baseParams={id_proceso_compra:this.id_proceso_compra,tipo_interfaz:this.nombreVista}; 
+        this.store.baseParams={id_proceso_compra:this.id_proceso_compra,tipo_interfaz: this.nombreVista}; 
         this.load({params:{start:0, limit:this.tam_pag}});
         
         
@@ -482,7 +482,7 @@ Phx.vista.CotizacionAdq = {
           //this.getBoton('btnReporte').enable(); 
          
               
-              if(data['estado']==  'borrador'){
+              if(data['estado'] == 'borrador'){
                  this.getBoton('fin_registro').enable();
                  this.getBoton('btnAdjudicar').disable();
                  this.getBoton('btnSolCon').disable();
@@ -536,10 +536,21 @@ Phx.vista.CotizacionAdq = {
                    this.getBoton('fin_registro').disable();
                }
                
-               if (data['estado']!='adjudicado'){
+               if (data['estado']!='adjudicado'&&data['estado']!='contrato_elaborado'&&data['estado']!='contrato_pendiente'){
                    this.getBoton('btnHabPago').disable();
                }
                else{
+                    if(data['estado']=='adjudicado'&&data['requiere_contrato']=='si'){
+                    	this.getBoton('btnHabPago').setIconClass('bdocuments');
+                    	this.getBoton('btnHabPago').setText( 'Solicitar Contrato' ); 
+                    	this.getBoton('btnHabPago').setTooltip('Solicita el contrato al área legal')
+                    }
+                    else{
+                    	this.getBoton('btnHabPago').setIconClass('bcharge');
+                    	this.getBoton('btnHabPago').setText( 'Habilitar Pago' );
+                    	this.getBoton('btnHabPago').setTooltip('Habilita la opción de registrar la obligación de pago' )
+                    }
+                    
                     this.getBoton('btnHabPago').enable();  
                }
                  
@@ -630,9 +641,9 @@ Phx.vista.CotizacionAdq = {
                 width:700,
                 height:450
             }, {data:{
-                   id_estado_wf:rec.data.id_estado_wf,
-                   id_proceso_wf:rec.data.id_proceso_wf,
-                   fecha_ini:rec.data.fecha_tentativa,
+                   id_estado_wf: rec.data.id_estado_wf,
+                   id_proceso_wf: rec.data.id_proceso_wf,
+                   fecha_ini: rec.data.fecha_tentativa,
                }}, this.idContenedor,'FormEstadoWf',
             {
                 config:[{
@@ -654,6 +665,7 @@ Phx.vista.CotizacionAdq = {
             url:'../../sis_adquisiciones/control/Cotizacion/habilitarPago',
             params:{
                 id_proceso_wf_act:  resp.id_proceso_wf_act,
+                id_estado_wf_act:   resp.id_estado_wf_act,
                 id_tipo_estado:     resp.id_tipo_estado,
                 id_funcionario_wf:  resp.id_funcionario_wf,
                 id_depto_wf:        resp.id_depto_wf,
