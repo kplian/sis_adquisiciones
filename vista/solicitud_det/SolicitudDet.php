@@ -114,7 +114,7 @@ Phx.vista.SolicitudDet=Ext.extend(Phx.gridInterfaz,{
 	       		    origen:'OT',
                     allowBlank:true,
                     renderer:function(value, p, record){return String.format('{0}', record.data['desc_orden_trabajo']);},
-            
+                    baseParams:{par_filtro:'desc_orden#motivo_orden'},
                     gdisplayField: 'desc_orden_trabajo',
                     
                     gwidth:200
