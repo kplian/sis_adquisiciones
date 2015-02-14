@@ -57,7 +57,7 @@ BEGIN
      	on te.id_tipo_proceso = tp.id_tipo_proceso
      inner join wf.tproceso_wf p
      	on p.id_tipo_proceso = tp.id_tipo_proceso
-     where te.codigo = 'registro' and p.id_proceso_wf = p_id_proceso_wf;
+     where te.codigo = 'registro' and p.id_proceso_wf = p_id_proceso_wf and te.estado_reg = 'activo';
      
      
      /*Insertar el contrato con el ultimo estado*/
@@ -75,7 +75,8 @@ BEGIN
           id_proveedor,
           solicitud,
           monto,
-          id_moneda
+          id_moneda,
+          id_cotizacion
         ) 
         VALUES (
           p_id_usuario,          
@@ -83,13 +84,14 @@ BEGIN
           p_usuario_ai,
           p_id_estado_wf,
           p_id_proceso_wf,
-          'borrador',
+          p_codigo_ewf,
           v_tipo,          
           v_cotizacion.id_gestion,
           v_cotizacion.id_proveedor,
           v_solicitud,
           v_cotizacion.monto_total_adjudicado,
-          v_cotizacion.id_moneda
+          v_cotizacion.id_moneda,
+          p_id_cotizacion
         );
         
         
