@@ -357,7 +357,7 @@ Phx.vista.SolicitudReq = {
                  this.wRPC.show();
                 */
               
-                 if(resp.argument.paneldoc){
+                 if(resp.argument.paneldoc.panel){
                  	resp.argument.paneldoc.panel.destroy();
                  }
                  this.reload();

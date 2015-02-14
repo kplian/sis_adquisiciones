@@ -39,6 +39,7 @@ DECLARE
     va_obs text[];
     v_x text;
     v_count integer;
+    v_resp   varchar;
 	
 BEGIN
    --buscamos siguiente estado correpondiente al proceso del WF
@@ -67,7 +68,7 @@ BEGIN
    
    end if; 
    
-    
+   
 
    --si el estado siguiente es de activos dijo o de la uti verificamos
    --verificamos las partida en el detalle de la solicitud correponden con las configuradas para su revision
@@ -137,7 +138,15 @@ BEGIN
       return;
    end if;
     
- 
+EXCEPTION
+				
+	WHEN OTHERS THEN
+		v_resp='';
+		v_resp = pxp.f_agrega_clave(v_resp,'mensaje',SQLERRM);
+		v_resp = pxp.f_agrega_clave(v_resp,'codigo_error',SQLSTATE);
+		v_resp = pxp.f_agrega_clave(v_resp,'procedimientos',v_nombre_funcion);
+		raise exception '%',v_resp;
+				        
 END;
 $body$
 LANGUAGE 'plpgsql'
