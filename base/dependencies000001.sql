@@ -4748,9 +4748,106 @@ AS
  
 
 
+/***********************************I-DEP-RAC-ADQ-1-04/03/2015*****************************************/
+ 
+
+--------------- SQL ---------------
+
+ -- object recreation
+DROP VIEW adq.vsolicitud_compra;
+
+CREATE VIEW adq.vsolicitud_compra
+AS
+  SELECT DISTINCT sol.id_solicitud,
+         sol.id_proveedor,
+         p.desc_proveedor,
+         sol.id_moneda,
+         sol.id_depto,
+         sol.numero,
+         sol.fecha_soli,
+         sol.estado,
+         sol.num_tramite,
+         sol.id_gestion,
+         sol.justificacion,
+         p.rotulo_comercial,
+         sol.id_categoria_compra,
+         mon.codigo,
+         COALESCE(sum(sd.precio_total), 0::numeric) AS precio_total,
+         COALESCE(sum(sd.precio_unitario_mb * sd.cantidad::numeric), 0::numeric)
+           AS precio_total_mb,
+         COALESCE(cac.codigo, ''::character varying) AS codigo_categoria,
+         COALESCE(cac.nombre, ''::character varying) AS nombre_categoria,
+         sol.id_proceso_wf,
+         ('<table>'::text || pxp.html_rows((((('<td>'::text || ci.desc_ingas::
+           text) || ' <br>'::text) || sd.descripcion) || '</td>'::text)::
+           character varying)::text) || '</table>'::text AS detalle,
+         fun.desc_funcionario1,
+         uo.codigo AS codigo_uo,
+         uo.nombre_unidad,
+         lower(sol.tipo::text) AS tipo,
+         lower(sol.tipo_concepto::text) AS tipo_concepto,
+         fun.nombre_cargo,
+         fun.nombre_unidad AS nombre_unidad_cargo,
+         fun.email_empresa,
+         usu.desc_persona AS desc_usuario,
+         COALESCE(sol.id_funcionario_supervisor, 0) AS id_funcionario_supervisor
+  ,
+         COALESCE(sol.id_funcionario_aprobador, 0) AS id_funcionario_aprobador,
+         dep.prioridad,
+         dep.nombre as nombre_depto
+  FROM adq.tsolicitud sol
+       LEFT JOIN adq.tsolicitud_det sd ON sd.id_solicitud = sol.id_solicitud AND
+         sd.estado_reg::text = 'activo'::text
+       LEFT JOIN param.tconcepto_ingas ci ON ci.id_concepto_ingas =
+         sd.id_concepto_ingas
+       JOIN param.tmoneda mon ON mon.id_moneda = sol.id_moneda
+       JOIN param.tdepto dep on dep.id_depto = sol.id_depto
+       JOIN orga.vfuncionario_cargo fun ON fun.id_funcionario =
+         sol.id_funcionario AND fun.estado_reg_asi::text = 'activo'::text
+       JOIN orga.tuo uo ON uo.id_uo = sol.id_uo
+       JOIN segu.vusuario usu ON usu.id_usuario = sol.id_usuario_reg
+       LEFT JOIN param.vproveedor p ON p.id_proveedor = sol.id_proveedor
+       LEFT JOIN adq.tcategoria_compra cac ON cac.id_categoria_compra =
+         sol.id_categoria_compra
+  WHERE fun.fecha_asignacion <= sol.fecha_soli AND
+        fun.fecha_finalizacion >= sol.fecha_soli OR
+        fun.fecha_asignacion <= sol.fecha_soli AND
+        fun.fecha_finalizacion IS NULL
+  GROUP BY sol.id_solicitud,
+           sol.id_proveedor,
+           p.desc_proveedor,
+           sol.id_moneda,
+           sol.id_depto,
+           sol.numero,
+           sol.fecha_soli,
+           sol.estado,
+           sol.num_tramite,
+           sol.id_gestion,
+           sol.justificacion,
+           p.rotulo_comercial,
+           sol.id_categoria_compra,
+           cac.codigo,
+           cac.nombre,
+           mon.codigo,
+           fun.desc_funcionario1,
+           uo.codigo,
+           uo.nombre_unidad,
+           sol.tipo_concepto,
+           sol.tipo,
+           fun.nombre_cargo,
+           fun.nombre_unidad,
+           fun.email_empresa,
+           usu.desc_persona,
+           dep.prioridad,
+           dep.nombre;
+
+ALTER TABLE adq.vsolicitud_compra
+  OWNER TO postgres;
+/***********************************F-DEP-RAC-ADQ-1-04/03/2015*****************************************/
+
 /***********************************I-DEP-RAC-ADQ-1-11/03/2015*****************************************/
  
-CREATE VIEW adq.vproceso_compra (
+CREATE OR REPLACE VIEW adq.vproceso_compra(
     id_proceso_compra,
     id_depto,
     num_convocatoria,
@@ -4841,4 +4938,5 @@ GROUP BY cot_1.id_proceso_compra
      LEFT JOIN segu.tusuario usu2 ON usu2.id_usuario = proc.id_usuario_mod
      LEFT JOIN segu.tusuario usua ON usua.id_usuario = proc.id_usuario_auxiliar;
 /***********************************F-DEP-RAC-ADQ-1-11/03/2015*****************************************/
+
  
