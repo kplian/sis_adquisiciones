@@ -152,11 +152,11 @@ Phx.vista.SolicitudReqDet = {
 	        
 	     this.Cmp.id_concepto_ingas.on('select',function( cmb, rec, ind){
 	        	
-	        	      this.Cmp.id_orden_trabajo.store.baseParams = {
+	        	    this.Cmp.id_orden_trabajo.store.baseParams = Ext.apply(this.Cmp.id_orden_trabajo.store.baseParams, {
 			        		                                           filtro_ot:rec.data.filtro_ot,
 			        		 										   requiere_ot:rec.data.requiere_ot,
 			        		 										   id_grupo_ots:rec.data.id_grupo_ots
-			        		 										 };
+			        		 										});
 			        this.Cmp.id_orden_trabajo.modificado = true;
 			        this.Cmp.id_orden_trabajo.enable();
 			        if(rec.data.requiere_ot =='obligatorio'){

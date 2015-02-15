@@ -68,6 +68,13 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
 		}
 	},
 	
+	rowExpander: new Ext.ux.grid.RowExpander({
+	        tpl : new Ext.Template(
+	            '<br><p><b>Justificación:</b> {justificacion}</p>',
+	            '<p><b>Obs:</b> {obs}</p><br>'
+	        )
+    }),
+	
 	addBotones: function() {
         this.menuAdq = new Ext.Toolbar.SplitButton({
             id: 'btn-adqrep-' + this.idContenedor,
@@ -160,6 +167,7 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
             },
             type:'TextField',
             filters:{pfiltro:'sol.num_tramite',type:'string'},
+            bottom_filter:true,
             id_grupo:1,
             grid:true,
             form:false
@@ -174,6 +182,7 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
 			},
 			type:'TextField',
 			filters:{pfiltro:'sol.estado',type:'string'},
+			bottom_filter:true,
 			id_grupo:1,
 			grid:true,
 			form:false
@@ -331,6 +340,7 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
    			type:'ComboRec',//ComboRec
    			id_grupo:0,
    			filters:{pfiltro:'fun.desc_funcionario1',type:'string'},
+   			bottom_filter:true,
    		    grid:true,
    			form:false
 		 },

@@ -26,8 +26,11 @@ Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
     	this.store.baseParams.estado = name;
     	this.load({params:{start:0, limit:50}});
     },
+    
+    stateId:'ProcesoCompra',
 	
 	constructor:function(config){
+		
 		this.maestro=config.maestro;
 		
 		//llama al constructor de la clase padre
@@ -62,7 +65,7 @@ Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
 	
 	diagramGantt:function(){  
 		
-		//window.open("../../../sis_workflow/vista/gantt/wfGantt.php");         
+		window.open("../../../sis_workflow/vista/gantt/LineaTiempo.php");         
             /*
            var data = this.sm.getSelected().data.id_proceso_wf;
            var rec = this.sm.getSelected();
@@ -88,6 +91,8 @@ Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
                     this.idContenedor);*/
            
            
+           //original ...
+           /*
             Phx.CP.loadingShow();
             var data = this.sm.getSelected().data.id_proceso_wf;
             Ext.Ajax.request({
@@ -97,7 +102,7 @@ Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
                 failure: this.conexionFailure,
                 timeout:this.timeout,
                 scope:this
-            });  
+            });  */
             
        
             
