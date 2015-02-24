@@ -398,8 +398,7 @@ Phx.vista.SolicitudReq = {
     },
     
   
-    
-	 preparaMenu:function(n){
+   preparaMenu:function(n){
       var data = this.getSelectedData();
       var tb =this.tbar;
       Phx.vista.SolicitudReq.superclass.preparaMenu.call(this,n);  

@@ -841,8 +841,8 @@ VALUES (15, E'adq_aprobacion', E'gerencia', E'aprobaciones: gerencia o presupues
 
 select pxp.f_insert_tgui ('Reportes', 'Reportes', 'REPADQ', 'si', 45, '', 2, '', '', 'ADQ');
 select pxp.f_insert_tgui ('Ejecución presupuestaria', 'Ejecución presupuestaria', 'ADQELEPRE', 'si', 1, 'sis_adquisiciones/vista/solicitud/SolReporteEje.php', 3, '', 'SolReporteEje', 'ADQ');
-select pxp.f_insert_testructura_gui ('REPADQ', 'ADQ')
-select pxp.f_insert_testructura_gui ('ADQELEPRE', 'REPADQ')
+select pxp.f_insert_testructura_gui ('REPADQ', 'ADQ');
+select pxp.f_insert_testructura_gui ('ADQELEPRE', 'REPADQ');
 
 
 /***********************************F-DAT-RAC-ADQ-0-12/02/2015*****************************************/
