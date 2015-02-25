@@ -55,7 +55,7 @@ Phx.vista.CotizacionAdq = {
           
        this.addButton('btnSendMail',{text:'Sol Cotizacion',iconCls: 'bemail',disabled:true,handler:this.onSendMail,tooltip: '<b>Solictar Cotizacion</b><p>Solicta la cotizacion por correo al proveedor</p>'});
        
-       this.addButton('btnSolCon',{text:'Sol Cont.',iconCls: 'bemail',disabled:true,handler:this.onSolContrato,tooltip: '<b>Solictar Cotizacion</b><p>Solicta la cotizacion por correo al proveedor</p>'});
+       this.addButton('btnSolCon',{text:'Hab. Contr.',iconCls: 'bemail',disabled:true,handler:this.onSolContrato,tooltip: '<b>HAbilitar Contrato</b><p>si tiene habilitado los contratos en esta cotización, antes de armar el plan de pago pasara al área legal</p>'});
        
        
        this.addButton('btnPreing',{
@@ -421,7 +421,6 @@ Phx.vista.CotizacionAdq = {
         },
         
        
-        
 
         
                                 
@@ -473,31 +472,7 @@ Phx.vista.CotizacionAdq = {
             }
         },
         
-       onSolContrato:function(){                   
-            var rec=this.sm.getSelected();
-            
-            var data = {id_funcionario:this.id_funcionario}
-            Ext.apply(data,rec.data)
-            
-            //pop pup confirmacion contrato
-            
-            if(confirm('Intrucciones RPC: ' + this.instruc_rpc + '\nDesea Continuar?' )){
-                 Phx.CP.loadWindows('../../../sis_adquisiciones/vista/cotizacion/SolContrato.php',
-                    'Solicitar Contrato',
-                    {
-                        modal:true,
-                        width:700,
-                        height:500
-                    },data ,this.idContenedor,'SolContrato')
-                 
-             } 
-            
-            
-        },
-       
-       
-        
-        preparaMenu:function(n){
+       preparaMenu:function(n){
           var data = this.getSelectedData();
           var tb =this.tbar;
           Phx.vista.CotizacionAdq.superclass.preparaMenu.call(this,n);

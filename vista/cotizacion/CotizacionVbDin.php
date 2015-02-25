@@ -81,7 +81,9 @@ Phx.vista.CotizacionVbDin = {
           
         this.addButton('diagrama_gantt',{text:'',iconCls: 'bgantt',disabled:true,handler:this.diagramGantt,tooltip: '<b>Diagrama gantt de proceso macro</b>'});
   
-        
+        this.addButton('btnSolCon',{text:'Hab. Contr.',iconCls: 'bemail',disabled:true,handler:this.onSolContrato,tooltip: '<b>HAbilitar Contrato</b><p>si tiene habilitado los contratos en esta cotización, antes de armar el plan de pago pasara al área legal</p>'});
+       
+       
         this.store.baseParams={tipo_interfaz:this.nombreVista}; 
         //coloca filtros para acceso directo si existen
         if(config.filtro_directo){
@@ -488,6 +490,7 @@ Phx.vista.CotizacionVbDin = {
                      this.getBoton('btnGenOC').enable();
                      this.getBoton('sig_estado').disable(); 
                      this.getBoton('ant_estado').enable();
+                     this.getBoton('btnSolCon').enable();
                 }
                 else{
                       this.getBoton('btnGenOC').disable();
@@ -538,6 +541,7 @@ Phx.vista.CotizacionVbDin = {
             
             this.getBoton('diagrama_gantt').disable();
             this.getBoton('btnChequeoDocumentosWf').disable(); 
+            this.getBoton('btnSolCon').disable();
             this.menuAdq.disable();
             
             
@@ -547,9 +551,7 @@ Phx.vista.CotizacionVbDin = {
     sortInfo:{
         field: 'cot.fecha_reg',
         direction: 'DESC'
-    },
-        
-    
-    
+    }
+  
 };
 </script>

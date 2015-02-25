@@ -94,7 +94,8 @@ BEGIN
                         cot.telefono_contacto,
                         cot.correo_contacto,
                         cot.prellenar_oferta,
-                        cot.forma_pago
+                        cot.forma_pago,
+                        cot.requiere_contrato
                         
 						from adq.tcotizacion cot
                         inner join adq.tproceso_compra proc on proc.id_proceso_compra = cot.id_proceso_compra
@@ -294,7 +295,8 @@ BEGIN
                         sol.id_categoria_compra,
                         sol.numero,
                         sol.num_tramite,
-                        cot.tiempo_entrega
+                        cot.tiempo_entrega,
+                        cot.requiere_contrato
 						from adq.tcotizacion cot
 						inner join segu.tusuario usu1 on usu1.id_usuario = cot.id_usuario_reg
                         inner join adq.tproceso_compra pc on pc.id_proceso_compra = cot.id_proceso_compra

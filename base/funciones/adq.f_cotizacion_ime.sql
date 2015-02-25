@@ -1,3 +1,5 @@
+--------------- SQL ---------------
+
 CREATE OR REPLACE FUNCTION adq.f_cotizacion_ime (
   p_administrador integer,
   p_id_usuario integer,
@@ -10,7 +12,7 @@ $body$
  SISTEMA:		Adquisiciones
  FUNCION: 		adq.f_cotizacion_ime
  DESCRIPCION:   Funcion que gestiona las operaciones basicas (inserciones, modificaciones, eliminaciones de la tabla 'adq.tcotizacion'
- AUTOR: 		Gonzalo Sarmiento Sejas
+ AUTOR: 		Gonzalo Sarmiento Sejas 
  FECHA:	        21-03-2013 14:48:35
  COMENTARIOS:	
 ***************************************************************************
@@ -133,6 +135,7 @@ DECLARE
       
       v_tipo varchar;
       v_tipo_concepto varchar;
+      v_requiere_contrato  varchar;
      
 			    
 BEGIN
@@ -654,7 +657,8 @@ BEGIN
             sc.id_funcionario_rpc,
             sc.numero,
             c.fecha_coti,
-            sc.instruc_rpc
+            sc.instruc_rpc,
+            c.requiere_contrato
            into 
             v_numero_oc,
             v_id_estado_wf,
@@ -664,7 +668,8 @@ BEGIN
             v_id_funcionario_rpc,
             v_num_sol,
             v_fecha_coti,
-            v_instruc_rpc
+            v_instruc_rpc,
+            v_requiere_contrato
             
            from adq.tcotizacion c
            inner join adq.tproceso_compra pc on pc.id_proceso_compra = c.id_proceso_compra
@@ -684,7 +689,7 @@ BEGIN
           where ew.id_estado_wf = v_id_estado_wf;
           
           
-          --validamos de adjudicaciones
+          -- validamos de adjudicaciones
           
           IF v_estado_cot = 'cotizado' THEN
                
@@ -759,7 +764,14 @@ BEGIN
                        - Cotizar
                        - Solicitar Pago
                       */
-                       IF(v_instruc_rpc in ('Iniciar Contrato','Solicitar Pago','Orden de Bien/Servicio') ) THEN
+                      
+                      --25/02/2015
+                       --IF(v_instruc_rpc in ('Iniciar Contrato','Solicitar Pago','Orden de Bien/Servicio') ) THEN
+                       
+                       --OJO ...  si requiere contrato no regrsa el RPC en otro caso regresa
+                       
+                        IF(v_requiere_contrato = 'si' ) THEN
+                       
                        
                              --obtenemos el estado siguiente
                              SELECT 
@@ -911,7 +923,7 @@ BEGIN
                               --si tiebe contrato
                               IF(v_instruc_rpc in ('Iniciar Contrato','Solicitar Pago') ) THEN  
                               
-                              v_numero_oc = 'CNTR - '||v_numero_oc;
+                                  v_numero_oc = 'CNTR - '||v_numero_oc;
                               
                               END IF;     
                                 
@@ -1675,6 +1687,45 @@ BEGIN
         
              --Definicion de la respuesta
              v_resp = pxp.f_agrega_clave(v_resp,'cambio a momento exigible para el contrato correspondiente a la cotizacion',v_result); 
+              
+            --Devuelve la respuesta
+            return v_resp;
+
+		end; 
+    
+        
+    /*********************************    
+ 	#TRANSACCION:  'ADQ_HABCONT_IME'
+ 	#DESCRIPCION:	Habilitar la bandera de contrato, si la bandera esta habilitada al momento de habilitar pago dispara el flujo en paralelo de contratos
+ 	#AUTOR:	        RAC KPLIAN
+ 	#FECHA:		    25/02/2015
+	***********************************/
+
+	elsif(p_transaccion='ADQ_HABCONT_IME')then
+
+		begin
+            
+            select 
+             cot.requiere_contrato
+            into
+             v_requiere_contrato
+            from adq.tcotizacion cot
+            where cot.id_cotizacion = v_parametros.id_cotizacion;
+            
+            if v_requiere_contrato = 'si' then
+             v_requiere_contrato = 'no';
+            else
+              v_requiere_contrato = 'si';
+            end if;
+             
+             update adq.tcotizacion  c set 
+               requiere_contrato =  v_requiere_contrato,
+               id_usuario_mod=p_id_usuario,
+               fecha_mod=now()
+             where c.id_cotizacion  = v_parametros.id_cotizacion;
+        
+             --Definicion de la respuesta
+             v_resp = pxp.f_agrega_clave(v_resp,'cambio de la bandera de contratos hacia: '||v_requiere_contrato,v_result); 
               
             --Devuelve la respuesta
             return v_resp;

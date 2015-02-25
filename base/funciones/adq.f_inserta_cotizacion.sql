@@ -1,3 +1,5 @@
+--------------- SQL ---------------
+
 CREATE OR REPLACE FUNCTION adq.f_inserta_cotizacion (
   p_administrador integer,
   p_id_usuario integer,
@@ -78,6 +80,8 @@ DECLARE
    v_fecha_inicio_sol date;
    v_dias_plazo_entrega_sol integer;
    v_lugar_entrega_sol varchar;
+   v_instruc_rpc varchar;
+   v_requiere_contrato varchar;
  
     
     
@@ -148,14 +152,16 @@ BEGIN
              sol.id_funcionario,
              sol.fecha_inicio,
              sol.dias_plazo_entrega,
-             sol.lugar_entrega
+             sol.lugar_entrega,
+             sol.instruc_rpc
            into
             v_id_proveedor_precoti,
             v_id_proceso_wf_sol,
             v_id_funcionario_sol,
             v_fecha_inicio_sol,
             v_dias_plazo_entrega_sol,
-            v_lugar_entrega_sol
+            v_lugar_entrega_sol,
+            v_instruc_rpc
                     
            from  adq.tsolicitud sol where sol.id_solicitud = v_id_solicitud;
            
@@ -335,6 +341,14 @@ BEGIN
                 v_telefono = COALESCE(v_registros_fun.telefono_ofi||', ','')|| COALESCE(v_registros_fun.celular1,'');
             END IF;
             
+            
+            --defni si requiere contrato segun RPC
+            
+            if  lower(v_instruc_rpc) = 'iniciar contrato' then
+               v_requiere_contrato = 'si';
+            else
+               v_requiere_contrato = 'no';
+            end if;
         
         
         	--Sentencia de la insercion
@@ -371,7 +385,8 @@ BEGIN
             telefono_contacto,
             correo_contacto,
             prellenar_oferta,
-            forma_pago
+            forma_pago,
+            requiere_contrato
           	) values(
 			'activo',
 			v_codigo_estado,
@@ -405,7 +420,8 @@ BEGIN
             v_telefono::varchar,
             COALESCE(v_registros_fun.email_empresa,'')::varchar,
             COALESCE((p_hstore_cotizacion->'prellenar_oferta')::varchar,'no'),
-            COALESCE((p_hstore_cotizacion->'forma_pago')::varchar,'')
+            COALESCE((p_hstore_cotizacion->'forma_pago')::varchar,''),
+            v_requiere_contrato
             
             
             )RETURNING id_cotizacion into v_id_cotizacion;

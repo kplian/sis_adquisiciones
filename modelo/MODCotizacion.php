@@ -65,6 +65,7 @@ class MODCotizacion extends MODbase{
 		$this->captura('correo_contacto','varchar');
 		$this->captura('prellenar_oferta','varchar');
 		$this->captura('forma_pago','varchar');
+		$this->captura('requiere_contrato','varchar');
 		
 		
 		
@@ -161,6 +162,7 @@ class MODCotizacion extends MODbase{
 		$this->captura('numero','varchar');
         $this->captura('num_tramite','varchar');
         $this->captura('tiempo_entrega','varchar');
+		$this->captura('requiere_contrato','varchar');
         
         
         //Ejecuta la instruccion
@@ -590,8 +592,8 @@ class MODCotizacion extends MODbase{
     
     function SolicitarContrato(){
         //Definicion de variables para ejecucion del procedimiento
-        $this->procedimiento='adq.f_cotizacion_ime';
-        $this->transaccion='ADQ_SOLCON_IME';
+        $this->procedimiento = 'adq.f_cotizacion_ime';
+        $this->transaccion = 'ADQ_SOLCON_IME';
         $this->tipo_procedimiento='IME';
                 
         //Define los parametros para la funcion
@@ -604,6 +606,24 @@ class MODCotizacion extends MODbase{
         //Devuelve la respuesta
         return $this->respuesta;
     }
+	function habilitarContrato(){
+        //Definicion de variables para ejecucion del procedimiento
+        $this->procedimiento = 'adq.f_cotizacion_ime';
+        $this->transaccion = 'ADQ_HABCONT_IME';
+        $this->tipo_procedimiento='IME';
+                
+        //Define los parametros para la funcion
+        $this->setParametro('id_cotizacion','id_cotizacion','int4');
+
+        //Ejecuta la instruccion
+        $this->armarConsulta();
+        $this->ejecutarConsulta();
+
+        //Devuelve la respuesta
+        return $this->respuesta;
+    }
+	
+	
     
 	
 
