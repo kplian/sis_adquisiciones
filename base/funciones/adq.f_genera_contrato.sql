@@ -83,7 +83,7 @@ BEGIN
           p_usuario_ai,
           p_id_estado_wf,
           p_id_proceso_wf,
-          'registro',
+          'borrador',
           v_tipo,          
           v_cotizacion.id_gestion,
           v_cotizacion.id_proveedor,
@@ -110,7 +110,8 @@ BEGIN
                                                          'Paso de estado automatico por proceso de adquisiciones'); 
 
 	 update leg.tcontrato
-     set id_estado_wf = v_id_estado_registro
+     set id_estado_wf = v_id_estado_registro,
+     estado = 'registro'
      where id_proceso_wf = p_id_proceso_wf;
     return true;
     
