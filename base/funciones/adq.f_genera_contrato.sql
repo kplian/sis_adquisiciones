@@ -5,7 +5,8 @@ CREATE OR REPLACE FUNCTION adq.f_genera_contrato (
   p_id_cotizacion integer,
   p_id_proceso_wf integer,
   p_id_estado_wf integer,
-  p_codigo_ewf varchar
+  p_codigo_ewf varchar,
+  p_codigo_llave varchar
 )
 RETURNS boolean AS
 $body$
@@ -47,10 +48,10 @@ BEGIN
      end if;
      
      v_solicitud = 'Por favor realizar contrato para la solicitud de compra con numero de tramite : ' || 
-     				v_cotizacion.v_num_tramite || '. Categoria : ' || v_cotizacion.nombre_categoria || '. Concepto : ' || v_cotizacion.tipo_concepto;
+     				v_cotizacion.num_tramite || '. Categoria : ' || v_cotizacion.nombre_categoria || '. Concepto : ' || v_cotizacion.tipo_concepto;
      
      /*Obtener el estado de registro*/
-     select id_tipo_estado into v_id_tipo_estado_registro
+     select te.id_tipo_estado into v_id_tipo_estado_registro
      from wf.ttipo_estado te
      inner join wf.ttipo_proceso tp
      	on te.id_tipo_proceso = tp.id_tipo_proceso
@@ -58,19 +59,7 @@ BEGIN
      	on p.id_tipo_proceso = tp.id_tipo_proceso
      where te.codigo = 'registro' and p.id_proceso_wf = p_id_proceso_wf;
      
-     /*Obtener el funcionario responsable para el siguiente estado*/
-     select wf.f_funcionario_wf_sel(p_id_usuario, v_id_estado_registro) into v_id_funcionario_responsable;
      
-     /*Registrar el estado de registro*/
-     v_id_estado_registro =  wf.f_registra_estado_wf(v_id_tipo_estado_registro,   --p_id_tipo_estado_siguiente
-                                                         v_id_funcionario_responsable, 
-                                                         p_id_estado_wf,   --  p_id_estado_wf_anterior
-                                                         p_id_proceso_wf,
-                                                         p_id_usuario,
-                                                         p_id_usuario_ai,
-                                                         p_usuario_ai,
-                                                         NULL,
-                                                         'Paso de estado automatico por proceso de adquisiciones');
      /*Insertar el contrato con el ultimo estado*/
      INSERT INTO 
           leg.tcontrato
@@ -92,7 +81,7 @@ BEGIN
           p_id_usuario,          
           p_id_usuario_ai,
           p_usuario_ai,
-          v_id_estado_registro,
+          p_id_estado_wf,
           p_id_proceso_wf,
           'registro',
           v_tipo,          
@@ -102,8 +91,27 @@ BEGIN
           v_cotizacion.monto_total_adjudicado,
           v_cotizacion.id_moneda
         );
+        
+        
+    /*Obtener el funcionario responsable para el siguiente estado*/
+     select id_funcionario  into v_id_funcionario_responsable
+     from wf.f_funcionario_wf_sel(p_id_usuario, v_id_tipo_estado_registro,now()::date,p_id_estado_wf) as (id_funcionario integer,desc_funcionario text,desc_cargo text,prioridad integer);
      
+    
+     /*Registrar el estado de registro*/
+     v_id_estado_registro =  wf.f_registra_estado_wf(v_id_tipo_estado_registro,   --p_id_tipo_estado_siguiente
+                                                         v_id_funcionario_responsable, 
+                                                         p_id_estado_wf,   --  p_id_estado_wf_anterior
+                                                         p_id_proceso_wf,
+                                                         p_id_usuario,
+                                                         p_id_usuario_ai,
+                                                         p_usuario_ai,
+                                                         NULL,
+                                                         'Paso de estado automatico por proceso de adquisiciones'); 
 
+	 update leg.tcontrato
+     set id_estado_wf = v_id_estado_registro
+     where id_proceso_wf = p_id_proceso_wf;
     return true;
     
 EXCEPTION
