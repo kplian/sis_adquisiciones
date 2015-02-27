@@ -64,6 +64,7 @@ DECLARE
     v_fecha_soli date;
     v_num_funcionarios integer;
     presu_comprometido varchar;
+    v_id_tipo_estado	integer;
     
     
    
@@ -109,8 +110,18 @@ p_hstore->'id_solicitud'
           from adq.tsolicitud s
           where s.id_solicitud=p_id_solicitud;
           
+          select 
+            ew.id_tipo_estado 
+           into 
+            v_id_tipo_estado
+          from wf.testado_wf ew
+          inner join wf.ttipo_estado te on te.id_tipo_estado = ew.id_tipo_estado
+          where ew.id_estado_wf = v_id_estado_wf;
+          
         --buscamos siguiente estado correpondiente al proceso del WF 
-        SELECT 
+      
+        
+        SELECT  
              ps_id_tipo_estado,
              ps_codigo_estado,
              ps_disparador,
@@ -121,11 +132,10 @@ p_hstore->'id_solicitud'
             va_codigo_estado,
             va_disparador,
             va_regla,
-            va_prioridad
-        
-        FROM wf.f_obtener_estado_wf(v_id_proceso_wf, v_id_estado_wf,NULL,'siguiente');
-        
-        
+            va_prioridad 
+          FROM adq.f_obtener_sig_estado_sol_rec(p_id_solicitud, v_id_proceso_wf, v_id_tipo_estado); 
+                        
+      
         v_num_estados= array_length(va_id_tipo_estado, 1);
                       
         IF v_num_estados = 1 then
@@ -185,22 +195,19 @@ p_hstore->'id_solicitud'
            
         
             --si no tiene supervisor pasamos directo al siguiente estado (deberia ser el visto bueno de gerencia) 
-            SELECT 
-                 ps_id_tipo_estado,
-                 ps_codigo_estado,
-                 ps_disparador,
-                 ps_regla,
-                 ps_prioridad
-              into
-                va_id_tipo_estado,
-                va_codigo_estado,
-                va_disparador,
-                va_regla,
-                va_prioridad
-            
-            FROM wf.f_obtener_estado_wf(v_id_proceso_wf, NULL,va_id_tipo_estado[1],'siguiente');
-            
-            
+            SELECT  
+               ps_id_tipo_estado,
+               ps_codigo_estado,
+               ps_disparador,
+               ps_regla,
+               ps_prioridad
+            into
+              va_id_tipo_estado,
+              va_codigo_estado,
+              va_disparador,
+              va_regla,
+              va_prioridad 
+            FROM adq.f_obtener_sig_estado_sol_rec(p_id_solicitud, v_id_proceso_wf, va_id_tipo_estado[1]);
             
             IF va_id_tipo_estado[1] is NULL THEN
            
