@@ -31,6 +31,7 @@ DECLARE
     v_id_obligacion_pago 			integer;
     v_id_obligacion_det 			integer;
     v_resp							varchar;
+    v_id_contrato					integer;
 
 	
 
@@ -65,7 +66,9 @@ BEGIN
               sol.id_categoria_compra,
               sol.tipo,
               sol.tipo_concepto,
-              sol.id_funcionario
+              sol.id_funcionario,
+              c.requiere_contrato,
+              sol.justificacion
             into
              v_registros_cotizacion
             from adq.tcotizacion c
@@ -77,9 +80,26 @@ BEGIN
               raise exception 'Solo pueden habilitarce pago para cotizaciones adjudicadas';
             END IF;
             
+            --------------------------------------
+            --  Recuperamos datos del contrato si que existe
+            -------------------------------------
+            v_id_contrato = NULL;
+            IF requiere_contrato.requiere_contrato = 'si'  THEN
+              
+                 select 
+                 	con.id_contrato
+                 into
+                    v_id_contrato
+                 from leg.tcontrato con
+                 where  con.id_cotizacion = p_id_cotizacion 
+                        and con.estado = 'finalizado' and con.estado_reg = 'activo';
+            
+            END IF;
+            
+            
             
             INSERT INTO 
-              tes.tobligacion_pago
+              tes.tobligacion_pago 
             (
               id_usuario_reg,
               fecha_reg,
@@ -98,7 +118,9 @@ BEGIN
               id_categoria_compra,
               tipo_solicitud,
               tipo_concepto_solicitud,
-              id_funcionario
+              id_funcionario,
+              id_contrato,
+              obs
             ) 
             VALUES (
               p_id_usuario,
@@ -117,7 +139,9 @@ BEGIN
               v_registros_cotizacion.id_categoria_compra,
               v_registros_cotizacion.tipo,
               v_registros_cotizacion.tipo_concepto,
-              v_registros_cotizacion.id_funcionario
+              v_registros_cotizacion.id_funcionario,
+              v_id_contrato,
+              v_registros_cotizacion.justificacion
               
             ) RETURNING id_obligacion_pago into v_id_obligacion_pago;
     
