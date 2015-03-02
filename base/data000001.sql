@@ -846,3 +846,12 @@ select pxp.f_insert_testructura_gui ('ADQELEPRE', 'REPADQ');
 
 
 /***********************************F-DAT-RAC-ADQ-0-12/02/2015*****************************************/
+
+
+/***********************************I-DAT-RAC-ADQ-0-02/03/2015*****************************************/
+
+INSERT INTO pxp.variable_global ("variable", "valor", "descripcion")
+VALUES (E'adq_tope_compra', E'1000000', E'Monto maximo decomprar por adquisiciones en moneda base');
+
+/***********************************F-DAT-RAC-ADQ-0-02/03/2015*****************************************/
+
