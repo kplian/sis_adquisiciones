@@ -750,7 +750,7 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
 	 loadCheckDocumentosSolWf:function() {
             var rec=this.sm.getSelected();
             rec.data.nombreVista = this.nombreVista;
-            rec.data.check_fisico = 'si'
+            rec.data.check_fisico = 'si';
             Phx.CP.loadWindows('../../../sis_workflow/vista/documento_wf/DocumentoWf.php',
                     'Chequear documento del WF',
                     {

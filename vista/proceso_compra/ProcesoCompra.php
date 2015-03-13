@@ -69,7 +69,7 @@ Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
             /*
            var data = this.sm.getSelected().data.id_proceso_wf;
            var rec = this.sm.getSelected();
-            Phx.CP.loadWindows('../../../sis_workflow/vista/gannt/gannt.php',
+            Phx.CP.loadWindows('../../../sis_workflow/vista/gantt/gannt.php',
                     'Diagrama Gannt',
                     {
                         width:'98%',
@@ -90,7 +90,7 @@ Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
                     { 'id_proceso_wf' : data },
                     this.idContenedor);*/
            
-           
+         
             Phx.CP.loadingShow();
             var data = this.sm.getSelected().data.id_proceso_wf;
             Ext.Ajax.request({
