@@ -1,3 +1,5 @@
+--------------- SQL ---------------
+
 CREATE OR REPLACE FUNCTION adq.f_cotizacion_ime (
   p_administrador integer,
   p_id_usuario integer,
@@ -1391,7 +1393,7 @@ BEGIN
                                                         p_id_usuario,
                                                         v_parametros._id_usuario_ai,
                                                         v_parametros._nombre_usuario_ai, 
-                                                        v_registros_cotizacion.id_cotizacion, 
+                                                        v_id_cotizacion, 
                                                         v_id_proceso_wf, 
                                                         v_id_estado_wf, 
                                                         v_codigo_estado,

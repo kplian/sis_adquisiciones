@@ -11,30 +11,26 @@ header("content-type: text/javascript; charset=UTF-8");
 ?>
 <script>
 Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
-
+    gruposBarraTareas:[{name:'pendientes',title:'<H1 align="center"><i class="fa fa-thumbs-o-down"></i> Pendientes</h1>',grupo:0},
+                       {name:'iniciados',title:'<H1 align="center"><i class="fa fa-eye"></i> Iniciados</h1>',grupo:1},
+                       {name:'en pago',title:'<H1 align="center"><i class="fa fa-credit-card"></i> En Pago</h1>',grupo:2},
+                       {name:'finalizados',title:'<H1 align="center"><i class="fa fa-thumbs-o-up"></i> Finalizados</h1>',grupo:3}],
+	
+    beditGroups:[0,1,2],
+    bdelGroups:[0,1,2],
+    bactGroups:[0,1,2,3],
+    btestGroups:[0],
+    bexcelGroups:[0,1,2,3],
+    
+    actualizarSegunTab: function(name, indice){
+    	this.store.baseParams.estado = name;
+    	this.load({params:{start:0, limit:50}});
+    },
+	
 	constructor:function(config){
 		this.maestro=config.maestro;
 		
-		this.tbarItems = ['-',{
-            text: 'Ver todos los procesos',
-            enableToggle: true,
-            pressed: false,
-            toggleHandler: function(btn, pressed) {
-               
-                if(pressed){
-                    this.store.baseParams.pendientes = 0;
-                     
-                }
-                else{
-                   this.store.baseParams.pendientes = 1;
-                }
-                
-                this.onButtonAct();
-             },
-            scope: this
-           }];
-		
-    	//llama al constructor de la clase padre
+		//llama al constructor de la clase padre
 		Phx.vista.ProcesoCompra.superclass.constructor.call(this,config);
 		this.init();
 		this.addButton('btnReporte',{
@@ -44,12 +40,13 @@ Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
             handler : this.onButtonSolicitud,
             tooltip : '<b> Solicitud</b><br/><b>Reporte de Solicitud de Compra</b>'
         });
-		this.addButton('btnCotizacion',{text :'Cotizacion',iconCls:'bdocuments',disabled: true, handler : this.onButtonCotizacion,tooltip : '<b>Cotizacion de solicitud de Compra</b><br/><b>Cotizacion de solicitud de Compra</b>'});
-  		this.addButton('btnChequeoDocumentos',{text: 'Documentos',iconCls: 'bchecklist',disabled: true,handler: this.loadCheckDocumentosSol,tooltip: '<b>Documentos del Proceso</b><br/>Subir los documetos requeridos en el proceso seleccionada.'});
-        this.addButton('btnCuadroComparativo',{text :'Cuadro Comparativo',iconCls : 'bexcel',disabled: true,handler : this.onCuadroComparativo,tooltip : '<b>Cuadro Comparativo</b><br/><b>Cuadro Comparativo de Cotizaciones</b>'});
-	    this.addButton('btnRevePres',{text:'Rev. Pre.',iconCls: 'balert',disabled:true,handler:this.onBtnRevPres,tooltip: '<b>Revertir Presupuesto</b> Revierte todo el presupuesto no adjudicado para la solicitud.'});
-        this.addButton('btnFinPro',{text:'Fin Proc.',iconCls: 'balert',disabled:true,handler:this.onBtnFinPro,tooltip: '<b>Finzalizar Proceso</b> Finaliza el proceso y la solicitud y revierte el presupuesto. No  puede deshacerse'});
-        this.addButton('diagrama_gantt',{text:'',iconCls: 'bgantt',disabled:true,handler:this.diagramGantt,tooltip: '<b>Diagrama Gantt de proceso macro</b>'});
+        
+		this.addButton('btnCotizacion',{grupo:[0,1,2,3], text :'Cotizacion',iconCls:'bdocuments',disabled: true, handler : this.onButtonCotizacion,tooltip : '<b>Cotizacion de solicitud de Compra</b><br/><b>Cotizacion de solicitud de Compra</b>'});
+  		this.addButton('btnChequeoDocumentos',{grupo:[0,1,2,3], text: 'Documentos',iconCls: 'bchecklist',disabled: true,handler: this.loadCheckDocumentosSol,tooltip: '<b>Documentos del Proceso</b><br/>Subir los documetos requeridos en el proceso seleccionada.'});
+        this.addButton('btnCuadroComparativo',{grupo:[0,1,2,3], text :'Cuadro Comparativo',iconCls : 'bexcel',disabled: true,handler : this.onCuadroComparativo,tooltip : '<b>Cuadro Comparativo</b><br/><b>Cuadro Comparativo de Cotizaciones</b>'});
+	    this.addButton('btnRevePres',{grupo:[0,1,2], text:'Rev. Pre.',iconCls: 'balert',disabled:true,handler:this.onBtnRevPres,tooltip: '<b>Revertir Presupuesto</b> Revierte todo el presupuesto no adjudicado para la solicitud.'});
+        this.addButton('btnFinPro',{grupo:[2], text:'Fin Proc.',iconCls: 'balert',disabled:true,handler:this.onBtnFinPro,tooltip: '<b>Finzalizar Proceso</b> Finaliza el proceso y la solicitud y revierte el presupuesto. No  puede deshacerse'});
+        this.addButton('diagrama_gantt',{grupo:[0,1,2,3], text:'Diagrama Gantt',iconCls: 'bgantt',disabled:true,handler:this.diagramGantt,tooltip: '<b>Diagrama Gantt de proceso macro</b>'});
         
         this.store.baseParams={};
         //coloca filtros para acceso directo si existen
@@ -57,8 +54,8 @@ Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
            this.store.baseParams.filtro_valor = config.filtro_directo.valor;
            this.store.baseParams.filtro_campo = config.filtro_directo.campo;
         }
-        this.store.baseParams={pendientes:1}
-        this.load({params:{start:0, limit:this.tam_pag}});
+        this.store.baseParams.estado = 'pendientes'
+        //this.load({params:{start:0, limit:this.tam_pag}});
 	    this.iniciarEventos();
 	
 	},
@@ -135,24 +132,27 @@ Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
 		},
         {
             config:{
+                name: 'instruc_rpc',
+                fieldLabel: 'Ins/RPC',
+                allowBlank: true,
+                anchor: '80%',
+                gwidth: 140,
+                maxLength:50
+            },
+            type:'Field',
+            filters:{pfiltro:'instruc_rpc',type:'string'},
+            id_grupo:1,
+            grid:true,
+            form:false
+        },
+        {
+            config:{
                 name: 'num_tramite',
                 fieldLabel: 'N# Tramite',
                 allowBlank: true,
                 anchor: '80%',
                 gwidth: 150,
-                maxLength:200,
-                renderer:function (value, p, record){  
-            	   
-                    if (record.data['desc_cotizacion']&&record.data['desc_cotizacion'].indexOf('S/N[borrador]')!=-1) {
-                    	 return  String.format('<b><font color="orange">{0}</font></b>',value);
-                    }
-                    else{
-                    	if(!record.data['desc_cotizacion']){
-                    		 return  String.format('<b><font color="orange">{0}</font></b>',value);
-                    	}
-                    	 return String.format('{0}', value);
-                    }
-               }
+                maxLength:200
             },
             type:'TextField',
             filters:{pfiltro:'num_tramite',type:'string'},
@@ -187,30 +187,30 @@ Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
         },
         {
             config:{
-                name: 'usr_aux',
-                fieldLabel: 'Aux',
-                allowBlank: true,
-                anchor: '80%',
-                gwidth: 80,
-                maxLength:4
-            },
-            type:'NumberField',
-            filters:{pfiltro:'usr_aux',type:'string'},
-            id_grupo:1,
-            grid:true,
-            form:false
-        },
-        {
-            config:{
-                name: 'desc_cotizacion',
-                fieldLabel: 'Est Cot',
+                name: 'estados_cotizacion',
+                fieldLabel: 'Estados Cot',
                 allowBlank: true,
                 anchor: '80%',
                 gwidth: 200,
                 maxLength:4
             },
             type:'Field',
-            filters:{pfiltro:'desc_cotizacion',type:'string'},
+            filters:{pfiltro:'estados_cotizacion',type:'string'},
+            id_grupo:1,
+            grid:true,
+            form:false
+        },
+        {
+            config:{
+                name: 'numeros_oc',
+                fieldLabel: 'Ordenes de Compra',
+                allowBlank: true,
+                anchor: '80%',
+                gwidth: 200,
+                maxLength:4
+            },
+            type:'Field',
+            filters:{pfiltro:'numeros_oc',type:'string'},
             id_grupo:1,
             grid:true,
             form:false
@@ -311,15 +311,15 @@ Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
         },
         {
             config:{
-                name: 'instruc_rpc',
-                fieldLabel: 'Ins/RPC',
+                name: 'proveedores_cot',
+                fieldLabel: 'Proveedores',
                 allowBlank: true,
                 anchor: '80%',
-                gwidth: 50,
-                maxLength:50
+                gwidth: 300,
+                maxLength:4
             },
             type:'Field',
-            filters:{pfiltro:'instruc_rpc',type:'string'},
+            filters:{pfiltro:'proveedores_cot',type:'string'},
             id_grupo:1,
             grid:true,
             form:false
@@ -337,6 +337,21 @@ Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
             },
             type:'TextField',
             filters:{pfiltro:'desc_moneda',type:'string'},
+            id_grupo:1,
+            grid:true,
+            form:false
+        },
+        {
+            config:{
+                name: 'usr_aux',
+                fieldLabel: 'Aux',
+                allowBlank: true,
+                anchor: '80%',
+                gwidth: 80,
+                maxLength:4
+            },
+            type:'NumberField',
+            filters:{pfiltro:'usr_aux',type:'string'},
             id_grupo:1,
             grid:true,
             form:false
@@ -541,7 +556,7 @@ Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
 		{name:'usr_mod', type: 'string'},
 		'desc_moneda','desc_funcionario',
 		'desc_uo','desc_depto','desc_solicitud','instruc_rpc',
-		'usr_aux','id_moneda','id_funcionario','desc_cotizacion','objeto'
+		'usr_aux','id_moneda','id_funcionario','desc_cotizacion','objeto','estados_cotizacion','numeros_oc','proveedores_cot'
 		
 	],
 	

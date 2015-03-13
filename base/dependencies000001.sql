@@ -4748,6 +4748,7 @@ AS
  
 
 
+<<<<<<< HEAD
 /***********************************I-DEP-RAC-ADQ-1-04/03/2015*****************************************/
  
 
@@ -4844,4 +4845,99 @@ AS
 ALTER TABLE adq.vsolicitud_compra
   OWNER TO postgres;
 /***********************************F-DEP-RAC-ADQ-1-04/03/2015*****************************************/
+=======
+/***********************************I-DEP-RAC-ADQ-1-11/03/2015*****************************************/
+ 
+CREATE VIEW adq.vproceso_compra (
+    id_proceso_compra,
+    id_depto,
+    num_convocatoria,
+    id_solicitud,
+    id_estado_wf,
+    fecha_ini_proc,
+    obs_proceso,
+    id_proceso_wf,
+    num_tramite,
+    codigo_proceso,
+    estado_reg,
+    estado,
+    num_cotizacion,
+    id_usuario_reg,
+    fecha_reg,
+    fecha_mod,
+    id_usuario_mod,
+    usr_reg,
+    usr_mod,
+    desc_depto,
+    desc_funcionario,
+    desc_solicitud,
+    desc_moneda,
+    instruc_rpc,
+    id_categoria_compra,
+    usr_aux,
+    id_moneda,
+    id_funcionario,
+    id_usuario_auxiliar,
+    objeto,
+    estados_cotizacion,
+    numeros_oc,
+    array_estados_cot,
+    proveedores_cot)
+AS
+ WITH cotizaciones AS (
+SELECT cot_1.id_proceso_compra,
+            count(cot_1.id_cotizacion) AS cantidad_cotizacion,
+            pxp.list(cot_1.estado::text) AS estados_cotizacion,
+            pxp.list(cot_1.numero_oc::text) AS numeros_oc,
+            pxp.list(prov.desc_proveedor::text) AS proveedores_cot
+FROM adq.tcotizacion cot_1
+             JOIN param.vproveedor prov ON prov.id_proveedor = cot_1.id_proveedor
+WHERE cot_1.estado_reg::text = 'activo'::text
+GROUP BY cot_1.id_proceso_compra
+        )
+    SELECT proc.id_proceso_compra,
+    proc.id_depto,
+    proc.num_convocatoria,
+    proc.id_solicitud,
+    proc.id_estado_wf,
+    proc.fecha_ini_proc,
+    proc.obs_proceso,
+    proc.id_proceso_wf,
+    proc.num_tramite,
+    proc.codigo_proceso,
+    proc.estado_reg,
+    proc.estado,
+    proc.num_cotizacion,
+    proc.id_usuario_reg,
+    proc.fecha_reg,
+    proc.fecha_mod,
+    proc.id_usuario_mod,
+    usu1.cuenta AS usr_reg,
+    usu2.cuenta AS usr_mod,
+    dep.codigo AS desc_depto,
+    fun.desc_funcionario1 AS desc_funcionario,
+    sol.numero AS desc_solicitud,
+    mon.codigo AS desc_moneda,
+    sol.instruc_rpc,
+    sol.id_categoria_compra,
+    usua.cuenta AS usr_aux,
+    sol.id_moneda,
+    sol.id_funcionario,
+    proc.id_usuario_auxiliar,
+    proc.objeto,
+    cot.estados_cotizacion,
+    cot.numeros_oc,
+    string_to_array(cot.estados_cotizacion, ','::text) AS array_estados_cot,
+    cot.proveedores_cot
+    FROM adq.tproceso_compra proc
+     JOIN segu.tusuario usu1 ON usu1.id_usuario = proc.id_usuario_reg
+     JOIN param.tdepto dep ON dep.id_depto = proc.id_depto
+     JOIN adq.tsolicitud sol ON sol.id_solicitud = proc.id_solicitud
+     JOIN orga.vfuncionario fun ON fun.id_funcionario = sol.id_funcionario
+     JOIN param.tmoneda mon ON mon.id_moneda = sol.id_moneda
+     LEFT JOIN cotizaciones cot ON cot.id_proceso_compra = proc.id_proceso_compra
+     LEFT JOIN segu.tusuario usu2 ON usu2.id_usuario = proc.id_usuario_mod
+     LEFT JOIN segu.tusuario usua ON usua.id_usuario = proc.id_usuario_auxiliar;
+/***********************************F-DEP-RAC-ADQ-1-11/03/2015*****************************************/
+>>>>>>> 34ec4a8af2dea38a9e27f5d587a7aed39229fb80
  

@@ -50,8 +50,12 @@ class MODProcesoCompra extends MODbase{
 		$this->captura('id_moneda','integer');
 		$this->captura('id_funcionario','integer');
 		$this->captura('id_usuario_auxiliar','integer');
-		$this->captura('desc_cotizacion','text');
 		$this->captura('objeto','varchar');
+		
+		$this->captura('estados_cotizacion','text');
+		$this->captura('numeros_oc','text');
+		$this->captura('proveedores_cot','text');
+		
 		
 		
 	 
