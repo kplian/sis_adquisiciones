@@ -4748,7 +4748,6 @@ AS
  
 
 
-<<<<<<< HEAD
 /***********************************I-DEP-RAC-ADQ-1-04/03/2015*****************************************/
  
 
@@ -4845,10 +4844,10 @@ AS
 ALTER TABLE adq.vsolicitud_compra
   OWNER TO postgres;
 /***********************************F-DEP-RAC-ADQ-1-04/03/2015*****************************************/
-=======
+
 /***********************************I-DEP-RAC-ADQ-1-11/03/2015*****************************************/
  
-CREATE VIEW adq.vproceso_compra (
+CREATE OR REPLACE VIEW adq.vproceso_compra(
     id_proceso_compra,
     id_depto,
     num_convocatoria,
@@ -4939,5 +4938,5 @@ GROUP BY cot_1.id_proceso_compra
      LEFT JOIN segu.tusuario usu2 ON usu2.id_usuario = proc.id_usuario_mod
      LEFT JOIN segu.tusuario usua ON usua.id_usuario = proc.id_usuario_auxiliar;
 /***********************************F-DEP-RAC-ADQ-1-11/03/2015*****************************************/
->>>>>>> 34ec4a8af2dea38a9e27f5d587a7aed39229fb80
+
  
