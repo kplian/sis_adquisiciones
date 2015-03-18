@@ -98,9 +98,10 @@ BEGIN
                               id_moneda,
                               id_funcionario,
                               id_usuario_auxiliar,
-                              desc_cotizacion,
-                              objeto 
-                         
+                              objeto,
+                              estados_cotizacion,
+                              numeros_oc,
+                              proveedores_cot
                    from adq.vproceso_compra  
                    where  '||v_filadd||'  ';
 			

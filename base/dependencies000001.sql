@@ -4846,7 +4846,11 @@ ALTER TABLE adq.vsolicitud_compra
 /***********************************F-DEP-RAC-ADQ-1-04/03/2015*****************************************/
 
 /***********************************I-DEP-RAC-ADQ-1-11/03/2015*****************************************/
- 
+
+--------------- SQL ---------------
+
+DROP VIEW adq.vproceso_compra;
+
 CREATE OR REPLACE VIEW adq.vproceso_compra(
     id_proceso_compra,
     id_depto,
