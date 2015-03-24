@@ -224,7 +224,8 @@ BEGIN
             usuario_ai,
             tipo_concepto,
             fecha_inicio,
-            dias_plazo_entrega
+            dias_plazo_entrega,
+            precontrato
           	) values(
 			'activo',
 			--v_parametros.id_solicitud_ext,
@@ -260,7 +261,8 @@ BEGIN
             v_parametros._nombre_usuario_ai,
             v_parametros.tipo_concepto,
             v_parametros.fecha_inicio,
-            v_parametros.dias_plazo_entrega
+            v_parametros.dias_plazo_entrega,
+            COALESCE(v_parametros.precontrato,'no')
 							
 			)RETURNING id_solicitud into v_id_solicitud;
         
@@ -391,7 +393,8 @@ BEGIN
             usuario_ai = v_parametros._nombre_usuario_ai,
             tipo_concepto =  v_parametros.tipo_concepto,
             fecha_inicio = v_parametros.fecha_inicio,
-            dias_plazo_entrega = v_parametros.dias_plazo_entrega
+            dias_plazo_entrega = v_parametros.dias_plazo_entrega,
+            precontrato = COALESCE(v_parametros.precontrato,'no')
 			where id_solicitud = v_parametros.id_solicitud;
                
 			--Definicion de la respuesta

@@ -9,22 +9,18 @@
 header("content-type: text/javascript; charset=UTF-8");
 ?>
 <script>
-Phx.vista.CotizacionAdq = {
+Phx.vista.CotizacionOC = {
     require:'../../../sis_adquisiciones/vista/cotizacion/Cotizacion.php',
     requireclase:'Phx.vista.Cotizacion',
     title:'Solicitud',
     nombreVista: 'CotizacionAdq',
+    bnew: false,
     
     constructor: function(config) {
         
         
-         Phx.vista.CotizacionAdq.superclass.constructor.call(this,config);
-          
-         
-        
+         Phx.vista.CotizacionOC.superclass.constructor.call(this,config);
          this.addButton('fin_registro',{text:'Fin Reg.',iconCls: 'badelante',disabled:true,handler:this.fin_registro,tooltip: '<b>Finalizar</b><p>Finalizar registro de cotización</p>'});
-         
-         
          this.addButton('btnAdjudicar',{
                     text :'Recomendar',
                     iconCls : 'bchecklist',
@@ -33,7 +29,7 @@ Phx.vista.CotizacionAdq = {
                     tooltip : '<b>Recomedar Todo</b><br/><b>Recomienda la adjudicación de todo lo disponible</b>'
           });
           
-           this.addButton('btnSolApro',{
+         this.addButton('btnSolApro',{
                          text:'Sol. Apro.',
                          iconCls: 'bok',
                          disabled:true,
@@ -41,16 +37,10 @@ Phx.vista.CotizacionAdq = {
                          tooltip: '<b>Solictar Aprobación</b><p>Solictar Aprobación del RPC</p>'});
            
         
-       
-       
         
        this.addButton('btnHabPago',{text:'Habilitar Pago',iconCls: 'bcharge',disabled:false,handler:this.sigEstado,tooltip: '<b>Pasar al Siguiente Estado</b>'});
-          
        this.addButton('btnSendMail',{text:'Sol Cotizacion',iconCls: 'bemail',disabled:true,handler:this.onSendMail,tooltip: '<b>Solictar Cotizacion</b><p>Solicta la cotizacion por correo al proveedor</p>'});
-       
        this.addButton('btnSolCon',{text:'Hab. Contr.',iconCls: 'bemail',disabled:true,handler:this.onSolContrato,tooltip: '<b>HAbilitar Contrato</b><p>si tiene habilitado los contratos en esta cotización, antes de armar el plan de pago pasara al área legal</p>'});
-       
-       
        this.addButton('btnPreing',{
                     text :'Preingreso',
                     iconCls : 'bchecklist',
@@ -66,10 +56,7 @@ Phx.vista.CotizacionAdq = {
                     handler : this.onOpenObs,
                     tooltip : '<b>Observaciones</b><br/><b>Observaciones del WF</b>'
           });
-		//RCM
-        //this.addButton('btnObPag',{text :'Obligación Pago',iconCls:'bdocuments',disabled: true, handler : this.onButtonObPag,tooltip : '<b>Obligación de Pago</b><br/><b>Formulario para el registro de la Obligación de Pago</b>'});
-           
-        
+		
         
         this.init();
         this.iniciarEventos();
@@ -153,7 +140,7 @@ Phx.vista.CotizacionAdq = {
         }); 
         
       
-        this.store.baseParams={id_proceso_compra:this.id_proceso_compra,tipo_interfaz: this.nombreVista}; 
+        this.store.baseParams={tipo_interfaz: this.nombreVista}; 
         this.load({params:{start:0, limit:this.tam_pag}});
         
         
@@ -209,31 +196,15 @@ Phx.vista.CotizacionAdq = {
     },
     
     EnableSelect:function(n){
-         Phx.vista.CotizacionAdq.superclass.EnableSelect.call(this,n,{desc_moneda_sol:this.desc_moneda});
+         Phx.vista.CotizacionOC.superclass.EnableSelect.call(this,n,{desc_moneda_sol:this.desc_moneda});
     },
     
-    onButtonNew:function(){         
-            Phx.vista.CotizacionAdq.superclass.onButtonNew.call(this);
-            
-            this.cmbMoneda.disable();
-            this.cmpTipoCambioConv.disable();
-            this.getComponente('id_proceso_compra').setValue(this.id_proceso_compra); 
-            
-            this.ocultarComponente(this.Cmp.correo_contacto);
-            this.ocultarComponente(this.Cmp.telefono_contacto);
-            this.ocultarComponente(this.Cmp.funcionario_contacto);
-            this.ocultarComponente(this.Cmp.lugar_entrega); 
-            this.ocultarComponente(this.Cmp.fecha_entrega); 
-            this.ocultarComponente(this.Cmp.tiempo_entrega); 
-            this.mostrarComponente(this.Cmp.prellenar_oferta); 
-
-        
-    },
+    
     
     onButtonEdit:function(){ 
     	
     	        
-            Phx.vista.CotizacionAdq.superclass.onButtonEdit.call(this);
+            Phx.vista.CotizacionOC.superclass.onButtonEdit.call(this);
             this.mostrarComponente(this.Cmp.correo_contacto);
             this.mostrarComponente(this.Cmp.telefono_contacto);
             this.mostrarComponente(this.Cmp.funcionario_contacto);
@@ -468,7 +439,7 @@ Phx.vista.CotizacionAdq = {
        preparaMenu:function(n){
           var data = this.getSelectedData();
           var tb =this.tbar;
-          Phx.vista.CotizacionAdq.superclass.preparaMenu.call(this,n);
+          Phx.vista.CotizacionOC.superclass.preparaMenu.call(this,n);
           this.menuAdq.enable();
           this.getBoton('btnReporte').enable();
 
@@ -512,7 +483,7 @@ Phx.vista.CotizacionAdq = {
                    }
                    this.getBoton('fin_registro').disable();
                    this.getBoton('edit').disable();
-                   this.getBoton('new').disable();
+                   
                  }
                
                if (data['estado']==  'borrador'||data['estado']=='cotizado'||data['estado']== 'adjudicado'){
@@ -569,7 +540,7 @@ Phx.vista.CotizacionAdq = {
     
      
      liberaMenu:function(){
-        var tb = Phx.vista.CotizacionAdq.superclass.liberaMenu.call(this);
+        var tb = Phx.vista.CotizacionOC.superclass.liberaMenu.call(this);
         if(tb){
             this.getBoton('fin_registro').disable();
             this.getBoton('btnAdjudicar').disable();

@@ -37,6 +37,7 @@ DECLARE
   
     v_strg_cot			varchar;
 	v_filtro varchar;
+    
     		    
 BEGIN
 
@@ -53,8 +54,26 @@ BEGIN
 	if(p_transaccion='ADQ_COT_SEL')then
      				
     	begin
+            IF  pxp.f_existe_parametro(p_tabla, 'id_proceso_compra') THEN
+            	v_filtro = 'cot.id_proceso_compra='||v_parametros.id_proceso_compra||' and ';
+            ELSE
+                v_filtro = '';
+            END IF;
+            
+            
     		--Sentencia de la consulta
-			v_consulta:='select
+			v_consulta:='WITH detalle as (
+                                       Select 
+                                        cd.id_cotizacion,
+                                        sum(cd.cantidad_adju *cd.precio_unitario) as total_adjudicado,
+                                        sum(cd.cantidad_coti *cd.precio_unitario) as total_cotizado,
+                                        sum(cd.cantidad_adju *cd.precio_unitario_mb) as total_adjudicado_mb
+                                      FROM  adq.tcotizacion_det  cd
+                                      WHERE cd.estado_reg = ''activo''
+                                      GROUP by cd.id_cotizacion
+                                      
+                        )
+                      select
 						cot.id_cotizacion,
 						cot.estado_reg,
 						cot.estado,
@@ -63,9 +82,7 @@ BEGIN
 						cot.fecha_coti,
 						cot.numero_oc,
 						cot.id_proveedor,
-                        pro.desc_proveedor,
-						
-						
+                        pro.desc_proveedor,					
 						cot.fecha_entrega,
 						cot.id_moneda,
                         mon.moneda,
@@ -73,8 +90,7 @@ BEGIN
 						cot.fecha_venc,
 						cot.obs,
 						cot.fecha_adju,
-						cot.nro_contrato,
-						
+						cot.nro_contrato,					
 						cot.fecha_reg,
 						cot.id_usuario_reg,
 						cot.fecha_mod,
@@ -95,27 +111,80 @@ BEGIN
                         cot.correo_contacto,
                         cot.prellenar_oferta,
                         cot.forma_pago,
-                        cot.requiere_contrato
-                        
+                        cot.requiere_contrato,
+                        d.total_adjudicado,
+                        d.total_cotizado,
+                        d.total_adjudicado_mb
 						from adq.tcotizacion cot
                         inner join adq.tproceso_compra proc on proc.id_proceso_compra = cot.id_proceso_compra
                         inner join adq.tsolicitud sol on sol.id_solicitud = proc.id_solicitud
 						inner join segu.tusuario usu1 on usu1.id_usuario = cot.id_usuario_reg
-						left join segu.tusuario usu2 on usu2.id_usuario = cot.id_usuario_mod
+						inner join detalle d on d.id_cotizacion = cot.id_cotizacion
 				        inner join param.tmoneda mon on mon.id_moneda = cot.id_moneda
                         inner join param.vproveedor pro on pro.id_proveedor = cot.id_proveedor
+                        left join segu.tusuario usu2 on usu2.id_usuario = cot.id_usuario_mod
                         
-                        where cot.id_proceso_compra='||v_parametros.id_proceso_compra||' and ';
+                        where '||v_filtro;
 			
+           
 			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;
 			v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
-
+             raise notice '%', v_consulta;
 			--Devuelve la respuesta
 			return v_consulta;
 						
 		end;
+    /*********************************    
+ 	#TRANSACCION:  'ADQ_COT_CONT'
+ 	#DESCRIPCION:	Conteo de registros de la consulta de cotizaciones 
+ 	#AUTOR:	 	Gonzalo Sarmiento Sejas
+ 	#FECHA:		21-03-2013 14:48:35
+	***********************************/
+
+	elsif(p_transaccion='ADQ_COT_CONT')then
+
+		begin
         
+            IF  pxp.f_existe_parametro(p_tabla, 'id_proceso_compra') THEN
+            	v_filtro = 'cot.id_proceso_compra='||v_parametros.id_proceso_compra||' and ';
+            ELSE
+                v_filtro = '';
+            END IF;
+            
+			--Sentencia de la consulta de conteo de registros
+			v_consulta:='WITH detalle as (
+                                       Select 
+                                        cd.id_cotizacion,
+                                        sum(cd.cantidad_adju *cd.precio_unitario) as total_adjudicado,
+                                        sum(cd.cantidad_coti *cd.precio_unitario) as total_cotizado,
+                                        sum(cd.cantidad_adju *cd.precio_unitario_mb) as total_adjudicado_mb
+                                      FROM  adq.tcotizacion_det  cd
+                                      WHERE cd.estado_reg = ''activo''
+                                      GROUP by cd.id_cotizacion
+                                      
+                        )
+                        SELECT count(cot.id_cotizacion)
+					    from adq.tcotizacion cot
+                        inner join adq.tproceso_compra proc on proc.id_proceso_compra = cot.id_proceso_compra
+                        inner join adq.tsolicitud sol on sol.id_solicitud = proc.id_solicitud
+						inner join segu.tusuario usu1 on usu1.id_usuario = cot.id_usuario_reg
+						inner join detalle d on d.id_cotizacion = cot.id_cotizacion
+				        inner join param.tmoneda mon on mon.id_moneda = cot.id_moneda
+                        inner join param.vproveedor pro on pro.id_proveedor = cot.id_proveedor
+                        left join segu.tusuario usu2 on usu2.id_usuario = cot.id_usuario_mod
+                        
+                        where '||v_filtro;
+			
+			--Definicion de la respuesta		    
+			v_consulta:=v_consulta||v_parametros.filtro;
+
+			--Devuelve la respuesta
+			return v_consulta;
+
+		end;
+        
+            
     /*********************************    
  	#TRANSACCION:  'ADQ_COTPROC_SEL'
  	#DESCRIPCION:	Consulta de datos
@@ -260,44 +329,60 @@ BEGIN
             raise notice 'tipo interface %',v_parametros.tipo_interfaz;
         
     		--Sentencia de la consulta
-			v_consulta:='select
-						'||v_strg_cot||',  
-						cot.estado_reg,
-						cot.estado,
-						cot.lugar_entrega,
-						cot.tipo_entrega,
-						cot.fecha_coti,
-						cot.numero_oc,
-						cot.id_proveedor,
-                        pro.desc_proveedor,
-						
-						
-						cot.fecha_entrega,
-						cot.id_moneda,
-                        mon.moneda,
-						cot.id_proceso_compra,
-						cot.fecha_venc,
-						cot.obs,
-						cot.fecha_adju,
-						cot.nro_contrato,
-						
-						cot.fecha_reg,
-						cot.id_usuario_reg,
-						cot.fecha_mod,
-						cot.id_usuario_mod,
-						usu1.cuenta as usr_reg,
-						usu2.cuenta as usr_mod,
-                        cot.id_estado_wf,
-                        cot.id_proceso_wf,
-                        mon.codigo as desc_moneda,
-                        cot.tipo_cambio_conv,
-                        sol.id_solicitud,
-                        sol.id_categoria_compra,
-                        sol.numero,
-                        sol.num_tramite,
-                        cot.tiempo_entrega,
-                        cot.requiere_contrato
+			v_consulta:='
+                          WITH detalle as (
+                                                     Select 
+                                                      cd.id_cotizacion,
+                                                      sum(cd.cantidad_adju *cd.precio_unitario) as total_adjudicado,
+                                                      sum(cd.cantidad_coti *cd.precio_unitario) as total_cotizado,
+                                                      sum(cd.cantidad_adju *cd.precio_unitario_mb) as total_adjudicado_mb
+                                                    FROM  adq.tcotizacion_det  cd
+                                                    WHERE cd.estado_reg = ''activo''
+                                                    GROUP by cd.id_cotizacion
+                                              )
+            
+           				select
+                            '||v_strg_cot||',  
+                            cot.estado_reg,
+                            cot.estado,
+                            cot.lugar_entrega,
+                            cot.tipo_entrega,
+                            cot.fecha_coti,
+                            cot.numero_oc,
+                            cot.id_proveedor,
+                            pro.desc_proveedor,
+    						
+    						
+                            cot.fecha_entrega,
+                            cot.id_moneda,
+                            mon.moneda,
+                            cot.id_proceso_compra,
+                            cot.fecha_venc,
+                            cot.obs,
+                            cot.fecha_adju,
+                            cot.nro_contrato,
+    						
+                            cot.fecha_reg,
+                            cot.id_usuario_reg,
+                            cot.fecha_mod,
+                            cot.id_usuario_mod,
+                            usu1.cuenta as usr_reg,
+                            usu2.cuenta as usr_mod,
+                            cot.id_estado_wf,
+                            cot.id_proceso_wf,
+                            mon.codigo as desc_moneda,
+                            cot.tipo_cambio_conv,
+                            sol.id_solicitud,
+                            sol.id_categoria_compra,
+                            sol.numero,
+                            sol.num_tramite,
+                            cot.tiempo_entrega,
+                            cot.requiere_contrato,
+                            d.total_adjudicado,
+                            d.total_cotizado,
+                            d.total_adjudicado_mb
 						from adq.tcotizacion cot
+                        inner join detalle d on d.id_cotizacion = cot.id_cotizacion
 						inner join segu.tusuario usu1 on usu1.id_usuario = cot.id_usuario_reg
                         inner join adq.tproceso_compra pc on pc.id_proceso_compra = cot.id_proceso_compra
                         inner join adq.tsolicitud sol on sol.id_solicitud = pc.id_solicitud
@@ -407,16 +492,28 @@ BEGIN
         
         
 			--Sentencia de la consulta de conteo de registros
-			v_consulta:='select count('||v_strg_cot||')
+			v_consulta:='
+                         WITH detalle as (
+                                                     Select 
+                                                      cd.id_cotizacion,
+                                                      sum(cd.cantidad_adju *cd.precio_unitario) as total_adjudicado,
+                                                      sum(cd.cantidad_coti *cd.precio_unitario) as total_cotizado,
+                                                      sum(cd.cantidad_adju *cd.precio_unitario_mb) as total_adjudicado_mb
+                                                    FROM  adq.tcotizacion_det  cd
+                                                    WHERE cd.estado_reg = ''activo''
+                                                    GROUP by cd.id_cotizacion
+                                              )
+                        select count('||v_strg_cot||')
 					    from adq.tcotizacion cot
-						inner join segu.tusuario usu1 on usu1.id_usuario = cot.id_usuario_reg
-                        inner join adq.tproceso_compra pc on pc.id_proceso_compra = cot.id_proceso_compra
-                        inner join adq.tsolicitud sol on sol.id_solicitud = pc.id_solicitud
-						left join segu.tusuario usu2 on usu2.id_usuario = cot.id_usuario_mod
-				        inner join param.tmoneda mon on mon.id_moneda = cot.id_moneda
-                        inner join param.vproveedor pro on pro.id_proveedor = cot.id_proveedor
-                        inner join wf.testado_wf ew on ew.id_estado_wf = cot.id_estado_wf
-                        where (cot.estado=''recomendado''  or  cot.estado=''adjudicado'')  and '|| v_add_filtro ||' ';
+                          inner join detalle d on d.id_cotizacion = cot.id_cotizacion
+                          inner join segu.tusuario usu1 on usu1.id_usuario = cot.id_usuario_reg
+                          inner join adq.tproceso_compra pc on pc.id_proceso_compra = cot.id_proceso_compra
+                          inner join adq.tsolicitud sol on sol.id_solicitud = pc.id_solicitud
+                          left join segu.tusuario usu2 on usu2.id_usuario = cot.id_usuario_mod
+                          inner join param.tmoneda mon on mon.id_moneda = cot.id_moneda
+                          inner join param.vproveedor pro on pro.id_proveedor = cot.id_proveedor
+                          inner join wf.testado_wf ew on ew.id_estado_wf = cot.id_estado_wf
+                          where (cot.estado=''recomendado''  or  cot.estado=''adjudicado'')  and '|| v_add_filtro ||' ';
 			--Definicion de la respuesta		    
 			v_consulta:=v_consulta||v_parametros.filtro;
 
@@ -609,34 +706,7 @@ BEGIN
 	
         
       
-	/*********************************    
- 	#TRANSACCION:  'ADQ_COT_CONT'
- 	#DESCRIPCION:	Conteo de registros de la consulta de cotizaciones 
- 	#AUTOR:	 	Gonzalo Sarmiento Sejas
- 	#FECHA:		21-03-2013 14:48:35
-	***********************************/
-
-	elsif(p_transaccion='ADQ_COT_CONT')then
-
-		begin
-			--Sentencia de la consulta de conteo de registros
-			v_consulta:='select count(cot.id_cotizacion)
-					    from adq.tcotizacion cot
-                        inner join adq.tproceso_compra proc on proc.id_proceso_compra = cot.id_proceso_compra
-                        inner join adq.tsolicitud sol on sol.id_solicitud = proc.id_solicitud
-						inner join segu.tusuario usu1 on usu1.id_usuario = cot.id_usuario_reg
-						left join segu.tusuario usu2 on usu2.id_usuario = cot.id_usuario_mod
-				        inner join param.tmoneda mon on mon.id_moneda = cot.id_moneda
-                        inner join param.vproveedor pro on pro.id_proveedor = cot.id_proveedor
-                        where cot.id_proceso_compra='||v_parametros.id_proceso_compra||' and ';
-			
-			--Definicion de la respuesta		    
-			v_consulta:=v_consulta||v_parametros.filtro;
-
-			--Devuelve la respuesta
-			return v_consulta;
-
-		end;				
+					
 	
     
     

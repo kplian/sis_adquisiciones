@@ -225,8 +225,7 @@ Phx.vista.SolicitudReq = {
        this.cmpIdDepto.disable();   
        this.Cmp.id_funcionario.disable();     
        this.Cmp.id_categoria_compra.disable();
-      
-       this.Cmp.tipo.disable();
+       this.Cmp.precontrato.disable();
        this.Cmp.tipo_concepto.disable();
        this.Cmp.id_moneda.disable();
        
@@ -260,19 +259,21 @@ Phx.vista.SolicitudReq = {
 	             
 	             },this);
              
-           this.Cmp.tipo.on('select',function(cmp,rec){
-               console.log('rec..',rec)
-               if(rec.json[0]=='Bien - Servicio'){
-                   
-                  this.Cmp.tipo_concepto.store.loadData(this.arrayStore['Bien'].concat(this.arrayStore['Servicio']));
-               }
-               else{
-                   this.Cmp.tipo_concepto.store.loadData(this.arrayStore[rec.json[0]]);
-               }
-                if(rec.json[0] == 'Bien' ||  rec.json[0] == 'Bien - Servicio'){
+           this.Cmp.tipo_concepto.on('select',function(cmp,rec){
+           	
+           	   //identificamos si es un bien o un servicio
+           	   if(this.isInArray(rec.json, this.arrayStore['Bien'])){
+           	   	  this.Cmp.tipo.setValue('Bien');
+           	   }
+           	   else{
+           	   	  this.Cmp.tipo.setValue('Servicio');
+           	   }
+           	   
+           	   if(this.Cmp.tipo.getValue() == 'Bien'){
                 	this.Cmp.lugar_entrega.setValue('Almacenes de Oficina Cochabamba');
                 	this.ocultarComponente(this.Cmp.fecha_inicio);
                 	this.Cmp.dias_plazo_entrega.allowBlank = false;
+                	
                 }
                 else{
                 	this.Cmp.lugar_entrega.setValue('');
@@ -280,7 +281,8 @@ Phx.vista.SolicitudReq = {
                 	this.Cmp.dias_plazo_entrega.allowBlank = true;
                 }
                 this.mostrarComponente(this.Cmp.dias_plazo_entrega);
-              
+                
+           	
            },this);
       
     },

@@ -187,30 +187,16 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
 			grid:true,
 			form:false
 		},
-	    {
-	       		config:{
-	       			name:'tipo',
-	       			fieldLabel:'Tipo',
-	       			allowBlank:false,
-	       			emptyText:'Tipo...',
-	       			typeAhead: true,
-	       		    triggerAction: 'all',
-	       		    lazyRender:true,
-	       		    mode: 'local',
-	       		    valueField: 'estilo',
-	       		    gwidth: 100,
-	       		    store:['Bien','Servicio','Bien - Servicio']
-	       		},
-	       		type:'ComboBox',
-	       		id_grupo:0,
-	       		filters:{	
-	       		         type: 'list',
-	       		          pfiltro:'sol.tipo',
-	       				 options: ['Bien','Servicio','Bien - Servicio'],	
-	       		 	},
-	       		grid:true,
-	       		form:false
-	       	},
+	   {
+            //configuracion del componente
+            config:{
+                    labelSeparator:'',
+                    inputType:'hidden',
+                    name: 'tipo'
+            },
+            type:'Field',
+            form:true 
+        },
        
         
           {
@@ -488,6 +474,31 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
 			grid: true,
 			form: false
 		},
+	    {
+       		config:{
+       			name: 'precontrato',
+       			fieldLabel: 'Contrato de adhesion',
+       			qtip: 'Si tine un contrato de adhesion',
+       			allowBlank: false,
+       			emptyText: 'Tipo...',
+       			typeAhead: true,
+       		    triggerAction: 'all',
+       		    lazyRender: true,
+       		    mode: 'local',
+       		    gwidth: 100,
+       		    store: ['si','no']
+       		},
+       		type: 'ComboBox',
+       		id_grupo: 0,
+       		filters:{	
+       		         type: 'list',
+       		         pfiltro:'sol.tipo',
+       				 options: ['si','no'],	
+       		 	},
+       		valorInicial: 'no',
+       		grid:false,
+       		form:true
+       	},
          {
             config:{
                 name:'id_proveedor',
@@ -773,7 +784,10 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
 		'ai_habilitado',
 		'tipo_concepto',
 		'revisado_asistente',
-		{name:'fecha_inicio', type: 'date',dateFormat:'Y-m-d'},'dias_plazo_entrega', 'obs_presupuestos'
+		{name:'fecha_inicio', type: 'date',dateFormat:'Y-m-d'},
+		'dias_plazo_entrega', 
+		'obs_presupuestos',
+		'precontrato'
 		
 	],
 	

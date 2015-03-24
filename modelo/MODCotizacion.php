@@ -66,8 +66,12 @@ class MODCotizacion extends MODbase{
 		$this->captura('prellenar_oferta','varchar');
 		$this->captura('forma_pago','varchar');
 		$this->captura('requiere_contrato','varchar');
+		$this->captura('total_adjudicado','numeric');
+		$this->captura('total_cotizado','numeric');
+		$this->captura('total_adjudicado_mb','numeric');
 		
 		
+		 
 		
 		
 				
@@ -163,6 +167,9 @@ class MODCotizacion extends MODbase{
         $this->captura('num_tramite','varchar');
         $this->captura('tiempo_entrega','varchar');
 		$this->captura('requiere_contrato','varchar');
+		$this->captura('total_adjudicado','numeric');
+		$this->captura('total_cotizado','numeric');
+		$this->captura('total_adjudicado_mb','numeric');
         
         
         //Ejecuta la instruccion

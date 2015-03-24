@@ -11,10 +11,10 @@ header("content-type: text/javascript; charset=UTF-8");
 ?>
 <script>
 Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
-    gruposBarraTareas:[{name:'pendientes',title:'<H1 align="center"><i class="fa fa-thumbs-o-down"></i> Pendientes</h1>',grupo:0},
-                       {name:'iniciados',title:'<H1 align="center"><i class="fa fa-eye"></i> Iniciados</h1>',grupo:1},
-                       {name:'en pago',title:'<H1 align="center"><i class="fa fa-credit-card"></i> En Pago</h1>',grupo:2},
-                       {name:'finalizados',title:'<H1 align="center"><i class="fa fa-thumbs-o-up"></i> Finalizados</h1>',grupo:3}],
+    gruposBarraTareas:[{name:'pendientes',title:'<H1 align="center"><i class="fa fa-thumbs-o-down"></i> Pendientes</h1>',grupo:0,height:0},
+                       {name:'iniciados',title:'<H1 align="center"><i class="fa fa-eye"></i> Iniciados</h1>',grupo:1,height:0},
+                       {name:'en pago',title:'<H1 align="center"><i class="fa fa-credit-card"></i> En Pago</h1>',grupo:2,height:0},
+                       {name:'finalizados',title:'<H1 align="center"><i class="fa fa-thumbs-o-up"></i> Finalizados</h1>',grupo:3,height:0}],
 	
     beditGroups:[0,1,2],
     bdelGroups:[0,1,2],
@@ -163,6 +163,7 @@ Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
             },
             type:'TextField',
             filters:{pfiltro:'num_tramite',type:'string'},
+            bottom_filter: true,
             id_grupo:1,
             grid:true,
             form:true
@@ -219,6 +220,7 @@ Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
             type:'Field',
             filters:{pfiltro:'numeros_oc',type:'string'},
             id_grupo:1,
+            bottom_filter: true,
             grid:true,
             form:false
         },
@@ -312,6 +314,7 @@ Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
             },
             type:'TextField',
             filters:{pfiltro:'desc_funcionario',type:'string'},
+            bottom_filter: true,
             id_grupo:1,
             grid:true,
             form:false
@@ -327,6 +330,7 @@ Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
             },
             type:'Field',
             filters:{pfiltro:'proveedores_cot',type:'string'},
+            bottom_filter: true,
             id_grupo:1,
             grid:true,
             form:false
@@ -753,7 +757,7 @@ Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
           { 
           url:'../../../sis_adquisiciones/vista/solicitud_det/SolicitudVbDet.php',
           title:'Detalle', 
-          height:'50%',
+          height:'30%',
           cls:'SolicitudVbDet'
          },
 	bdel:true,

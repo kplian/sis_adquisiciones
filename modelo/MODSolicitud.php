@@ -85,6 +85,7 @@ class MODSolicitud extends MODbase{
 		$this->captura('fecha_inicio','date');
 		$this->captura('dias_plazo_entrega','integer');
 		$this->captura('obs_presupuestos','varchar');
+		$this->captura('precontrato','varchar');
 		
 		  
 		
@@ -128,18 +129,15 @@ class MODSolicitud extends MODbase{
 		$this->setParametro('id_categoria_compra','id_categoria_compra','int4');
 		$this->setParametro('id_funcionario','id_funcionario','int4');
 		$this->setParametro('id_estado_wf','id_estado_wf','int4');
-		$this->setParametro('fecha_soli','fecha_soli','date');
-		
+		$this->setParametro('fecha_soli','fecha_soli','date');		
 		$this->setParametro('id_uo','id_uo','int4');
-		$this->setParametro('id_proceso_macro','id_proceso_macro','int4');
-		
+		$this->setParametro('id_proceso_macro','id_proceso_macro','int4');		
 		$this->setParametro('id_proveedor','id_proveedor','int4');
 		$this->setParametro('id_funcionario_supervisor','id_funcionario_supervisor','int4');
-
-		$this->setParametro('tipo_concepto','tipo_concepto','varchar');
-		
+		$this->setParametro('tipo_concepto','tipo_concepto','varchar');		
 		$this->setParametro('fecha_inicio','fecha_inicio','date');
 		$this->setParametro('dias_plazo_entrega','dias_plazo_entrega','integer');
+		$this->setParametro('precontrato','precontrato','varchar');
 		
 
 		//Ejecuta la instruccion
@@ -179,16 +177,15 @@ class MODSolicitud extends MODbase{
 		$this->setParametro('id_categoria_compra','id_categoria_compra','int4');
 		$this->setParametro('id_funcionario','id_funcionario','int4');
 		$this->setParametro('id_estado_wf','id_estado_wf','int4');
-		$this->setParametro('fecha_soli','fecha_soli','date');
-		
+		$this->setParametro('fecha_soli','fecha_soli','date');		
 		$this->setParametro('id_uo','id_uo','int4');
 		$this->setParametro('id_proceso_macro','id_proceso_macro','int4');
 		$this->setParametro('id_proveedor','id_proveedor','int4');
 		$this->setParametro('id_funcionario_supervisor','id_funcionario_supervisor','int4');
-		$this->setParametro('tipo_concepto','tipo_concepto','varchar');
-		
+		$this->setParametro('tipo_concepto','tipo_concepto','varchar');		
 		$this->setParametro('fecha_inicio','fecha_inicio','date');
 		$this->setParametro('dias_plazo_entrega','dias_plazo_entrega','integer');
+		$this->setParametro('precontrato','precontrato','varchar');
         
 		
 		//Ejecuta la instruccion
@@ -516,6 +513,7 @@ class MODSolicitud extends MODbase{
 			$this->setParametro('tipo_concepto','tipo_concepto','varchar');
 			$this->setParametro('fecha_inicio','fecha_inicio','date');
 			$this->setParametro('dias_plazo_entrega','dias_plazo_entrega','integer');
+			$this->setParametro('precontrato','precontrato','varchar');
 			
 			//Ejecuta la instruccion
             $this->armarConsulta();
