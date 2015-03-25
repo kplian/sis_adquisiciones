@@ -114,7 +114,8 @@ BEGIN
                         cot.requiere_contrato,
                         d.total_adjudicado,
                         d.total_cotizado,
-                        d.total_adjudicado_mb
+                        d.total_adjudicado_mb,
+                        cot.tiene_form500
 						from adq.tcotizacion cot
                         inner join adq.tproceso_compra proc on proc.id_proceso_compra = cot.id_proceso_compra
                         inner join adq.tsolicitud sol on sol.id_solicitud = proc.id_solicitud

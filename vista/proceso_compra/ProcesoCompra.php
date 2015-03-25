@@ -171,6 +171,7 @@ Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
         {
             config:{
                 name: 'estado',
+                hidden: true,
                 fieldLabel: 'Estado',
                 allowBlank: true,
                 anchor: '80%',
@@ -196,6 +197,7 @@ Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
         {
             config:{
                 name: 'estados_cotizacion',
+                
                 fieldLabel: 'Estados Cot',
                 allowBlank: true,
                 anchor: '80%',
@@ -211,6 +213,7 @@ Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
         {
             config:{
                 name: 'numeros_oc',
+                hidden: true,
                 fieldLabel: 'Ordenes de Compra',
                 allowBlank: true,
                 anchor: '80%',
@@ -228,8 +231,9 @@ Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
         
 		{
             config:{
-                name:'id_depto',
-                 hiddenName: 'id_depto',
+                    name:'id_depto',
+                    hidden: true,
+                    hiddenName: 'id_depto',
                     origen:'DEPTO',
                     allowBlank:false,
                     fieldLabel: 'Depto',
@@ -249,6 +253,7 @@ Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
         {
             config: {
                 name: 'id_solicitud',
+                hidden: true,
                 hiddenName: 'id_solicitud',
                 fieldLabel: 'Solicutud de Compra',
                 typeAhead: false,
@@ -340,6 +345,7 @@ Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
         {
             config:{
                 name: 'desc_moneda',
+                
                 fieldLabel: 'Moneda',
                 allowBlank: true,
                 anchor: '80%',
@@ -355,6 +361,7 @@ Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
         {
             config:{
                 name: 'usr_aux',
+                hidden: true,
                 fieldLabel: 'Aux',
                 allowBlank: true,
                 anchor: '80%',
@@ -370,6 +377,7 @@ Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
         {
             config:{
                 name: 'codigo_proceso',
+                hidden: true,
                 fieldLabel: 'Código Proceso',
                 allowBlank: true,
                 anchor: '80%',
@@ -386,6 +394,7 @@ Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
         {
             config:{
                 name: 'fecha_ini_proc',
+                hidden: true,
                 fieldLabel: 'Fecha Inicio',
                 allowBlank: true,
                 anchor: '80%',
@@ -402,6 +411,7 @@ Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
         {
             config:{
                 name: 'obs_proceso',
+                hidden: true,
                 fieldLabel: 'Observaciones',
                 allowBlank: true,
                 anchor: '80%',
@@ -417,6 +427,7 @@ Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
         {
             config:{
                 name: 'objeto',
+                hidden: true,
                 fieldLabel: 'Objeto',
                 allowBlank: true,
                 anchor: '80%',
@@ -432,6 +443,7 @@ Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
         {
             config:{
                 name: 'num_cotizacion',
+                hidden: true,
                 fieldLabel: 'num_cotizacion',
                 allowBlank: true,
                 anchor: '80%',
@@ -448,6 +460,7 @@ Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
 		{
 			config:{
 				name: 'num_convocatoria',
+				hidden: true,
 				fieldLabel: 'Num Convocatoria',
 				allowBlank: true,
 				anchor: '80%',
@@ -463,6 +476,7 @@ Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
 		{
 			config:{
 				name: 'estado_reg',
+				hidden: true,
 				fieldLabel: 'Estado Reg.',
 				allowBlank: true,
 				anchor: '80%',
@@ -478,6 +492,7 @@ Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
 		{
 			config:{
 				name: 'usr_reg',
+				hidden: true,
 				fieldLabel: 'Creado por',
 				allowBlank: true,
 				anchor: '80%',
@@ -493,6 +508,7 @@ Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
 		{
 			config:{
 				name: 'fecha_reg',
+				hidden: true,
 				fieldLabel: 'Fecha creación',
 				allowBlank: true,
 				anchor: '80%',
@@ -509,6 +525,7 @@ Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
 		{
 			config:{
 				name: 'fecha_mod',
+				hidden: true,
 				fieldLabel: 'Fecha Modif.',
 				allowBlank: true,
 				anchor: '80%',
@@ -525,6 +542,7 @@ Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
 		{
 			config:{
 				name: 'usr_mod',
+				hidden: true,
 				fieldLabel: 'Modificado por',
 				allowBlank: true,
 				anchor: '80%',
@@ -570,7 +588,19 @@ Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
 		'usr_aux','id_moneda','id_funcionario','desc_cotizacion','objeto','estados_cotizacion','numeros_oc','proveedores_cot'
 		
 	],
-	
+	rowExpander: new Ext.ux.grid.RowExpander({
+	        tpl : new Ext.Template(
+	            '<br>',
+	            '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Departamento:&nbsp;&nbsp;</b> {desc_depto}</p>',
+	            '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Ordenes de compra:&nbsp;&nbsp;</b> {numeros_oc}</p>',
+	            '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Estado proceso:&nbsp;&nbsp;</b> {estado}</p>',
+	            '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Objeto:&nbsp;&nbsp;</b> {objeto}</p>',
+	            '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Obs:&nbsp;&nbsp;</b> {obs_proceso}</p><br>',
+	            '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Solicitud Nº:&nbsp;&nbsp;</b> {desc_solicitud}</p><br>',
+	            '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Creado por:&nbsp;&nbsp;</b> {usr_reg}</p><br>',
+	            '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Estado Registro:&nbsp;&nbsp;</b> {estado_reg}</p><br>'
+	        )
+    }),
 	iniciarEventos:function(){
 	  this.cmbDepto = this.getComponente('id_depto');
 	  this.cmbSolicitud = this.getComponente('id_solicitud');

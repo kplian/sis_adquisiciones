@@ -69,6 +69,8 @@ class MODCotizacion extends MODbase{
 		$this->captura('total_adjudicado','numeric');
 		$this->captura('total_cotizado','numeric');
 		$this->captura('total_adjudicado_mb','numeric');
+		$this->captura('tiene_form500','varchar');
+		
 		
 		
 		 
@@ -631,7 +633,22 @@ class MODCotizacion extends MODbase{
         return $this->respuesta;
     }
 	
-	
+	function cambioFomrulario500(){
+		//Definicion de variables para ejecucion del procedimiento
+		$this->procedimiento='adq.f_cotizacion_ime';
+		$this->transaccion='ADQ_CBFRM500_IME';
+		$this->tipo_procedimiento='IME';
+				
+		//Define los parametros para la funcion
+		$this->setParametro('id_cotizacion','id_cotizacion','int4');
+
+		//Ejecuta la instruccion
+		$this->armarConsulta();
+		$this->ejecutarConsulta();
+
+		//Devuelve la respuesta
+		return $this->respuesta;
+	}
     
 	
 

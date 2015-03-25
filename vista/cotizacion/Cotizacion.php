@@ -517,6 +517,27 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
 		},
 		{
 			config:{
+				name: 'tiene_form500',
+				fieldLabel: 'Form 500',
+				gwidth: 70,
+				maxLength:50,
+                renderer: function(value,p,record){
+                         if(record.data.tiene_form500 == 'requiere'){
+                             return String.format('<b><font color="red">{0}</font></b>', value);
+                         }
+                        else {
+                             return String.format('<b>{0}</b>', value);
+                        }
+                 }
+			},
+			type:'TextField',
+			filters:{pfiltro:'cot.tiene_form500',type:'list',options: ['si','no','requiere']},
+			id_grupo:1,
+			grid:false,
+			form:false
+		},
+		{
+			config:{
 				name: 'funcionario_contacto',
 				hidden: true,
 				fieldLabel: 'Func Contacto',
@@ -591,8 +612,7 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
 			id_grupo: 1,
 			filters: {	pfiltro:'cot.prellenar_oferta',
 	       		         type: 'list',
-	       				 //dataIndex: 'size',
-	       				 options: ['si','no'],	
+	       				 options: ['si','no']
 	       		 	},
 			grid:true,
 			form:true
@@ -720,7 +740,7 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
 		'funcionario_contacto',
         'telefono_contacto',
         'correo_contacto',
-        'prellenar_oferta', 'forma_pago', 'requiere_contrato','total_adjudicado','total_cotizado','total_adjudicado_mb'
+        'prellenar_oferta', 'forma_pago', 'requiere_contrato','total_adjudicado','total_cotizado','total_adjudicado_mb','tiene_form500'
 		
 	],
     rowExpander: new Ext.ux.grid.RowExpander({

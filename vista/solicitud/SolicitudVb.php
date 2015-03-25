@@ -397,7 +397,17 @@ Phx.vista.SolicitudVb = {
                      if(resp.argument.data.estado=='vbrpc'){
                         this.cmbIntrucRPC.show();
                         this.cmbIntrucRPC.enable();
-                        this.cmbIntrucRPC.setValue('Orden de Bien/Servicio')
+                        console.log('..........', resp.argument.data)
+                        
+                        if(resp.argument.data.precontrato == 'si'){
+                        	this.cmbIntrucRPC.setValue('Iniciar Contrato');
+                        	this.cmbIntrucRPC.setReadOnly(true);
+                        }
+                        else{
+                        	this.cmbIntrucRPC.setValue('Orden de Bien/Servicio');
+                        	this.cmbIntrucRPC.setReadOnly(false);
+                        }
+                        
                      }
                      else{
                          this.cmbIntrucRPC.hide();

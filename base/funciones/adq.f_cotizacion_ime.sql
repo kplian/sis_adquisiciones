@@ -1546,7 +1546,28 @@ BEGIN
             return v_resp;
 
 		end; 
-    
+    /*********************************    
+ 	#TRANSACCION:  'ADQ_CBFRM500_IME'
+ 	#DESCRIPCION:	CAmbio el estado de requiere fromr 500 para no generar mas alarmas de correo
+ 	#AUTOR:		RAC KPLIAN
+ 	#FECHA:		02-03-2015
+	***********************************/
+
+	elsif(p_transaccion='ADQ_CBFRM500_IME')then
+
+		begin
+         
+           update adq.tcotizacion  set 
+            tiene_form500 = 'si'
+           where id_cotizacion = v_parametros.id_cotizacion;
+           
+            --Definicion de la respuesta
+            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Se cambio el estado de tiene formulario 500 '); 
+            v_resp = pxp.f_agrega_clave(v_resp,'id_cotizacion',v_parametros.id_cotizacion::varchar);
+            
+            --Devuelve la respuesta
+            return v_resp;        
+        end;
     else
      
     	raise exception 'Transaccion inexistente: %',p_transaccion;

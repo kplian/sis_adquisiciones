@@ -19,6 +19,8 @@ Phx.vista.CotizacionOC = {
     constructor: function(config) {
         
         
+        
+         this.Atributos[this.getIndAtributo('tiene_form500')].grid=true; 
          Phx.vista.CotizacionOC.superclass.constructor.call(this,config);
          this.addButton('fin_registro',{text:'Fin Reg.',iconCls: 'badelante',disabled:true,handler:this.fin_registro,tooltip: '<b>Finalizar</b><p>Finalizar registro de cotización</p>'});
          this.addButton('btnAdjudicar',{
@@ -57,7 +59,15 @@ Phx.vista.CotizacionOC = {
                     tooltip : '<b>Observaciones</b><br/><b>Observaciones del WF</b>'
           });
 		
-        
+         this.addButton('btnForm500', {
+                text : 'Form500',
+                iconCls : 'bassign',
+                disabled : true,
+                handler : this.onBtnForm500,
+                tooltip : '<b>Tiene de Form500</b><br>Evita que le lleguen mas alertas solicitando el formulario 500'
+            });
+            
+            
         this.init();
         this.iniciarEventos();
         
@@ -449,7 +459,7 @@ Phx.vista.CotizacionOC = {
               if(data['estado'] == 'borrador'){
                  this.getBoton('fin_registro').enable();
                  this.getBoton('btnAdjudicar').disable();
-                 this.getBoton('btnSolCon').disable();
+                
                  
                  this.getBoton('btnSolApro').disable();
                  this.getBoton('ant_estado').disable();
@@ -470,7 +480,6 @@ Phx.vista.CotizacionOC = {
                    }
                    else{
                       this.getBoton('btnAdjudicar').disable();
-                      this.getBoton('btnSolCon').disable(); 
                       this.getBoton('btnSolApro').disable();
                      
                    }
@@ -478,9 +487,16 @@ Phx.vista.CotizacionOC = {
                    if(data['estado']=='adjudicado' || data['estado']=='pago_habilitado'|| data['estado']=='finalizada'){
                        
                     this.getBoton('btnRepOC').enable();
-                    this.getBoton('btnSolCon').enable();
-                    
                    }
+                   
+                   if(data['estado']=='adjudicado'){
+                     this.getBoton('btnSolCon').enable();
+                   }
+                   else{
+                   	 this.getBoton('btnSolCon').disable();
+                   }
+                   
+                   
                    this.getBoton('fin_registro').disable();
                    this.getBoton('edit').disable();
                    
@@ -526,10 +542,12 @@ Phx.vista.CotizacionOC = {
                
                if (data['estado']=='recomendado'){
                    this.getBoton('btnRepOC').disable();
-                   this.getBoton('btnSolCon').disable();
+                  
                }
                
-               
+              if(data['tiene_form500']=='requiere'){
+	            this.getBoton('btnForm500').enable();
+	          }  
             this.getBoton('btnObs').enable();    
             this.getBoton('btnChequeoDocumentosWf').enable(); 
            
@@ -550,7 +568,8 @@ Phx.vista.CotizacionOC = {
             this.getBoton('btnSendMail').disable(); 
             this.getBoton('btnPreing').disable();
             this.getBoton('btnRepOC').disable();
-            this.getBoton('btnObs').disable();  
+            this.getBoton('btnObs').disable();
+            this.getBoton('btnForm500').disable(); 
            
             this.getBoton('btnChequeoDocumentosWf').disable();
             this.menuAdq.disable();
@@ -670,7 +689,27 @@ Phx.vista.CotizacionOC = {
                     this.idContenedor,
                     'Obs'
         )
-    }
+    },
+    onBtnForm500: function(){
+    	   var data = this.getSelectedData();
+          
+           
+           if(data.tiene_form500 == 'requiere'){
+	           	Phx.CP.loadingShow();
+	           	Ext.Ajax.request({
+	                // form:this.form.getForm().getEl(),
+	                url:'../../sis_adquisiciones/control/Cotizacion/cambioFomrulario500',
+	                params:{id_cotizacion: data.id_cotizacion},
+	                success: this.successSinc,
+	                failure: this.conexionFailure,
+	                timeout:this.timeout,
+	                scope:this
+	            });
+           }
+           else{
+           	alert('La cotización no esta marcada  para requerir formulario 500')
+           }
+   }
     
 };
 </script>

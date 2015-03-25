@@ -598,3 +598,16 @@ COMMENT ON COLUMN adq.tsolicitud.precontrato
 IS 'identifica si la solcitud va adjuntar un precontrato,  o contrato de adhesion';
 
 /***********************************F-SCP-RAC-ADQ-0-24/03/2015****************************************/
+
+
+/***********************************I-SCP-RAC-ADQ-0-25/03/2015****************************************/
+
+--------------- SQL ---------------
+
+ALTER TABLE adq.tcotizacion
+  ADD COLUMN tiene_form500 VARCHAR(13) DEFAULT 'no' NOT NULL;
+
+COMMENT ON COLUMN adq.tcotizacion.tiene_form500
+IS 'no, requiere, o si';
+
+/***********************************F-SCP-RAC-ADQ-0-25/03/2015****************************************/
