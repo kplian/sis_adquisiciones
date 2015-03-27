@@ -28,6 +28,9 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
                 tooltip: '<b>Documentos de la Solicitud</b><br/>Subir los documetos requeridos en la solicitud seleccionada.'
             }
         );
+        
+        this.addButton('diagrama_gantt',{text:'Gantt',iconCls: 'bgantt',disabled:true,handler:this.diagramGantt,tooltip: '<b>Diagrama gantt de proceso macro</b>'});
+  
         this.addButton('ant_estado',{
               argument: {estado: 'anterior'},
               text:'Anterior',
@@ -42,6 +45,19 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
         this.Cmp.id_moneda.store.baseParams.id_moneda = this.maestro.id_moneda;
 	
 	},
+	
+	 diagramGantt:function(){           
+            var data=this.sm.getSelected().data.id_proceso_wf;
+            Phx.CP.loadingShow();
+            Ext.Ajax.request({
+                url:'../../sis_workflow/control/ProcesoWf/diagramaGanttTramite',
+                params:{'id_proceso_wf':data},
+                success:this.successExport,
+                failure: this.conexionFailure,
+                timeout:this.timeout,
+                scope:this
+            });         
+    },
     
     addBotones: function() {
         this.menuAdq = new Ext.Toolbar.SplitButton({
@@ -143,7 +159,7 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
                 fieldLabel: 'Estado',
                 allowBlank: true,
                 anchor: '80%',
-                gwidth: 90,
+                gwidth: 110,
                 renderer: function(value,p,record){
                          if(record.data.estado=='anulado'){
                              return String.format('<b><font color="red">{0}</font></b>', value);
@@ -222,7 +238,6 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
         {
             config:{
                 name: 'numero',
-                hidden: true,
                 fieldLabel: 'Numero Sol',
                 allowBlank: true,
                 anchor: '80%',
@@ -327,7 +342,6 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
           {
             config:{
                 name: 'total_adjudicado_mb',
-                hidden: true,
                 fieldLabel: 'Total Adj (BS)',
                 allowBlank: false,
                 anchor: '80%',
@@ -344,7 +358,6 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
         {
             config:{
                 name: 'tipo_cambio_conv',
-                hidden: true,
                 fieldLabel: 'Tipo de Cambio',
                 allowBlank: false,
                 anchor: '80%',
@@ -360,7 +373,6 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
 		{
 			config:{
 				name: 'lugar_entrega',
-				hidden: true,
 				fieldLabel: 'Lugar Entrega',
 				allowBlank: true,
 				anchor: '80%',
@@ -377,7 +389,6 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
 		{
 			config:{
 				name: 'forma_pago',
-				hidden: true,
 				fieldLabel: 'Forma de pago',
 				allowBlank: true,
 				anchor: '80%',
@@ -395,7 +406,6 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
 		{
 			config:{
 				name: 'tipo_entrega',
-				hidden: true,
 				fieldLabel: 'Tipo Entrega',
 				allowBlank: true,
 				anchor: '80%',
@@ -411,7 +421,6 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
         {
             config:{
                 name: 'tiempo_entrega',
-                hidden: true,
                 qtip:'Dias en que se espera la entrega a partir de la emision de la OC',
                 fieldLabel: 'Tiempo de entrega',
                 allowBlank: true,
@@ -429,7 +438,6 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
 		{
 			config:{
 				name: 'fecha_venc',
-				hidden: true,
 				gtipo:'Fechas estimada de vencimiento',
 				fieldLabel: 'Fecha Venc',
 				qtip:'Fecha de vencimiento de la cotizacion',
@@ -450,7 +458,6 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
         {
             config:{
                 name: 'fecha_entrega',
-                hidden: true,
                 fieldLabel: 'Fecha Entrega/Inicio',
                 qtip:'Fecha de entrar o inicio de servicio segun el proveedor',
                 allowBlank: true,
@@ -468,7 +475,6 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
 		{
 			config:{
 				name: 'obs',
-				hidden: true,
 				fieldLabel: 'Obs',
 				allowBlank: true,
 				anchor: '80%',
@@ -484,7 +490,6 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
 		{
 			config:{
 				name: 'fecha_adju',
-				hidden: true,
 				fieldLabel: 'Fecha Adju',
 				allowBlank: true,
 				anchor: '80%',
@@ -501,9 +506,7 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
 		{
 			config:{
 				name: 'nro_contrato',
-				hidden: true,
-				fieldLabel: 'Nro Contrato',
-			
+				fieldLabel: 'Nro Contrato',			
 				allowBlank: true,
 				anchor: '80%',
 				gwidth: 100,
@@ -539,7 +542,6 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
 		{
 			config:{
 				name: 'funcionario_contacto',
-				hidden: true,
 				fieldLabel: 'Func Contacto',
 				qtip:'Funcionario de contacto para el proveedor',
 				allowBlank: true,
@@ -556,7 +558,6 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
 		{
 			config:{
 				name: 'telefono_contacto',
-				hidden: true,
 				fieldLabel: 'Telefono Contacto',
 				qtip:'Telefono de contacto para el proveedor',
 				allowBlank: true,
@@ -573,7 +574,6 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
 		{
 			config:{
 				name: 'correo_contacto',
-				hidden: true,
 				fieldLabel: 'Correo de Contacto',
 				qtip:'Correo de contacto para el proveedor',
 				allowBlank: true,
@@ -590,7 +590,6 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
 		{
 			config:{
 				name: 'prellenar_oferta',
-				hidden: true,
 				fieldLabel: 'Prellenar Cotización',
 				qtip:'Copia los precios la cantidad y precio ofertado de la solicitud de compra',
 				allowBlank: true,
@@ -620,7 +619,6 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
 		{
 			config:{
 				name: 'estado_reg',
-				hidden: true,
 				fieldLabel: 'Estado Reg.',
 				allowBlank: true,
 				anchor: '80%',
@@ -636,7 +634,6 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
 		{
 			config:{
 				name: 'fecha_reg',
-				hidden: true,
 				fieldLabel: 'Fecha creación',
 				allowBlank: true,
 				anchor: '80%',
@@ -653,7 +650,6 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
 		{
 			config:{
 				name: 'usr_reg',
-				hidden: true,
 				fieldLabel: 'Creado por',
 				allowBlank: true,
 				anchor: '80%',
@@ -669,7 +665,6 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
 		{
 			config:{
 				name: 'fecha_mod',
-				hidden: true,
 				fieldLabel: 'Fecha Modif.',
 				allowBlank: true,
 				anchor: '80%',
@@ -753,6 +748,11 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
 	            '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Obs:&nbsp;&nbsp;</b> {obs}</p><br>'
 	        )
     }),
+    arrayDefaultColumHidden:['id_fecha_reg','id_fecha_mod',
+'fecha_mod','usr_reg','usr_mod','numero',
+'total_adjudicado_mb','tipo_cambio_conv','lugar_entrega','forma_pago','tipo_entrega','tiempo_entrega',
+'fecha_venc','fecha_entrega','obs','fecha_adju', 'nro_contrato','funcionario_contacto',
+'telefono_contacto','correo_contacto','prellenar_oferta','estado_reg','fecha_reg','usr_reg','fecha_mod','usr_mod'],
 	sortInfo:{
 		field: 'id_cotizacion',
 		direction: 'ASC'

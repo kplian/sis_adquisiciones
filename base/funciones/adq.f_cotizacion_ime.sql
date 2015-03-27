@@ -132,7 +132,8 @@ DECLARE
       v_tipo 							varchar;
       v_tipo_concepto					varchar;
       v_requiere_contrato 				varchar;
-      v_registros_cotizacion record;
+      v_registros_cotizacion 			record;
+      v_tiene_form500					varchar;
      
 			    
 BEGIN
@@ -935,8 +936,10 @@ BEGIN
                               update wf.tproceso_wf set
                               codigo_proceso = v_numero_oc
                               where id_proceso_wf = v_id_proceso_wf;
-                     
-                     
+                     ELSE
+                            update adq.tcotizacion set
+                            fecha_adju = v_parametros.fecha_oc
+                             where id_cotizacion = v_parametros.id_cotizacion;
                      END IF;
                  END IF;
           
@@ -1557,8 +1560,23 @@ BEGIN
 
 		begin
          
+          select 
+           tiene_form500
+          into
+           v_tiene_form500
+          from adq.tcotizacion cot
+          where cot.id_cotizacion = v_parametros.id_cotizacion;
+          
+          IF v_tiene_form500 = 'no' THEN
+            v_tiene_form500 = 'requiere';
+          ELSEIF v_tiene_form500 = 'requiere' THEN
+           v_tiene_form500 = 'si';
+          ELSEIF v_tiene_form500 = 'si' THEN 
+            v_tiene_form500 = 'no';
+          END IF;
+        
            update adq.tcotizacion  set 
-            tiene_form500 = 'si'
+            tiene_form500 = v_tiene_form500
            where id_cotizacion = v_parametros.id_cotizacion;
            
             --Definicion de la respuesta

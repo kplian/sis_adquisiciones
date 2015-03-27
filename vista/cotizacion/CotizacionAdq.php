@@ -504,7 +504,7 @@ Phx.vista.CotizacionAdq = {
                      
                    }
                    
-                   if(data['estado']=='adjudicado' || data['estado']=='pago_habilitado'|| data['estado']=='finalizada'){
+                   if(data['estado']=='adjudicado'|| data['estado']=='contrato_pendiente'|| data['estado']=='contrato_elaborado' || data['estado']=='pago_habilitado'|| data['estado']=='finalizada'){
                        
                     this.getBoton('btnRepOC').enable();
                     this.getBoton('btnSolCon').enable();
@@ -561,7 +561,7 @@ Phx.vista.CotizacionAdq = {
                
             this.getBoton('btnObs').enable();    
             this.getBoton('btnChequeoDocumentosWf').enable(); 
-           
+            this.getBoton('diagrama_gantt').enable();
               
             return tb 
      }, 
@@ -580,7 +580,7 @@ Phx.vista.CotizacionAdq = {
             this.getBoton('btnPreing').disable();
             this.getBoton('btnRepOC').disable();
             this.getBoton('btnObs').disable();  
-           
+            this.getBoton('diagrama_gantt').disable();
             this.getBoton('btnChequeoDocumentosWf').disable();
             this.menuAdq.disable();
             

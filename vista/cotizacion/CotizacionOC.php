@@ -484,8 +484,8 @@ Phx.vista.CotizacionOC = {
                      
                    }
                    
-                   if(data['estado']=='adjudicado' || data['estado']=='pago_habilitado'|| data['estado']=='finalizada'){
-                       
+                   if(data['estado']=='adjudicado'|| data['estado']=='contrato_pendiente'|| data['estado']=='contrato_elaborado' || data['estado']=='pago_habilitado'|| data['estado']=='finalizada'){
+                      
                     this.getBoton('btnRepOC').enable();
                    }
                    
@@ -545,12 +545,10 @@ Phx.vista.CotizacionOC = {
                   
                }
                
-              if(data['tiene_form500']=='requiere'){
-	            this.getBoton('btnForm500').enable();
-	          }  
-            this.getBoton('btnObs').enable();    
+            this.getBoton('btnForm500').enable();
+	        this.getBoton('btnObs').enable();    
             this.getBoton('btnChequeoDocumentosWf').enable(); 
-           
+            this.getBoton('diagrama_gantt').enable();
               
             return tb 
      }, 
@@ -570,7 +568,7 @@ Phx.vista.CotizacionOC = {
             this.getBoton('btnRepOC').disable();
             this.getBoton('btnObs').disable();
             this.getBoton('btnForm500').disable(); 
-           
+            this.getBoton('diagrama_gantt').disable();
             this.getBoton('btnChequeoDocumentosWf').disable();
             this.menuAdq.disable();
             
@@ -691,24 +689,18 @@ Phx.vista.CotizacionOC = {
         )
     },
     onBtnForm500: function(){
-    	   var data = this.getSelectedData();
+    	    var data = this.getSelectedData();
+            Phx.CP.loadingShow();
+           	Ext.Ajax.request({
+                // form:this.form.getForm().getEl(),
+                url:'../../sis_adquisiciones/control/Cotizacion/cambioFomrulario500',
+                params:{id_cotizacion: data.id_cotizacion},
+                success: this.successSinc,
+                failure: this.conexionFailure,
+                timeout:this.timeout,
+                scope:this
+            });
           
-           
-           if(data.tiene_form500 == 'requiere'){
-	           	Phx.CP.loadingShow();
-	           	Ext.Ajax.request({
-	                // form:this.form.getForm().getEl(),
-	                url:'../../sis_adquisiciones/control/Cotizacion/cambioFomrulario500',
-	                params:{id_cotizacion: data.id_cotizacion},
-	                success: this.successSinc,
-	                failure: this.conexionFailure,
-	                timeout:this.timeout,
-	                scope:this
-	            });
-           }
-           else{
-           	alert('La cotización no esta marcada  para requerir formulario 500')
-           }
    }
     
 };
