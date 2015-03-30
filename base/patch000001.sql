@@ -581,3 +581,33 @@ COMMENT ON COLUMN adq.tsolicitud.obs_presupuestos
 IS 'Observaciones del area de presupuesto que se van concatenando cada vez que pasa por el estado vbpresupeustos del WF';
 
 /***********************************F-SCP-RAC-ADQ-0-11/01/2015****************************************/
+
+
+
+/***********************************I-SCP-RAC-ADQ-0-24/03/2015****************************************/
+
+--------------- SQL ---------------
+
+ALTER TABLE adq.tsolicitud
+  ADD COLUMN precontrato VARCHAR(4);
+
+ALTER TABLE adq.tsolicitud
+  ALTER COLUMN precontrato SET DEFAULT 'no';
+
+COMMENT ON COLUMN adq.tsolicitud.precontrato
+IS 'identifica si la solcitud va adjuntar un precontrato,  o contrato de adhesion';
+
+/***********************************F-SCP-RAC-ADQ-0-24/03/2015****************************************/
+
+
+/***********************************I-SCP-RAC-ADQ-0-25/03/2015****************************************/
+
+--------------- SQL ---------------
+
+ALTER TABLE adq.tcotizacion
+  ADD COLUMN tiene_form500 VARCHAR(13) DEFAULT 'no' NOT NULL;
+
+COMMENT ON COLUMN adq.tcotizacion.tiene_form500
+IS 'no, requiere, o si';
+
+/***********************************F-SCP-RAC-ADQ-0-25/03/2015****************************************/

@@ -11,7 +11,7 @@ header("content-type: text/javascript; charset=UTF-8");
 <script>
 Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
     tam_pag:50,
-	constructor:function(config){
+    constructor:function(config){
 	    
 	    this.maestro=config;
 		//llama al constructor de la clase padre
@@ -19,17 +19,7 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
     	
     	//RAC: Se agrega menú de reportes de adquisiciones
         this.addBotones();
-    	
-         this.addButton('ant_estado',{
-              argument: {estado: 'anterior'},
-              text:'Anterior',
-              iconCls: 'batras',
-              disabled:true,
-              handler:this.antEstado,
-              tooltip: '<b>Pasar al Anterior Estado</b>'
-          });
-          
-          this.addButton('btnChequeoDocumentosWf',
+    	this.addButton('btnChequeoDocumentosWf',
             {
                 text: 'Docs',
                 iconCls: 'bchecklist',
@@ -38,10 +28,36 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
                 tooltip: '<b>Documentos de la Solicitud</b><br/>Subir los documetos requeridos en la solicitud seleccionada.'
             }
         );
+        
+        this.addButton('diagrama_gantt',{text:'Gantt',iconCls: 'bgantt',disabled:true,handler:this.diagramGantt,tooltip: '<b>Diagrama gantt de proceso macro</b>'});
+  
+        this.addButton('ant_estado',{
+              argument: {estado: 'anterior'},
+              text:'Anterior',
+              iconCls: 'batras',
+              disabled:true,
+              handler:this.antEstado,
+              tooltip: '<b>Pasar al Anterior Estado</b>'
+          });
+          
+          
     
         this.Cmp.id_moneda.store.baseParams.id_moneda = this.maestro.id_moneda;
 	
 	},
+	
+	 diagramGantt:function(){           
+            var data=this.sm.getSelected().data.id_proceso_wf;
+            Phx.CP.loadingShow();
+            Ext.Ajax.request({
+                url:'../../sis_workflow/control/ProcesoWf/diagramaGanttTramite',
+                params:{'id_proceso_wf':data},
+                success:this.successExport,
+                failure: this.conexionFailure,
+                timeout:this.timeout,
+                scope:this
+            });         
+    },
     
     addBotones: function() {
         this.menuAdq = new Ext.Toolbar.SplitButton({
@@ -131,6 +147,7 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
             },
             type:'TextField',
             filters:{pfiltro:'sol.num_tramite',type:'string'},
+            bottom_filter: true,
             id_grupo:1,
             grid:true,
             form:false
@@ -141,7 +158,7 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
                 fieldLabel: 'Estado',
                 allowBlank: true,
                 anchor: '80%',
-                gwidth: 90,
+                gwidth: 110,
                 renderer: function(value,p,record){
                          if(record.data.estado=='anulado'){
                              return String.format('<b><font color="red">{0}</font></b>', value);
@@ -155,8 +172,12 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
                 maxLength:30
             },
             type:'TextField',
-            filters:{pfiltro:'cot.estado',type:'string'},
+            filters:{pfiltro:'cot.estado',
+                     options: ['borrador','cotizado','adjudicado','recomendado','contro_pendiente','contrato_eleborado','pago_habilitado','finalizada','anulada'],	
+	       		 	 type:'list'},
+            
             id_grupo:1,
+            bottom_filter: true,
             grid:true,
             form:false
         },		
@@ -192,7 +213,7 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
 				typeAhead: true,
 				allowBlank: false,
 				anchor: '80%',
-				gwidth: 150,
+				gwidth: 180,
 				mode: 'remote',
 				renderer: function(value,p,record){
                         if(record.data.estado=='anulado'){
@@ -208,6 +229,7 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
 	           			
 			type:'ComboBox',
 			filters:{pfiltro:'pro.desc_proveedor',type:'string'},
+			bottom_filter: true,
 			id_grupo:1,
 			grid:true,
 			form:true
@@ -262,6 +284,7 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
             },
             type:'Field',
             filters:{pfiltro:'cot.numero_oc',type:'string'},
+            bottom_filter:true,
             id_grupo:1,
             grid:true,
             form:false
@@ -301,12 +324,43 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
             grid:true,
             form:true
           },
-           {
+          {
+            config:{
+                name: 'total_cotizado',
+                fieldLabel: 'Total Cotizado',
+                allowBlank: false,
+                anchor: '80%',
+                gwidth: 100
+            },
+            type:'NumberField',
+            filters:{pfiltro:'total_cotizado',type:'numeric'},
+            id_grupo:1,
+            grid:true,
+            form:false
+        },
+          {
+            config:{
+                name: 'total_adjudicado_mb',
+                fieldLabel: 'Total Adj (BS)',
+                allowBlank: false,
+                anchor: '80%',
+                gwidth: 100
+            },
+            type:'NumberField',
+            filters:{pfiltro:'total_adjudicado_mb',type:'numeric'},
+            id_grupo:1,
+            grid:true,
+            form:false
+        },
+        
+        
+        {
             config:{
                 name: 'tipo_cambio_conv',
                 fieldLabel: 'Tipo de Cambio',
                 allowBlank: false,
                 anchor: '80%',
+                hidden: true,
                 gwidth: 100
             },
             type:'NumberField',
@@ -321,6 +375,7 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
 				fieldLabel: 'Lugar Entrega',
 				allowBlank: true,
 				anchor: '80%',
+				hidden: true,
 				gwidth: 100,
 				maxLength:450
 			},
@@ -450,8 +505,7 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
 		{
 			config:{
 				name: 'nro_contrato',
-				fieldLabel: 'Nro Contrato',
-			
+				fieldLabel: 'Nro Contrato',			
 				allowBlank: true,
 				anchor: '80%',
 				gwidth: 100,
@@ -462,6 +516,27 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
 			id_grupo:1,
 			grid:true,
 			form:true
+		},
+		{
+			config:{
+				name: 'tiene_form500',
+				fieldLabel: 'Form 500',
+				gwidth: 70,
+				maxLength:50,
+                renderer: function(value,p,record){
+                         if(record.data.tiene_form500 == 'requiere'){
+                             return String.format('<b><font color="red">{0}</font></b>', value);
+                         }
+                        else {
+                             return String.format('<b>{0}</b>', value);
+                        }
+                 }
+			},
+			type:'TextField',
+			filters:{pfiltro:'cot.tiene_form500',type:'list',options: ['si','no','requiere']},
+			id_grupo:1,
+			grid:false,
+			form:false
 		},
 		{
 			config:{
@@ -535,8 +610,7 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
 			id_grupo: 1,
 			filters: {	pfiltro:'cot.prellenar_oferta',
 	       		         type: 'list',
-	       				 //dataIndex: 'size',
-	       				 options: ['si','no'],	
+	       				 options: ['si','no']
 	       		 	},
 			grid:true,
 			form:true
@@ -606,6 +680,7 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
 		{
 			config:{
 				name: 'usr_mod',
+				hidden: true,
 				fieldLabel: 'Modificado por',
 				allowBlank: true,
 				anchor: '80%',
@@ -659,10 +734,24 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
 		'funcionario_contacto',
         'telefono_contacto',
         'correo_contacto',
-        'prellenar_oferta', 'forma_pago', 'requiere_contrato'
+        'prellenar_oferta', 'forma_pago', 'requiere_contrato','total_adjudicado','total_cotizado','total_adjudicado_mb','tiene_form500'
 		
 	],
-
+    rowExpander: new Ext.ux.grid.RowExpander({
+	        tpl : new Ext.Template(
+	            '<br>',
+	            '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Solicitud de Compra:&nbsp;&nbsp;</b> {numero}</p>',
+	            '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Total Adudicado en Bs:&nbsp;&nbsp;</b> {total_adjudicado_mb}</p>',
+	            '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Funcionario de Contacto:&nbsp;&nbsp;</b> {funcionario_contacto}</p>',
+	            '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Usuario Registro:&nbsp;&nbsp;</b> {usr_reg}</p>',
+	            '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Obs:&nbsp;&nbsp;</b> {obs}</p><br>'
+	        )
+    }),
+    arrayDefaultColumHidden:['id_fecha_reg','id_fecha_mod',
+'fecha_mod','usr_reg','usr_mod','numero',
+'total_adjudicado_mb','tipo_cambio_conv','lugar_entrega','forma_pago','tipo_entrega','tiempo_entrega',
+'fecha_venc','fecha_entrega','obs','fecha_adju', 'nro_contrato','funcionario_contacto',
+'telefono_contacto','correo_contacto','prellenar_oferta','estado_reg','fecha_reg','usr_reg','fecha_mod','usr_mod'],
 	sortInfo:{
 		field: 'id_cotizacion',
 		direction: 'ASC'
@@ -749,7 +838,7 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
 	 loadCheckDocumentosSolWf:function() {
             var rec=this.sm.getSelected();
             rec.data.nombreVista = this.nombreVista;
-            rec.data.check_fisico = 'si'
+            rec.data.check_fisico = 'si';
             Phx.CP.loadWindows('../../../sis_workflow/vista/documento_wf/DocumentoWf.php',
                     'Documentos del Proceso',
                     {

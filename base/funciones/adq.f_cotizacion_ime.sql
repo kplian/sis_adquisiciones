@@ -1,3 +1,5 @@
+--------------- SQL ---------------
+
 CREATE OR REPLACE FUNCTION adq.f_cotizacion_ime (
   p_administrador integer,
   p_id_usuario integer,
@@ -130,7 +132,8 @@ DECLARE
       v_tipo 							varchar;
       v_tipo_concepto					varchar;
       v_requiere_contrato 				varchar;
-      v_registros_cotizacion record;
+      v_registros_cotizacion 			record;
+      v_tiene_form500					varchar;
      
 			    
 BEGIN
@@ -933,8 +936,10 @@ BEGIN
                               update wf.tproceso_wf set
                               codigo_proceso = v_numero_oc
                               where id_proceso_wf = v_id_proceso_wf;
-                     
-                     
+                     ELSE
+                            update adq.tcotizacion set
+                            fecha_adju = v_parametros.fecha_oc
+                             where id_cotizacion = v_parametros.id_cotizacion;
                      END IF;
                  END IF;
           
@@ -1391,7 +1396,7 @@ BEGIN
                                                         p_id_usuario,
                                                         v_parametros._id_usuario_ai,
                                                         v_parametros._nombre_usuario_ai, 
-                                                        v_registros_cotizacion.id_cotizacion, 
+                                                        v_id_cotizacion, 
                                                         v_id_proceso_wf, 
                                                         v_id_estado_wf, 
                                                         v_codigo_estado,
@@ -1544,7 +1549,43 @@ BEGIN
             return v_resp;
 
 		end; 
-    
+    /*********************************    
+ 	#TRANSACCION:  'ADQ_CBFRM500_IME'
+ 	#DESCRIPCION:	CAmbio el estado de requiere fromr 500 para no generar mas alarmas de correo
+ 	#AUTOR:		RAC KPLIAN
+ 	#FECHA:		02-03-2015
+	***********************************/
+
+	elsif(p_transaccion='ADQ_CBFRM500_IME')then
+
+		begin
+         
+          select 
+           tiene_form500
+          into
+           v_tiene_form500
+          from adq.tcotizacion cot
+          where cot.id_cotizacion = v_parametros.id_cotizacion;
+          
+          IF v_tiene_form500 = 'no' THEN
+            v_tiene_form500 = 'requiere';
+          ELSEIF v_tiene_form500 = 'requiere' THEN
+           v_tiene_form500 = 'si';
+          ELSEIF v_tiene_form500 = 'si' THEN 
+            v_tiene_form500 = 'no';
+          END IF;
+        
+           update adq.tcotizacion  set 
+            tiene_form500 = v_tiene_form500
+           where id_cotizacion = v_parametros.id_cotizacion;
+           
+            --Definicion de la respuesta
+            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Se cambio el estado de tiene formulario 500 '); 
+            v_resp = pxp.f_agrega_clave(v_resp,'id_cotizacion',v_parametros.id_cotizacion::varchar);
+            
+            --Devuelve la respuesta
+            return v_resp;        
+        end;
     else
      
     	raise exception 'Transaccion inexistente: %',p_transaccion;

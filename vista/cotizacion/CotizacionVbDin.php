@@ -79,8 +79,7 @@ Phx.vista.CotizacionVbDin = {
 											 tooltip : '<b>Cuadro Comparativo</b><br/><b>Cuadro comparativo de cotizaciones</b>'
 	 						});         
           
-        this.addButton('diagrama_gantt',{text:'',iconCls: 'bgantt',disabled:true,handler:this.diagramGantt,tooltip: '<b>Diagrama gantt de proceso macro</b>'});
-  
+        
         this.addButton('btnSolCon',{text:'Hab. Contr.',iconCls: 'bemail',disabled:true,handler:this.onSolContrato,tooltip: '<b>HAbilitar Contrato</b><p>si tiene habilitado los contratos en esta cotización, antes de armar el plan de pago pasara al área legal</p>'});
        
        
@@ -306,18 +305,7 @@ Phx.vista.CotizacionVbDin = {
     },
   
   
-  diagramGantt:function(){           
-            var data=this.sm.getSelected().data.id_proceso_wf;
-            Phx.CP.loadingShow();
-            Ext.Ajax.request({
-                url:'../../sis_workflow/control/ProcesoWf/diagramaGanttTramite',
-                params:{'id_proceso_wf':data},
-                success:this.successExport,
-                failure: this.conexionFailure,
-                timeout:this.timeout,
-                scope:this
-            });         
-    },
+ 
   
         
    successSinc:function(resp){
@@ -500,6 +488,7 @@ Phx.vista.CotizacionVbDin = {
                      this.getBoton('btnGenOC').disable();
                      this.getBoton('sig_estado').disable();
                      this.getBoton('ant_estado').enable();
+                     this.getBoton('btnSolCon').disable();
                  }
                
                //el paso a siguiente solo se habilita para otros estados deiferentes de adjudicado y recomendado

@@ -29,7 +29,7 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
             tooltip : '<b>Reporte Solicitud de Compra</b><br/><b>Reporte Solicitud de Compra</b>'
        }); */
   
-        this.addButton('diagrama_gantt',{text:'',iconCls: 'bgantt',disabled:true,handler:diagramGantt,tooltip: '<b>Diagrama Gantt de proceso macro</b>'});
+        this.addButton('diagrama_gantt',{text:'Gantt',iconCls: 'bgantt',disabled:true,handler:diagramGantt,tooltip: '<b>Diagrama Gantt de proceso macro</b>'});
   
 	 
         this.addButton('btnChequeoDocumentosWf',
@@ -67,6 +67,13 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
 			});			
 		}
 	},
+	
+	rowExpander: new Ext.ux.grid.RowExpander({
+	        tpl : new Ext.Template(
+	            '<br><p><b>Justificación:</b> {justificacion}</p>',
+	            '<p><b>Obs:</b> {obs}</p><br>'
+	        )
+    }),
 	
 	addBotones: function() {
         this.menuAdq = new Ext.Toolbar.SplitButton({
@@ -160,6 +167,7 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
             },
             type:'TextField',
             filters:{pfiltro:'sol.num_tramite',type:'string'},
+            bottom_filter:true,
             id_grupo:1,
             grid:true,
             form:false
@@ -174,34 +182,21 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
 			},
 			type:'TextField',
 			filters:{pfiltro:'sol.estado',type:'string'},
+			bottom_filter:true,
 			id_grupo:1,
 			grid:true,
 			form:false
 		},
-	    {
-	       		config:{
-	       			name:'tipo',
-	       			fieldLabel:'Tipo',
-	       			allowBlank:false,
-	       			emptyText:'Tipo...',
-	       			typeAhead: true,
-	       		    triggerAction: 'all',
-	       		    lazyRender:true,
-	       		    mode: 'local',
-	       		    valueField: 'estilo',
-	       		    gwidth: 100,
-	       		    store:['Bien','Servicio','Bien - Servicio']
-	       		},
-	       		type:'ComboBox',
-	       		id_grupo:0,
-	       		filters:{	
-	       		         type: 'list',
-	       		          pfiltro:'sol.tipo',
-	       				 options: ['Bien','Servicio','Bien - Servicio'],	
-	       		 	},
-	       		grid:true,
-	       		form:false
-	       	},
+	   {
+            //configuracion del componente
+            config:{
+                    labelSeparator:'',
+                    inputType:'hidden',
+                    name: 'tipo'
+            },
+            type:'Field',
+            form:true 
+        },
        
         
           {
@@ -331,6 +326,7 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
    			type:'ComboRec',//ComboRec
    			id_grupo:0,
    			filters:{pfiltro:'fun.desc_funcionario1',type:'string'},
+   			bottom_filter:true,
    		    grid:true,
    			form:false
 		 },
@@ -478,6 +474,31 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
 			grid: true,
 			form: false
 		},
+	    {
+       		config:{
+       			name: 'precontrato',
+       			fieldLabel: 'Contrato de adhesion',
+       			qtip: 'Si tine un contrato de adhesion',
+       			allowBlank: false,
+       			emptyText: 'Tipo...',
+       			typeAhead: true,
+       		    triggerAction: 'all',
+       		    lazyRender: true,
+       		    mode: 'local',
+       		    gwidth: 100,
+       		    store: ['si','no']
+       		},
+       		type: 'ComboBox',
+       		id_grupo: 0,
+       		filters:{	
+       		         type: 'list',
+       		         pfiltro:'sol.tipo',
+       				 options: ['si','no'],	
+       		 	},
+       		valorInicial: 'no',
+       		grid:false,
+       		form:true
+       	},
          {
             config:{
                 name:'id_proveedor',
@@ -763,7 +784,10 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
 		'ai_habilitado',
 		'tipo_concepto',
 		'revisado_asistente',
-		{name:'fecha_inicio', type: 'date',dateFormat:'Y-m-d'},'dias_plazo_entrega', 'obs_presupuestos'
+		{name:'fecha_inicio', type: 'date',dateFormat:'Y-m-d'},
+		'dias_plazo_entrega', 
+		'obs_presupuestos',
+		'precontrato'
 		
 	],
 	

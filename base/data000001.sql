@@ -846,3 +846,20 @@ select pxp.f_insert_testructura_gui ('ADQELEPRE', 'REPADQ');
 
 
 /***********************************F-DAT-RAC-ADQ-0-12/02/2015*****************************************/
+
+
+/***********************************I-DAT-RAC-ADQ-0-02/03/2015*****************************************/
+
+INSERT INTO pxp.variable_global ("variable", "valor", "descripcion")
+VALUES (E'adq_tope_compra', E'1000000', E'Monto maximo decomprar por adquisiciones en moneda base');
+
+/***********************************F-DAT-RAC-ADQ-0-02/03/2015*****************************************/
+
+
+
+/***********************************I-DAT-RAC-ADQ-0-23/03/2015*****************************************/
+
+select pxp.f_insert_tgui ('Cotizaciones/Ordenes', 'Cotizaciones y Ordenes de Compra', 'COTOC', 'si', 10, 'sis_adquisiciones/vista/cotizacion/CotizacionOC.php', 2, '', 'CotizacionOC', 'ADQ');
+select pxp.f_insert_testructura_gui ('COTOC', 'ADQ');
+
+/***********************************F-DAT-RAC-ADQ-0-23/03/2015*****************************************/

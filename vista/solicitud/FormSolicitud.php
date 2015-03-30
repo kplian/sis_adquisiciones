@@ -17,6 +17,7 @@ Phx.vista.FormSolicitud=Ext.extend(Phx.frmInterfaz,{
     layout: 'fit',
     autoScroll: false,
     breset: false,
+    labelSubmit: '<i class="fa fa-check"></i> Siguiente',
     constructor:function(config)
     {   
     	
@@ -33,6 +34,8 @@ Phx.vista.FormSolicitud=Ext.extend(Phx.frmInterfaz,{
         this.iniciarEventos();
         this.iniciarEventosDetalle();
         this.onNew();
+        
+        this.Cmp.tipo_concepto.store.loadData(this.arrayStore['Bien'].concat(this.arrayStore['Servicio']));
         
     },
     buildComponentesDetalle: function(){
@@ -54,7 +57,7 @@ Phx.vista.FormSolicitud=Ext.extend(Phx.frmInterfaz,{
 							                            totalProperty: 'total',
 							                            fields: ['id_concepto_ingas','tipo','desc_ingas','movimiento','desc_partida','id_grupo_ots','filtro_ot','requiere_ot'],
 							                            remoteSort: true,
-							                            baseParams:{par_filtro:'desc_ingas#par.codigo#par.nombre_partida',movimiento:'gasto', autorizacion: 'adquisiciones'}
+							                            baseParams:{par_filtro:'desc_ingas#par.codigo',movimiento:'gasto', autorizacion: 'adquisiciones'}
 							                }),
 							               valueField: 'id_concepto_ingas',
 							               displayField: 'desc_ingas',
@@ -226,7 +229,7 @@ Phx.vista.FormSolicitud=Ext.extend(Phx.frmInterfaz,{
     bloqueaRequisitos: function(sw){
     	this.Cmp.id_depto.setDisabled(sw);
     	this.Cmp.id_moneda.setDisabled(sw);
-    	this.Cmp.tipo.setDisabled(sw);
+    	
     	this.Cmp.tipo_concepto.setDisabled(sw);
     	this.Cmp.fecha_soli.setDisabled(sw);
     	this.cargarDatosMaestro();
@@ -583,30 +586,21 @@ Phx.vista.FormSolicitud=Ext.extend(Phx.frmInterfaz,{
             type:'Field',
             form:true 
         },
+		
+		{
+            //configuracion del componente
+            config:{
+                    labelSeparator:'',
+                    inputType:'hidden',
+                    name: 'tipo'
+            },
+            type:'Field',
+            form:true 
+        },
         {
-	       		config:{
-	       			name:'tipo',
-	       			fieldLabel:'Tipo',
-	       			allowBlank:false,
-	       			emptyText:'Tipo...',
-	       			typeAhead: true,
-	       		    triggerAction: 'all',
-	       		    lazyRender:true,
-	       		    width: '80%',
-	       		    mode: 'local',
-	       		    valueField: 'estilo',
-	       		    store:['Bien','Servicio','Bien - Servicio']
-	       		},
-	       		type: 'ComboBox',
-	       		id_grupo: 0,
-	       		form: true
-	       	},
-       
-        
-          {
             config:{
                 name: 'tipo_concepto',
-                fieldLabel: 'Subtipo',
+                fieldLabel: 'Tipo',
                 allowBlank: false,
                 emptyText:'Subtipo...',
                 store:new Ext.data.ArrayStore({
@@ -798,7 +792,32 @@ Phx.vista.FormSolicitud=Ext.extend(Phx.frmInterfaz,{
 			type:'TextArea',
 			id_grupo: 1,
 			form:true
-		}
+		},
+	    {
+       		config:{
+       			name: 'precontrato',
+       			fieldLabel: 'Contrato de adhesion',
+       			qtip: 'Si tine un contrato de adhesion',
+       			allowBlank: false,
+       			emptyText: 'Tipo...',
+       			typeAhead: true,
+       		    triggerAction: 'all',
+       		    lazyRender: true,
+       		    mode: 'local',
+       		    gwidth: 100,
+       		    store: ['si','no']
+       		},
+       		type: 'ComboBox',
+       		id_grupo: 0,
+       		filters:{	
+       		         type: 'list',
+       		         pfiltro:'sol.tipo',
+       				 options: ['si','no'],	
+       		 	},
+       		valorInicial: 'no',
+       		grid:false,
+       		form:true
+       	}
 	],
 	title: 'Frm solicitud',
 	
@@ -820,31 +839,33 @@ Phx.vista.FormSolicitud=Ext.extend(Phx.frmInterfaz,{
              },this);
         
        
-           
-           this.Cmp.tipo.on('select',function(cmp,rec){
-               if(rec.json[0]=='Bien - Servicio'){
-                   
-                  this.Cmp.tipo_concepto.store.loadData(this.arrayStore['Bien'].concat(this.arrayStore['Servicio']));
-               }
-               else{
-                   this.Cmp.tipo_concepto.store.loadData(this.arrayStore[rec.json[0]]);
-               }
-                if(rec.json[0] == 'Bien' ||  rec.json[0] == 'Bien - Servicio'){
+           this.Cmp.tipo_concepto.on('select',function(cmp,rec){
+           	
+           	   //identificamos si es un bien o un servicio
+           	   if(this.isInArray(rec.json, this.arrayStore['Bien'])){
+           	   	  this.Cmp.tipo.setValue('Bien');
+           	   }
+           	   else{
+           	   	  this.Cmp.tipo.setValue('Servicio');
+           	   }
+           	   
+           	   if(this.Cmp.tipo.getValue() == 'Bien'){
                 	this.Cmp.lugar_entrega.setValue('Almacenes de Oficina Cochabamba');
                 	this.ocultarComponente(this.Cmp.fecha_inicio);
                 	this.Cmp.dias_plazo_entrega.allowBlank = false;
                 	
-                	
-                	
-                 }
+                }
                 else{
                 	this.Cmp.lugar_entrega.setValue('');
                 	this.mostrarComponente(this.Cmp.fecha_inicio);
                 	this.Cmp.dias_plazo_entrega.allowBlank = true;
                 }
                 this.mostrarComponente(this.Cmp.dias_plazo_entrega);
-                this.Cmp.tipo_concepto.reset();
+                
+           	
            },this);
+           
+           
            
            this.Cmp.id_funcionario.on('select', function(combo, record, index){ 
             	

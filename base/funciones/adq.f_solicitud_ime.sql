@@ -80,23 +80,24 @@ DECLARE
       v_uo_sol varchar;
       v_obs text;
       
-      v_numero_sol varchar;
-      v_id_subsistema integer;
-      v_id_uo  integer;
-      v_cont  integer;
-      v_mensaje_resp  varchar;
+      v_numero_sol					varchar;
+      v_id_subsistema 				integer;
+      v_id_uo  						integer;
+      v_cont  						integer;
+      v_mensaje_resp  				varchar;
       
 
-       v_acceso_directo  	varchar;
-       v_clase   			varchar;
-       v_parametros_ad   		varchar;
-       v_tipo_noti  			varchar;
-       v_titulo   			varchar;
-       v_estado_actual   varchar;
-       v_id_categoria_compra   integer;
-       v_resp_doc boolean;
-       v_revisado varchar;
-       va_id_funcionario_gerente   INTEGER[];
+       v_acceso_directo  			varchar;
+       v_clase   					varchar;
+       v_parametros_ad   			varchar;
+       v_tipo_noti  				varchar;
+       v_titulo   					varchar;
+       v_estado_actual   			varchar;
+       v_id_categoria_compra   		integer;
+       v_resp_doc					boolean;
+       v_revisado 					varchar;
+       va_id_funcionario_gerente  	INTEGER[];
+       v_tope_compra 				numeric;
 
 			    
 BEGIN
@@ -161,7 +162,7 @@ BEGIN
         -- recupera la uo gerencia del funcionario
         v_id_uo =   orga.f_get_uo_gerencia(NULL, v_parametros.id_funcionario, v_parametros.fecha_soli::Date);
         
-        --------------------------------------
+        ------------------------------------
         -- recuepra el funcionario aprobador
         -------------------------------------
         
@@ -223,7 +224,8 @@ BEGIN
             usuario_ai,
             tipo_concepto,
             fecha_inicio,
-            dias_plazo_entrega
+            dias_plazo_entrega,
+            precontrato
           	) values(
 			'activo',
 			--v_parametros.id_solicitud_ext,
@@ -259,7 +261,8 @@ BEGIN
             v_parametros._nombre_usuario_ai,
             v_parametros.tipo_concepto,
             v_parametros.fecha_inicio,
-            v_parametros.dias_plazo_entrega
+            v_parametros.dias_plazo_entrega,
+            COALESCE(v_parametros.precontrato,'no')
 							
 			)RETURNING id_solicitud into v_id_solicitud;
         
@@ -390,7 +393,8 @@ BEGIN
             usuario_ai = v_parametros._nombre_usuario_ai,
             tipo_concepto =  v_parametros.tipo_concepto,
             fecha_inicio = v_parametros.fecha_inicio,
-            dias_plazo_entrega = v_parametros.dias_plazo_entrega
+            dias_plazo_entrega = v_parametros.dias_plazo_entrega,
+            precontrato = COALESCE(v_parametros.precontrato,'no')
 			where id_solicitud = v_parametros.id_solicitud;
                
 			--Definicion de la respuesta
@@ -577,8 +581,19 @@ BEGIN
                   IF  v_total_soli = 0  THEN
                     raise exception ' La Solicitud  tiene que ser por un valor mayor a 0';
                   END IF;
-                --  
-                 IF exists ( select 1
+                  
+                  -- validamos que el monsto de la oslicitud no supere el tope configurado
+                  
+                  v_tope_compra = pxp.f_get_variable_global('adq_tope_compra')::numeric; 
+                
+                  IF  v_total_soli  >= v_tope_compra  THEN
+                  
+                    raise exception 'Las compras por encima de % (moneda base) no pueden realizarse  por el sistema de adquisiciones',v_tope_compra;
+                  
+                  END IF;
+                
+                
+                  IF exists ( select 1
                   from adq.tsolicitud_det sd
                   where sd.id_solicitud = v_parametros.id_solicitud
                   and sd.estado_reg = 'activo' and (COALESCE( sd.precio_ga_mb,0)  + COALESCE(sd.precio_sg_mb,0)=0)) THEN

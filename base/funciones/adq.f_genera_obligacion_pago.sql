@@ -80,11 +80,13 @@ BEGIN
               raise exception 'Solo pueden habilitarce pago para cotizaciones adjudicadas';
             END IF;
             
+            
+            
             --------------------------------------
             --  Recuperamos datos del contrato si que existe
             -------------------------------------
             v_id_contrato = NULL;
-            IF requiere_contrato.requiere_contrato = 'si'  THEN
+            IF v_registros_cotizacion.requiere_contrato = 'si'  THEN
               
                  select 
                  	con.id_contrato
@@ -96,8 +98,7 @@ BEGIN
             
             END IF;
             
-            
-            
+          
             INSERT INTO 
               tes.tobligacion_pago 
             (
