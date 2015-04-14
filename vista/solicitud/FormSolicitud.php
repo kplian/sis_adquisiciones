@@ -1017,7 +1017,7 @@ Phx.vista.FormSolicitud=Ext.extend(Phx.frmInterfaz,{
 	loadCheckDocumentosSolWf:function(data) {
 		   //TODO Eventos para cuando ce cierre o destruye la interface de documentos
             Phx.CP.loadWindows('../../../sis_workflow/vista/documento_wf/DocumentoWf.php',
-                    'Documentos de la solicitu de compra',
+                    'Documentos del Proceso',
                     {
                         width:'90%',
                         height:500

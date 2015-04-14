@@ -66,7 +66,6 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
             disabled: true,
             iconCls : 'bpdf32',
             scope: this,
-            menu:{
             items: [{
                 id:'b-btnReporte-' + this.idContenedor,
                 text: 'Cotización',
@@ -841,7 +840,7 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
             rec.data.nombreVista = this.nombreVista;
             rec.data.check_fisico = 'si';
             Phx.CP.loadWindows('../../../sis_workflow/vista/documento_wf/DocumentoWf.php',
-                    'Chequear documento del WF',
+                    'Documentos del Proceso',
                     {
                         width:'90%',
                         height:500

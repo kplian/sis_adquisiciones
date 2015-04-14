@@ -813,7 +813,7 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
             var rec=this.sm.getSelected();
             rec.data.nombreVista = this.nombreVista;
             Phx.CP.loadWindows('../../../sis_workflow/vista/documento_wf/DocumentoWf.php',
-                    'Documentos del porceso',
+                    'Documentos del Proceso',
                     {
                         width:'90%',
                         height:500
