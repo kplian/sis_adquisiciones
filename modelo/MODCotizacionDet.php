@@ -172,21 +172,15 @@ class MODCotizacionDet extends MODbase{
 		//Definicion de la lista del resultado del query
 		
 	
+		 $this->captura('cantidad_sol','BIGINT');
+		 $this->captura('precio_unitario_sol','numeric');
+		 $this->captura('cantidad_coti','numeric');
+		 $this->captura('cantidad_adju','numeric');
+		 $this->captura('precio_unitario','numeric');
+		 $this->captura('desc_solicitud_det','varchar'); 
+		 $this->captura('descripcion_sol','text'); 
 		
-		$this->captura('estado_reg','varchar');
-		$this->captura('id_cotizacion','int4');
-		$this->captura('precio_unitario','numeric');
-		$this->captura('cantidad_adju','numeric');
-		$this->captura('cantidad_coti','numeric');
-		$this->captura('obs','varchar');
-		$this->captura('desc_solicitud_det','varchar');
-		$this->captura('cantidad_sol','BIGINT');
-        $this->captura('precio_unitario_sol','numeric');
-        $this->captura('descripcion_sol','text'); 
-        $this->captura('precio_unitario_mb','numeric');
-        $this->captura('precio_unitario_mb_sol','numeric');
-        $this->captura('revertido_mb','numeric');
-        $this->captura('revertido_mo','numeric');
+		
 		
 		
 		//Ejecuta la instruccion

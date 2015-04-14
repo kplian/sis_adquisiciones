@@ -1,7 +1,9 @@
 <?php
+include_once dirname(__FILE__)."/../../lib/lib_reporte/lang.es_AR.php";
+require_once dirname(__FILE__).'/../../pxp/lib/lib_reporte/mypdf.php';
 require_once dirname(__FILE__).'/../../pxp/pxpReport/Report.php';
 
- class CustomReport extends TCPDF {
+ class CustomReport extends MYPDF {
     
     private $dataSource;
     
@@ -56,13 +58,7 @@ require_once dirname(__FILE__).'/../../pxp/pxpReport/Report.php';
         $this->Cell(7, $height/4, $fecha_coti[0], 1, 0, 'C', false, '', 1, false, 'T', 'C');
         $this->Ln();	
         	
-        if($tipo=='adjudicado'){
-		     $this->SetFontSize(9);
-             $this->SetFont('','B');						
-			 $this->Cell(30, $height, 'Numero de O.C. :', 0, 0, 'L', false, '', 1, false, 'T', 'C');
-			 $this->SetFont('','');	
-			 $this->Cell(30, $height, $this->getDataSource()->getParameter('numero_oc'), 0, 0, 'L', false, '', 1, false, 'T', 'C');
-		}
+        
     }
     
     public function Footer() {
@@ -227,8 +223,96 @@ Class RCotizacion extends Report {
         								
         $pdf->Output($fileName, 'F');
     }
+
+   function writeDetalles (DataSource $dataSource, TCPDF $pdf,$tipo) {
+    	
+    	$blackAll = array('LTRB' =>array('width' => 0.3, 'cap' => 'butt', 'join' => 'miter', 'dash' => 0, 'color' => array(0, 0, 0)));
+        $widthMarginLeft = 1;
+        $width1 = 20;
+        $width2 = 130;
+        
+        $pdf->Ln();
+        $pdf->SetFontSize(7.5);
+        $pdf->SetFont('', 'B');
+        $height = 5;
+        $pdf->SetFillColor(255,255,255, true);
+        $pdf->setTextColor(0,0,0); 
+		
+		$pdf->SetFontSize(6.5);
+		$gran_total=0.00;
+		
+		$conf_par_tablewidths=array($width2-$width1*2,$width1,$width1,$width1,$width1,$width1);
+        $conf_par_tablealigns=array('L','L','L','R');
+        $conf_par_tablenumbers=array(0,0,0,0);
+        $conf_tableborders=array($blackAll,$blackAll,$blackAll,$blackAll);
+        $conf_tabletextcolor=array();
+				
+		$pdf->tablewidths=$conf_par_tablewidths;
+		$pdf->tablealigns=$conf_par_tablealigns;
+		$pdf->tablenumbers=$conf_par_tablenumbers;
+		$pdf->tableborders=$conf_tableborders;
+		
+		
+		$RowArray = array(
+		            'item'  => 'Item',
+					'cantidad'  => 'Cantidad Ref.',
+					'precio_unitario_sol' => 'Precio Unitario Ref.',
+					'cantida_cot' => 'Cantidad Ofert.',
+					'precio_unitario_cot' => 'Precio Unitario Ofert.',
+					'total' => 'Total'
+				);     
+					 
+		 $pdf-> MultiRow($RowArray,false,1); 
+		 
+        foreach($dataSource->getDataset() as $row) {
+			            
+			 
+				if($tipo=='borrador'){		
+				     $RowArray = array(
+			            'item'  => $row['desc_solicitud_det']."\r\n".'  - '.$row['descripcion_sol'],
+						'cantidad'  => $row['cantidad_sol'],
+						'precio_unitario_sol' => '',
+						'cantida_cot' => '',
+						'precio_unitario_cot' => '',
+						'total' => ''
+					);		
+				}
+				else{
+					$totalItem=number_format($row['cantidad_coti']*$row['precio_unitario'],2);
+					$RowArray = array(
+			            'item'  => $row['desc_solicitud_det']."\r\n".'  - '.$row['descripcion_sol'],
+						'cantidad'  => $row['cantidad_sol'],
+						'precio_unitario_sol' => number_format($row['precio_unitario_sol'],2),
+						'cantida_cot' => $row['cantidad_coti'],
+						'precio_unitario_cot' => number_format($row['precio_unitario'],2),
+						'total' => $totalItem
+					);
+					$gran_total=$gran_total + $totalItem;
+				}	     
+				$pdf-> MultiRow($RowArray,false,1) ; 
+			
+						  
+        }
+		if($tipo=='borrador'){		
+	    	$height=5;		 								
+	    	$obj = new Numbers_Words_es_AR;
+	    	$numero=explode('.', number_format($gran_total,2));
+	    	$pdf->Cell(($width2-$width1*2) +(4*$width1), $height, 'En total son: ', 1, 0, 'L', false, '', 1, false, 'T', 'C');
+	    	$pdf->Cell($width1, $height, '', 1, 0, 'R', false, '', 1, false, 'T', 'C');
+	    	$pdf->Ln();  
+    	}  
+		else{
+			$height=5;		 								
+	    	$obj = new Numbers_Words_es_AR;
+	    	$numero=explode('.', number_format($gran_total,2));
+	    	$pdf->Cell(($width2-$width1*2) +(4*$width1), $height, 'En total son: '. strtoupper(trim($obj->toWords(str_replace(',', '', $numero[0])))).' '.$numero[1].'/'.'100 '.strtoupper($this->getDataSource()->getParameter('moneda')), 1, 0, 'L', false, '', 1, false, 'T', 'C');
+	    	$pdf->Cell($width1, $height, number_format($gran_total,2), 1, 0, 'R', false, '', 1, false, 'T', 'C');
+	    	$pdf->Ln(); 
+		}  									
+    }     
+
     
-    function writeDetalles (DataSource $dataSource, TCPDF $pdf,$tipo) {
+    function writeDetalles2 (DataSource $dataSource, TCPDF $pdf,$tipo) {
     	
     	$blackAll = array('LTRB' =>array('width' => 0.3, 'cap' => 'butt', 'join' => 'miter', 'dash' => 0, 'color' => array(0, 0, 0)));
         $widthMarginLeft = 1;

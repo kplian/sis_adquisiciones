@@ -611,3 +611,5 @@ COMMENT ON COLUMN adq.tcotizacion.tiene_form500
 IS 'no, requiere, o si';
 
 /***********************************F-SCP-RAC-ADQ-0-25/03/2015****************************************/
+
+

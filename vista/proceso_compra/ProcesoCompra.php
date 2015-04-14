@@ -616,17 +616,24 @@ Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
 	},
 	loadCheckDocumentosSol:function() {
             var rec=this.sm.getSelected();
-            rec.data.nombreVista = this.nombreVista;
-            Phx.CP.loadWindows('../../../sis_workflow/vista/documento_wf/DocumentoWf.php',
+            
+            var datos = { nombreVista: this.nombreVista,
+            	          gruposBarraTareas: [
+            	               {name:'proceso',title:"<H1 align=center><i class=\"fa fa-thumbs-o-down\"></i> del Proceso</h1>",grupo:0,height:0},
+                               {name:'legales',title:"<H1 align=center><i class=\"fa fa-eye\"></i> Legales</h1>",grupo:1,height:0}]};
+	
+			
+            Phx.CP.loadWindows(
+            	     '../../../sis_workflow/vista/documento_wf/DocumentoWf.php',
                     'Chequear documento del WF',
                     {
                         width:'90%',
                         height:500
+                       
                     },
-                    rec.data,
+                    Ext.apply(datos, rec.data),
                     this.idContenedor,
-                    'DocumentoWf'
-        )
+                    'DocumentoWf');
     },
 	
 	onBtnRevPres:function(){

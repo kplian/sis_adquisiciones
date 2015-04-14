@@ -57,7 +57,7 @@ BEGIN
      	on te.id_tipo_proceso = tp.id_tipo_proceso
      inner join wf.tproceso_wf p
      	on p.id_tipo_proceso = tp.id_tipo_proceso
-     where te.codigo = 'registro' and p.id_proceso_wf = p_id_proceso_wf and te.estado_reg = 'activo';
+     where te.codigo = 'pendiente_asignacion' and p.id_proceso_wf = p_id_proceso_wf and te.estado_reg = 'activo';
      
      
      /*Insertar el contrato con el ultimo estado*/
@@ -76,7 +76,8 @@ BEGIN
           solicitud,
           monto,
           id_moneda,
-          id_cotizacion
+          id_cotizacion,
+          contrato_adhesion
         ) 
         VALUES (
           p_id_usuario,          
@@ -91,7 +92,8 @@ BEGIN
           v_solicitud,
           v_cotizacion.monto_total_adjudicado,
           v_cotizacion.id_moneda,
-          p_id_cotizacion
+          p_id_cotizacion,
+          v_cotizacion.precontrato
         );
         
         
@@ -113,7 +115,7 @@ BEGIN
 
 	 update leg.tcontrato
      set id_estado_wf = v_id_estado_registro,
-     estado = 'registro'
+     estado = 'pendiente_asignacion'
      where id_proceso_wf = p_id_proceso_wf;
     return true;
     

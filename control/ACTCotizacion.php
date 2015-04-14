@@ -247,13 +247,13 @@ class ACTCotizacion extends ACTbase{
             $dataSource->putParameter('tipo_entrega', $datosCotizacion[0]['tipo_entrega']);
             //get detalle
             //Reset all extra params:
-            $this->objParam->defecto('ordenacion', 'id_cotizacion_det');
+             $this->objParam->defecto('ordenacion', 'id_solicitud_det');
             $this->objParam->defecto('cantidad', 1000);
             $this->objParam->defecto('puntero', 0);
             $this->objParam->addParametro('id_cotizacion', $idCotizacion );
     
             $modCotizacionDet = $this->create('MODCotizacionDet');
-            $resultCotizacionDet = $modCotizacionDet->listarCotizacionDet();
+            $resultCotizacionDet = $modCotizacionDet->listarCotizacionDetReporte();
             $cotizacionDetDataSource = new DataSource();
             $cotizacionDetDataSource->setDataSet($resultCotizacionDet->getDatos());
             $dataSource->putParameter('detalleDataSource', $cotizacionDetDataSource);

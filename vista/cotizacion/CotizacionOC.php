@@ -615,6 +615,16 @@ Phx.vista.CotizacionOC = {
     //WIZARD
     sigEstado:function(){                   
             var rec=this.sm.getSelected();
+            if (rec.data.estado == 'adjudicado' && rec.data.requiere_contrato == 'si') {
+            	this.forzar_documentos = 'si';
+            	this.gruposBarraTareas = [{name:"legales",title:"Doc. Legales",grupo:0,height:0},
+                            {name:"proceso",title:"Doc del Proceso",grupo:1,height:0}];
+            } else {
+            	this.forzar_documentos = 'no';
+            	this.gruposBarraTareas = [{name:"proceso",title:"Doc del Proceso",grupo:0,height:0},
+                            {name:"legales",title:"Doc. Legales",grupo:1,height:0}];
+            }
+            
             Phx.CP.loadWindows('../../../sis_workflow/vista/estado_wf/FormEstadoWf.php',
             'Estado de Wf',
             {
@@ -625,6 +635,11 @@ Phx.vista.CotizacionOC = {
                    id_estado_wf: rec.data.id_estado_wf,
                    id_proceso_wf: rec.data.id_proceso_wf,
                    fecha_ini: rec.data.fecha_tentativa,
+                   forzar_documentos : this.forzar_documentos,
+                   gruposBarraTareas: this.gruposBarraTareas,
+                   forzar_documentos : this.forzar_documentos,
+                   gruposBarraTareas: this.gruposBarraTareas,
+                   check_fisico : 'si'
                }}, this.idContenedor,'FormEstadoWf',
             {
                 config:[{

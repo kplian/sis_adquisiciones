@@ -68,12 +68,7 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
 		}
 	},
 	
-	rowExpander: new Ext.ux.grid.RowExpander({
-	        tpl : new Ext.Template(
-	            '<br><p><b>Justificación:</b> {justificacion}</p>',
-	            '<p><b>Obs:</b> {obs}</p><br>'
-	        )
-    }),
+	
 	
 	addBotones: function() {
         this.menuAdq = new Ext.Toolbar.SplitButton({
@@ -571,8 +566,8 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
         {
             config:{
                 name: 'dias_plazo_entrega',
-                fieldLabel: 'Dias entrga',
-                qtip: 'Cuantos días después de emitida  la orden de compra se hara la entrega de los bienes. EJM. Quedara de esta forma en la orden de Compra:  (Tiempo de entrega: X días Hábiles de emitida la presente orden)',
+                fieldLabel: 'Dias entrega (Calendario)',
+                qtip: '¿Después de cuantos días calendario de emitida  la orden de compra se hara la entrega de los bienes?. EJM. Quedara de esta forma en la orden de Compra:  (Tiempo de entrega: X días calendario  de emitida la presente orden)',
                 allowBlank: true,
                 allowDecimals: false,
                 width: 100,
@@ -791,7 +786,29 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
 		
 	],
 	
+	arrayDefaultColumHidden:['id_fecha_reg','id_fecha_mod',
+	'fecha_mod','usr_reg','estado_reg','fecha_reg','usr_mod',
+	'id_depto','numero','obs','id_funcionario_aprobador','desc_funcionario_rpc','fecha_apro','id_categoria_compra','justificacion',
+	'lugar_entrega','fecha_inicio','dias_plazo_entrega','posibles_proveedores','comite_calificacion','extendida', 'obs_presupuestos'],
 	
+	
+	
+	
+	rowExpander: new Ext.ux.grid.RowExpander({
+		        tpl : new Ext.Template(
+		            '<br>',
+		            '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Número de solicitud:&nbsp;&nbsp;</b> {numero}</p>',
+		            '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Depto:&nbsp;&nbsp;</b> {desc_depto}</p>',	       
+		            '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>RPC:&nbsp;&nbsp;</b> {desc_funcionario_rpc}</p>',
+		            '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Aprueba:&nbsp;&nbsp;</b> {desc_funcionario_apro}</p>',
+		            '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Fecha aprobación:&nbsp;&nbsp;</b> {fecha_apro:date("d/m/Y")}</p>',
+		            '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Categoría de compra:&nbsp;&nbsp;</b> {desc_categoria_compra}</p>',
+		            '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Justificación:&nbsp;&nbsp;</b> {justificacion}</p>',
+		            '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Intrucciones:&nbsp;&nbsp;</b> {obs}</p>',
+		            '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Observaciones de área de presupuestos:&nbsp;&nbsp;</b> {obs_presupuestos}</p><br>'
+		            
+		        )
+	    }),
     loadCheckDocumentosSolWf:function() {
             var rec=this.sm.getSelected();
             rec.data.nombreVista = this.nombreVista;

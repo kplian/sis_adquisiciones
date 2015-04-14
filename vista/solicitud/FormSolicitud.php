@@ -739,8 +739,8 @@ Phx.vista.FormSolicitud=Ext.extend(Phx.frmInterfaz,{
         {
             config:{
                 name: 'dias_plazo_entrega',
-                fieldLabel: 'Dias entrga',
-                qtip: '¿Después de cuantos días  de emitida  la orden de compra se hara la entrega de los bienes?. EJM. Quedara de esta forma en la orden de Compra:  (Tiempo de entrega: X días Hábiles de emitida la presente orden)',
+                fieldLabel: 'Dias entrega (Calendario)',
+                qtip: '¿Después de cuantos días calendario de emitida  la orden de compra se hara la entrega de los bienes?. EJM. Quedara de esta forma en la orden de Compra:  (Tiempo de entrega: X días calendario  de emitida la presente orden)',
                 allowBlank: true,
                 allowDecimals: false,
                 width: 100,
