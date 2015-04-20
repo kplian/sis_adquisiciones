@@ -863,3 +863,12 @@ select pxp.f_insert_tgui ('Cotizaciones/Ordenes', 'Cotizaciones y Ordenes de Com
 select pxp.f_insert_testructura_gui ('COTOC', 'ADQ');
 
 /***********************************F-DAT-RAC-ADQ-0-23/03/2015*****************************************/
+
+
+/***********************************I-DAT-RAC-ADQ-0-17/04/2015*****************************************/
+
+INSERT INTO pxp.variable_global ("variable", "valor", "descripcion")
+VALUES (E'adq_tope_compra_regional', E'40000', E'define el monto maximo de compra en moneda base para las regionales');
+
+/***********************************F-DAT-RAC-ADQ-0-17/04/2015*****************************************/
+

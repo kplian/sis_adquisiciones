@@ -98,6 +98,7 @@ DECLARE
        v_revisado 					varchar;
        va_id_funcionario_gerente  	INTEGER[];
        v_tope_compra 				numeric;
+       v_prioridad_depto			integer;
 
 			    
 BEGIN
@@ -558,6 +559,8 @@ BEGIN
 
 	elseif(p_transaccion='ADQ_FINSOL_IME')then   
         begin
+          
+       
         
           IF  v_parametros.operacion = 'verificar' THEN
           
@@ -591,6 +594,8 @@ BEGIN
                     raise exception 'Las compras por encima de % (moneda base) no pueden realizarse  por el sistema de adquisiciones',v_tope_compra;
                   
                   END IF;
+                  
+                  
                 
                 
                   IF exists ( select 1
@@ -619,14 +624,33 @@ BEGIN
                      sol.fecha_soli,
                      sol.id_proceso_macro,
                      sol.id_uo,
-                     sol.id_categoria_compra
+                     sol.id_categoria_compra,
+                     dep.prioridad 
                     INTO
                      v_fecha_soli,
                      v_id_proceso_macro,
                      v_id_uo,
-                     v_id_categoria_compra 
+                     v_id_categoria_compra,
+                     v_prioridad_depto
                     from adq.tsolicitud sol
+                    inner join param.tdepto dep on dep.id_depto = sol.id_depto
                     where sol.id_solicitud = v_parametros.id_solicitud;
+                  
+                  
+                  
+                  --valida que no se compre por encima de 40 000 en la regionales
+                  
+                  v_tope_compra = pxp.f_get_variable_global('adq_tope_compra_regional')::integer; 
+                  
+                  IF v_tope_compra is NULL THEN
+                    raise exception 'revise la configuracion globar de la variable adq_tope_compra_regional para compras en regioanles no puede ser nula';
+                  END IF;
+                  
+                  
+                  IF  v_prioridad_depto > 0 and  v_total_soli  >= v_tope_compra  THEN
+                   raise exception 'Las compras en las regionales no pueden estar por encima de % (moneda base) no pueden realizarse  por el sistema de adquisiciones',v_tope_compra;
+                  END IF;
+                  
                   
                   
                    v_cont = 0;
@@ -641,7 +665,7 @@ BEGIN
                             p_id_categoria_compra integer,
                     
                     */
-                    
+                     
                   
                    	FOR v_registros in (
                             SELECT 
@@ -679,8 +703,10 @@ BEGIN
                      
                        v_cont = v_cont +1;
                        
+                       
+                        
                        IF v_cont = 1 THEN
-                 
+                          
                          v_resp =  adq.f_finalizar_reg_solicitud(
                                             p_administrador, 
                                             p_id_usuario,
@@ -692,7 +718,7 @@ BEGIN
                                             v_registros.id_cargo,
                                             v_registros.id_cargo_ai,
                                             v_registros.ai_habilitado);
-                  
+                                   
                        END IF;
                        
                        v_mensaje_resp = v_mensaje_resp||' - '||v_registros.desc_funcionario||' <br>';

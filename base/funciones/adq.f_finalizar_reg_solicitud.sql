@@ -121,6 +121,8 @@ p_hstore->'id_solicitud'
         --buscamos siguiente estado correpondiente al proceso del WF 
       
         
+       
+        
         SELECT  
              ps_id_tipo_estado,
              ps_codigo_estado,
@@ -137,7 +139,11 @@ p_hstore->'id_solicitud'
                         
       
         v_num_estados= array_length(va_id_tipo_estado, 1);
-                      
+        
+        
+        
+         
+                       
         IF v_num_estados = 1 then
                   -- si solo hay un estado,  verificamos si tiene mas de un funcionario por este estado
                  SELECT 
@@ -182,19 +188,15 @@ p_hstore->'id_solicitud'
        
                  
         
-        -- 22/09/2014  RAC,   se comenta  este if por que ahora se lo puede hacer dinamicamente 
-        -- con reglas en el WF
-        
+        -- 15/04/2015, por qu ese agregan mas estado al flujo es nesario obtene el funcionari dinamicamente  
+         v_num_estados= array_length(va_id_tipo_estado, 1);
         
          v_id_funcionario_estado_sig = v_id_funcionario_supervisor;
         
-        --verifica si tiene un supervisor
+        -- verifica si tiene un supervisor
         IF v_id_funcionario_supervisor is NULL then
         
-        
-           
-        
-            --si no tiene supervisor pasamos directo al siguiente estado (deberia ser el visto bueno de gerencia) 
+         --si no tiene supervisor pasamos directo al siguiente estado
             SELECT  
                ps_id_tipo_estado,
                ps_codigo_estado,
@@ -215,19 +217,57 @@ p_hstore->'id_solicitud'
            
             END IF;
             
-             v_id_funcionario_estado_sig = v_id_funcionario_aprobador;
-        
+            v_num_estados= array_length(va_id_tipo_estado, 1);
             
-      
+            IF v_num_estados = 1 then
+                    -- si solo hay un estado,  verificamos si tiene mas de un funcionario por este estado
+                   SELECT 
+                   *
+                    into
+                    v_num_funcionarios
+                    
+                   FROM wf.f_funcionario_wf_sel(
+                       p_id_usuario, 
+                       va_id_tipo_estado[1], 
+                       v_fecha_soli,
+                       v_id_estado_wf,
+                       TRUE) AS (total bigint);
+                       
+                       
+               
+                                     
+                        IF v_num_funcionarios = 1 THEN
+                        -- si solo es un funcionario, recuperamos el funcionario correspondiente
+                             SELECT 
+                                 id_funcionario
+                                   into
+                                 v_id_funcionario_estado_sig
+                             FROM wf.f_funcionario_wf_sel(
+                                 p_id_usuario, 
+                                 va_id_tipo_estado[1], 
+                                 v_fecha_soli,
+                                 v_id_estado_wf,
+                                 FALSE) 
+                                 AS (id_funcionario integer,
+                                   desc_funcionario text,
+                                   desc_funcionario_cargo text,
+                                   prioridad integer);
+                        ELSE
+                            raise exception 'El estado solo puede tener un funcionario registrado %', va_id_tipo_estado;
+                        END IF;  
+          
+          ELSE
+          
+              raise exception 'El flujo se encuentra mal parametrizados, mas de un estado destino';
+          
+          END IF;
+            
         END IF;
         
        
           
           --cambiamos estado de la solicitud
-          
-           
-          
-          
+         
           IF  va_id_tipo_estado[2] is not null  THEN
            
             raise exception 'El proceso se encuentra mal parametrizado dentro de Work Flow,  la finalizacion de solicitud solo admite un estado siguiente';

@@ -29,7 +29,7 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
             tooltip : '<b>Reporte Solicitud de Compra</b><br/><b>Reporte Solicitud de Compra</b>'
        }); */
   
-        this.addButton('diagrama_gantt',{text:'Gantt',iconCls: 'bgantt',disabled:true,handler:diagramGantt,tooltip: '<b>Diagrama Gantt de proceso macro</b>'});
+        this.addButton('diagrama_gantt',{ text:'Gantt', iconCls: 'bgantt', disabled:true, handler: diagramGantt, tooltip: '<b>Diagrama Gantt de proceso macro</b>'});
   
 	 
         this.addButton('btnChequeoDocumentosWf',

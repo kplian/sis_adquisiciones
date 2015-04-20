@@ -66,11 +66,11 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
             disabled: true,
             iconCls : 'bpdf32',
             scope: this,
-            items: [{
+            menu: [{
                 id:'b-btnReporte-' + this.idContenedor,
                 text: 'Cotización',
                 tooltip: '<b>Reporte de  Cotización</b>',
-                handler:this.onButtonReporte,
+                handler: this.onButtonReporte,
                 scope: this
             }, {
                 id:'b-btnRepOC-' + this.idContenedor,
@@ -85,8 +85,7 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
                 handler:this.onButtonCartaAdj,
                 scope: this
             }
-        ]}
-        });
+        ]});
         
         //Adiciona el menú a la barra de herramientas
         this.tbar.add(this.menuAdq);
