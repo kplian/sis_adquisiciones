@@ -82,6 +82,8 @@ DECLARE
    v_lugar_entrega_sol varchar;
    v_instruc_rpc varchar;
    v_requiere_contrato varchar;
+   v_id_funcionario_aux integer;
+   v_id_usuario_auxiliar     integer;
  
     
     
@@ -131,7 +133,8 @@ BEGIN
             pc.estado,
             pc.id_depto,
             pc.id_solicitud,
-            pc.num_cotizacion
+            pc.num_cotizacion,
+            pc.id_usuario_auxiliar
            into
             v_num_tramite,
             v_id_proceso_wf_pro,
@@ -139,11 +142,20 @@ BEGIN
             v_estado_pro,
             v_id_depto,
             v_id_solicitud,
-            v_num_cotizacion
+            v_num_cotizacion,
+            v_id_usuario_auxiliar
            from adq.tproceso_compra pc
            where pc.id_proceso_compra = (p_hstore_cotizacion->'id_proceso_compra')::integer;
          
-            
+           --obtener el funcionario del auxiliar del proceso
+           SELECT 
+           	fun.id_funcionario
+           into
+           	v_id_funcionario_aux
+           FROM segu.tusuario u 
+           INNER JOIN orga.tfuncionario fun on fun.id_persona = u.id_persona
+           WHERE u.id_usuario = v_id_usuario_auxiliar
+           OFFSET 0 LIMIT 1;
            
            --recupera datos de la solicitud      
            select  
@@ -178,7 +190,7 @@ BEGIN
            
            
 
-        
+           --raise exception 'ssss % %', v_id_funcionario_aux, v_id_usuario_auxiliar;
 
             IF  v_estado_pro = 'pendiente' THEN
                          
@@ -214,7 +226,7 @@ BEGIN
                     
                     
                      v_id_estado_actual =  wf.f_registra_estado_wf(va_id_tipo_estado_pro[1], 
-                                                                   NULL, --id_funcionario
+                                                                   v_id_funcionario_aux, --id_funcionario
                                                                    v_id_estado_wf_pro, 
                                                                    v_id_proceso_wf_pro,
                                                                    p_id_usuario,
@@ -251,7 +263,7 @@ BEGIN
                                (p_hstore_cotizacion->'_id_usuario_ai')::integer,
                                (p_hstore_cotizacion->'_nombre_usuario_ai')::varchar,
                                v_id_estado_actual, 
-                               NULL, 
+                               v_id_funcionario_aux, 
                                v_id_depto, 
                                'Cotización del proveedor: '||v_dec_proveedor::varchar,
                                '',
@@ -275,7 +287,7 @@ BEGIN
                           (p_hstore_cotizacion->'_id_usuario_ai')::integer,
                           (p_hstore_cotizacion->'_nombre_usuario_ai')::varchar,
                            v_id_estado_wf_pro, 
-                           NULL, 
+                           v_id_funcionario_aux, 
                            v_id_depto,
                           'Cotización del proveedor: '||v_dec_proveedor::varchar,
                           '',

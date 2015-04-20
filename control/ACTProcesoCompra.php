@@ -27,7 +27,7 @@ class ACTProcesoCompra extends ACTbase{
         }*/
 		
 		if(strtolower($this->objParam->getParametro('estado'))=='pendientes'){
-             $this->objParam->addFiltro("(estado in (''pendiente'',''proceso'')) and (array_estados_cot is NULL  or  ''borrador''=ANY(array_estados_cot))");
+             $this->objParam->addFiltro("(estado in (''pendiente'',''proceso'')) and (array_estados_cot is NULL  or  ''borrador''=ANY(array_estados_cot) or  ''anulado''=ANY(array_estados_cot)  )");
         }
 		if(strtolower($this->objParam->getParametro('estado'))=='iniciados'){
              $this->objParam->addFiltro("(estado in (''pendiente'',''proceso'')) and (''cotizado''=ANY(array_estados_cot)  or ''adjudicado''=ANY(array_estados_cot) or ''recomendado''=ANY(array_estados_cot) or ''contrato_pendiente''=ANY(array_estados_cot) or ''contrato_elaborado''=ANY(array_estados_cot))");

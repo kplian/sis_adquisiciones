@@ -286,6 +286,14 @@ BEGIN
             v_resp_doc = wf.f_verifica_documento(p_id_usuario, v_id_estado_wf);
             
             
+            --registra el auxiliar en adquisiciones
+            
+            IF  pxp.f_existe_parametro(p_tabla,'id_depto_usuario') THEN
+               IF adq.f_registrar_auxiliar_adq(p_id_usuario,  v_parametros.id_depto_usuario, v_parametros.id_solicitud ) != 'true' THEN
+                 raise exception 'No se pudo asignar el usuario';
+               END IF;
+            END IF;
+            
             --chequear que si la solicitud de compra tiene proveedor 
             
             IF v_id_proveedor is not NULL THEN
@@ -325,13 +333,7 @@ BEGIN
                 
             END IF;
             
-            --registra el auxiliar en adquisiciones
             
-            IF  pxp.f_existe_parametro(p_tabla,'id_depto_usuario') THEN
-               IF adq.f_registrar_auxiliar_adq(p_id_usuario,  v_parametros.id_depto_usuario, v_parametros.id_solicitud ) != 'true' THEN
-                 raise exception 'No se pudo asignar el usuario';
-               END IF;
-            END IF;
             
             
             
