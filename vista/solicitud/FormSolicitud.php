@@ -97,7 +97,7 @@ Phx.vista.FormSolicitud=Ext.extend(Phx.frmInterfaz,{
 					'descripcion': new Ext.form.TextField({
 										name: 'descripcion',
 										msgTarget: 'title',
-										fieldLabel: 'descripcion',
+										fieldLabel: 'Descripcion',
 										allowBlank: false,
 										anchor: '80%',
 										maxLength:1200
@@ -105,7 +105,7 @@ Phx.vista.FormSolicitud=Ext.extend(Phx.frmInterfaz,{
 					'cantidad_sol': new Ext.form.NumberField({
 										name: 'cantidad_sol',
 										msgTarget: 'title',
-						                fieldLabel: 'cantidad',
+						                fieldLabel: 'Cantidad',
 						                allowBlank: false,
 						                allowDecimals: false,
 						                maxLength:10
@@ -387,7 +387,7 @@ Phx.vista.FormSolicitud=Ext.extend(Phx.frmInterfaz,{
                     },
                     {
                        
-                        header: 'Centro de costo',
+                        header: 'Centro de Costo',
                         dataIndex: 'id_centro_costo',
                         align: 'center',
                         width: 200,
@@ -405,7 +405,7 @@ Phx.vista.FormSolicitud=Ext.extend(Phx.frmInterfaz,{
                     },
                     {
                        
-                        header: 'Description',
+                        header: 'Descripción',
                         dataIndex: 'descripcion',
                         align: 'center',
                         width: 200,
@@ -413,7 +413,7 @@ Phx.vista.FormSolicitud=Ext.extend(Phx.frmInterfaz,{
                     },
                     {
                        
-                        header: 'Cant',
+                        header: 'Cantidad',
                         dataIndex: 'cantidad_sol',
                         align: 'center',
                         width: 50,
@@ -424,7 +424,7 @@ Phx.vista.FormSolicitud=Ext.extend(Phx.frmInterfaz,{
                     
                     {
                        
-                        header: 'P/Unit',
+                        header: 'P / Unit',
                         dataIndex: 'precio_unitario',
                         align: 'center',
                         width: 50,
@@ -602,7 +602,7 @@ Phx.vista.FormSolicitud=Ext.extend(Phx.frmInterfaz,{
                 name: 'tipo_concepto',
                 fieldLabel: 'Tipo',
                 allowBlank: false,
-                emptyText:'Subtipo...',
+                emptyText:'Tipo...',
                 store:new Ext.data.ArrayStore({
                             fields :['variable','valor'],
                             data :  []}),
@@ -626,7 +626,7 @@ Phx.vista.FormSolicitud=Ext.extend(Phx.frmInterfaz,{
        		    name:'id_funcionario',
        		    hiddenName: 'id_funcionario',
    				origen: 'FUNCIONARIOCAR',
-   				fieldLabel:'Funcionario',
+   				fieldLabel:'Funcionario Solicitante',
    				allowBlank: false,
                 valueField: 'id_funcionario',
                 width: '80%',
@@ -711,7 +711,7 @@ Phx.vista.FormSolicitud=Ext.extend(Phx.frmInterfaz,{
         {
             config:{
                 name: 'fecha_soli',
-                fieldLabel: 'Fecha Sol.',
+                fieldLabel: 'Fecha Solicitud',
                 allowBlank: false,
                 disabled: false,
                 width: 105,
@@ -725,7 +725,7 @@ Phx.vista.FormSolicitud=Ext.extend(Phx.frmInterfaz,{
         {
             config:{
                 name: 'fecha_inicio',
-                fieldLabel: 'Fecha Inicio Estimada.',
+                fieldLabel: 'Fecha de Inicio Estimada',
                 qtip:'En que se fecha se estima el inicio del servicio',
                 allowBlank: false,
                 disabled: false,
@@ -739,7 +739,7 @@ Phx.vista.FormSolicitud=Ext.extend(Phx.frmInterfaz,{
         {
             config:{
                 name: 'dias_plazo_entrega',
-                fieldLabel: 'Dias entrega (Calendario)',
+                fieldLabel: 'Dias de Entrega (Calendario)',
                 qtip: '¿Después de cuantos días calendario de emitida  la orden de compra se hara la entrega de los bienes?. EJM. Quedara de esta forma en la orden de Compra:  (Tiempo de entrega: X días calendario  de emitida la presente orden)',
                 allowBlank: true,
                 allowDecimals: false,
@@ -783,8 +783,8 @@ Phx.vista.FormSolicitud=Ext.extend(Phx.frmInterfaz,{
 		{
 			config:{
 				name: 'lugar_entrega',
-				fieldLabel: 'Lugar Entrega',
-				qtip:'Proporcionar una buena descripcion para informar al proveedor, Ejm. Entrega en oficinas de aeropuerto Cochabamba, Jaime Rivera #28',
+				fieldLabel: 'Lugar de Entrega',
+				qtip:'Proporcionar una buena descripcion para informar al proveedor, Ej. Entrega en oficinas de aeropuerto Cochabamba, Jaime Rivera #28',
 				allowBlank: false,
 				width: '100%',
 				maxLength:255
@@ -796,7 +796,7 @@ Phx.vista.FormSolicitud=Ext.extend(Phx.frmInterfaz,{
 	    {
        		config:{
        			name: 'precontrato',
-       			fieldLabel: 'Contrato de adhesion',
+       			fieldLabel: 'Contrato de Adhesion',
        			qtip: 'Si tine un contrato de adhesion',
        			allowBlank: false,
        			emptyText: 'Tipo...',

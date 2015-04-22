@@ -86,6 +86,7 @@ class MODSolicitud extends MODbase{
 		$this->captura('dias_plazo_entrega','integer');
 		$this->captura('obs_presupuestos','varchar');
 		$this->captura('precontrato','varchar');
+		$this->captura('update_enable','varchar');
 		
 		  
 		

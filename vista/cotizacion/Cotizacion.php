@@ -10,10 +10,10 @@ header("content-type: text/javascript; charset=UTF-8");
 ?>
 <script>
 Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
-    tam_pag:50,
-    constructor:function(config){
+    tam_pag: 50,
+    constructor: function(config){
 	    
-	    this.maestro=config;
+	    this.maestro = config;
 		//llama al constructor de la clase padre
     	Phx.vista.Cotizacion.superclass.constructor.call(this,config);
     	

@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION adq.f_solicitud_sel (
   p_administrador integer,
   p_id_usuario integer,
@@ -198,7 +196,7 @@ BEGIN
                         sol.dias_plazo_entrega,
                         sol.obs_presupuestos,
                         sol.precontrato
-                        	
+                        sol.update_enable	
 						from adq.tsolicitud sol
 						inner join segu.tusuario usu1 on usu1.id_usuario = sol.id_usuario_reg
                         

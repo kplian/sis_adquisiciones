@@ -118,10 +118,16 @@ p_hstore->'id_solicitud'
           inner join wf.ttipo_estado te on te.id_tipo_estado = ew.id_tipo_estado
           where ew.id_estado_wf = v_id_estado_wf;
           
+          --actualizamos el rpc
+          update adq.tsolicitud  s set 
+             id_funcionario_rpc=p_id_funcionario_rpc
+          where id_solicitud = p_id_solicitud;
+          
+          
         --buscamos siguiente estado correpondiente al proceso del WF 
       
         
-       
+     
         
         SELECT  
              ps_id_tipo_estado,
@@ -141,7 +147,7 @@ p_hstore->'id_solicitud'
         v_num_estados= array_length(va_id_tipo_estado, 1);
         
         
-        
+      
          
                        
         IF v_num_estados = 1 then
@@ -186,6 +192,7 @@ p_hstore->'id_solicitud'
         END IF;
         
        
+   
                  
         
         -- 15/04/2015, por qu ese agregan mas estado al flujo es nesario obtene el funcionari dinamicamente  
@@ -218,6 +225,7 @@ p_hstore->'id_solicitud'
             END IF;
             
             v_num_estados= array_length(va_id_tipo_estado, 1);
+            
             
             IF v_num_estados = 1 then
                     -- si solo hay un estado,  verificamos si tiene mas de un funcionario por este estado
@@ -358,7 +366,6 @@ p_hstore->'id_solicitud'
            update adq.tsolicitud  s set 
              id_estado_wf =  v_id_estado_actual,
              estado = va_codigo_estado[1],
-             id_funcionario_rpc=p_id_funcionario_rpc,
              id_usuario_mod=p_id_usuario,
              fecha_mod=now(),
              id_cargo_rpc = p_id_cargo,

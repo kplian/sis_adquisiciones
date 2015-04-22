@@ -646,9 +646,11 @@ BEGIN
                     raise exception 'revise la configuracion globar de la variable adq_tope_compra_regional para compras en regioanles no puede ser nula';
                   END IF;
                   
+                  --prioridad 2 regionales nacioanles, 3 internacionales, 1 central,  0 reservado
+                  --si la el tope de compra es igual a 0 entonces no tiene limite
                   
-                  IF  v_prioridad_depto > 0 and  v_total_soli  >= v_tope_compra  THEN
-                   raise exception 'Las compras en las regionales no pueden estar por encima de % (moneda base) no pueden realizarse  por el sistema de adquisiciones',v_tope_compra;
+                  IF  v_prioridad_depto = 2 and  (v_total_soli  >= v_tope_compra and v_tope_compra != 0)   THEN
+                   raise exception 'Las compras en las regionales no pueden estar por encima de % (moneda base)',v_tope_compra;
                   END IF;
                   
                   

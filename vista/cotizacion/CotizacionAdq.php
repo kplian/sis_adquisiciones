@@ -529,7 +529,7 @@ Phx.vista.CotizacionAdq = {
                    this.getBoton('fin_registro').disable();
                }
                
-               if (data['estado']!='adjudicado'&&data['estado']!='contrato_elaborado'&&data['estado']!='contrato_pendiente'){
+               if (data['estado']!='adjudicado'&&data['estado']!='contrato_elaborado'){
                    this.getBoton('btnHabPago').disable();
                }
                else{
@@ -547,16 +547,22 @@ Phx.vista.CotizacionAdq = {
                     this.getBoton('btnHabPago').enable();  
                }
                  
-               if (data['estado']=='pago_habilitado'){
+              if (data['estado']=='pago_habilitado' ){
                    this.getBoton('ant_estado').disable();
                    this.getBoton('btnPreing').enable();
+                   this.getBoton('btnSolCon').disable();
                   
-               }
+              } 
+              
+              if(data['estado']=='contrato_pendiente' || data['estado']=='contrato_elaborado'){
+              	 this.getBoton('ant_estado').disable();
+              	  this.getBoton('btnSolCon').disable();
+              }
                
-               if (data['estado']=='recomendado'){
+              if (data['estado']=='recomendado'){
                    this.getBoton('btnRepOC').disable();
                    this.getBoton('btnSolCon').disable();
-               }
+              }
                
                
             this.getBoton('btnObs').enable();    

@@ -68,7 +68,8 @@ BEGIN
               sol.tipo_concepto,
               sol.id_funcionario,
               c.requiere_contrato,
-              sol.justificacion
+              sol.justificacion,
+              sol.id_funcionario_aprobador
             into
              v_registros_cotizacion
             from adq.tcotizacion c
@@ -121,7 +122,8 @@ BEGIN
               tipo_concepto_solicitud,
               id_funcionario,
               id_contrato,
-              obs
+              obs,
+              id_funcionario_gerente
             ) 
             VALUES (
               p_id_usuario,
@@ -142,7 +144,8 @@ BEGIN
               v_registros_cotizacion.tipo_concepto,
               v_registros_cotizacion.id_funcionario,
               v_id_contrato,
-              v_registros_cotizacion.justificacion
+              v_registros_cotizacion.justificacion,
+              v_registros_cotizacion.id_funcionario_aprobador
               
             ) RETURNING id_obligacion_pago into v_id_obligacion_pago;
     
