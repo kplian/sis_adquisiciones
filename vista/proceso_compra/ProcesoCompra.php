@@ -16,11 +16,11 @@ Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
                        {name:'en pago',title:'<H1 align="center"><i class="fa fa-credit-card"></i> En Pago</h1>',grupo:2,height:0},
                        {name:'finalizados',title:'<H1 align="center"><i class="fa fa-thumbs-o-up"></i> Finalizados</h1>',grupo:3,height:0}],
 	
-    beditGroups:[0,1,2],
-    bdelGroups:[0,1,2],
-    bactGroups:[0,1,2,3],
-    btestGroups:[0],
-    bexcelGroups:[0,1,2,3],
+    beditGroups: [0,1,2],
+    bdelGroups:  [0,1,2],
+    bactGroups:  [0,1,2,3],
+    btestGroups: [0],
+    bexcelGroups: [0,1,2,3],
     
     actualizarSegunTab: function(name, indice){
     	this.store.baseParams.estado = name;
@@ -586,8 +586,7 @@ Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
 	        )
     }),
     
-    arrayDefaultColumHidden:['id_fecha_reg','id_fecha_mod','fecha_mod','usr_reg','usr_mod','estado','numeros_oc','id_depto','id_solicitud',
-'usr_aux','codigo_proceso','fecha_ini_proc','obs_proceso','objeto','num_cotizacion','num_convocatoria','estado_reg','fecha_reg'],
+    arrayDefaultColumHidden:['fecha_mod','usr_reg','usr_mod','estado','numeros_oc','id_depto','id_solicitud','usr_aux','codigo_proceso','fecha_ini_proc','obs_proceso','objeto','num_cotizacion','num_convocatoria','estado_reg','fecha_reg'],
 
 
 	iniciarEventos:function(){

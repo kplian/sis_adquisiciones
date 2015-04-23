@@ -158,7 +158,16 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
                 allowBlank: true,
                 anchor: '80%',
                 gwidth: 150,
-                maxLength:200
+                maxLength:200,
+                renderer:function (value, p, record){  
+                            if(record.data['update_enable'] == 'si')
+                                return  String.format('<font color="red">{0}</font>',value);
+                            else
+                                return value;
+                        },
+                
+                
+                
             },
             type:'TextField',
             filters:{pfiltro:'sol.num_tramite',type:'string'},
@@ -782,7 +791,8 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
 		{name:'fecha_inicio', type: 'date',dateFormat:'Y-m-d'},
 		'dias_plazo_entrega', 
 		'obs_presupuestos',
-		'precontrato'
+		'precontrato',
+		'update_enable'
 		
 	],
 	
