@@ -195,7 +195,7 @@ BEGIN
                         sol.fecha_inicio,
                         sol.dias_plazo_entrega,
                         sol.obs_presupuestos,
-                        sol.precontrato
+                        sol.precontrato,
                         sol.update_enable	
 						from adq.tsolicitud sol
 						inner join segu.tusuario usu1 on usu1.id_usuario = sol.id_usuario_reg
