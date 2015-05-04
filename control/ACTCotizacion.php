@@ -10,9 +10,7 @@ require_once(dirname(__FILE__).'/../../pxp/pxpReport/ReportWriter.php');
 require_once(dirname(__FILE__).'/../reportes/RCotizacion.php');
 require_once(dirname(__FILE__).'/../reportes/ROrdenCompra.php');
 require_once(dirname(__FILE__).'/../reportes/RCartaAdjudicacion.php');
-
 require_once(dirname(__FILE__).'/../../pxp/pxpReport/DataSource.php');
-
 include_once(dirname(__FILE__).'/../../lib/PHPMailer/class.phpmailer.php');
 include_once(dirname(__FILE__).'/../../lib/PHPMailer/class.smtp.php');
 include_once(dirname(__FILE__).'/../../lib/lib_general/cls_correo_externo.php');
@@ -80,6 +78,12 @@ class ACTCotizacion extends ACTbase{
 	function eliminarCotizacion(){
 			$this->objFunc=$this->create('MODCotizacion' );
         $this->res=$this->objFunc->eliminarCotizacion($this->objParam);
+        $this->res->imprimirRespuesta($this->res->generarJson());
+    }
+	
+	function generarNumOC(){
+		$this->objFunc=$this->create('MODCotizacion' );
+        $this->res=$this->objFunc->generarNumOC($this->objParam);
         $this->res->imprimirRespuesta($this->res->generarJson());
     }
 	

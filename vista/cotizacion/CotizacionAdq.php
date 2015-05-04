@@ -66,6 +66,15 @@ Phx.vista.CotizacionAdq = {
                     handler : this.onOpenObs,
                     tooltip : '<b>Observaciones</b><br/><b>Observaciones del WF</b>'
           });
+          
+          this.addButton('btnCorreoWf',{
+                    text :'Correos',
+                    iconCls : 'bemail',
+                    disabled: true,
+                    handler : this.onCorreoWf,
+                    tooltip : '<b>Correos</b><br/><b>Correos enviados durante el proceso wf</b>'
+          });
+          
 		//RCM
         //this.addButton('btnObPag',{text :'Obligación Pago',iconCls:'bdocuments',disabled: true, handler : this.onButtonObPag,tooltip : '<b>Obligación de Pago</b><br/><b>Formulario para el registro de la Obligación de Pago</b>'});
            
@@ -506,7 +515,9 @@ Phx.vista.CotizacionAdq = {
                    
                    if(data['estado']=='adjudicado'|| data['estado']=='contrato_pendiente'|| data['estado']=='contrato_elaborado' || data['estado']=='pago_habilitado'|| data['estado']=='finalizada'){
                        
-                    this.getBoton('btnRepOC').enable();
+                    if(data['requiere_contrato']=='no'){
+                     	 this.getBoton('btnRepOC').enable();
+                     }
                     this.getBoton('btnSolCon').enable();
                     
                    }
@@ -568,6 +579,7 @@ Phx.vista.CotizacionAdq = {
             this.getBoton('btnObs').enable();    
             this.getBoton('btnChequeoDocumentosWf').enable(); 
             this.getBoton('diagrama_gantt').enable();
+            this.getBoton('btnCorreoWf').enable();
               
             return tb 
      }, 
@@ -588,6 +600,8 @@ Phx.vista.CotizacionAdq = {
             this.getBoton('btnObs').disable();  
             this.getBoton('diagrama_gantt').disable();
             this.getBoton('btnChequeoDocumentosWf').disable();
+            this.getBoton('btnCorreoWf').disable();
+            
             this.menuAdq.disable();
             
             
@@ -717,6 +731,28 @@ Phx.vista.CotizacionAdq = {
                     data,
                     this.idContenedor,
                     'Obs'
+        )
+    },
+    
+    onCorreoWf: function() {
+            var rec=this.sm.getSelected();
+            
+            var data = {
+            	id_proceso_wf: rec.data.id_proceso_wf,
+            	id_estado_wf: rec.data.id_estado_wf,
+            	num_tramite: rec.data.num_tramite
+            }
+            
+            console.log(rec.data)
+            Phx.CP.loadWindows('../../../sis_parametros/vista/alarma/CorreoWf.php',
+                    'Correos enviados',
+                    {
+                        width:'80%',
+                        height:'70%'
+                    },
+                    data,
+                    this.idContenedor,
+                    'CorreoWf'
         )
     }
     

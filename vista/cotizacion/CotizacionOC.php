@@ -485,8 +485,10 @@ Phx.vista.CotizacionOC = {
                    }
                    
                    if(data['estado']=='adjudicado'|| data['estado']=='contrato_pendiente'|| data['estado']=='contrato_elaborado' || data['estado']=='pago_habilitado'|| data['estado']=='finalizada'){
-                      
-                    this.getBoton('btnRepOC').enable();
+                     if(data['requiere_contrato']=='no'){
+                     	 this.getBoton('btnRepOC').enable();
+                     }
+                     
                    }
                    
                    if(data['estado']=='adjudicado'){

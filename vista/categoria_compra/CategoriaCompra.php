@@ -112,7 +112,8 @@ Phx.vista.CategoriaCompra=Ext.extend(Phx.gridInterfaz,{
         {
             config:{
                 name: 'obs',
-                fieldLabel: 'Observaciones',
+                fieldLabel: 'Código OC',
+                qtip: 'Identifica el código del documento utilizado para generar la OC, debe coinsidir con código de correlativo',
                 allowBlank: true,
                 anchor: '80%',
                 gwidth: 150,

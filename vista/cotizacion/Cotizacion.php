@@ -773,21 +773,69 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
         },
 	
 	onButtonRepOC: function(){
-                var rec=this.sm.getSelected();
-                Ext.Ajax.request({
-                    url:'../../sis_adquisiciones/control/Cotizacion/reporteOC',
-                    params:{'id_cotizacion':rec.data.id_cotizacion,'id_proveedor':rec.data.id_proveedor},
-                    success: this.successExport,
-                    failure: function() {
-                        alert("fail");
-                    },
-                    timeout: function() {
-                        alert("timeout");
-                    },
-                    scope:this
-                });
+		
+		        var rec=this.sm.getSelected();
+                if (rec.data.requiere_contrato == 'no'){
+	                 //si no tiene numero de orden compra generamos 
+	                if(!rec.data.numero_oc || rec.data.numero_oc == '' ){
+		                Phx.CP.loadingShow();
+		                Ext.Ajax.request({
+		                    url:'../../sis_adquisiciones/control/Cotizacion/generarNumOC',
+		                    params:{'id_cotizacion':rec.data.id_cotizacion},
+		                    success: function(resp){
+		                    	Phx.CP.loadingHide();
+					            var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
+					            if(!reg.ROOT.error){
+					                 this.mostrarReporteOC(rec.data);
+					             }
+					             else{
+					                 alert('error al generar número de OC');
+		                         }
+		                    	
+		                    },
+		                    failure: function() {
+		                    	Phx.CP.loadingHide();
+		                        alert('error al generar número de OC');
+		                    },
+		                    timeout: function() {
+		                    	Phx.CP.loadingHide();
+		                        alert("timeout");
+		                    },
+		                    scope:this
+		                });	
+	                }
+	                else{
+	                	 this.mostrarReporteOC(rec.data);
+	                }
+	                	
+                }
+                else{
+                	alert('Esta cotizaicón no genera OC por que esta marcada para tener contrato');
+                	return;
+                }
+               
+                
+                
+                
+               
         },
-    
+      
+      mostrarReporteOC: function(data){
+  	        Ext.Ajax.request({
+                url: '../../sis_adquisiciones/control/Cotizacion/reporteOC',
+                params: { 'id_cotizacion': data.id_cotizacion, 'id_proveedor': data.id_proveedor },
+                success: this.successExport,
+                failure: function() {
+                	Phx.CP.loadingHide();
+                    alert("fail");
+                },
+                timeout: function() {
+                    alert("timeout");
+                },
+                scope:this
+            });
+      },
+      
       onButtonReporte:function(){
         var rec=this.sm.getSelected();
                 Ext.Ajax.request({
@@ -805,11 +853,10 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
     },
      antEstado:function(res,eve)
         {                   
-            var d= this.sm.getSelected().data;
-            Phx.CP.loadingShow();
-            var operacion = 'cambiar';
+            var d= this.sm.getSelected().data,
+                operacion = 'cambiar';
             operacion=  res.argument.estado == 'inicio'?'inicio':operacion; 
-            
+            Phx.CP.loadingShow();
             Ext.Ajax.request({
                 url:'../../sis_adquisiciones/control/Cotizacion/anteriorEstadoCotizacion',
                 params:{id_cotizacion:d.id_cotizacion, 

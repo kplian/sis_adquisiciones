@@ -453,7 +453,7 @@ BEGIN
      
 	/*********************************    
  	#TRANSACCION:  'ADQ_GENOC_IME'
- 	#DESCRIPCION:	Generar el numero secuencial de Orden de compra y pasa al siguiente estado la cotizacion
+ 	#DESCRIPCION:	Aprobar adjudicación,  Generar el numero secuencial de Orden de compra y pasa al siguiente estado la cotizacion
  	#AUTOR:	        Rensi Arteaga Copari
     
     ESTA TRANSACCION YA NOSE UTILIZA FUE REMPLAZADA PRO LA ADQ_SIGECOT_IME
@@ -478,7 +478,8 @@ BEGIN
             f.desc_funcionario1,
             so.numero,
             so.num_tramite,
-            pc.id_proceso_compra
+            pc.id_proceso_compra,
+            c.fecha_adju
            into 
               v_registros_proc
            
@@ -514,42 +515,13 @@ BEGIN
                    END IF;
            
            
-           --si no existe un numero de oc obtenemos uno
-           IF  v_numero_oc is NULL THEN
-           
-               
-                   
-                   
-                   -- determina la fecha del periodo
-                  
-                   select id_periodo into v_id_periodo from
-                                  param.tperiodo per 
-                                 where per.fecha_ini <= v_parametros.fecha_oc 
-                                   and per.fecha_fin >=  v_parametros.fecha_oc
-                                   limit 1 offset 0;
-                  
-                  
-               
-               
-               
-                  --obtener correlativo
-                   v_numero_oc =   param.f_obtener_correlativo(
-                            'OC', 
-                             v_id_periodo,-- par_id, 
-                             NULL, --id_uo 
-                             v_id_depto,    -- id_depto
-                             p_id_usuario, 
-                             'ADQ', 
-                             NULL);
-                             
-                             
+              --si no existe un numero de oc obtenemos uno
+             IF  v_numero_oc is NULL THEN
+                     -- guardamos la fecha de adjudicación para generar la OC
                     update adq.tcotizacion set
-                    fecha_adju = v_parametros.fecha_oc,
-                    numero_oc = v_numero_oc
+                    fecha_adju = now()::date
                     where id_cotizacion = v_parametros.id_cotizacion;
-           
-           
-           END IF;
+              END IF;
            
              IF  v_estado_cot != 'recomendado' THEN
                   raise exception 'Solo se admiten cotizaciones en estado recomendado';
@@ -896,51 +868,12 @@ BEGIN
                 -- si la cotizacion esta actualmente cotizada 
                 IF v_estado_cot = 'cotizado' THEN 
                 
-                       --si no existe un numero de oc obtenemos uno
-                     IF  v_numero_oc is NULL THEN
                      
                              -- determina la fecha del periodo
-                            
-                             select id_periodo into v_id_periodo from
-                                            param.tperiodo per 
-                                           where per.fecha_ini <= v_parametros.fecha_oc 
-                                             and per.fecha_fin >=  v_parametros.fecha_oc
-                                             limit 1 offset 0;
-                            
-                             --obtener correlativo
-                             v_numero_oc =   param.f_obtener_correlativo(
-                                      'OC', 
-                                       v_id_periodo,-- par_id, 
-                                       NULL, --id_uo 
-                                       v_id_depto,    -- id_depto
-                                       p_id_usuario, 
-                                       'ADQ', 
-                                       NULL);
-                              
-                              
-                              --si tiebe contrato
-                              IF(v_instruc_rpc in ('Iniciar Contrato','Solicitar Pago') ) THEN  
-                              
-                                  v_numero_oc = 'CNTR - '||v_numero_oc;
-                              
-                              END IF;     
-                                
-                             
                               update adq.tcotizacion set
-                              fecha_adju = v_parametros.fecha_oc,
-                              numero_oc = v_numero_oc
+                              fecha_adju = v_parametros.fecha_oc
                               where id_cotizacion = v_parametros.id_cotizacion;
-                              
-                              --actualiza el codigo de proceso wf, 
-                              --porque el numero de oc es mas apropiado para este estado del proceso
-                              update wf.tproceso_wf set
-                              codigo_proceso = v_numero_oc
-                              where id_proceso_wf = v_id_proceso_wf;
-                     ELSE
-                            update adq.tcotizacion set
-                            fecha_adju = v_parametros.fecha_oc
-                             where id_cotizacion = v_parametros.id_cotizacion;
-                     END IF;
+                      
                  END IF;
           
           
@@ -1024,6 +957,86 @@ BEGIN
         
         end;
     
+    
+    /*********************************    
+ 	#TRANSACCION:  'ADQ_GENOCDE_IME'
+ 	#DESCRIPCION:	Generar Numero de OC por demanda, antes de genera rel reporte
+ 	#AUTOR:	        Rensi Arteaga
+ 	#FECHA:		21-03-2013 14:48:35
+	***********************************/
+
+	elsif(p_transaccion='ADQ_GENOCDE_IME')then
+
+		begin
+        
+          select
+           cot.id_cotizacion,
+           cot.numero_oc,
+           cot.id_proceso_wf,
+           cot.fecha_adju,
+           sol.id_categoria_compra,
+           cat.obs as codigo_oc,
+           sol.id_depto
+           
+          into
+           v_registros
+          from adq.tcotizacion cot
+          inner join adq.tproceso_compra pro on pro.id_proceso_compra = cot.id_proceso_compra
+          inner join adq.tsolicitud sol on sol.id_solicitud = pro.id_proceso_compra
+          inner join adq.tcategoria_compra cat on cat.id_categoria_compra = sol.id_categoria_compra
+          where cot.id_cotizacion = v_parametros.id_cotizacion;
+        
+          IF v_registros.fecha_adju  IS NULL THEN
+             raise exception 'no tenemos una fecha de adjudicación';
+          END IF;
+        
+            --si no existe un numero de oc obtenemos uno
+           IF  v_registros.numero_oc is NULL THEN
+                   -- determina la fecha del periodo
+                  
+                   select id_periodo into v_id_periodo from
+                                  param.tperiodo per 
+                                 where per.fecha_ini <= v_registros.fecha_adju 
+                                   and per.fecha_fin >=  v_registros.fecha_adju
+                                   limit 1 offset 0;
+                  
+                  
+                   -- obtener correlativo de orden de compra
+                   v_numero_oc =   param.f_obtener_correlativo(
+                             v_registros.codigo_oc, 
+                             v_id_periodo,-- par_id, 
+                             NULL, --id_uo 
+                             v_registros.id_depto,    -- id_depto
+                             p_id_usuario, 
+                             'ADQ', 
+                             NULL);
+                             
+                             
+                    update adq.tcotizacion set
+                    numero_oc = v_numero_oc
+                    where id_cotizacion = v_parametros.id_cotizacion;
+           
+                    --actualiza el codigo de proceso wf, 
+                    --porque el numero de oc es mas apropiado para este estado del proceso
+                    update wf.tproceso_wf set
+                    codigo_proceso = v_numero_oc
+                    where id_proceso_wf = v_id_proceso_wf;
+                    v_resp = pxp.f_agrega_clave(v_resp,'mensaje','se genero el número de OC para la cotización)'); 
+                    v_resp = pxp.f_agrega_clave(v_resp,'generado','si)'); 
+           ELSE         
+                    v_resp = pxp.f_agrega_clave(v_resp,'mensaje','no se pudo generar el número de OC para la cotización)');
+                    v_resp = pxp.f_agrega_clave(v_resp,'generado','no)');
+           END IF;
+           
+            --Definicion de la respuesta
+           
+            v_resp = pxp.f_agrega_clave(v_resp,'id_cotizacion',v_parametros.id_cotizacion::varchar);
+              
+            --Devuelve la respuesta
+            return v_resp;
+
+		end;   
+          
     
     
     

@@ -515,6 +515,7 @@ class MODSolicitud extends MODbase{
 			$this->setParametro('fecha_inicio','fecha_inicio','date');
 			$this->setParametro('dias_plazo_entrega','dias_plazo_entrega','integer');
 			$this->setParametro('precontrato','precontrato','varchar');
+			$this->setParametro('correo_proveedor','correo_proveedor','varchar');
 			
 			//Ejecuta la instruccion
             $this->armarConsulta();

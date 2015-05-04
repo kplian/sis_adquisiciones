@@ -94,7 +94,7 @@ Phx.vista.FormSolicitud=Ext.extend(Phx.frmInterfaz,{
 						                    allowBlank:true
 						            }),
 						            
-					'descripcion': new Ext.form.TextField({
+					'descripcion': new Ext.form.TextArea({
 										name: 'descripcion',
 										msgTarget: 'title',
 										fieldLabel: 'Descripcion',
@@ -407,6 +407,7 @@ Phx.vista.FormSolicitud=Ext.extend(Phx.frmInterfaz,{
                        
                         header: 'Descripción',
                         dataIndex: 'descripcion',
+                        
                         align: 'center',
                         width: 200,
                         editor: this.detCmp.descripcion 
@@ -767,6 +768,17 @@ Phx.vista.FormSolicitud=Ext.extend(Phx.frmInterfaz,{
             id_grupo: 0,
             form:true
         },
+        {
+            config:{
+                name: 'correo_proveedor',
+                fieldLabel: 'Email Proveedor',
+                qtip: 'El correo del proveedor es necesario para el envió de notificaciones (como la orden de compra o invitación), asegúrese de que sea el correcto',
+                allowBlank: false                
+            },
+            type: 'TextField',
+            id_grupo: 0,
+            form: true
+        },
 		{
 			config:{
 				name: 'justificacion',
@@ -808,7 +820,7 @@ Phx.vista.FormSolicitud=Ext.extend(Phx.frmInterfaz,{
        		    store: ['si','no']
        		},
        		type: 'ComboBox',
-       		id_grupo: 0,
+       		id_grupo: 2,
        		filters:{	
        		         type: 'list',
        		         pfiltro:'sol.tipo',
@@ -877,6 +889,14 @@ Phx.vista.FormSolicitud=Ext.extend(Phx.frmInterfaz,{
             	this.Cmp.id_depto.store.baseParams.id_lugar = record.data.id_lugar;
             	this.Cmp.id_depto.modificado = true;
             	this.Cmp.id_depto.enable();
+            	
+            	
+            }, this);
+            
+            this.Cmp.id_proveedor.on('select', function(combo, record, index){ 
+            	
+            	this.Cmp.correo_proveedor.reset();
+            	this.Cmp.correo_proveedor.setValue(record.data.email);
             	
             	
             }, this);

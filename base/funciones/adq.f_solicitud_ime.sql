@@ -99,6 +99,7 @@ DECLARE
        va_id_funcionario_gerente  	INTEGER[];
        v_tope_compra 				numeric;
        v_prioridad_depto			integer;
+       v_reg_prov					record;
 
 			    
 BEGIN
@@ -188,6 +189,25 @@ BEGIN
                         --NOTA el valor en la primera posicion del array es el gerente  de menor nivel
                     END IF;  
                 END IF;
+        
+        --si existe el parametro del correo proveedor  actulizamos la tabla
+        select 
+          p.id_persona,
+          p.id_institucion
+        into
+          v_reg_prov
+        from param.tproveedor p
+        where  p.id_proveedor = v_parametros.id_proveedor;
+        
+        IF  v_reg_prov.id_persona is not NULL   THEN 
+        
+             update segu.tpersona set correo = v_parametros.correo_proveedor where id_persona = v_reg_prov.id_persona;
+        
+        ELSE
+             update param.tinstitucion set email1 = v_parametros.correo_proveedor where id_institucion = v_reg_prov.id_institucion;
+        
+        END IF;
+        
         
         --inserta solicitud
         insert into adq.tsolicitud(

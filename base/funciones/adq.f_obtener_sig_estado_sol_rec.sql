@@ -40,9 +40,12 @@ DECLARE
     v_x text;
     v_count integer;
     v_resp   varchar;
+    v_nombre_funcion  varchar;
 	
 BEGIN
    --buscamos siguiente estado correpondiente al proceso del WF
+   
+   v_nombre_funcion = 'f_obtener_sig_estado_sol_rec';
                SELECT 
                  *
               into
