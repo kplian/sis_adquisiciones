@@ -519,6 +519,7 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
             type:'ComboRec',//ComboRec
             id_grupo:0,
             filters:{pfiltro:'pro.desc_proveedor',type:'string'},
+            bottom_filter:true,
             grid:true,
             form:false
         },
