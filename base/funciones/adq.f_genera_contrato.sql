@@ -77,7 +77,9 @@ BEGIN
           monto,
           id_moneda,
           id_cotizacion,
-          contrato_adhesion
+          contrato_adhesion,
+          id_concepto_ingas,
+          id_orden_trabajo
         ) 
         VALUES (
           p_id_usuario,          
@@ -93,7 +95,9 @@ BEGIN
           v_cotizacion.monto_total_adjudicado,
           v_cotizacion.id_moneda,
           p_id_cotizacion,
-          v_cotizacion.precontrato
+          v_cotizacion.precontrato,
+          string_to_array(v_cotizacion.conceptos,',')::integer[],
+          string_to_array(v_cotizacion.ots,',')::integer[]
         );
         
         

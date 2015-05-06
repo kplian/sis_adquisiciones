@@ -903,28 +903,23 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
             var data = {id_funcionario:this.id_funcionario}
             Ext.apply(data,rec.data)
             //pop pup confirmacion contrato
-            if(confirm('Intrucciones RPC: ' + this.instruc_rpc + '\nDesea Continuar?' )){
+            if(this.instruc_rpc){
+            	if(!confirm('Intrucciones RPC: ' + this.instruc_rpc + '\nDesea Continuar?' )){
+             	    return
+                }
+            }
             	
-            	/*  25/02/2015, deshabilitar formualri ode correo electronico
-                 Phx.CP.loadWindows('../../../sis_adquisiciones/vista/cotizacion/SolContrato.php',
-                    'Solicitar Contrato',
-                    {
-                        modal:true,
-                        width:700,
-                        height:500
-                    },data ,this.idContenedor,'SolContrato')
-                 */ 
                  
-                 Phx.CP.loadingShow();
-	              Ext.Ajax.request({
-	                url:'../../sis_adquisiciones/control/Cotizacion/habilitarContrato',
-	                params: { id_cotizacion: rec.data.id_cotizacion },
-	                success: this.successSimple,
-	                failure: this.conexionFailure,
-	                timeout: this.timeout,
-	                scope: this
-	              });
-             } 
+             Phx.CP.loadingShow();
+              Ext.Ajax.request({
+                url:'../../sis_adquisiciones/control/Cotizacion/habilitarContrato',
+                params: { id_cotizacion: rec.data.id_cotizacion },
+                success: this.successSimple,
+                failure: this.conexionFailure,
+                timeout: this.timeout,
+                scope: this
+              });
+              
     },
     
     successSimple:function(resp){

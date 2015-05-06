@@ -32,6 +32,7 @@ DECLARE
     v_id_obligacion_det 			integer;
     v_resp							varchar;
     v_id_contrato					integer;
+    v_num_contrato					varchar;
 
 	
 
@@ -90,14 +91,27 @@ BEGIN
             IF v_registros_cotizacion.requiere_contrato = 'si'  THEN
               
                  select 
-                 	con.id_contrato
+                 	con.id_contrato,
+                    con.numero
                  into
-                    v_id_contrato
+                    v_id_contrato,
+                    v_num_contrato
                  from leg.tcontrato con
                  where  con.id_cotizacion = p_id_cotizacion 
                         and con.estado = 'finalizado' and con.estado_reg = 'activo';
-            
+                
+                
+                IF v_id_contrato is NULL THEN
+                 raise exception 'El proceso esta marcado para tener contrato y no se encontro ninguno';
+                END IF;
+                
+            ELSE
+              IF v_registros_cotizacion.numero_oc is NULL THEN
+                 raise exception 'El proceso no tiene contrato y no se genero un  número de orden de compra';
+              END IF;
             END IF;
+            
+            
             
           
             INSERT INTO 
@@ -134,7 +148,7 @@ BEGIN
               v_registros_cotizacion.id_moneda,
               'adquisiciones',
               now(),
-              v_registros_cotizacion.numero_oc,
+              pxp.f_iif(v_num_contrato is NULL, v_registros_cotizacion.numero_oc, v_num_contrato),
               v_registros_cotizacion.tipo_cambio_conv,
               v_registros_cotizacion.num_tramite,
               v_registros_cotizacion.id_gestion,

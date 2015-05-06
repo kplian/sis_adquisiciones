@@ -34,10 +34,11 @@ class ACTProcesoCompra extends ACTbase{
         }
         
 		if(strtolower($this->objParam->getParametro('estado'))=='en pago'){
-             $this->objParam->addFiltro("(''pago_habilitado''=ANY(array_estados_cot))");
+             $this->objParam->addFiltro(" (''pago_habilitado''=ANY(array_estados_cot)  or  ''finalizada''=ANY(array_estados_cot))  and estado != ''finalizado'' ");
         }
         if(strtolower($this->objParam->getParametro('estado'))=='finalizados'){
              $this->objParam->addFiltro("(estado in (''finalizado'',''anulado''))");
+			 //$this->objParam->addFiltro("(''finalizada''=ANY(array_estados_cot) or (estado in (''finalizado'',''anulado'')))");
         }
 		
 		if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
