@@ -80,7 +80,7 @@ BEGIN
 						cot.lugar_entrega,
 						cot.tipo_entrega,
 						cot.fecha_coti,
-						cot.numero_oc,
+						COALESCE(cot.numero_oc,''S/N''),
 						cot.id_proveedor,
                         pro.desc_proveedor,					
 						cot.fecha_entrega,
@@ -115,7 +115,8 @@ BEGIN
                         d.total_adjudicado,
                         d.total_cotizado,
                         d.total_adjudicado_mb,
-                        cot.tiene_form500
+                        cot.tiene_form500,
+                        cot.correo_oc
 						from adq.tcotizacion cot
                         inner join adq.tproceso_compra proc on proc.id_proceso_compra = cot.id_proceso_compra
                         inner join adq.tsolicitud sol on sol.id_solicitud = proc.id_solicitud

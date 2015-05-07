@@ -872,3 +872,13 @@ VALUES (E'adq_tope_compra_regional', E'40000', E'define el monto maximo de compr
 
 /***********************************F-DAT-RAC-ADQ-0-17/04/2015*****************************************/
 
+
+
+/***********************************I-DAT-RAC-ADQ-0-06/05/2015*****************************************/
+
+select pxp.f_insert_tgui ('VoBo Solicitud (Poa)', 'VoBo Solicitud (Poa)', 'VBPOA', 'si', 7, 'sis_adquisiciones/vista/solicitud/SolicitudVbPoa.php', 3, '', 'SolicitudVbPoa', 'ADQ');
+select pxp.f_insert_testructura_gui ('VBPOA', 'ADQ');
+
+/***********************************F-DAT-RAC-ADQ-0-06/05/2015*****************************************/
+
+

@@ -114,6 +114,12 @@ class ACTSolicitud extends ACTbase{
 		$this->res=$this->objFunc->modificarObsPresupuestos($this->objParam);
 		$this->res->imprimirRespuesta($this->res->generarJson());
 	}
+	
+	function modificarObsPoa(){
+			$this->objFunc=$this->create('MODSolicitud');	
+		$this->res=$this->objFunc->modificarObsPoa($this->objParam);
+		$this->res->imprimirRespuesta($this->res->generarJson());
+	}
 
  
 

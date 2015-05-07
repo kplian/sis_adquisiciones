@@ -616,3 +616,37 @@ IS 'no, requiere, o si';
 ALTER TABLE adq.tsolicitud
   ADD COLUMN update_enable VARCHAR(2) DEFAULT 'no' NOT NULL;
 /***********************************F-SCP-JRR-ADQ-0-22/04/2015****************************************/
+
+
+
+/***********************************I-RAC-RAC-ADQ-0-06/05/2015****************************************/
+
+--------------- SQL ---------------
+
+ALTER TABLE adq.tcotizacion
+  ADD COLUMN correo_oc VARCHAR(20) DEFAULT 'ninguno' NOT NULL;
+
+COMMENT ON COLUMN adq.tcotizacion.correo_oc
+IS 'valores ninguno, bloqueado, pendiente, acuse';
+
+
+ALTER TABLE adq.tsolicitud
+  ADD COLUMN codigo_poa VARCHAR;
+
+COMMENT ON COLUMN adq.tsolicitud.codigo_poa
+IS 'para cruzar con las actividades de POA';
+
+
+--------------- SQL ---------------
+
+ALTER TABLE adq.tsolicitud
+  ADD COLUMN obs_poa VARCHAR;
+
+COMMENT ON COLUMN adq.tsolicitud.obs_poa
+IS 'Observacion en bisto bueno POA';
+
+
+
+/***********************************F-RAC-RAC-ADQ-0-06/05/2015****************************************/
+
+

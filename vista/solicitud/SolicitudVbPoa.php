@@ -11,7 +11,7 @@
 header("content-type: text/javascript; charset=UTF-8");
 ?>
 <script>
-Phx.vista.SolicitudVbPresupuesto = {
+Phx.vista.SolicitudVbPoa = {
     bedit:false,
     bnew:false,
     bsave:false,
@@ -19,7 +19,7 @@ Phx.vista.SolicitudVbPresupuesto = {
 	require:'../../../sis_adquisiciones/vista/solicitud/Solicitud.php',
 	requireclase:'Phx.vista.Solicitud',
 	title:'Solicitud',
-	nombreVista: 'solicitudvbpresupuestos',
+	nombreVista: 'solicitudvbpoa',
 	
 	constructor: function(config) {
 	    
@@ -57,12 +57,12 @@ Phx.vista.SolicitudVbPresupuesto = {
             scope: this
            }];
         
-    	Phx.vista.SolicitudVbPresupuesto.superclass.constructor.call(this,config);
+    	Phx.vista.SolicitudVbPoa.superclass.constructor.call(this,config);
     	this.addButton('ini_estado',{  argument: {estado: 'inicio'},text:'Dev. al Solicitante',iconCls: 'batras',disabled:true,handler:this.antEstado,tooltip: '<b>Retorna la Solcitud al estado borrador</b>'});
         this.addButton('ant_estado',{argument: {estado: 'anterior'},text:'Rechazar',iconCls: 'batras',disabled:true,handler:this.antEstado,tooltip: '<b>Pasar al Anterior Estado</b>'});
         this.addButton('sig_estado',{text:'Aprobar',iconCls: 'badelante',disabled:true, handler: this.sigEstado, tooltip: '<b>Pasar al Siguiente Estado</b>'});
         
-        this.addButton('obs_presu',{text:'Obs. Presupuestos', disabled:true, handler: this.initObs, tooltip: '<b>Observacioens del área de presupuesto</b>'});
+        this.addButton('obs_poa',{text:'Datos POA', disabled:true, handler: this.initObs, tooltip: '<b>Código de actividad POA</b>'});
         
         this.crearFormObs();
         
@@ -270,9 +270,21 @@ Phx.vista.SolicitudVbPresupuesto = {
             autoHeight: true,
             items: [
                  {
-                    name: 'obs',
+                    name: 'codigo_poa',
+                    xtype: 'textfield',
+                    fieldLabel: 'Código POA',
+                    allowBlank: false,
+                    grow: true,
+                    growMin : '80%',
+                    value:'',
+                    anchor: '80%',
+                    maxLength:500
+                },
+                 
+                 {
+                    name: 'obs_poa',
                     xtype: 'textarea',
-                    fieldLabel: 'Obs',
+                    fieldLabel: 'Obs POA',
                     allowBlank: true,
                     grow: true,
                     growMin : '80%',
@@ -284,7 +296,7 @@ Phx.vista.SolicitudVbPresupuesto = {
         
         
          this.wObs = new Ext.Window({
-            title: 'Obs de Presupuestos',
+            title: 'Daotos POA',
             collapsible: true,
             maximizable: true,
             autoDestroy: true,
@@ -299,7 +311,7 @@ Phx.vista.SolicitudVbPresupuesto = {
             closeAction: 'hide',
             buttons: [{
                     text: 'Guardar',
-                    handler: this.submitObsPresupuestos,
+                    handler: this.submitObsPoa,
                     scope: this
                     
              },
@@ -310,24 +322,28 @@ Phx.vista.SolicitudVbPresupuesto = {
             }]
         });
         
-        this.cmbObsPres = this.formObs.getForm().findField('obs');
+        this.cmbObsPoa = this.formObs.getForm().findField('obs_poa');
+        this.cmbCodigoPoa = this.formObs.getForm().findField('codigo_poa');
+        
 	},
 	
 	initObs:function(){
 		var d= this.sm.getSelected().data;
-        this.cmbObsPres.setValue(d.obs_presupuestos);
+        this.cmbObsPoa.setValue(d.obs_poa);
+        this.cmbCodigoPoa.setValue(d.codigo_poa);
 		this.wObs.show()
 	},
 	
-	submitObsPresupuestos:function(){
+	submitObsPoa:function(){
 		    Phx.CP.loadingShow();
 		    var d= this.sm.getSelected().data;
             Ext.Ajax.request({
                 // form:this.form.getForm().getEl(),
-                url: '../../sis_adquisiciones/control/Solicitud/modificarObsPresupuestos',
+                url: '../../sis_adquisiciones/control/Solicitud/modificarObsPoa',
                 params: {
                     id_solicitud:d.id_solicitud,
-                    obs: this.cmbObsPres.getValue()
+                    obs_poa: this.cmbObsPoa.getValue(),
+                    codigo_poa: this.cmbCodigoPoa.getValue()
                     },
                 success: function(resp){
                            Phx.CP.loadingHide();
@@ -543,10 +559,10 @@ Phx.vista.SolicitudVbPresupuesto = {
   preparaMenu:function(n){
       var data = this.getSelectedData();
       var tb =this.tbar;
-      Phx.vista.SolicitudVbPresupuesto.superclass.preparaMenu.call(this,n);  
+      Phx.vista.SolicitudVbPoa.superclass.preparaMenu.call(this,n);  
       
       if(this.historico == 'no'){
-          if(data.estado =='vbpresupuestos' ){ 
+          if(data.estado =='vbpoa' ){ 
             this.getBoton('ant_estado').enable();
             this.getBoton('sig_estado').enable();
             this.getBoton('ini_estado').enable();
@@ -558,22 +574,22 @@ Phx.vista.SolicitudVbPresupuesto = {
                 
             }
            this.menuAdq.enable();
-           this.getBoton('obs_presu').enable();
+           this.getBoton('obs_poa').enable();
       } 
       else{
           this.desBotoneshistorico();
-           this.getBoton('obs_presu').enable();
+           this.getBoton('obs_poa').enable();
           
       }   
       return tb 
      }, 
      liberaMenu:function(){
-        var tb = Phx.vista.SolicitudVbPresupuesto.superclass.liberaMenu.call(this);
+        var tb = Phx.vista.SolicitudVbPoa.superclass.liberaMenu.call(this);
         if(tb){
             this.getBoton('sig_estado').disable();
             this.getBoton('ini_estado').disable();
             this.getBoton('ant_estado').disable();
-             this.getBoton('obs_presu').disable();
+            this.getBoton('obs_poa').disable();
             //boton de reporte de solicitud y preorden de compra
             this.menuAdq.disable();
            

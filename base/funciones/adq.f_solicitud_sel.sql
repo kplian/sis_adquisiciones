@@ -1,3 +1,5 @@
+--------------- SQL ---------------
+
 CREATE OR REPLACE FUNCTION adq.f_solicitud_sel (
   p_administrador integer,
   p_id_usuario integer,
@@ -96,8 +98,13 @@ BEGIN
             END IF;
             
             --la interface de vbpresupuestos mustra todas las solcitudes no importa el funcionario asignado
-            IF  lower(v_parametros.tipo_interfaz) = 'solicitudvbpresupuestos' THEN
+            IF  lower(v_parametros.tipo_interfaz) = 'solicitudvbpresupuestos' and v_historico =  'no' THEN
                  v_filtro = ' (lower(sol.estado)=''vbpresupuestos'' ) and ';
+            END IF;
+            
+            --la interface de vbpresupuestos mustra todas las solcitudes no importa el funcionario asignado
+            IF  lower(v_parametros.tipo_interfaz) = 'solicitudvbpoa' and v_historico =  'no'  THEN
+                 v_filtro = ' (lower(sol.estado)=''vbpoa'' ) and ';
             END IF;
             
             
@@ -120,7 +127,7 @@ BEGIN
                v_strg_sol = 'DISTINCT(sol.id_solicitud)'; 
                v_strg_obs = '''---''::text';
                
-               IF p_administrador =1 THEN
+               IF p_administrador = 1 THEN
               
                   v_filtro = ' (lower(sol.estado)!=''borrador'' ) and ';
               
@@ -196,7 +203,9 @@ BEGIN
                         sol.dias_plazo_entrega,
                         sol.obs_presupuestos,
                         sol.precontrato,
-                        sol.update_enable	
+                        sol.update_enable,
+                        sol.codigo_poa,
+                        sol.obs_poa	
 						from adq.tsolicitud sol
 						inner join segu.tusuario usu1 on usu1.id_usuario = sol.id_usuario_reg
                         

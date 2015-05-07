@@ -1322,7 +1322,32 @@ BEGIN
             return v_resp;
             
 		end;
-        
+    
+    
+    /*********************************    
+ 	#TRANSACCION:  'ADQ_MODOBSPOA_MOD'
+ 	#DESCRIPCION:	Modificar datos de POA
+ 	#AUTOR:		RAC	
+ 	#FECHA:		07-05-2015 12:12:51
+	***********************************/
+
+	elsif(p_transaccion='ADQ_MODOBSPOA_MOD')then
+
+		begin
+			--Sentencia de la modificacion
+			update adq.tsolicitud set
+			obs_poa = v_parametros.obs_poa,
+            codigo_poa = v_parametros.codigo_poa
+			where id_solicitud = v_parametros.id_solicitud;
+               
+			--Definicion de la respuesta
+            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','datos POA modificados'); 
+            v_resp = pxp.f_agrega_clave(v_resp,'id_solicitud',v_parametros.id_solicitud::varchar);
+               
+            --Devuelve la respuesta
+            return v_resp;
+            
+		end;    
         
     else
      

@@ -19,11 +19,9 @@ class MODSolicitud extends MODbase{
 		$this->transaccion='ADQ_SOL_SEL';
 		$this->tipo_procedimiento='SEL';//tipo de transaccion
 		
-		
-		
+			
 		$this->setParametro('id_funcionario_usu','id_funcionario_usu','int4');
-		$this->setParametro('tipo_interfaz','tipo_interfaz','varchar');
-		
+		$this->setParametro('tipo_interfaz','tipo_interfaz','varchar');		
 		$this->setParametro('historico','historico','varchar');
 			
 				
@@ -87,6 +85,10 @@ class MODSolicitud extends MODbase{
 		$this->captura('obs_presupuestos','varchar');
 		$this->captura('precontrato','varchar');
 		$this->captura('update_enable','varchar');
+		$this->captura('codigo_poa','varchar');		
+		$this->captura('obs_poa','varchar');
+		
+		
 		
 		  
 		
@@ -139,7 +141,8 @@ class MODSolicitud extends MODbase{
 		$this->setParametro('fecha_inicio','fecha_inicio','date');
 		$this->setParametro('dias_plazo_entrega','dias_plazo_entrega','integer');
 		$this->setParametro('precontrato','precontrato','varchar');
-		
+		$this->setParametro('codigo_poa','codigo_poa','varchar');		
+		$this->setParametro('obs_poa','obs_poa','varchar');
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -231,6 +234,27 @@ class MODSolicitud extends MODbase{
 		//Devuelve la respuesta
 		return $this->respuesta;
 	}
+	
+	function modificarObsPoa(){
+		//Definicion de variables para ejecucion del procedimiento
+		$this->procedimiento='adq.f_solicitud_ime';
+		$this->transaccion='ADQ_MODOBSPOA_MOD';
+		$this->tipo_procedimiento='IME';
+				
+		//Define los parametros para la funcion
+		$this->setParametro('id_solicitud','id_solicitud','int4');
+		$this->setParametro('obs_poa','obs_poa','varchar');
+		$this->setParametro('codigo_poa','codigo_poa','varchar');
+
+		//Ejecuta la instruccion
+		$this->armarConsulta();
+		$this->ejecutarConsulta();
+
+		//Devuelve la respuesta
+		return $this->respuesta;
+	}
+	
+	
 
 
 	

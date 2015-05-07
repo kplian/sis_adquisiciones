@@ -793,7 +793,7 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
 		'dias_plazo_entrega', 
 		'obs_presupuestos',
 		'precontrato',
-		'update_enable'
+		'update_enable','codigo_poa','obs_poa'
 		
 	],
 	
@@ -816,6 +816,7 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
 		            '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Categoría de compra:&nbsp;&nbsp;</b> {desc_categoria_compra}</p>',
 		            '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Justificación:&nbsp;&nbsp;</b> {justificacion}</p>',
 		            '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Intrucciones:&nbsp;&nbsp;</b> {obs}</p>',
+		            '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>POA:&nbsp;&nbsp;</b> {codigo_poa} - {obs_poa}</p>',
 		            '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Observaciones de área de presupuestos:&nbsp;&nbsp;</b> {obs_presupuestos}</p><br>'
 		            
 		        )

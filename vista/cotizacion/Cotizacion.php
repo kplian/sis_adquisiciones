@@ -122,10 +122,10 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
                 maxLength:200,
                 renderer: function(value,p,record){
                          if(record.data.requiere_contrato=='si'){
-                             return String.format('<b><font color="green"><i class="fa fa-file-o  fa-2x"></i> Si</font></b>', value);
+                             return String.format('<div title="Requiere elaboración de contrato"><b><font color="green"><i class="fa fa-file-o  fa-2x"></i> Si</font></b></div>', value);
                          }
                         else {
-                             return String.format('<b><i class="fa fa-file  fa-2x"></i> No</b>', value);
+                             return String.format('<div title="Solamente requiere orden de compra o servicio"><b><i class="fa fa-file  fa-2x"></i> No</b></div>', value);
                         }
                  }
             },
@@ -142,7 +142,20 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
                 allowBlank: true,
                 anchor: '80%',
                 gwidth: 150,
-                maxLength:200
+                maxLength:200,
+                renderer: function(value,p,record){
+                        if(record.data.correo_oc=='bloqueado'){
+                             return String.format('<div title="Envio de correo con la orden de compra bloqueado"><b><font color="red">{0}</font></b>', value);
+                         }
+                        else if(record.data.correo_oc=='pendiente'){
+                             return String.format('<div title="Acuse de recibo de la OC en espera"><b><font color="orange">{0}</font></b></div>', value);
+                        }
+                        else if(record.data.correo_oc=='acuse'){
+                             return String.format('<div title="Acuse de OC recibido"><b><font color="green">{0}</font></b></div>', value);
+                        }
+                        else{
+                            return String.format('{0}', value);
+                        }}
             },
             type:'TextField',
             filters:{pfiltro:'sol.num_tramite',type:'string'},
@@ -163,7 +176,7 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
                              return String.format('<b><font color="red">{0}</font></b>', value);
                          }
                         else if(record.data.estado=='adjudicado'){
-                             return String.format('<b><font color="green">{0}</font></b>', value);
+                             return String.format('<div title="Esta cotización tiene items adjudicados"><b><font color="green">{0}</font></b></div>', value);
                         }
                         else{
                             return String.format('{0}', value);
@@ -219,7 +232,7 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
                              return String.format('<b><font color="red">{0}</font></b>', record.data['desc_proveedor']);
                          }
                         else if(record.data.estado=='adjudicado'){
-                             return String.format('<b><font color="green">{0}</font></b>', record.data['desc_proveedor']);
+                             return String.format('<div title="Esta cotización tiene items adjudicados"><b><font color="green">{0}</font></b></div>', record.data['desc_proveedor']);
                         }
                         else{
                             return String.format('{0}', record.data['desc_proveedor']);
@@ -245,9 +258,7 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
                              return String.format('<b><font color="red">{0}</font></b>', value);
                          }
                         else if(record.data.estado=='adjudicado'){
-                             return String.format('<b><font color="green">{0}</font></b>', value);
-                         
-                        
+                             return String.format('<div title="Esta cotización tiene items adjudicados"><b><font color="green">{0}</font></b></div>', value);
                         }
                         else{
                             return String.format('{0}', value);
@@ -732,7 +743,7 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
 		{name:'id_obligacion_pago', type: 'numeric'},'tiempo_entrega',
 		'funcionario_contacto',
         'telefono_contacto',
-        'correo_contacto',
+        'correo_contacto', 'correo_oc',
         'prellenar_oferta', 'forma_pago', 'requiere_contrato','total_adjudicado','total_cotizado','total_adjudicado_mb','tiene_form500'
 		
 	],
@@ -743,6 +754,7 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
 	            '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Total Adudicado en Bs:&nbsp;&nbsp;</b> {total_adjudicado_mb}</p>',
 	            '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Funcionario de Contacto:&nbsp;&nbsp;</b> {funcionario_contacto}</p>',
 	            '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Usuario Registro:&nbsp;&nbsp;</b> {usr_reg}</p>',
+	            '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Notificación Orden de compra:&nbsp;&nbsp;</b> {correo_oc}</p>',
 	            '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Obs:&nbsp;&nbsp;</b> {obs}</p><br>'
 	        )
     }),

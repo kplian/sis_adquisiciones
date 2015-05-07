@@ -70,6 +70,7 @@ class MODCotizacion extends MODbase{
 		$this->captura('total_cotizado','numeric');
 		$this->captura('total_adjudicado_mb','numeric');
 		$this->captura('tiene_form500','varchar');
+		$this->captura('correo_oc','varchar');
 		
 		
 		
