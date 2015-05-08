@@ -740,7 +740,7 @@ BEGIN
                        
                        --OJO ...  si requiere contrato no regrsa el RPC en otro caso regresa
                        
-                        IF(v_requiere_contrato = 'si' ) THEN
+                        IF(v_requiere_contrato = 'si' or v_instruc_rpc in ('Orden de Bien/Servicio')) THEN
                        
                        
                              --obtenemos el estado siguiente
