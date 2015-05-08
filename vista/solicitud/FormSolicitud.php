@@ -555,14 +555,14 @@ Phx.vista.FormSolicitud=Ext.extend(Phx.frmInterfaz,{
     arrayStore :{
                     'Bien':[
                                 ['bien','Bienes'],
-                                ['inmueble','Inmuebles'],
-                                ['vehiculo','Vehiculos']
+                                //['inmueble','Inmuebles'],
+                                //['vehiculo','Vehiculos']
                      ],	
                      'Servicio':[
                                 ['servicio','Servicios'],
                                 ['consultoria_personal','Consultoria de Personas'],
                                 ['consultoria_empresa','Consultoria de Empresas'],
-                                ['alquiler_inmueble','Alquiler Inmuebles']
+                                //['alquiler_inmueble','Alquiler Inmuebles']
                      ]
     },
 	Atributos:[
@@ -690,7 +690,7 @@ Phx.vista.FormSolicitud=Ext.extend(Phx.frmInterfaz,{
 					fields: ['id_categoria_compra', 'nombre', 'codigo'],
 					// turn on remote sorting
 					remoteSort: true,
-					baseParams: {par_filtro: 'catcomp.nombre#catcomp.codigo', codigo_subsistema:'ADQ'}
+					baseParams: { par_filtro: 'catcomp.nombre#catcomp.codigo', codigo_subsistema: 'ADQ'}
 				}),
 				valueField: 'id_categoria_compra',
 				displayField: 'nombre',

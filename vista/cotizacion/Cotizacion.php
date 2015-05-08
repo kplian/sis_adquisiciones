@@ -789,7 +789,7 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
 		        var rec=this.sm.getSelected();
                 if (rec.data.requiere_contrato == 'no'){
 	                 //si no tiene numero de orden compra generamos 
-	                if(!rec.data.numero_oc || rec.data.numero_oc == '' ){
+	                if(!rec.data.numero_oc || rec.data.numero_oc == '' || rec.data.numero_oc == 'S/N'){
 		                Phx.CP.loadingShow();
 		                Ext.Ajax.request({
 		                    url:'../../sis_adquisiciones/control/Cotizacion/generarNumOC',

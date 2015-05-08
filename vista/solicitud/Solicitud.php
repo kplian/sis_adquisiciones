@@ -100,14 +100,14 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
 	arrayStore :{
                     'Bien':[
                                 ['bien','Bienes'],
-                                ['inmueble','Inmuebles'],
-                                ['vehiculo','Vehiculos']
+                                //['inmueble','Inmuebles'],
+                                //['vehiculo','Vehiculos']
                      ],	
                      'Servicio':[
                                 ['servicio','Servicios'],
                                 ['consultoria_personal','Consultoria de Personas'],
                                 ['consultoria_empresa','Consultoria de Empresas'],
-                                ['alquiler_inmueble','Alquiler Inmuebles']
+                                //['alquiler_inmueble','Alquiler Inmuebles']
                      ]
     },
 	Atributos:[
