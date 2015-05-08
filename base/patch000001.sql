@@ -629,6 +629,10 @@ ALTER TABLE adq.tcotizacion
 COMMENT ON COLUMN adq.tcotizacion.correo_oc
 IS 'valores ninguno, bloqueado, pendiente, acuse';
 
+/***********************************F-RAC-RAC-ADQ-0-06/05/2015****************************************/
+
+
+/***********************************I-RAC-RAC-ADQ-0-07/05/2015****************************************/
 
 ALTER TABLE adq.tsolicitud
   ADD COLUMN codigo_poa VARCHAR;
@@ -636,17 +640,10 @@ ALTER TABLE adq.tsolicitud
 COMMENT ON COLUMN adq.tsolicitud.codigo_poa
 IS 'para cruzar con las actividades de POA';
 
-
---------------- SQL ---------------
-
 ALTER TABLE adq.tsolicitud
   ADD COLUMN obs_poa VARCHAR;
 
 COMMENT ON COLUMN adq.tsolicitud.obs_poa
 IS 'Observacion en bisto bueno POA';
 
-
-
-/***********************************F-RAC-RAC-ADQ-0-06/05/2015****************************************/
-
-
+/***********************************F-RAC-RAC-ADQ-0-07/05/2015****************************************/
