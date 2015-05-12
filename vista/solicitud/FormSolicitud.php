@@ -773,7 +773,7 @@ Phx.vista.FormSolicitud=Ext.extend(Phx.frmInterfaz,{
                 name: 'correo_proveedor',
                 fieldLabel: 'Email Proveedor',
                 qtip: 'El correo del proveedor es necesario para el envió de notificaciones (como la orden de compra o invitación), asegúrese de que sea el correcto',
-                allowBlank: false                
+                allowBlank: true                
             },
             type: 'TextField',
             id_grupo: 0,

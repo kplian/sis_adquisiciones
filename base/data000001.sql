@@ -831,8 +831,8 @@ select pxp.f_insert_testructura_gui ('VBSOLP', 'ADQ');
 /***********************************I-DAT-RAC-ADQ-0-04/02/2015*****************************************/
 
 
-INSERT INTO pxp.variable_global ("id_variable_global", "variable", "valor", "descripcion")
-VALUES (15, E'adq_aprobacion', E'gerencia', E'aprobaciones: gerencia o presupuesto,  para determinar si aprueban solo genretens o dueños de presupeustos');
+INSERT INTO pxp.variable_global ( "variable", "valor", "descripcion")
+VALUES ( E'adq_aprobacion', E'gerencia', E'aprobaciones: gerencia o presupuesto,  para determinar si aprueban solo genretens o dueños de presupeustos');
 
 /***********************************F-DAT-RAC-ADQ-0-04/02/2015*****************************************/
 
