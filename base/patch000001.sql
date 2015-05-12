@@ -639,6 +639,6 @@ ALTER TABLE adq.tsolicitud
   ADD COLUMN obs_poa VARCHAR;
 
 COMMENT ON COLUMN adq.tsolicitud.obs_poa
-IS 'Observacion en bisto bueno POA';
+IS 'Observacion en visto bueno POA';
 
 /***********************************F-SCP-RAC-ADQ-0-08/05/2015****************************************/

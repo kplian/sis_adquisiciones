@@ -813,7 +813,7 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
 		                    	Phx.CP.loadingHide();
 		                        alert("timeout");
 		                    },
-		                    scope:this
+		                    scope: this
 		                });	
 	                }
 	                else{
