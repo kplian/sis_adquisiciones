@@ -1028,7 +1028,7 @@ Phx.vista.FormSolicitud=Ext.extend(Phx.frmInterfaz,{
     		arra[i].precio_sg = 0.0; 
 		}
    	    me.argumentExtraSubmit = { 'json_new_records': Ext.encode(arra) };
-   	    if( i > 0){
+   	    if( i > 0 &&  !this.editorDetail.isVisible()){
    	    	 Phx.vista.FormSolicitud.superclass.onSubmit.call(this,o);
    	    }
    	    else{
