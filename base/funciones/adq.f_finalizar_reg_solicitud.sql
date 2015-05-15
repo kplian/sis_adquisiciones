@@ -126,7 +126,7 @@ p_hstore->'id_solicitud'
           
         --buscamos siguiente estado correpondiente al proceso del WF 
       
-        
+          
      
         
         SELECT  
@@ -229,6 +229,11 @@ p_hstore->'id_solicitud'
             
             IF v_num_estados = 1 then
                     -- si solo hay un estado,  verificamos si tiene mas de un funcionario por este estado
+                   
+                   
+                    
+          
+          
                    SELECT 
                    *
                     into
@@ -261,7 +266,7 @@ p_hstore->'id_solicitud'
                                    desc_funcionario_cargo text,
                                    prioridad integer);
                         ELSE
-                            raise exception 'El estado solo puede tener un funcionario registrado %', va_id_tipo_estado;
+                            raise exception 'El estado % , solo puede tener un funcionario registrado id =  %', va_codigo_estado,  va_id_tipo_estado;
                         END IF;  
           
           ELSE
@@ -272,7 +277,7 @@ p_hstore->'id_solicitud'
             
         END IF;
         
-       
+         
           
           --cambiamos estado de la solicitud
          

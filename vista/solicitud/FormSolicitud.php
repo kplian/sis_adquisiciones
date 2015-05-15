@@ -883,12 +883,22 @@ Phx.vista.FormSolicitud=Ext.extend(Phx.frmInterfaz,{
             	
             	if(!record.data.id_lugar){
             		alert('El funcionario no tiene oficina definida');
+            		return
             	}
             	
             	this.Cmp.id_depto.reset();
             	this.Cmp.id_depto.store.baseParams.id_lugar = record.data.id_lugar;
             	this.Cmp.id_depto.modificado = true;
             	this.Cmp.id_depto.enable();
+            	
+            	this.Cmp.id_depto.store.load({params:{start:0,limit:this.tam_pag}, 
+		           callback : function (r) {
+		                if (r.length == 1 ) {                       
+		                    this.Cmp.id_depto.setValue(r[0].data.id_depto);
+		                }    
+		                                
+		            }, scope : this
+		        });
             	
             	
             }, this);
@@ -982,7 +992,7 @@ Phx.vista.FormSolicitud=Ext.extend(Phx.frmInterfaz,{
 	    	}, scope : this
 	    });
 	    
-	    
+	    /*
 	    this.Cmp.id_depto.store.load({params:{start:0,limit:this.tam_pag}, 
            callback : function (r) {
                 if (r.length == 1 ) {                       
@@ -990,14 +1000,14 @@ Phx.vista.FormSolicitud=Ext.extend(Phx.frmInterfaz,{
                 }    
                                 
             }, scope : this
-        });
+        });*/
 	    
 	    
 	    this.Cmp.id_funcionario.store.load({params:{start:0,limit:this.tam_pag}, 
 	       callback : function (r) {
 	       		if (r.length == 1 ) {	       				
 	    			this.Cmp.id_funcionario.setValue(r[0].data.id_funcionario);
-	    			this.Cmp.id_funcionario.fireEvent('select', r[0]);
+	    			this.Cmp.id_funcionario.fireEvent('select', this.Cmp.id_funcionario, r[0]);
 	    		}    
 	    			    		
 	    	}, scope : this
@@ -1018,7 +1028,7 @@ Phx.vista.FormSolicitud=Ext.extend(Phx.frmInterfaz,{
     		arra[i].precio_sg = 0.0; 
 		}
    	    me.argumentExtraSubmit = { 'json_new_records': Ext.encode(arra) };
-   	    if( i > 0){
+   	    if( i > 0 &&  !this.editorDetail.isVisible()){
    	    	 Phx.vista.FormSolicitud.superclass.onSubmit.call(this,o);
    	    }
    	    else{

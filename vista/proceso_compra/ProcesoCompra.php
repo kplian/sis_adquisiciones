@@ -14,13 +14,14 @@ Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
     gruposBarraTareas:[{name:'pendientes',title:'<H1 align="center"><i class="fa fa-thumbs-o-down"></i> Pendientes</h1>',grupo:0,height:0},
                        {name:'iniciados',title:'<H1 align="center"><i class="fa fa-eye"></i> Iniciados</h1>',grupo:1,height:0},
                        {name:'en pago',title:'<H1 align="center"><i class="fa fa-credit-card"></i> En Pago</h1>',grupo:2,height:0},
+                       {name:'anulados',title:'<H1 align="center"><i class="fa fa-bell-o"></i> Anulados</h1>',grupo:2,height:0},
                        {name:'finalizados',title:'<H1 align="center"><i class="fa fa-thumbs-o-up"></i> Finalizados</h1>',grupo:3,height:0}],
 	
-    beditGroups: [0,1,2],
-    bdelGroups:  [0,1,2],
-    bactGroups:  [0,1,2,3],
+    beditGroups: [0,1,2,3],
+    bdelGroups:  [0,1,2,3],
+    bactGroups:  [0,1,2,3,4],
     btestGroups: [0],
-    bexcelGroups: [0,1,2,3],
+    bexcelGroups: [0,1,2,3,4],
     
     actualizarSegunTab: function(name, indice){
     	this.store.baseParams.estado = name;
