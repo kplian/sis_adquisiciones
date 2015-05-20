@@ -24,8 +24,10 @@ Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
     bexcelGroups: [0,1,2,3,4],
     
     actualizarSegunTab: function(name, indice){
-    	this.store.baseParams.estado = name;
-    	this.load({params:{start:0, limit:50}});
+    	if(this.finCons){
+    		 this.store.baseParams.estado = name;
+    	     this.load({params:{start:0, limit:this.tam_pag}});
+         }
     },
     
     stateId:'ProcesoCompra',
@@ -59,8 +61,9 @@ Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
            this.store.baseParams.filtro_campo = config.filtro_directo.campo;
         }
         this.store.baseParams.estado = 'pendientes'
-        //this.load({params:{start:0, limit:this.tam_pag}});
+        this.load({params:{start:0, limit:this.tam_pag}});
 	    this.iniciarEventos();
+	    this.finCons = true;
 	
 	},
 	

@@ -30,7 +30,17 @@ class ACTSolicitud extends ACTbase{
         if($this->objParam->getParametro('estado')!=''){
             $this->objParam->addFiltro("sol.estado = ''".$this->objParam->getParametro('estado')."''");
         }
-        
+
+        if($this->objParam->getParametro('pes_estado')=='borrador'){
+             $this->objParam->addFiltro("sol.estado in (''borrador'')");
+        }
+        if($this->objParam->getParametro('pes_estado')=='proceso'){
+             $this->objParam->addFiltro("sol.estado not in (''borrador'',''finalizado'',''anulado'')");
+        }
+        if($this->objParam->getParametro('pes_estado')=='finalizados'){
+             $this->objParam->addFiltro("sol.estado in (''finalizado'',''anulado'')");
+        }
+
         if($this->objParam->getParametro('filtro_aprobadas')==1){
              $this->objParam->addFiltro("(sol.estado = ''aprobado'' or  sol.estado = ''proceso'')");
         }
@@ -41,7 +51,7 @@ class ACTSolicitud extends ACTbase{
          
         if($this->objParam->getParametro('filtro_campo')!=''){
             $this->objParam->addFiltro($this->objParam->getParametro('filtro_campo')." = ".$this->objParam->getParametro('filtro_valor'));  
-       }
+        }
 		
 		 //var_dump($_SESSION["ss_id_funcionario"]);
 		
