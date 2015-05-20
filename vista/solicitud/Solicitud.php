@@ -29,12 +29,13 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
             tooltip : '<b>Reporte Solicitud de Compra</b><br/><b>Reporte Solicitud de Compra</b>'
        }); */
   
-        this.addButton('diagrama_gantt',{ text:'Gantt', iconCls: 'bgantt', disabled:true, handler: diagramGantt, tooltip: '<b>Diagrama Gantt de proceso macro</b>'});
+        this.addButton('diagrama_gantt',{ grupo:[0,1,2],text:'Gantt', iconCls: 'bgantt', disabled:true, handler: diagramGantt, tooltip: '<b>Diagrama Gantt de proceso macro</b>'});
   
 	 
         this.addButton('btnChequeoDocumentosWf',
             {
                 text: 'Documentos',
+                grupo:[0,1,2],
                 iconCls: 'bchecklist',
                 disabled: true,
                 handler: this.loadCheckDocumentosSolWf,
@@ -44,6 +45,7 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
         
         this.addButton('btnObs',{
                     text :'Obs Wf',
+                    grupo:[0,1,2],
                     iconCls : 'bchecklist',
                     disabled: true,
                     handler : this.onOpenObs,
@@ -60,10 +62,10 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
 			Ext.Ajax.request({
 				url:'../../sis_workflow/control/ProcesoWf/diagramaGanttTramite',
 				params:{'id_proceso_wf':data},
-				success:this.successExport,
+				success: this.successExport,
 				failure: this.conexionFailure,
-				timeout:this.timeout,
-				scope:this
+				timeout: this.timeout,
+				scope: this
 			});			
 		}
 	},

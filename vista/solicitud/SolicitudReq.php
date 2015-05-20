@@ -16,6 +16,22 @@ Phx.vista.SolicitudReq = {
 	nombreVista: 'solicitudReq',
 	//layoutType: 'wizard',
 	
+	gruposBarraTareas:[{name:'borrador',title:'<H1 align="center"><i class="fa fa-thumbs-o-down"></i> Borradores</h1>',grupo:0,height:0},
+                       {name:'proceso',title:'<H1 align="center"><i class="fa fa-eye"></i> Iniciados</h1>',grupo:1,height:0},
+                       {name:'finalizados',title:'<H1 align="center"><i class="fa fa-thumbs-o-up"></i> Finalizados</h1>',grupo:2,height:0}],
+	
+	actualizarSegunTab: function(name, indice){
+    	if(this.finCons){
+    		 this.store.baseParams.pes_estado = name;
+    	     this.load({params:{start:0, limit:this.tam_pag}});
+    	   }
+    },
+	beditGroups: [0],
+    bdelGroups:  [0],
+    bactGroups:  [0,1,2],
+    btestGroups: [0],
+    bexcelGroups: [0,1,2],
+    
 	constructor: function(config) {
 		
 		    this.Atributos[this.getIndAtributo('tipo')].form=true; 
@@ -35,8 +51,8 @@ Phx.vista.SolicitudReq = {
 		
 		
     		Phx.vista.SolicitudReq.superclass.constructor.call(this,config);
-    		this.addButton('fin_requerimiento',{ text:'Finalizar', iconCls: 'badelante', disabled: true, handler: this.fin_requerimiento, tooltip: '<b>Finalizar</b>'});
-            this.addButton('btnSolpre',{ text:'Sol Pre.',iconCls: 'bemail', disabled: true, handler: this.onSolModPresupuesto, tooltip: '<b>Solicitar Presuuesto</b><p>Emite un correo para solicitar traspaso presupuestario</p>'});
+    		this.addButton('fin_requerimiento',{ grupo:[0],text:'Finalizar', iconCls: 'badelante', disabled: true, handler: this.fin_requerimiento, tooltip: '<b>Finalizar</b>'});
+            this.addButton('btnSolpre',{ grupo:[0,],text:'Sol Pre.',iconCls: 'bemail', disabled: true, handler: this.onSolModPresupuesto, tooltip: '<b>Solicitar Presuuesto</b><p>Emite un correo para solicitar traspaso presupuestario</p>'});
        
         
             this.iniciarEventos();
@@ -132,8 +148,11 @@ Phx.vista.SolicitudReq = {
            this.store.baseParams.filtro_valor = config.filtro_directo.valor;
            this.store.baseParams.filtro_campo = config.filtro_directo.campo;
         }
-		this.load({params:{start:0, limit:this.tam_pag}});
+		//primera carga
+		this.store.baseParams.pes_estado = 'borrador';
+    	this.load({params:{start:0, limit:this.tam_pag}});
 		
+		this.finCons = true;
 		
 	},
     

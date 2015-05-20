@@ -57,8 +57,8 @@ BEGIN
      	on te.id_tipo_proceso = tp.id_tipo_proceso
      inner join wf.tproceso_wf p
      	on p.id_tipo_proceso = tp.id_tipo_proceso
-     where te.codigo = 'pendiente_asignacion' and p.id_proceso_wf = p_id_proceso_wf and te.estado_reg = 'activo';
-     
+     where te.codigo = 'revision' and p.id_proceso_wf = p_id_proceso_wf and te.estado_reg = 'activo';
+    
      
      /*Insertar el contrato con el ultimo estado*/
      INSERT INTO 
@@ -119,7 +119,7 @@ BEGIN
 
 	 update leg.tcontrato
      set id_estado_wf = v_id_estado_registro,
-     estado = 'pendiente_asignacion'
+     estado = 'revision'
      where id_proceso_wf = p_id_proceso_wf;
     return true;
     

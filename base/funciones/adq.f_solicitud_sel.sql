@@ -40,6 +40,8 @@ DECLARE
     v_inner            varchar;
     v_strg_sol         varchar;
     v_strg_obs         varchar;
+    v_exception_detail   varchar;
+    v_exception_context    varchar;
 BEGIN
 
 	v_nombre_funcion = 'adq.f_solicitud_sel';
@@ -59,6 +61,8 @@ BEGIN
      				
     	begin
           --si es administrador
+          
+           
             
             v_filtro='';
             if (v_parametros.id_funcionario_usu is null) then
@@ -86,13 +90,10 @@ BEGIN
             
                        
                 IF p_administrador !=1 THEN
-                
-                              
-                    v_filtro = ' (ew.id_funcionario='||v_parametros.id_funcionario_usu::varchar||' ) and  (lower(sol.estado)!=''borrador'') and ';
-                  ELSE
+                  v_filtro = ' (ew.id_funcionario='||v_parametros.id_funcionario_usu::varchar||' ) and  (lower(sol.estado)!=''borrador'') and (lower(sol.estado)!=''proceso'' ) and ';
+                ELSE
                     v_filtro = ' (lower(sol.estado)!=''borrador''  and lower(sol.estado)!=''proceso'' and lower(sol.estado)!=''finalizado'') and ';
-                  
-                 END IF;
+                END IF;
                 
                 
             END IF;
@@ -230,7 +231,7 @@ BEGIN
 			v_consulta:=v_consulta||v_parametros.filtro;
 			v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
  
-             raise notice '%',v_consulta;
+             --raise exception '%',v_consulta;
 			--Devuelve la respuesta
 			return v_consulta;
 						
@@ -598,11 +599,13 @@ BEGIN
 EXCEPTION
 					
 	WHEN OTHERS THEN
+    
+                
 			v_resp='';
 			v_resp = pxp.f_agrega_clave(v_resp,'mensaje',SQLERRM);
 			v_resp = pxp.f_agrega_clave(v_resp,'codigo_error',SQLSTATE);
 			v_resp = pxp.f_agrega_clave(v_resp,'procedimientos',v_nombre_funcion);
-			raise exception '%',v_resp;
+            raise exception '%',v_resp;
 END;
 $body$
 LANGUAGE 'plpgsql'
