@@ -183,8 +183,21 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
 				fieldLabel: 'estado',
 				allowBlank: true,
 				anchor: '80%',
-				gwidth: 100,
-				maxLength:50
+				gwidth: 115,
+				maxLength:50,
+				renderer:function(value_ori,p,record){
+                        
+                        var value = value_ori;
+                        if(value_ori == 'pagado'){
+                        	value = 'contabilizado '
+                        }
+                        
+                        if(record.data.contador_estados > 1){
+                             return String.format('<div title="Número de revisiones: {1}"><b><font color="red">{0} - ({1})</font></b></div>', value, record.data.contador_estados);
+                         }
+                          else{
+                            return String.format('<div title="Número de revisiones: {1}">{0} - ({1})</div>', value, record.data.contador_estados);
+                        }}
 			},
 			type:'TextField',
 			filters:{pfiltro:'sol.estado',type:'string'},
@@ -795,7 +808,7 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
 		'dias_plazo_entrega', 
 		'obs_presupuestos',
 		'precontrato',
-		'update_enable','codigo_poa','obs_poa'
+		'update_enable','codigo_poa','obs_poa','contador_estados'
 		
 	],
 	

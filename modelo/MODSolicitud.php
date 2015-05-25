@@ -87,6 +87,7 @@ class MODSolicitud extends MODbase{
 		$this->captura('update_enable','varchar');
 		$this->captura('codigo_poa','varchar');		
 		$this->captura('obs_poa','varchar');
+		$this->captura('contador_estados','bigint');
 		
 		
 		

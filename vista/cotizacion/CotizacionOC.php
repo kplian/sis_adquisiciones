@@ -42,7 +42,7 @@ Phx.vista.CotizacionOC = {
         
        this.addButton('btnHabPago',{text:'Habilitar Pago',iconCls: 'bcharge',disabled:false,handler:this.sigEstado,tooltip: '<b>Pasar al Siguiente Estado</b>'});
        this.addButton('btnSendMail',{text:'Sol Cotizacion',iconCls: 'bemail',disabled:true,handler:this.onSendMail,tooltip: '<b>Solictar Cotizacion</b><p>Solicta la cotizacion por correo al proveedor</p>'});
-       this.addButton('btnSolCon',{text:'Hab. Contr.',iconCls: 'bemail',disabled:true,handler:this.onSolContrato,tooltip: '<b>HAbilitar Contrato</b><p>si tiene habilitado los contratos en esta cotización, antes de armar el plan de pago pasara al área legal</p>'});
+       this.addButton('btnSolCon',{text:'Hab. Contr.',iconCls: 'bemail',disabled:true,handler:this.onSolContrato,tooltip: '<b>Habilitar Contrato</b><p>si se tiene habilitado el  contrato en esta cotización, antes de armar el plan de pago pasara al área legal</p>'});
        this.addButton('btnPreing',{
                     text :'Preingreso',
                     iconCls : 'bchecklist',
@@ -491,7 +491,7 @@ Phx.vista.CotizacionOC = {
                      
                    }
                    
-                   if(data['estado']=='adjudicado'){
+                   if(data['estado']=='adjudicado' || data['estado']=='cotizado'){
                      this.getBoton('btnSolCon').enable();
                    }
                    else{

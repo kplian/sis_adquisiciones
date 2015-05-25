@@ -29,6 +29,8 @@ DECLARE
     v_monto_ejecutar_mo  numeric;
     v_estado_anterior varchar;
     v_sw_presu_comprometido varchar;
+    v_total_soli		numeric;
+    v_tope_compra 		numeric;
    
 	
     
@@ -82,6 +84,41 @@ BEGIN
       -- comprometer presupuesto cuando el estado anterior es el vbpresupuestos)
              IF v_estado_anterior =  'vbpresupuestos'  and v_registros.presu_comprometido = 'no' THEN 
 
+               -- como en presupeustos puede mover los montos validamos que nose pase del monto tope
+                   select 
+                      sum( COALESCE( sd.precio_ga_mb,0)  + COALESCE(sd.precio_sg_mb,0)) 
+                    into  
+                      v_total_soli
+                    from adq.tsolicitud_det sd
+                    where sd.id_solicitud = v_registros.id_solicitud
+                    and sd.estado_reg = 'activo';
+                  
+                  v_total_soli =  COALESCE(v_total_soli,0);
+                  
+                  
+                  IF  v_total_soli = 0  THEN
+                    raise exception ' La Solicitud  tiene que ser por un valor mayor a 0';
+                  END IF;
+                  
+                  
+                  
+                  -- validamos que el monsto de la oslicitud no supere el tope configurado
+                  
+                  v_tope_compra = pxp.f_get_variable_global('adq_tope_compra')::numeric; 
+                  
+                  
+                  
+                  --IF  v_total_soli::numeric  >= v_tope_compra::numeric  THEN
+                  
+                  IF  v_total_soli  >= v_tope_compra  THEN
+                  
+                    raise exception 'Las compras por encima de % (moneda base) no pueden realizarse  por el sistema de adquisiciones',v_tope_compra;
+                  
+                  END IF;
+              
+              
+              
+              
               -- Comprometer Presupuesto
               
               
