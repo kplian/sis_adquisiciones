@@ -89,8 +89,8 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
                 scope: this
             }, {
                 id:'b-btnRepOC-' + this.idContenedor,
-                text: 'PreOrden de Compra',
-                tooltip: '<b>Reporte de PreOrden de Compra</b>',
+                text: 'Pre-orden de Compra',
+                tooltip: '<b>Reporte de Pre-orden de Compra</b>',
                 handler:this.onButtonRepOC,
                 scope: this
             }
