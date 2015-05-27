@@ -114,7 +114,7 @@ BEGIN
                                                          p_id_usuario,
                                                          p_id_usuario_ai,
                                                          p_usuario_ai,
-                                                         NULL,
+                                                         31,
                                                          'Paso de estado automatico por proceso de adquisiciones'); 
 
 	 update leg.tcontrato

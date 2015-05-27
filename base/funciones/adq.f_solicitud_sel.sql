@@ -206,10 +206,13 @@ BEGIN
                         sol.precontrato,
                         sol.update_enable,
                         sol.codigo_poa,
-                        sol.obs_poa	
+                        sol.obs_poa,
+                        (select count(*)
+                             from unnest(id_tipo_estado_wfs) elemento
+                             where elemento = ew.id_tipo_estado) as contador_estados	
 						from adq.tsolicitud sol
 						inner join segu.tusuario usu1 on usu1.id_usuario = sol.id_usuario_reg
-                        
+                        inner join wf.tproceso_wf pwf on pwf.id_proceso_wf = sol.id_proceso_wf
                         inner join orga.vfuncionario fun on fun.id_funcionario = sol.id_funcionario
                         inner join orga.tuo uo on uo.id_uo = sol.id_uo
                         inner join param.tmoneda mon on mon.id_moneda = sol.id_moneda

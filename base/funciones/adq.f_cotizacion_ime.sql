@@ -982,7 +982,7 @@ BEGIN
            v_registros
           from adq.tcotizacion cot
           inner join adq.tproceso_compra pro on pro.id_proceso_compra = cot.id_proceso_compra
-          inner join adq.tsolicitud sol on sol.id_solicitud = pro.id_proceso_compra
+          inner join adq.tsolicitud sol on sol.id_solicitud = pro.id_solicitud
           inner join adq.tcategoria_compra cat on cat.id_categoria_compra = sol.id_categoria_compra
           where cot.id_cotizacion = v_parametros.id_cotizacion;
         

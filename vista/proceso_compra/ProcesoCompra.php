@@ -13,15 +13,18 @@ header("content-type: text/javascript; charset=UTF-8");
 Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
     gruposBarraTareas:[{name:'pendientes',title:'<H1 align="center"><i class="fa fa-thumbs-o-down"></i> Pendientes</h1>',grupo:0,height:0},
                        {name:'iniciados',title:'<H1 align="center"><i class="fa fa-eye"></i> Iniciados</h1>',grupo:1,height:0},
-                       {name:'en pago',title:'<H1 align="center"><i class="fa fa-credit-card"></i> En Pago</h1>',grupo:2,height:0},
-                       {name:'anulados',title:'<H1 align="center"><i class="fa fa-bell-o"></i> Anulados</h1>',grupo:2,height:0},
-                       {name:'finalizados',title:'<H1 align="center"><i class="fa fa-thumbs-o-up"></i> Finalizados</h1>',grupo:3,height:0}],
+                       {name:'contrato',title:'<H1 align="center"><i class="fa fa-file-o"></i> Para Contrato</h1>',grupo:2,height:0},
+                       
+                       {name:'en pago',title:'<H1 align="center"><i class="fa fa-credit-card"></i> En Pago</h1>',grupo:3,height:0},
+                       
+                       {name:'anulados',title:'<H1 align="center"><i class="fa fa-bell-o"></i> Anulados</h1>',grupo:4,height:0},
+                       {name:'finalizados',title:'<H1 align="center"><i class="fa fa-thumbs-o-up"></i> Finalizados</h1>',grupo:5,height:0}],
 	
-    beditGroups: [0,1,2,3],
+    beditGroups: [0,1,2,3,4],
     bdelGroups:  [0,1,2,3],
-    bactGroups:  [0,1,2,3,4],
+    bactGroups:  [0,1,2,3,4,5],
     btestGroups: [0],
-    bexcelGroups: [0,1,2,3,4],
+    bexcelGroups: [0,1,2,3,4,5],
     
     actualizarSegunTab: function(name, indice){
     	if(this.finCons){
@@ -47,12 +50,12 @@ Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
             tooltip : '<b> Solicitud</b><br/><b>Reporte de Solicitud de Compra</b>'
         });
         
-		this.addButton('btnCotizacion',{grupo:[0,1,2,3], text :'Cotizacion',iconCls:'bdocuments',disabled: true, handler : this.onButtonCotizacion,tooltip : '<b>Cotizacion de solicitud de Compra</b><br/><b>Cotizacion de solicitud de Compra</b>'});
-  		this.addButton('btnChequeoDocumentos',{grupo:[0,1,2,3], text: 'Documentos',iconCls: 'bchecklist',disabled: true,handler: this.loadCheckDocumentosSol,tooltip: '<b>Documentos del Proceso</b><br/>Subir los documetos requeridos en el proceso seleccionada.'});
-        this.addButton('btnCuadroComparativo',{grupo:[0,1,2,3], text :'Cuadro Comparativo',iconCls : 'bexcel',disabled: true,handler : this.onCuadroComparativo,tooltip : '<b>Cuadro Comparativo</b><br/><b>Cuadro Comparativo de Cotizaciones</b>'});
-	    this.addButton('btnRevePres',{grupo:[0,1,2], text:'Rev. Pre.',iconCls: 'balert',disabled:true,handler:this.onBtnRevPres,tooltip: '<b>Revertir Presupuesto</b> Revierte todo el presupuesto no adjudicado para la solicitud.'});
+		this.addButton('btnCotizacion',{grupo:[0,1,2,3,4], text :'Cotizacion',iconCls:'bdocuments',disabled: true, handler : this.onButtonCotizacion,tooltip : '<b>Cotizacion de solicitud de Compra</b><br/><b>Cotizacion de solicitud de Compra</b>'});
+  		this.addButton('btnChequeoDocumentos',{grupo:[0,1,2,3,4], text: 'Documentos',iconCls: 'bchecklist',disabled: true,handler: this.loadCheckDocumentosSol,tooltip: '<b>Documentos del Proceso</b><br/>Subir los documetos requeridos en el proceso seleccionada.'});
+        this.addButton('btnCuadroComparativo',{grupo:[0,1,2,3,4], text :'Cuadro Comparativo',iconCls : 'bexcel',disabled: true,handler : this.onCuadroComparativo,tooltip : '<b>Cuadro Comparativo</b><br/><b>Cuadro Comparativo de Cotizaciones</b>'});
+	    this.addButton('btnRevePres',{grupo:[0,1,2,3], text:'Rev. Pre.',iconCls: 'balert',disabled:true,handler:this.onBtnRevPres,tooltip: '<b>Revertir Presupuesto</b> Revierte todo el presupuesto no adjudicado para la solicitud.'});
         this.addButton('btnFinPro',{grupo:[2], text:'Fin Proc.',iconCls: 'balert',disabled:true,handler:this.onBtnFinPro,tooltip: '<b>Finzalizar Proceso</b> Finaliza el proceso y la solicitud y revierte el presupuesto. No  puede deshacerse'});
-        this.addButton('diagrama_gantt',{grupo:[0,1,2,3], text:'Diagrama Gantt',iconCls: 'bgantt',disabled:true,handler:this.diagramGantt,tooltip: '<b>Diagrama Gantt de proceso macro</b>'});
+        this.addButton('diagrama_gantt',{grupo:[0,1,2,3,4,5], text:'Diagrama Gantt',iconCls: 'bgantt',disabled:true,handler:this.diagramGantt,tooltip: '<b>Diagrama Gantt de proceso macro</b>'});
         
         this.store.baseParams={};
         //coloca filtros para acceso directo si existen
