@@ -642,3 +642,5 @@ COMMENT ON COLUMN adq.tsolicitud.obs_poa
 IS 'Observacion en visto bueno POA';
 
 /***********************************F-SCP-RAC-ADQ-0-08/05/2015****************************************/
+
+

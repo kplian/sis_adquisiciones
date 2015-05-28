@@ -5452,6 +5452,10 @@ AS
 /***********************************I-DEP-RAC-ADQ-0-12/05/2015*****************************************/
 
 
+/***********************************F-DEP-RAC-ADQ-0-12/05/2015*****************************************/
+
+
+/***********************************I-DEP-RAC-ADQ-0-27/05/2015*****************************************/
 
 CREATE OR REPLACE VIEW adq.vsolicitud_compra(
     id_solicitud,
@@ -5515,10 +5519,11 @@ AS
    <TH>Detalle</TH> 
    <TH>Cantidad</TH>
    <TH>P / U ('::text || mon.codigo::text) || ')</TH>'::text) || pxp.html_rows((
-     ((((((('<td>'::text || ci.desc_ingas::text) || '</td> <td>'::text) ||
-     sd.descripcion) || '</td> <td>'::text) || sd.cantidad) || '</td> <td>'::
-     text) || round(sd.precio_unitario_mb, 2)) || '</td> '::text)::character
-     varying)::text) || '</table>'::text AS detalle,
+     ((((((('<td>'::text || COALESCE(ci.desc_ingas::text, '-'::text)) ||
+     '</td> <td>'::text) || COALESCE(sd.descripcion, '-'::text)) || '</td> <td>'
+     ::text) || COALESCE(sd.cantidad::text, '-'::text)) || '</td> <td>'::text)
+     || COALESCE(round(sd.precio_unitario, 2)::text, '-'::text)) || '</td> '::
+     text)::character varying)::text) || '</table>'::text AS detalle,
          fun.desc_funcionario1,
          uo.codigo AS codigo_uo,
          uo.nombre_unidad,
@@ -5528,7 +5533,8 @@ AS
          fun.nombre_unidad AS nombre_unidad_cargo,
          fun.email_empresa,
          usu.desc_persona AS desc_usuario,
-         COALESCE(sol.id_funcionario_supervisor, 0) AS id_funcionario_supervisor,
+         COALESCE(sol.id_funcionario_supervisor, 0) AS id_funcionario_supervisor
+  ,
          COALESCE(sol.id_funcionario_aprobador, 0) AS id_funcionario_aprobador,
          dep.prioridad,
          dep.nombre AS nombre_depto,
@@ -5580,8 +5586,6 @@ AS
            dep.prioridad,
            dep.nombre,
            sol.id_funcionario_rpc;
-           
-
-/***********************************F-DEP-RAC-ADQ-0-12/05/2015*****************************************/
 
 
+/***********************************F-DEP-RAC-ADQ-0-27/05/2015*****************************************/
