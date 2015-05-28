@@ -574,6 +574,9 @@ Phx.vista.CotizacionAdq = {
                    this.getBoton('btnRepOC').disable();
                    this.getBoton('btnSolCon').disable();
               }
+              if (data['estado']=='cotizado'){
+                  this.getBoton('btnSolCon').enable();
+              }
                
                
             this.getBoton('btnObs').enable();    

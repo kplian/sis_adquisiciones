@@ -29,9 +29,9 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
             tooltip : '<b>Reporte Solicitud de Compra</b><br/><b>Reporte Solicitud de Compra</b>'
        }); */
   
-        this.addButton('diagrama_gantt',{ grupo:[0,1,2],text:'Gantt', iconCls: 'bgantt', disabled:true, handler: diagramGantt, tooltip: '<b>Diagrama Gantt de proceso macro</b>'});
+        //this.addButton('diagrama_gantt',{ grupo:[0,1,2],text:'Gantt', iconCls: 'bgantt', disabled:true, handler: this.diagramGantt, tooltip: '<b>Diagrama Gantt de proceso macro</b>'});
   
-	 
+	    this.addBotonesGantt();
         this.addButton('btnChequeoDocumentosWf',
             {
                 text: 'Documentos',
@@ -56,7 +56,10 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
         
         
         
-       function diagramGantt(){			
+       
+	},
+	
+	diagramGantt: function (){			
 			var data=this.sm.getSelected().data.id_proceso_wf;
 			Phx.CP.loadingShow();
 			Ext.Ajax.request({
@@ -67,15 +70,17 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
 				timeout: this.timeout,
 				scope: this
 			});			
-		}
 	},
-	
-	
+	diagramGanttDinamico: function (){			
+			var data=this.sm.getSelected().data.id_proceso_wf;
+			window.open('../../../sis_workflow/reportes/gantt/gantt_dinamico.html?id_proceso_wf='+data)		
+	},  
 	
 	addBotones: function() {
         this.menuAdq = new Ext.Toolbar.SplitButton({
             id: 'btn-adqrep-' + this.idContenedor,
             text: 'Rep.',
+            grupo:[0,1,2],
             disabled: true,
             iconCls : 'bpdf32',
             handler:this.onButtonSolicitud,
@@ -85,7 +90,7 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
                 id:'b-btnSolicitud-' + this.idContenedor,
                 text: 'Solicitud',
                 tooltip: '<b>Reporte de Solicitud de Compra</b>',
-                handler:this.onButtonSolicitud,
+                handler:this.onButtonSolicitud,               
                 scope: this
             }, {
                 id:'b-btnRepOC-' + this.idContenedor,
@@ -97,6 +102,34 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
         ]}
         });
 		this.tbar.add(this.menuAdq);
+    },
+    
+    addBotonesGantt: function() {
+        this.menuAdqGantt = new Ext.Toolbar.SplitButton({
+            id: 'b-diagrama_gantt-' + this.idContenedor,
+            text: 'Gantt',
+            disabled: true,
+            grupo:[0,1,2],
+            iconCls : 'bgantt',
+            handler:this.diagramGanttDinamico,
+            scope: this,
+            menu:{
+            items: [{
+                id:'b-gantti-' + this.idContenedor,
+                text: 'Gantt Imagen',
+                tooltip: '<b>Mues un reporte gantt en formato de imagen</b>',
+                handler:this.diagramGantt,
+                scope: this
+            }, {
+                id:'b-ganttd-' + this.idContenedor,
+                text: 'Gantt Dinámico',
+                tooltip: '<b>Muestra el reporte gantt facil de entender</b>',
+                handler:this.diagramGanttDinamico,
+                scope: this
+            }
+        ]}
+        });
+		this.tbar.add(this.menuAdqGantt);
     },
 	
 	arrayStore :{
