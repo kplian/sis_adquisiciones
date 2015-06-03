@@ -389,7 +389,7 @@ Class RSolicitudCompra extends Report {
            $pdf->tableborders=$conf_tp_tableborders;
             
            $RowArray = array(
-                        'precio_unitario' => '',
+                        'precio_unitario' => '('.$this->getDataSource()->getParameter('desc_moneda').')',
                         'precio_total' => $totalRef
                     );     
                          
@@ -411,7 +411,7 @@ Class RSolicitudCompra extends Report {
            $pdf->tableborders=array(0,0);
             
            $RowArray = array(
-                        'precio_unitario' => 'Total Solicitud',
+                        'precio_unitario' => 'Total Solcitud ('.$this->getDataSource()->getParameter('desc_moneda').')',
                         'precio_total' => $total_solicitud
                     );     
                          
