@@ -21,16 +21,17 @@ $body$
 
 DECLARE
 
-	v_nombre_funcion   	text;
-    v_resp    			varchar;
-    v_mensaje varchar;
+	v_nombre_funcion   		text;
+    v_resp    				varchar;
+    v_mensaje 				varchar;
     
     v_registros record;
-    v_monto_ejecutar_mo  numeric;
-    v_estado_anterior varchar;
-    v_sw_presu_comprometido varchar;
-    v_total_soli		numeric;
-    v_tope_compra 		numeric;
+    v_monto_ejecutar_mo 	 numeric;
+    v_estado_anterior		 varchar;
+    v_sw_presu_comprometido	 varchar;
+    v_total_soli				numeric;
+    v_tope_compra 				numeric;
+    v_tope_compra_lista			varchar;
    
 	
     
@@ -44,11 +45,13 @@ BEGIN
             s.fecha_soli,
             s.numero,
             s.estado,
-            s.presu_comprometido
+            s.presu_comprometido,
+            uo.codigo as codigo_uo
           into 
             v_registros
             
           from adq.tsolicitud s
+          inner join orga.tuo uo on uo.id_uo = s.id_uo
           where id_proceso_wf = p_id_proceso_wf;
      
           IF p_instrucciones_rpc = '' THEN
@@ -104,13 +107,13 @@ BEGIN
                   
                   -- validamos que el monsto de la oslicitud no supere el tope configurado
                   
+                  
+                  
                   v_tope_compra = pxp.f_get_variable_global('adq_tope_compra')::numeric; 
+                  v_tope_compra_lista = pxp.f_get_variable_global('adq_tope_compra_lista_blanca'); 
                   
-                  
-                  
-                  --IF  v_total_soli::numeric  >= v_tope_compra::numeric  THEN
-                  
-                  IF  v_total_soli  >= v_tope_compra  THEN
+                   --raise exception '%', v_registros_sol.codigo_uo;
+                  IF  v_total_soli  >= v_tope_compra  and (v_registros.codigo_uo != ANY( string_to_array(v_tope_compra_lista,',')))  THEN
                   
                     raise exception 'Las compras por encima de % (moneda base) no pueden realizarse  por el sistema de adquisiciones',v_tope_compra;
                   
