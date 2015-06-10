@@ -28,6 +28,7 @@ DECLARE
 	v_nro_requerimiento    	integer;
 	v_parametros           	record;
     v_registros 	        record;
+    v_registros_sol	        record;
 	v_id_requerimiento     	integer;
 	v_resp		            varchar;
 	v_nombre_funcion        text;
@@ -100,6 +101,7 @@ DECLARE
        v_tope_compra 				numeric;
        v_prioridad_depto			integer;
        v_reg_prov					record;
+       v_tope_compra_lista			varchar;
 
 			    
 BEGIN
@@ -162,7 +164,7 @@ BEGIN
         END IF;
         
         -- recupera la uo gerencia del funcionario
-        v_id_uo =   orga.f_get_uo_gerencia(NULL, v_parametros.id_funcionario, v_parametros.fecha_soli::Date);
+        v_id_uo =   orga.f_get_uo_gerencia_ope(NULL, v_parametros.id_funcionario, v_parametros.fecha_soli::Date);
         
         ------------------------------------
         -- recuepra el funcionario aprobador
@@ -364,7 +366,7 @@ BEGIN
             
             
             -- recupera la uo gerencia del funcionario
-            v_id_uo =   orga.f_get_uo_gerencia(NULL, v_parametros.id_funcionario, v_parametros.fecha_soli::Date);
+            v_id_uo =   orga.f_get_uo_gerencia_ope(NULL, v_parametros.id_funcionario, v_parametros.fecha_soli::Date);
         
           --------------------------------------
           -- recuepra el funcionario aprobador
@@ -584,6 +586,16 @@ BEGIN
         
           IF  v_parametros.operacion = 'verificar' THEN
           
+              --recupera datos de la solicitud
+               select
+                 uo.id_uo,
+                 uo.codigo as codigo_uo
+               into
+                v_registros_sol
+               from  adq.tsolicitud sol 
+               inner join orga.tuo uo on uo.id_uo = sol.id_uo;
+              
+          
           --  29/01/2014  RAC
           --  Se quita la opcion de que el solcitante eescoja un RPC en un combo
           --  en su lugar se configura por defecto el RPC de manea Unica, si deveulve mas de una opcion de RPC
@@ -605,11 +617,13 @@ BEGIN
                     raise exception ' La Solicitud  tiene que ser por un valor mayor a 0';
                   END IF;
                   
-                  -- validamos que el monsto de la oslicitud no supere el tope configurado
+                  -- validamos que el monsto de la solicitud no supere el tope configurado
                   
                   v_tope_compra = pxp.f_get_variable_global('adq_tope_compra')::numeric; 
-                
-                  IF  v_total_soli  >= v_tope_compra  THEN
+                  v_tope_compra_lista = pxp.f_get_variable_global('adq_tope_compra_lista_blanca'); 
+                  
+                   --raise exception '%', v_registros_sol.codigo_uo;
+                  IF  v_total_soli  >= v_tope_compra  and (v_registros_sol.codigo_uo != ANY( string_to_array(v_tope_compra_lista,',')))  THEN
                   
                     raise exception 'Las compras por encima de % (moneda base) no pueden realizarse  por el sistema de adquisiciones',v_tope_compra;
                   

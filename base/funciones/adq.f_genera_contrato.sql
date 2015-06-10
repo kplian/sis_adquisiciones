@@ -35,8 +35,11 @@ DECLARE
 BEGIN
 
 	v_nombre_funcion='adq.f_genera_contrato';
-     select c.* into v_cotizacion
+     select c.*,s.id_funcionario,s.id_funcionario_aprobador,
+     		s.id_funcionario_rpc 
+     into 	v_cotizacion
      from adq.vcotizacion c
+     inner join adq.tsolicitud s on s.id_solicitud = c.id_solicitud
      where id_cotizacion = p_id_cotizacion;
      
      if (v_cotizacion.nombre_categoria = 'Compra Internacional') then
@@ -79,7 +82,9 @@ BEGIN
           id_cotizacion,
           contrato_adhesion,
           id_concepto_ingas,
-          id_orden_trabajo
+          id_orden_trabajo,
+          id_funcionario,
+          rpc_regional
         ) 
         VALUES (
           p_id_usuario,          
@@ -97,7 +102,9 @@ BEGIN
           p_id_cotizacion,
           v_cotizacion.precontrato,
           string_to_array(v_cotizacion.conceptos,',')::integer[],
-          string_to_array(v_cotizacion.ots,',')::integer[]
+          string_to_array(v_cotizacion.ots,',')::integer[],
+          v_cotizacion.id_funcionario,
+          (case when id_funcionario_aprobador = id_funcionario_rpc then 'si' else 'no' end)
         );
         
         

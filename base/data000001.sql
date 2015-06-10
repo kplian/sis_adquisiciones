@@ -882,3 +882,10 @@ select pxp.f_insert_testructura_gui ('VBPOA', 'ADQ');
 /***********************************F-DAT-RAC-ADQ-0-06/05/2015*****************************************/
 
 
+
+/***********************************I-DAT-RAC-ADQ-0-08/06/2015*****************************************/
+
+INSERT INTO pxp.variable_global ("variable", "valor", "descripcion")
+VALUES (E'adq_tope_compra_lista_blanca', E' ', E'lista de codigos  UOs  que pueden comprar por encima del tope');
+
+/***********************************F-DAT-RAC-ADQ-0-08/06/2015*****************************************/
