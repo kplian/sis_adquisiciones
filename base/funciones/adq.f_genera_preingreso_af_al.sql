@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION adq.f_genera_preingreso_af_al (
   p_id_usuario integer,
   p_id_usuario_ai integer,
@@ -18,9 +16,9 @@ Fecha: 01/10/2013
 Descripción: Generar el Preingreso a Activos Fijos
 
 ----------------------------------
-Autor: 			RAC
-Fecha:   		14/03/2014
-Descripcion:  	Se generan id_proceso_wf independientes para almances y activos fijos
+Autor:      RAC
+Fecha:      14/03/2014
+Descripcion:    Se generan id_proceso_wf independientes para almances y activos fijos
 
 
 
@@ -28,13 +26,13 @@ Descripcion:  	Se generan id_proceso_wf independientes para almances y activos f
 
 DECLARE
 
-	v_rec_cot record;
+  v_rec_cot record;
     v_rec_cot_det record;
     v_id_preingreso integer;
     v_id_proceso_wf integer;
     v_id_estado_wf integer;
     v_codigo_estado varchar;
-    v_id_moneda	integer;
+    v_id_moneda integer;
     v_resp boolean;
     v_precio_compra numeric;
     v_nombre_funcion varchar;
@@ -46,10 +44,11 @@ DECLARE
     v_almacenable  varchar;
     v_activo_fijo  varchar;
     v_tipo   varchar;
+    v_mensaje varchar;
 
 BEGIN
 
-	v_nombre_funcion='adq.f_genera_preingreso_af';
+  v_nombre_funcion='adq.f_genera_preingreso_af';
     v_af = 0;
     
     --inicia variable
@@ -58,23 +57,27 @@ BEGIN
       v_almacenable = 'no';
       v_activo_fijo = 'si';
       v_tipo = 'activo_fijo';
+      v_mensaje = 'Activo Fijo';
     
     ELSIF   p_tipo_preingreso = 'preingreso_almacen' THEN
     
       v_almacenable = 'si';
       v_activo_fijo = 'no';
       v_tipo = 'almacen';
+      v_mensaje = 'Item';
     
     ELSE
     
        raise exception 'No se reconoce el tipo de preingreso';
     
     END IF;
+    
+    --raise exception 'pancananita: % % %',v_almacenable,v_activo_fijo,v_tipo;
   
     ---------------------
     --OBTENCION DE DATOS
     ---------------------
-	--Cotización
+  --Cotización
     select 
        cot.id_cotizacion,
        cot.id_proceso_wf, 
@@ -90,16 +93,16 @@ BEGIN
     inner join adq.tproceso_compra pro on pro.id_proceso_compra = cot.id_proceso_compra
     inner join adq.tsolicitud sol on sol.id_solicitud = pro.id_solicitud
     where cot.id_cotizacion = p_id_cotizacion;
-    
+
     --Moneda Base
     v_id_moneda = param.f_get_moneda_base();
     
     ---------------
     --VALIDACIONES
     ---------------
-	--Existencia de la cotización en estado 'pago_habilitado'
-	if v_rec_cot.id_cotizacion is null then
-    	raise exception 'Cotización no encontrada';
+  --Existencia de la cotización en estado 'pago_habilitado'
+  if v_rec_cot.id_cotizacion is null then
+      raise exception 'Cotización no encontrada';
     end if;
     
      if exists(select 1
@@ -109,9 +112,9 @@ BEGIN
               where pi.id_cotizacion = p_id_cotizacion
               and  tp.codigo_llave = p_tipo_preingreso
               and estado in ('borrador','finalizado')) then
-    	raise exception 'El Preingreso ya fue generado anteriormente.';
+      raise exception 'El Preingreso ya fue generado anteriormente.';
     end if;
-	
+  
      if exists(select 1
                   from adq.tcotizacion_det cdet
                   inner join adq.tsolicitud_det sdet
@@ -127,15 +130,11 @@ BEGIN
         v_af = 1;
     end if;
     
-   
-    
-    
-
     if  v_af = 0 then
-    	raise exception 'La cotización no tiene ningún Activo Fijo. Nada que hacer.';
+      raise exception 'La cotización no tiene ningún %. Nada que hacer.', v_mensaje;
     end if;
 
-	
+  
     --------------------------
     -- CREACIÓN DE PREINGRESO
     --------------------------
@@ -180,12 +179,12 @@ BEGIN
             insert into alm.tpreingreso_det(
               id_usuario_reg, fecha_reg, estado_reg,
               id_preingreso, id_cotizacion_det, cantidad_det, precio_compra,
-              id_usuario_ai,usuario_ai
+              id_usuario_ai,usuario_ai,estado
             )
             select
               p_id_usuario, now(),'activo',        
               v_id_preingreso,cdet.id_cotizacion_det, cdet.cantidad_adju, cdet.precio_unitario_mb,
-              p_id_usuario_ai,p_usuario_ai
+              p_id_usuario_ai,p_usuario_ai,'orig'
             from adq.tcotizacion_det cdet
             inner join adq.tsolicitud_det sdet
             on sdet.id_solicitud_det = cdet.id_solicitud_det
@@ -200,7 +199,7 @@ BEGIN
     return true;
     
 EXCEPTION
-	WHEN OTHERS THEN
+  WHEN OTHERS THEN
       v_resp='';
       v_resp = pxp.f_agrega_clave(v_resp,'mensaje',SQLERRM);
       v_resp = pxp.f_agrega_clave(v_resp,'codigo_error',SQLSTATE);
