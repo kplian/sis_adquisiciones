@@ -29,11 +29,13 @@ DECLARE
 	v_parametros           	record;
     v_registros 	        record;
     v_registros_sol	        record;
+    v_registros_proc        record;
 	v_id_requerimiento     	integer;
 	v_resp		            varchar;
 	v_nombre_funcion        text;
 	v_mensaje_error         text;
-	v_id_solicitud	integer;
+	v_id_solicitud			integer;
+    v_codigo_tipo_pro   	varchar;
     
     v_num_sol   varchar;
     v_id_periodo integer;
@@ -102,6 +104,9 @@ DECLARE
        v_prioridad_depto			integer;
        v_reg_prov					record;
        v_tope_compra_lista			varchar;
+       v_res_validacion				text;
+       v_valid_campos				boolean;
+       v_documentos					record;
 
 			    
 BEGIN
@@ -1094,6 +1099,363 @@ BEGIN
           END IF;
 
         
+          --Devuelve la respuesta
+            return v_resp;
+        
+        end;
+    
+     /*********************************    
+ 	#TRANSACCION:  'ADQ_SIGESOLWZD_IME'
+ 	#DESCRIPCION:	cambia al siguiente estado de la solcitud con el wizard del WF
+ 	#AUTOR:		RAC	
+ 	#FECHA:		19-06-2015 12:12:51
+	***********************************/
+
+	elseif(p_transaccion='ADQ_SIGESOLWZD_IME')then   
+        begin
+        
+         /*   PARAMETROS
+         
+        $this->setParametro('id_proceso_wf_act','id_proceso_wf_act','int4');
+        $this->setParametro('id_tipo_estado','id_tipo_estado','int4');
+        $this->setParametro('id_funcionario_wf','id_funcionario_wf','int4');
+        $this->setParametro('id_depto_wf','id_depto_wf','int4');
+        $this->setParametro('obs','obs','text');
+        $this->setParametro('json_procesos','json_procesos','text');
+        */
+        
+        --obtenermos datos basicos
+         --obtenermos datos basicos
+          
+          select
+            s.id_proceso_wf,
+            s.fecha_soli,
+            s.numero,
+            s.estado,
+            s.id_solicitud
+          into 
+            v_id_proceso_wf,
+            v_fecha_soli,
+            v_numero_sol,
+            v_estado_actual,
+            v_id_solicitud
+            
+          from adq.tsolicitud s
+          where s.id_proceso_wf=v_parametros.id_proceso_wf_act;
+          
+           select 
+            ew.id_tipo_estado ,
+            te.pedir_obs,
+            te.codigo
+           into 
+            v_id_tipo_estado,
+            v_perdir_obs,
+            v_codigo_estado
+          from wf.testado_wf ew
+          inner join wf.ttipo_estado te on te.id_tipo_estado = ew.id_tipo_estado
+          where ew.id_estado_wf = v_parametros.id_estado_wf_act;
+        
+         
+          
+         
+           -- obtener datos tipo estado
+           select
+                 te.codigo
+            into
+                 v_codigo_estado_siguiente
+           from wf.ttipo_estado te
+           where te.id_tipo_estado = v_parametros.id_tipo_estado;
+                
+             IF  pxp.f_existe_parametro(p_tabla,'id_depto_wf') THEN
+              v_id_depto = v_parametros.id_depto_wf;
+             END IF;
+                
+                
+                
+             IF  pxp.f_existe_parametro(p_tabla,'obs') THEN
+                  v_obs=v_parametros.obs;
+             ELSE
+                  v_obs='---';
+            END IF;
+            
+              
+             --configurar acceso directo para la alarma   
+             --configurar acceso directo para la alarma   
+             v_acceso_directo = '';
+             v_clase = '';
+             v_parametros_ad = '';
+             v_tipo_noti = 'notificacion';
+             v_titulo  = 'Visto Bueno';
+                               
+                             
+             IF  v_codigo_estado_siguiente not in('borrador','aprobado','en_proceso','finalizado','anulado')   THEN
+                 v_acceso_directo = '../../../sis_adquisiciones/vista/solicitud/SolicitudVb.php';
+                 v_clase = 'SolicitudVb';
+                 v_parametros_ad = '{filtro_directo:{campo:"sol.id_proceso_wf",valor:"'||v_id_proceso_wf::varchar||'"}}';
+                 v_tipo_noti = 'notificacion';
+                 v_titulo  = 'Visto Bueno';
+                               
+              END IF;
+             
+             
+             -- hay que recuperar el supervidor que seria el estado inmediato,...
+             v_id_estado_actual =  wf.f_registra_estado_wf(v_parametros.id_tipo_estado, 
+                                                             v_parametros.id_funcionario_wf, 
+                                                             v_parametros.id_estado_wf_act, 
+                                                             v_id_proceso_wf,
+                                                             p_id_usuario,
+                                                             v_parametros._id_usuario_ai,
+                                                             v_parametros._nombre_usuario_ai,
+                                                             v_id_depto,
+                                                             COALESCE(v_numero_sol,'--')||' Obs:'||v_obs,
+                                                             v_acceso_directo ,
+                                                             v_clase,
+                                                             v_parametros_ad,
+                                                             v_tipo_noti,
+                                                             v_titulo);
+                                                             
+             
+                
+          --------------------------------------
+          -- registra los procesos disparados
+          --------------------------------------
+         
+          FOR v_registros_proc in ( select * from json_populate_recordset(null::wf.proceso_disparado_wf, v_parametros.json_procesos::json)) LOOP
+    
+               --get cdigo tipo proceso
+               select   
+                  tp.codigo 
+               into 
+                  v_codigo_tipo_pro   
+               from wf.ttipo_proceso tp 
+               where  tp.id_tipo_proceso =  v_registros_proc.id_tipo_proceso_pro;
+          
+          
+               -- disparar creacion de procesos seleccionados
+              
+              SELECT
+                       ps_id_proceso_wf,
+                       ps_id_estado_wf,
+                       ps_codigo_estado
+                 into
+                       v_id_proceso_wf,
+                       v_id_estado_wf,
+                       v_codigo_estado
+              FROM wf.f_registra_proceso_disparado_wf(
+                       p_id_usuario,
+                       v_parametros._id_usuario_ai,
+                       v_parametros._nombre_usuario_ai,
+                       v_id_estado_actual, 
+                       v_registros_proc.id_funcionario_wf_pro, 
+                       v_registros_proc.id_depto_wf_pro,
+                       v_registros_proc.obs_pro,
+                       v_codigo_tipo_pro,    
+                       v_codigo_tipo_pro);
+                       
+                       
+           END LOOP; 
+           
+           -- actualiza estado en la solicitud
+           -- funcion para cambio de estado     
+           
+          IF v_estado_actual = 'vbpresupuestos' THEN
+               update adq.tsolicitud  s set 
+                obs_presupuestos = v_parametros.obs
+               where id_proceso_wf = v_parametros.id_proceso_wf_act;
+          END IF;
+                  
+          IF  not adq.f_fun_inicio_solicitud_wf(p_id_usuario, 
+                                         v_parametros._id_usuario_ai, 
+                                         v_parametros._nombre_usuario_ai, 
+                                         v_id_estado_actual, 
+                                         v_id_proceso_wf, 
+                                         v_codigo_estado_siguiente,
+                                         v_parametros.instruc_rpc) THEN
+            
+                   raise exception 'Error al retroceder estado';
+            
+          END IF;
+          
+          
+          -- si hay mas de un estado disponible  preguntamos al usuario
+          v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Se realizo el cambio de estado del plan de pagos)'); 
+          v_resp = pxp.f_agrega_clave(v_resp,'operacion','cambio_exitoso');
+          
+          
+          -- Devuelve la respuesta
+          return v_resp;
+        
+     end;  
+    
+    
+     /*********************************    
+ 	#TRANSACCION:  'ADQ_VERSIGPRO_IME'
+ 	#DESCRIPCION:   Verifica los estodos siguientes de la solicitud
+ 	#AUTOR:		RAC	
+ 	#FECHA:		19-06-2015 12:12:51
+	***********************************/
+
+	elseif(p_transaccion='ADQ_VERSIGPRO_IME')then   
+        begin
+        
+          --  obtenermos datos basicos
+          
+          select
+            pw.id_proceso_wf,
+            ew.id_estado_wf,
+            te.codigo,
+            pw.fecha_ini,
+            te.id_tipo_estado,
+            te.pedir_obs,
+            pw.nro_tramite,
+            sol.id_solicitud
+          into 
+            v_registros
+            
+          from wf.tproceso_wf pw
+          inner join adq.tsolicitud sol on sol.id_proceso_wf = pw.id_proceso_wf
+          inner join wf.testado_wf ew  on ew.id_proceso_wf = pw.id_proceso_wf and ew.estado_reg = 'activo'
+          inner join wf.ttipo_estado te on ew.id_tipo_estado = te.id_tipo_estado
+          where pw.id_proceso_wf =  v_parametros.id_proceso_wf;
+          
+          v_res_validacion = wf.f_valida_cambio_estado(v_registros.id_estado_wf);
+          
+          IF  (v_res_validacion IS NOT NULL AND v_res_validacion != '') THEN
+          		v_resp = pxp.f_agrega_clave(v_resp,'otro_dato','si');
+          	  v_resp = pxp.f_agrega_clave(v_resp,'error_validacion_campos','si');
+              v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Es necesario registrar los siguientes campos en el formulario: '|| v_res_validacion);
+              return v_resp;
+          ELSE
+          		v_resp = pxp.f_agrega_clave(v_resp,'otro_dato','si');
+          		v_resp = pxp.f_agrega_clave(v_resp,'error_validacion_campos','no');
+          END IF;
+          
+          --validacion de documentos
+          
+          for v_documentos in (
+          		select
+                    dwf.id_documento_wf,                    
+                    dwf.id_tipo_documento,
+                    wf.f_priorizar_documento(v_parametros.id_proceso_wf , p_id_usuario
+                         ,dwf.id_tipo_documento,'ASC' ) as priorizacion
+                from wf.tdocumento_wf dwf
+                inner join wf.tproceso_wf pw on pw.id_proceso_wf = dwf.id_proceso_wf
+                where  pw.nro_tramite = COALESCE(v_registros.nro_tramite,'--')) loop
+                
+                if (v_documentos.priorizacion in (0,9)) then
+                	v_resp = pxp.f_agrega_clave(v_resp,'otro_dato','si');
+          	  		v_resp = pxp.f_agrega_clave(v_resp,'error_validacion_documentos','si');
+              		v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Es necesario subir algun(os) documento(s) antes de pasar al siguiente estado');
+                    return v_resp;
+                end if;
+          
+          end loop;
+          v_resp = pxp.f_agrega_clave(v_resp,'otro_dato','si');
+          v_resp = pxp.f_agrega_clave(v_resp,'error_validacion_documentos','no'); 
+          
+         
+        
+         ------------------------------------------------------------------------------------------------------- 
+         -- Verifica  los posibles estados sigueintes para que desde la interfaz se tome la decision si es necesario
+         ------------------------------------------------------------------------------------------------------
+          IF  v_parametros.operacion = 'verificar' THEN
+          
+                  --buscamos siguiente estado correpondiente al proceso del WF
+                 
+                  ----- variables de retorno------
+                  
+                  v_num_estados=0;
+                  v_num_funcionarios=0;
+                  v_num_deptos=0;
+                  
+                  --------------------------------- 
+              
+               SELECT  
+                   ps_id_tipo_estado,
+                   ps_codigo_estado,
+                   ps_disparador,
+                   ps_regla,
+                   ps_prioridad
+                into
+                  va_id_tipo_estado,
+                  va_codigo_estado,
+                  va_disparador,
+                  va_regla,
+                  va_prioridad 
+                FROM adq.f_obtener_sig_estado_sol_rec(v_registros.id_solicitud, v_parametros.id_proceso_wf, v_registros.id_tipo_estado);  
+                 
+          
+                raise notice 'verifica';
+                
+                v_num_estados= array_length(va_id_tipo_estado, 1);
+            
+                 --  raise exception 'Estados...  %',v_registros.pedir_obs;
+           
+              
+                                   
+                 --verificamos el numero de deptos
+                 raise notice 'verificamos el numero de deptos';
+                             
+                            
+                  SELECT 
+                  *
+                  into
+                    v_num_deptos 
+                 FROM wf.f_depto_wf_sel(
+                     p_id_usuario, 
+                     va_id_tipo_estado[1], 
+                     v_registros.fecha_ini,
+                     v_registros.id_estado_wf,
+                     TRUE) AS (total bigint);
+                
+                
+                --recupera el depto   
+                IF v_num_deptos >= 1 THEN
+                  
+                  SELECT 
+                       id_depto
+                         into
+                       v_id_depto_estado
+                  FROM wf.f_depto_wf_sel(
+                       p_id_usuario, 
+                       va_id_tipo_estado[1], 
+                       v_registros.fecha_ini,
+                       v_registros.id_estado_wf,
+                       FALSE) 
+                       AS (id_depto integer,
+                         codigo_depto varchar,
+                         nombre_corto_depto varchar,
+                         nombre_depto varchar,
+                         prioridad integer,
+                         subsistema varchar);
+               
+                END IF;
+                -- si solo hay un estado,  verificamos si tiene mas de un funcionario por este estado
+                 raise notice ' si solo hay un estado';
+                   SELECT 
+                   *
+                    into
+                   v_num_funcionarios 
+                   FROM wf.f_funcionario_wf_sel(
+                       p_id_usuario, 
+                       va_id_tipo_estado[1], 
+                       v_registros.fecha_ini,
+                       v_registros.id_estado_wf,
+                       TRUE,1,0,'0=0', COALESCE(v_id_depto_estado,0)) AS (total bigint);              
+                             
+                  -- si hay mas de un estado disponible  preguntamos al usuario
+                  v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Verificacion para el siguiente estado)'); 
+                  v_resp = pxp.f_agrega_clave(v_resp,'estados', array_to_string(va_id_tipo_estado, ','));
+                  v_resp = pxp.f_agrega_clave(v_resp,'operacion','preguntar_todo');
+                  v_resp = pxp.f_agrega_clave(v_resp,'num_estados',v_num_estados::varchar);
+                  v_resp = pxp.f_agrega_clave(v_resp,'num_funcionarios',v_num_funcionarios::varchar);
+                  v_resp = pxp.f_agrega_clave(v_resp,'num_deptos',v_num_deptos::varchar);
+                  v_resp = pxp.f_agrega_clave(v_resp,'id_funcionario_estado',v_id_funcionario_estado::varchar);
+                  v_resp = pxp.f_agrega_clave(v_resp,'id_depto_estado',v_id_depto_estado::varchar);
+                  v_resp = pxp.f_agrega_clave(v_resp,'id_tipo_estado', va_id_tipo_estado[1]::varchar);
+                  
+           END IF;
+           
           --Devuelve la respuesta
             return v_resp;
         

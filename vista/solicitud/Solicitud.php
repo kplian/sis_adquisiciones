@@ -50,7 +50,7 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
                     disabled: true,
                     handler : this.onOpenObs,
                     tooltip : '<b>Observaciones</b><br/><b>Observaciones del WF</b>'
-          });
+         });
         
         
         

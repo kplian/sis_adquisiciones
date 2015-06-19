@@ -1034,7 +1034,7 @@ Phx.vista.FormSolicitud=Ext.extend(Phx.frmInterfaz,{
 							}) };
 							
    	    if( i > 0 &&  !this.editorDetail.isVisible()){
-   	    	Phx.vista.FormObligacion.superclass.onSubmit.call(this,o, true);
+   	    	Phx.vista.FormSolicitud.superclass.onSubmit.call(this,o, true);
    	    }
    	    else{
    	    	alert('no tiene ningun concepto  para comprar')
