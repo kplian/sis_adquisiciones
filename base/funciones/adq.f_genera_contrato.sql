@@ -104,7 +104,7 @@ BEGIN
           string_to_array(v_cotizacion.conceptos,',')::integer[],
           string_to_array(v_cotizacion.ots,',')::integer[],
           v_cotizacion.id_funcionario,
-          (case when id_funcionario_aprobador = id_funcionario_rpc then 'si' else 'no' end)
+          (case when v_cotizacion.id_funcionario_aprobador = v_cotizacion.id_funcionario_rpc then 'si' else 'no' end)
         );
         
         
