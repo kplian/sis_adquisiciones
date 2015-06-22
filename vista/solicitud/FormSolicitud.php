@@ -1032,8 +1032,9 @@ Phx.vista.FormSolicitud=Ext.extend(Phx.frmInterfaz,{
 							    }
 							    return value;
 							}) };
+							
    	    if( i > 0 &&  !this.editorDetail.isVisible()){
-   	    	 Phx.vista.FormSolicitud.superclass.onSubmit.call(this,o);
+   	    	Phx.vista.FormSolicitud.superclass.onSubmit.call(this,o, true);
    	    }
    	    else{
    	    	alert('no tiene ningun concepto  para comprar')
