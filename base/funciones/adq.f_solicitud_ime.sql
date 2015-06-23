@@ -1186,12 +1186,26 @@ BEGIN
              v_parametros_ad = '';
              v_tipo_noti = 'notificacion';
              v_titulo  = 'Visto Bueno';
-                               
-                             
-             IF  v_codigo_estado_siguiente not in('borrador','aprobado','en_proceso','finalizado','anulado')   THEN
+             
+             
+             IF  v_codigo_estado_siguiente in('vbpresupuestos')   THEN    
                  v_acceso_directo = '../../../sis_adquisiciones/vista/solicitud/SolicitudVb.php';
                  v_clase = 'SolicitudVb';
-                 v_parametros_ad = '{filtro_directo:{campo:"sol.id_proceso_wf",valor:"'||v_id_proceso_wf::varchar||'"}}';
+                 v_parametros_ad = '{filtro_directo:{campo:"sol.id_proceso_wf",valor:"'||v_id_proceso_wf::varchar||'"},"nombreVista":"solicitudvbpresupuestos"}';
+                 v_tipo_noti = 'notificacion';
+                 v_titulo  = 'Visto Presupuestos';
+             
+             ELSEIF v_codigo_estado_siguiente in('vbpoa')   THEN    
+                 v_acceso_directo = '../../../sis_adquisiciones/vista/solicitud/SolicitudVb.php';
+                 v_clase = 'SolicitudVb';
+                 v_parametros_ad = '{filtro_directo:{campo:"sol.id_proceso_wf",valor:"'||v_id_proceso_wf::varchar||'"},"nombreVista":"solicitudvbpoa"}';
+                 v_tipo_noti = 'notificacion';
+                 v_titulo  = 'Visto POA';              
+                             
+             ELSEIF  v_codigo_estado_siguiente not in('borrador','aprobado','en_proceso','finalizado','anulado')   THEN
+                 v_acceso_directo = '../../../sis_adquisiciones/vista/solicitud/SolicitudVb.php';
+                 v_clase = 'SolicitudVb';
+                 v_parametros_ad = '{filtro_directo:{campo:"sol.id_proceso_wf",valor:"'||v_id_proceso_wf::varchar||'"},"nombreVista":"solicitudvbpoa"}';
                  v_tipo_noti = 'notificacion';
                  v_titulo  = 'Visto Bueno';
                                
@@ -1207,7 +1221,7 @@ BEGIN
                                                              v_parametros._id_usuario_ai,
                                                              v_parametros._nombre_usuario_ai,
                                                              v_id_depto,
-                                                             COALESCE(v_numero_sol,'--')||' Obs:'||v_obs,
+                                                             COALESCE(v_numero_sol,'--')||' Obs:'||v_obs||' - '||COALESCE(v_parametros.instruc_rpc, ''),
                                                              v_acceso_directo ,
                                                              v_clase,
                                                              v_parametros_ad,
@@ -1478,16 +1492,19 @@ BEGIN
             sol.presu_comprometido,
             pw.id_tipo_proceso,
            	pw.id_proceso_wf,
-            sol.numero
+            sol.numero,
+            sol.estado
            into
             v_id_estado_wf,
             v_presu_comprometido,
             v_id_tipo_proceso,
             v_id_proceso_wf,
-            v_numero_sol
+            v_numero_sol,
+            v_estado_actual
              
        FROM adq.tsolicitud sol
        inner join wf.tproceso_wf pw on pw.id_proceso_wf = sol.id_proceso_wf
+       inner join wf.testado_wf ewf on ewf.id_estado_wf = sol.id_estado_wf
        WHERE  sol.id_solicitud = v_parametros.id_solicitud;
        
        --configurar acceso directo para la alarma   
@@ -1536,15 +1553,28 @@ BEGIN
                       
                        
                      
-                       IF  v_codigo_estado not in('borrador','aprobado','en_proceso','finalizado','anulado')   THEN
-                           
+                       IF  v_codigo_estado_siguiente in ('vbpresupuestos')   THEN    
                            v_acceso_directo = '../../../sis_adquisiciones/vista/solicitud/SolicitudVb.php';
                            v_clase = 'SolicitudVb';
-                           v_parametros_ad = '{filtro_directo:{campo:"sol.id_proceso_wf",valor:"'||v_id_proceso_wf::varchar||'"}}';
+                           v_parametros_ad = '{filtro_directo:{campo:"sol.id_proceso_wf",valor:"'||v_id_proceso_wf::varchar||'"},"nombreVista":"solicitudvbpresupuestos"}';
+                           v_tipo_noti = 'notificacion';
+                           v_titulo  = 'Visto Presupuestos';
+                       
+                       ELSEIF v_codigo_estado_siguiente in ('vbpoa')   THEN    
+                           v_acceso_directo = '../../../sis_adquisiciones/vista/solicitud/SolicitudVb.php';
+                           v_clase = 'SolicitudVb';
+                           v_parametros_ad = '{filtro_directo:{campo:"sol.id_proceso_wf",valor:"'||v_id_proceso_wf::varchar||'"},"nombreVista":"solicitudvbpoa"}';
+                           v_tipo_noti = 'notificacion';
+                           v_titulo  = 'Visto POA';              
+                                       
+                       ELSEIF  v_codigo_estado_siguiente not in('borrador','aprobado','en_proceso','finalizado','anulado')   THEN
+                           v_acceso_directo = '../../../sis_adquisiciones/vista/solicitud/SolicitudVb.php';
+                           v_clase = 'SolicitudVb';
+                           v_parametros_ad = '{filtro_directo:{campo:"sol.id_proceso_wf",valor:"'||v_id_proceso_wf::varchar||'"},"nombreVista":"solicitudvbpoa"}';
                            v_tipo_noti = 'notificacion';
                            v_titulo  = 'Visto Bueno';
-                       
-                        END IF;
+                                         
+                       END IF;
                         
                         IF v_codigo_estado  in('borrador')   THEN
                            
@@ -1660,7 +1690,11 @@ BEGIN
             
             END IF;
            
-           
+             IF v_estado_actual = 'vbpresupuestos' THEN
+                update adq.tsolicitud  s set 
+                  obs_presupuestos = v_parametros.obs
+                where s.id_solicitud = v_parametros.id_solicitud;
+              END IF;
            
            
            

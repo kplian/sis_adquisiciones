@@ -16,10 +16,10 @@ Phx.vista.SolicitudVb = {
     bnew:false,
     bsave:false,
     bdel:false,
-	require:'../../../sis_adquisiciones/vista/solicitud/Solicitud.php',
+	require: '../../../sis_adquisiciones/vista/solicitud/Solicitud.php',
 	requireclase:'Phx.vista.Solicitud',
 	title:'Solicitud',
-	nombreVista: 'solicitudVb',
+	nombreVista: 'SolicitudVb',
 	
 	constructor: function(config) {
 	    
@@ -59,161 +59,10 @@ Phx.vista.SolicitudVb = {
         
     	Phx.vista.SolicitudVb.superclass.constructor.call(this,config);
     	this.addButton('ini_estado',{  argument: {estado: 'inicio'},text:'Dev. al Solicitante',iconCls: 'batras',disabled:true,handler:this.antEstado,tooltip: '<b>Retorna la Solcitud al estado borrador</b>'});
-        this.addButton('ant_estado',{argument: {estado: 'anterior'},text:'Rechazar',iconCls: 'batras',disabled:true,handler:this.antEstado,tooltip: '<b>Pasar al Anterior Estado</b>'});
-        this.addButton('sig_estado',{text:'Aprobar',iconCls: 'badelante',disabled:true,handler:this.sigEstado,tooltip: '<b>Pasar al Siguiente Estado</b>'});
+        this.addButton('ant_estado',{ argument: {estado: 'anterior'},text:'Rechazar',iconCls: 'batras',disabled:true,handler:this.antEstado,tooltip: '<b>Pasar al Anterior Estado</b>'});
+        this.addButton('sig_estado',{ text:'Aprobar', iconCls: 'badelante', disabled: true, handler: this.sigEstado, tooltip: '<b>Pasar al Siguiente Estado</b>'});
         
-        //formulario para preguntar sobre siguiente estado
-        //agrega ventana para selecion de RPC
-            
                 
-       this.formEstado = new Ext.form.FormPanel({
-            baseCls: 'x-plain',
-            autoDestroy: true,
-           
-            border: false,
-            layout: 'form',
-             autoHeight: true,
-           
-    
-            items: [
-                {
-                    xtype: 'combo',
-                    name: 'id_tipo_estado',
-                      hiddenName: 'id_tipo_estado',
-                    fieldLabel: 'Siguiente Estado',
-                    listWidth:280,
-                    allowBlank: false,
-                    emptyText:'Elija el estado siguiente',
-                    store:new Ext.data.JsonStore(
-                    {
-                        url: '../../sis_workflow/control/TipoEstado/listarTipoEstado',
-                        id: 'id_tipo_estado',
-                        root:'datos',
-                        sortInfo:{
-                            field:'tipes.codigo',
-                            direction:'ASC'
-                        },
-                        totalProperty:'total',
-                        fields: ['id_tipo_estado','codigo_estado','nombre_estado'],
-                        // turn on remote sorting
-                        remoteSort: true,
-                        baseParams:{par_filtro:'tipes.nombre_estado#tipes.codigo'}
-                    }),
-                    valueField: 'id_tipo_estado',
-                    displayField: 'codigo_estado',
-                    forceSelection:true,
-                    typeAhead: false,
-                    triggerAction: 'all',
-                    lazyRender:true,
-                    mode:'remote',
-                    pageSize:50,
-                    queryDelay:500,
-                    width:210,
-                    gwidth:220,
-                    minChars:2,
-                    tpl: '<tpl for="."><div class="x-combo-list-item"><p>{codigo_estado}</p>Prioridad: <strong>{nombre_estado}</strong> </div></tpl>'
-                
-                },
-                {
-                    xtype: 'combo',
-                    name: 'id_funcionario_wf',
-                    hiddenName: 'id_funcionario_wf',
-                    fieldLabel: 'Funcionario Resp.',
-                    allowBlank: false,
-                    emptyText:'Elija un funcionario',
-                    listWidth:280,
-                    store:new Ext.data.JsonStore(
-                    {
-                        url: '../../sis_workflow/control/TipoEstado/listarFuncionarioWf',
-                        id: 'id_funcionario',
-                        root:'datos',
-                        sortInfo:{
-                            field:'prioridad',
-                            direction:'ASC'
-                        },
-                        totalProperty:'total',
-                        fields: ['id_funcionario','desc_funcionario','prioridad'],
-                        // turn on remote sorting
-                        remoteSort: true,
-                        baseParams:{par_filtro:'fun.desc_funcionario1'}
-                    }),
-                    valueField: 'id_funcionario',
-                    displayField: 'desc_funcionario',
-                    forceSelection:true,
-                    typeAhead: false,
-                    triggerAction: 'all',
-                    lazyRender:true,
-                    mode:'remote',
-                    pageSize:50,
-                    queryDelay:500,
-                    width:210,
-                    gwidth:220,
-                    minChars:2,
-                    tpl: '<tpl for="."><div class="x-combo-list-item"><p>{desc_funcionario}</p>Prioridad: <strong>{prioridad}</strong> </div></tpl>'
-                
-                },
-                  {
-                    xtype: 'combo',
-                    name: 'instruc_rpc',
-                    fieldLabel:'Intrucciones',
-                    allowBlank: false,
-                    emptyText:'Tipo...',
-                    typeAhead: true,
-                    triggerAction: 'all',
-                    lazyRender: true,
-                    mode: 'local',
-                    valueField: 'estilo',
-                    gwidth: 100,
-                    value: 'Orden de Bien/Servicio',
-                    //store:['Iniciar Contrato','Orden de Bien/Servicio','Cotizar','Solicitar Pago']
-                    store: ['Iniciar Contrato','Orden de Bien/Servicio','Cotizar']
-                },
-                {
-                    name: 'obs',
-                    xtype: 'textarea',
-                    fieldLabel: 'Obs',
-                    allowBlank: true,
-                    value:'',
-                    anchor: '80%',
-                    maxLength:500
-                }]
-        });
-        
-        
-         this.wEstado = new Ext.Window({
-            title: 'Estados',
-            collapsible: true,
-            maximizable: true,
-             autoDestroy: true,
-            width: 380,
-            height: 290,
-            layout: 'fit',
-            plain: true,
-            bodyStyle: 'padding:5px;',
-            buttonAlign: 'center',
-            items: this.formEstado,
-            modal:true,
-             closeAction: 'hide',
-            buttons: [{
-                text: 'Guardar',
-                 handler:this.confSigEstado,
-                scope:this
-                
-            },
-             {
-                    text: 'Guardar',
-                    handler:this.antEstadoSubmmit,
-                    scope:this
-                    
-             },
-             {
-                text: 'Cancelar',
-                handler:function(){this.wEstado.hide()},
-                scope:this
-            }]
-        });
-        
-        
         this.store.baseParams={tipo_interfaz:this.nombreVista};
         //coloca filtros para acceso directo si existen
         if(config.filtro_directo){
@@ -223,235 +72,22 @@ Phx.vista.SolicitudVb = {
         //carga inicial de la pagina
         this.load({params:{start:0, limit:this.tam_pag}}); 
         
-        this.cmbTipoEstado =this.formEstado.getForm().findField('id_tipo_estado');
-        this.cmbTipoEstado.store.on('loadexception', this.conexionFailure,this);
-     
-        this.cmbFuncionarioWf =this.formEstado.getForm().findField('id_funcionario_wf');
-        this.cmbFuncionarioWf.store.on('loadexception', this.conexionFailure,this);
-      
-        this.cmpObs=this.formEstado.getForm().findField('obs');
-        
-        this.cmbIntrucRPC =this.formEstado.getForm().findField('instruc_rpc');
-       
-        
-        this.cmbTipoEstado.on('select',function(){
-            
-            this.cmbFuncionarioWf.enable();
-            this.cmbFuncionarioWf.store.baseParams.id_tipo_estado = this.cmbTipoEstado.getValue();
-            this.cmbFuncionarioWf.modificado=true;
-            
-            this.cmbFuncionarioWf.store.load({params:{start:0,limit:this.tam_pag}, 
-                       callback : function (r) {
-                           if (r.length >= 1 ) {                       
-                                this.cmbFuncionarioWf.setValue(r[0].data.id_funcionario);
-                                this.cmbFuncionarioWf.fireEvent('select', r[0]);
-                            }    
-                                            
-                        }, scope : this
-                    });
-            
-        },this);
         
         
-		
+        if(this.nombreVista == 'solicitudvbpoa') {
+           this.addButton('obs_poa',{ text:'Datos POA', disabled:true, handler: this.initObs, tooltip: '<b>Código de actividad POA</b>'});
+           this.crearFormObs();
+        }
+        if(this.nombreVista == 'solicitudvbpresupuestos') {
+           this.addButton('obs_presu',{text:'Obs. Presupuestos', disabled:true, handler: this.initObs, tooltip: '<b>Observacioens del área de presupuesto</b>'});
+           this.crearFormObs();
+        }
+        
+		console.log('configuracion',config, this.nombreVista)
 	},
-	confSigEstado :function() {                   
-            var d= this.sm.getSelected().data;
-            
-            if ( this.formEstado.getForm().isValid()){
-                 Phx.CP.loadingShow();
-                    Ext.Ajax.request({
-                        // form:this.form.getForm().getEl(),
-                        url:'../../sis_adquisiciones/control/Solicitud/siguienteEstadoSolicitud',
-                        params:{
-                            id_solicitud:d.id_solicitud,
-                            id_estado_wf:d.id_estado_wf,
-                            operacion:'cambiar',
-                            id_tipo_estado:this.cmbTipoEstado.getValue(),
-                            id_funcionario:this.cmbFuncionarioWf.getValue(),
-                            obs:this.cmpObs.getValue(),
-                            instruc_rpc:this.cmbIntrucRPC.getValue()
-                            },
-                        success:this.successSinc,
-                        failure: this.failureCheck,
-                        timeout:this.timeout,
-                        scope:this
-                    }); 
-              }    
-        },   
-    
-    sigEstado:function(){                   
-            var d= this.sm.getSelected().data;
-           
-            Phx.CP.loadingShow();
-             this.formEstado.getForm().reset();
-            this.cmbTipoEstado.reset();
-            this.cmbFuncionarioWf.reset();
-            this.cmbFuncionarioWf.store.baseParams.id_estado_wf=d.id_estado_wf;
-            this.cmbFuncionarioWf.store.baseParams.fecha=d.fecha_soli;
-            
-            this.cmbTipoEstado.show();
-            this.cmbFuncionarioWf.show();
-            this.cmbTipoEstado.enable();
-         
-            Ext.Ajax.request({
-                // form:this.form.getForm().getEl(),
-                url:'../../sis_adquisiciones/control/Solicitud/siguienteEstadoSolicitud',
-                params:{id_solicitud:d.id_solicitud,
-                        id_estado_wf:d.id_estado_wf, 
-                        operacion:'verificar',
-                        obs:this.cmpObs.getValue()},
-                success:this.successSinc,
-                argument:{data:d},
-                failure: this.conexionFailure,
-                timeout:this.timeout,
-                scope:this
-            });     
-        },
-       
-       failureCheck:function(resp1,resp2,resp3){
-       	  
-       	   this.conexionFailure(resp1,resp2,resp3);
-       	   var d= this.sm.getSelected().data;
-       	   if(d.estado == 'vbpresupuestos'){
-       	   	 this.checkPresupuesto();
-       	   }
-       	  
-       },
-       
-      antEstado:function(res,eve) {                   
-            this.wEstado.buttons[0].hide();
-            this.wEstado.buttons[1].show();
-            this.wEstado.show();
-            
-            this.cmbTipoEstado.hide();
-            this.cmbFuncionarioWf.hide();
-            this.cmbTipoEstado.disable();
-            this.cmbFuncionarioWf.disable();
-            this.cmbIntrucRPC.hide();
-            this.cmbIntrucRPC.disable(); 
-            this.cmpObs.setValue('');
-            
-            this.sw_estado =res.argument.estado;
-           
-               
-        },
-        
-        antEstadoSubmmit:function(res){
-            var d= this.sm.getSelected().data;
-           
-            Phx.CP.loadingShow();
-            var operacion = 'cambiar';
-            operacion=  this.sw_estado == 'inicio'?'inicio':operacion; 
-            
-            Ext.Ajax.request({
-                // form:this.form.getForm().getEl(),
-                url:'../../sis_adquisiciones/control/Solicitud/anteriorEstadoSolicitud',
-                params:{id_solicitud:d.id_solicitud, 
-                        id_estado_wf:d.id_estado_wf, 
-                        operacion: operacion,
-                        obs:this.cmpObs.getValue()},
-                success:this.successSinc,
-                failure: this.conexionFailure,
-                timeout:this.timeout,
-                scope:this
-            });  
-            
-            
-        }, 
-       
-       successSinc:function(resp){
-            
-            Phx.CP.loadingHide();
-            var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
-            if(!reg.ROOT.error){
-                
-              
-               if (reg.ROOT.datos.operacion=='preguntar_todo'){
-                   if(reg.ROOT.datos.num_estados==1 && reg.ROOT.datos.num_funcionarios==1){
-                       //directamente mandamos los datos
-                       Phx.CP.loadingShow();
-                       var d= this.sm.getSelected().data;
-                       Ext.Ajax.request({
-                        // form:this.form.getForm().getEl(),
-                        url:'../../sis_adquisiciones/control/Solicitud/siguienteEstadoSolicitud',
-                        params:{id_solicitud:d.id_solicitud,
-                            operacion:'cambiar',
-                            id_tipo_estado:reg.ROOT.datos.id_tipo_estado,
-                            id_funcionario:reg.ROOT.datos.id_funcionario_estado,
-                            id_depto:reg.ROOT.datos.id_depto_estado,
-                            id_solicitud:d.id_solicitud,
-                            id_estado_wf:d.id_estado_wf,
-                            obs:this.cmpObs.getValue(),
-                            instruc_rpc:this.cmbIntrucRPC.getValue()
-                            },
-                        success:this.successSinc,
-                        failure: this.failureCheck,
-                        timeout:this.timeout,
-                        scope:this
-                    }); 
-                 }  
-                   else{
-                     this.cmbTipoEstado.store.baseParams.estados= reg.ROOT.datos.estados;
-                     this.cmbTipoEstado.modificado=true;
-                     if(resp.argument.data.estado=='vbrpc'){
-                        this.cmbIntrucRPC.show();
-                        this.cmbIntrucRPC.enable();
-                        console.log('..........', resp.argument.data)
-                        
-                        if(resp.argument.data.precontrato == 'si'){
-                        	this.cmbIntrucRPC.setValue('Iniciar Contrato');
-                        	this.cmbIntrucRPC.setReadOnly(true);
-                        }
-                        else{
-                        	this.cmbIntrucRPC.setValue('Orden de Bien/Servicio');
-                        	this.cmbIntrucRPC.setReadOnly(false);
-                        }
-                        
-                     }
-                     else{
-                         this.cmbIntrucRPC.hide();
-                         this.cmbIntrucRPC.disable(); 
-                         
-                     }
-                     
-                     this.cmpObs.setValue('');
-                     this.cmbFuncionarioWf.disable();
-                     this.wEstado.buttons[1].hide();
-                     this.wEstado.buttons[0].show();
-                     this.wEstado.show();  
-                     
-                     
-                     //precarga como de estado
-                     this.cmbTipoEstado.store.load({params:{start:0,limit:this.tam_pag}, 
-                       callback : function (r) {
-                            if (r.length == 1 ) {                       
-                                this.cmbTipoEstado.setValue(r[0].data.id_tipo_estado);
-                                this.cmbTipoEstado.fireEvent('select', r[0]);
-                            }    
-                                            
-                        }, scope : this
-                    });
-                     
-                  }
-                   
-               }
-               
-                if (reg.ROOT.datos.operacion=='cambio_exitoso'){
-                
-                  this.reload();
-                  this.wEstado.hide();
-                
-                }
-               
-                
-            }else{
-                
-                alert('ocurrio un error durante el proceso')
-            }
-           
-            
-        },
+	
+   
+   
      
   //deshabilitas botones para informacion historica
   desBotoneshistorico:function(){
@@ -489,17 +125,27 @@ Phx.vista.SolicitudVb = {
                 this.getBoton('sig_estado').enable();
                 this.getBoton('ini_estado').enable();
             }
-            /*if(data.estado !='aprobado' && data.estado !='proceso' ){
-                this.getBoton('ant_estado').disable();
-                this.getBoton('sig_estado').disable();
-                this.getBoton('ini_estado').disable();
-            }*/
             
+             if(data.estado =='vbpoa'){
+             	if(this.getBoton('obs_poa')){
+             		this.getBoton('obs_poa').enable();
+             	}
+             }
+             if(this.getBoton('obs_presu')){
+               this.getBoton('obs_presu').enable();
+             }
+             
            //habilitar reporte de colicitud de comrpa y preorden de compra
            this.menuAdq.enable();
       } 
       else{
           this.desBotoneshistorico();
+          if(this.getBoton('obs_poa')){
+             this.getBoton('obs_poa').enable();
+          }
+          if(this.getBoton('obs_presu')){
+             this.getBoton('obs_presu').disable();
+          }
           
       }   
       return tb 
@@ -510,6 +156,12 @@ Phx.vista.SolicitudVb = {
             this.getBoton('sig_estado').disable();
             this.getBoton('ini_estado').disable();
             this.getBoton('ant_estado').disable();
+            if(this.getBoton('obs_poa')){
+              this.getBoton('obs_poa').disable();
+            }
+            if(this.getBoton('obs_presu')){
+              this.getBoton('obs_presu').disable();
+            }
             //boton de reporte de solicitud y preorden de compra
             this.menuAdq.disable();
            
@@ -541,6 +193,324 @@ Phx.vista.SolicitudVb = {
             }
     },
     
+    sigEstado:function(){                   
+      	var rec=this.sm.getSelected();
+      	
+      	this.mostrarWizard(rec);
+      	
+               
+     },
+    mostrarWizard : function(rec) {
+     	var configExtra = [],
+     		obsValorInicial;
+     	 if(this.nombreVista == 'solicitudvbpresupuestos') {
+     	 	obsValorInicial = rec.data.obs_presupuestos;
+     	 }
+     	
+     	if(rec.data.estado == 'vbrpc'){
+     		 configExtra = [
+					       	{
+					   			config:{
+				                    name: 'instruc_rpc',
+				                    fieldLabel:'Intrucciones',
+				                    allowBlank: false,
+				                    emptyText:'Tipo...',
+				                    typeAhead: true,
+				                    triggerAction: 'all',
+				                    lazyRender: true,
+				                    mode: 'local',
+				                    valueField: 'estilo',
+				                    gwidth: 100,
+				                    value: 'Orden de Bien/Servicio',
+				                    store: ['Iniciar Contrato','Orden de Bien/Servicio','Cotizar']
+				                },
+					   			type:'ComboBox',
+					   			id_grupo: 1,
+					   			form: true
+					       	}
+					     ];
+     	 }
+     	 
+     	
+     	this.objWizard = Phx.CP.loadWindows('../../../sis_workflow/vista/estado_wf/FormEstadoWf.php',
+                                'Estado de Wf',
+                                {
+                                    modal: true,
+                                    width: 700,
+                                    height: 450
+                                }, {
+                                	configExtra: configExtra,
+                                	data:{
+                                       id_estado_wf: rec.data.id_estado_wf,
+                                       id_proceso_wf: rec.data.id_proceso_wf,
+                                       fecha_ini: rec.data.fecha_tentativa,
+                                       url_verificacion:'../../sis_adquisiciones/control/Solicitud/verficarSigEstSolWf'
+                                   },
+                                   obsValorInicial : obsValorInicial,
+                                }, this.idContenedor,'FormEstadoWf',
+                                {
+                                    config:[{
+                                              event:'beforesave',
+                                              delegate: this.onSaveWizard,
+                                              
+                                            },
+					                        {
+					                          event:'requirefields',
+					                          delegate: function () {
+						                          	this.onButtonEdit();
+										        	this.window.setTitle('Registre los campos antes de pasar al siguiente estado');
+										        	this.formulario_wizard = 'si';
+					                          }
+					                          
+					                        }],
+                                    
+                                    scope:this
+                                 });        
+     },
+    onSaveWizard:function(wizard,resp){
+        Phx.CP.loadingShow();
+        Ext.Ajax.request({
+            url:'../../sis_adquisiciones/control/Solicitud/siguienteEstadoSolicitudWzd',
+            params:{
+            	    id_proceso_wf_act:  resp.id_proceso_wf_act,
+	                id_estado_wf_act:   resp.id_estado_wf_act,
+	                id_tipo_estado:     resp.id_tipo_estado,
+	                id_funcionario_wf:  resp.id_funcionario_wf,
+	                id_depto_wf:        resp.id_depto_wf,
+	                obs:                resp.obs,
+	                instruc_rpc:		resp.instruc_rpc,
+	                json_procesos:      Ext.util.JSON.encode(resp.procesos)
+                },
+            success: this.successWizard,
+            failure: this.failureCheck, //chequea si esta en verificacion presupeusto para enviar correo de transferencia
+            argument: { wizard:wizard },
+            timeout: this.timeout,
+            scope: this
+        });
+    },
+    successWizard:function(resp){
+        Phx.CP.loadingHide();
+        resp.argument.wizard.panel.destroy()
+        this.reload();
+    },
+    
+    failureCheck:function(resp1,resp2,resp3){
+       	  
+       	   this.conexionFailure(resp1,resp2,resp3);
+       	   var d= this.sm.getSelected().data;
+       	   if(d.estado == 'vbpresupuestos'){
+       	   	 this.checkPresupuesto();
+       	   }
+       	  
+       },
+       
+    //para retroceder de estado
+    antEstado:function(res){
+         var rec=this.sm.getSelected(),
+             obsValorInicial;
+         
+         if(this.nombreVista == 'solicitudvbpresupuestos') {
+     	 	obsValorInicial = rec.data.obs_presupuestos;
+     	 }
+         Phx.CP.loadWindows('../../../sis_workflow/vista/estado_wf/AntFormEstadoWf.php',
+            'Estado de Wf',
+            {
+                modal:true,
+                width:450,
+                height:250
+                
+            }, { data:rec.data, 
+            	 estado_destino: res.argument.estado,
+                 obsValorInicial: obsValorInicial }, this.idContenedor,'AntFormEstadoWf',
+            {
+                config:[{
+                          event:'beforesave',
+                          delegate: this.onAntEstado,
+                        }
+                        ],
+               scope:this
+             })
+   },
+   
+   onAntEstado: function(wizard,resp){
+            Phx.CP.loadingShow();
+            var operacion = 'cambiar';
+            operacion=  resp.estado_destino == 'inicio'?'inicio':operacion; 
+            Ext.Ajax.request({
+                url:'../../sis_adquisiciones/control/Solicitud/anteriorEstadoSolicitud',
+                params:{
+                        id_proceso_wf: resp.id_proceso_wf,
+                        id_estado_wf:  resp.id_estado_wf,  
+                        obs: resp.obs,
+                        operacion: operacion,
+                        id_solicitud: resp.data.id_solicitud
+                 },
+                argument:{wizard:wizard},  
+                success: this.successEstadoSinc,
+                failure: this.conexionFailure,
+                timeout: this.timeout,
+                scope: this
+            });
+           
+     },
+     
+   successEstadoSinc:function(resp){
+        Phx.CP.loadingHide();
+        resp.argument.wizard.panel.destroy()
+        this.reload();
+     },
+    crearFormObs:function(){
+		
+		 var titulo;
+		 if(this.nombreVista == 'solicitudvbpoa') {
+		 	   titulo = 'Datos POA';
+				this.formObs = new Ext.form.FormPanel({
+		            baseCls: 'x-plain',
+		            autoDestroy: true,
+		            border: false,
+		            layout: 'form',
+		            autoHeight: true,
+		            items: [
+		                 {
+		                    name: 'codigo_poa',
+		                    xtype: 'textfield',
+		                    fieldLabel: 'Código POA',
+		                    allowBlank: false,
+		                    grow: true,
+		                    growMin : '80%',
+		                    value:'',
+		                    anchor: '80%',
+		                    maxLength:500
+		                },
+		                 
+		                 {
+		                    name: 'obs_poa',
+		                    xtype: 'textarea',
+		                    fieldLabel: 'Obs POA',
+		                    allowBlank: true,
+		                    grow: true,
+		                    growMin : '80%',
+		                    value:'',
+		                    anchor: '80%',
+		                    maxLength:500
+		                }]
+		        });
+       }
+       else{
+       	 titulo = 'Observaciones Presupuestos';
+       	 this.formObs = new Ext.form.FormPanel({
+            baseCls: 'x-plain',
+            autoDestroy: true,
+            border: false,
+            layout: 'form',
+            autoHeight: true,
+            items: [
+                 {
+                    name: 'obs',
+                    xtype: 'textarea',
+                    fieldLabel: 'Obs',
+                    allowBlank: true,
+                    grow: true,
+                    growMin : '80%',
+                    value:'',
+                    anchor: '80%',
+                    maxLength:500
+                }]
+        });
+        
+       }
+        
+        
+       
+         this.wObs = new Ext.Window({
+            title: titulo,
+            collapsible: true,
+            maximizable: true,
+            autoDestroy: true,
+            width: 380,
+            height: 290,
+            layout: 'fit',
+            plain: true,
+            bodyStyle: 'padding:5px;',
+            buttonAlign: 'center',
+            items: this.formObs,
+            modal:true,
+            closeAction: 'hide',
+            buttons: [{
+                    text: 'Guardar',
+                    handler: this.submitObs,
+                    scope: this
+                    
+             },
+             {
+                text: 'Cancelar',
+                handler:function(){this.wObs.hide()},
+                scope:this
+            }]
+        });
+        if(this.nombreVista == 'solicitudvbpoa') { 
+        	this.cmbObsPoa = this.formObs.getForm().findField('obs_poa');
+        	this.cmbCodigoPoa = this.formObs.getForm().findField('codigo_poa');
+        }
+        else{
+        	this.cmbObsPres = this.formObs.getForm().findField('obs');
+        }
+	},
+	
+	initObs:function(){
+		var d= this.sm.getSelected().data;
+		if(this.nombreVista == 'solicitudvbpoa') { 
+	        this.cmbObsPoa.setValue(d.obs_poa);
+	        this.cmbCodigoPoa.setValue(d.codigo_poa);
+       }
+       else{
+       	   this.cmbObsPres.setValue(d.obs_presupuestos);
+       }
+		this.wObs.show()
+	},
+	
+	submitObs:function(){
+		    Phx.CP.loadingShow();
+		    var d= this.sm.getSelected().data,
+		        url, params;
+            if(this.nombreVista == 'solicitudvbpoa') {
+               url = '../../sis_adquisiciones/control/Solicitud/modificarObsPoa';
+               params = {
+                    id_solicitud:d.id_solicitud,
+                    obs_poa: this.cmbObsPoa.getValue(),
+                    codigo_poa: this.cmbCodigoPoa.getValue()
+                    };
+            }
+            else{
+            	 url = '../../sis_adquisiciones/control/Solicitud/modificarObsPresupuestos';
+            	 params= { id_solicitud:d.id_solicitud,
+                           obs: this.cmbObsPres.getValue()
+                        };
+            }
+            Ext.Ajax.request({
+                url: url,
+                params: params,
+                success: function(resp){
+                           Phx.CP.loadingHide();
+			               var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
+			               if(!reg.ROOT.error){
+			            	  this.reload();
+                              this.wObs.hide();
+			               }
+			             },
+                failure: function(resp1,resp2,resp3){
+       	  
+			       	   this.conexionFailure(resp1,resp2,resp3);
+			       	   var d = this.sm.getSelected().data;
+			       	   
+			       	  
+			       },
+                timeout:this.timeout,
+                scope:this
+            }); 
+		
+	},
+	
 	south:
           { 
           url:'../../../sis_adquisiciones/vista/solicitud_det/SolicitudReqDet.php',
