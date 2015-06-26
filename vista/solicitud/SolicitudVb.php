@@ -17,8 +17,8 @@ Phx.vista.SolicitudVb = {
     bsave:false,
     bdel:false,
 	require: '../../../sis_adquisiciones/vista/solicitud/Solicitud.php',
-	requireclase:'Phx.vista.Solicitud',
-	title:'Solicitud',
+	requireclase: 'Phx.vista.Solicitud',
+	title: 'Solicitud',
 	nombreVista: 'SolicitudVb',
 	
 	constructor: function(config) {
