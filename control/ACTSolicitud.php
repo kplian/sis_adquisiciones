@@ -711,7 +711,23 @@ function groupArray($array,$groupkey,$groupkeyTwo,$id_moneda,$estado_sol, $onlyD
        
    }
 
-
+   function siguienteEstadoSolicitudWzd(){
+        $this->objFunc=$this->create('MODSolicitud');  
+        
+        $this->objParam->addParametro('id_funcionario_usu',$_SESSION["ss_id_funcionario"]); 
+        
+        $this->res=$this->objFunc->siguienteEstadoSolicitudWzd($this->objParam);
+        $this->res->imprimirRespuesta($this->res->generarJson());
+    }
+   
+    function verficarSigEstSolWf(){
+        $this->objFunc=$this->create('MODSolicitud');  
+        
+        $this->objParam->addParametro('id_funcionario_usu',$_SESSION["ss_id_funcionario"]); 
+        
+        $this->res=$this->objFunc->verficarSigEstSolWf($this->objParam);
+        $this->res->imprimirRespuesta($this->res->generarJson());
+    }
 
     
     /*

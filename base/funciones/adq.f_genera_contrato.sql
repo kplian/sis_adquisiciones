@@ -100,11 +100,11 @@ BEGIN
           v_cotizacion.monto_total_adjudicado,
           v_cotizacion.id_moneda,
           p_id_cotizacion,
-          v_cotizacion.precontrato,
+          coalesce(v_cotizacion.precontrato,'no'),
           string_to_array(v_cotizacion.conceptos,',')::integer[],
           string_to_array(v_cotizacion.ots,',')::integer[],
           v_cotizacion.id_funcionario,
-          (case when id_funcionario_aprobador = id_funcionario_rpc then 'si' else 'no' end)
+          (case when v_cotizacion.id_funcionario_aprobador = v_cotizacion.id_funcionario_rpc then 'si' else 'no' end)
         );
         
         

@@ -889,3 +889,12 @@ INSERT INTO pxp.variable_global ("variable", "valor", "descripcion")
 VALUES (E'adq_tope_compra_lista_blanca', E' ', E'lista de codigos  UOs  que pueden comprar por encima del tope');
 
 /***********************************F-DAT-RAC-ADQ-0-08/06/2015*****************************************/
+
+
+
+/***********************************I-DAT-RAC-ADQ-0-23/06/2015*****************************************/
+
+select pxp.f_insert_tgui ('VoBo Solicitud (Poa)', 'VoBo Solicitud (Poa)', 'VBPOA', 'si', 7, 'sis_adquisiciones/vista/solicitud/SolicitudVb.php', 3, '', 'SolicitudVb', 'ADQ');
+select pxp.f_insert_tgui ('Visto Bueno Solicitud (Presupuestos)', 'Visto Bueno Solicitud (Presupuestos)', 'VBSOLP', 'si', 7, 'sis_adquisiciones/vista/solicitud/SolicitudVb.php', 2, '', 'SolicitudVb', 'ADQ');
+
+/***********************************F-DAT-RAC-ADQ-0-23/06/2015*****************************************/
