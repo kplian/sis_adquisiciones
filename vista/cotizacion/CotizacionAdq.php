@@ -181,7 +181,8 @@ Phx.vista.CotizacionAdq = {
                         xtype: 'datefield',   
                         name: 'fecha_oc',
                         fieldLabel: 'Fecha OC',
-                        allowBlank: false
+                        allowBlank: false,
+                        readOnly: true
                        }
                       ]
             });

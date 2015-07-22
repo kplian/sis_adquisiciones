@@ -86,7 +86,7 @@ BEGIN
                
             END IF;
             
-            IF  lower(v_parametros.tipo_interfaz) in ('solicitudvb','solicitudvbwzd','solicitudvbpoa','vbpresupuestos') THEN
+            IF  lower(v_parametros.tipo_interfaz) in ('solicitudvb','solicitudvbwzd','solicitudvbpoa','solicitudvbpresupuestos') THEN
             
                        
                 IF p_administrador !=1 THEN
