@@ -95,10 +95,10 @@ class MODProveedor extends MODbase{
 		$this->setParametro('apellido_materno','apellido_materno','varchar');
 		$this->setParametro('ci','ci','int4');
 		$this->setParametro('correo','correo','varchar');
-		$this->setParametro('celular1','celular1','bigint');
-		$this->setParametro('celular2','celular2','bigint');
-		$this->setParametro('telefono1','telefono1','bigint');
-		$this->setParametro('telefono2','telefono2','bigint');
+		$this->setParametro('celular1','celular1','varchar');
+		$this->setParametro('celular2','celular2','varchar');
+		$this->setParametro('telefono1','telefono1','varchar');
+		$this->setParametro('telefono2','telefono2','varchar');
 		$this->setParametro('genero','genero','varchar');
 		$this->setParametro('fecha_nacimiento','fecha_nacimiento','date');
 		$this->setParametro('direccion','direccion','varchar');
@@ -109,6 +109,8 @@ class MODProveedor extends MODbase{
 
 		//Devuelve la respuesta
 		return $this->respuesta;
+		
+		
 	}
 			
 	function modificarProveedor(){

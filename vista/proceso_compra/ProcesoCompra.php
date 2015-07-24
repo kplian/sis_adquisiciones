@@ -21,7 +21,7 @@ Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
                        {name:'finalizados',title:'<H1 align="center"><i class="fa fa-thumbs-o-up"></i> Finalizados</h1>',grupo:5,height:0}],
 	
     beditGroups: [0,1,2,3,4],
-    bdelGroups:  [0,1,2,3],
+    bdelGroups:  [0,1,2,3,4],
     bactGroups:  [0,1,2,3,4,5],
     btestGroups: [0],
     bexcelGroups: [0,1,2,3,4,5],
