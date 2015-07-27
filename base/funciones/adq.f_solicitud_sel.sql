@@ -88,24 +88,32 @@ BEGIN
             
             IF  lower(v_parametros.tipo_interfaz) in ('solicitudvb','solicitudvbwzd','solicitudvbpoa','solicitudvbpresupuestos') THEN
             
-                       
+          IF v_historico =  'no' THEN       
+                
                 IF p_administrador !=1 THEN
                   v_filtro = ' (ew.id_funcionario='||v_parametros.id_funcionario_usu::varchar||' ) and  (lower(sol.estado)!=''borrador'') and (lower(sol.estado)!=''proceso'' ) and ';
                 ELSE
                     v_filtro = ' (lower(sol.estado)!=''borrador''  and lower(sol.estado)!=''proceso'' and lower(sol.estado)!=''finalizado'') and ';
                 END IF;
+           ELSE
+                IF p_administrador !=1 THEN
+                  v_filtro = ' (ew.id_funcionario='||v_parametros.id_funcionario_usu::varchar||' ) and  (lower(sol.estado)!=''borrador'') ) and ';
+                ELSE
+                    v_filtro = ' (lower(sol.estado)!=''borrador'') and ';
+                END IF;
+              END IF;
                 
                 
             END IF;
             
             --la interface de vbpresupuestos mustra todas las solcitudes no importa el funcionario asignado
             IF  lower(v_parametros.tipo_interfaz) = 'solicitudvbpresupuestos' and v_historico =  'no' THEN
-                 v_filtro = ' (lower(sol.estado)=''vbpresupuestos'' ) and ';
+                 v_filtro = v_filtro||' (lower(sol.estado)=''vbpresupuestos'' ) and ';
             END IF;
             
             --la interface de vbpresupuestos mustra todas las solcitudes no importa el funcionario asignado
             IF  lower(v_parametros.tipo_interfaz) = 'solicitudvbpoa' and v_historico =  'no'  THEN
-                 v_filtro = ' (lower(sol.estado)=''vbpoa'' ) and ';
+                 v_filtro = v_filtro||' (lower(sol.estado)=''vbpoa'' ) and ';
             END IF;
             
             
@@ -275,19 +283,37 @@ BEGIN
                
             END IF;
             
-            IF  lower(v_parametros.tipo_interfaz) in ('solicitudvb','solicitudvbwzd','solicitudvbpoa','vbpresupuestos') THEN
+            IF  lower(v_parametros.tipo_interfaz) in ('solicitudvb','solicitudvbwzd','solicitudvbpoa','solicitudvbpresupuestos') THEN
             
-                       
+              IF v_historico =  'no' THEN       
+                
                 IF p_administrador !=1 THEN
-                    v_filtro = '(ew.id_funcionario='||v_parametros.id_funcionario_usu::varchar||' ) and  (lower(sol.estado)!=''borrador'') and ';
-                  
-                 ELSE
+                  v_filtro = ' (ew.id_funcionario='||v_parametros.id_funcionario_usu::varchar||' ) and  (lower(sol.estado)!=''borrador'') and (lower(sol.estado)!=''proceso'' ) and ';
+                ELSE
                     v_filtro = ' (lower(sol.estado)!=''borrador''  and lower(sol.estado)!=''proceso'' and lower(sol.estado)!=''finalizado'') and ';
-                  
                 END IF;
+              ELSE
+                IF p_administrador !=1 THEN
+                  v_filtro = ' (ew.id_funcionario='||v_parametros.id_funcionario_usu::varchar||' ) and  (lower(sol.estado)!=''borrador'') ) and ';
+                ELSE
+                    v_filtro = ' (lower(sol.estado)!=''borrador'') and ';
+                END IF;
+              END IF;
                 
                 
             END IF;
+            
+            --la interface de vbpresupuestos mustra todas las solcitudes no importa el funcionario asignado
+            IF  lower(v_parametros.tipo_interfaz) = 'solicitudvbpresupuestos' and v_historico =  'no' THEN
+                 v_filtro = v_filtro||' (lower(sol.estado)=''vbpresupuestos'' ) and ';
+            END IF;
+            
+            --la interface de vbpresupuestos mustra todas las solcitudes no importa el funcionario asignado
+            IF  lower(v_parametros.tipo_interfaz) = 'solicitudvbpoa' and v_historico =  'no'  THEN
+                 v_filtro = v_filtro||' (lower(sol.estado)=''vbpoa'' ) and ';
+            END IF;
+            
+            
             
             IF  lower(v_parametros.tipo_interfaz) = 'solicitudvbasistente' THEN
             
