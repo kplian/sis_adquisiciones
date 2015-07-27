@@ -144,17 +144,22 @@ Phx.vista.SolicitudDet=Ext.extend(Phx.gridInterfaz,{
 		{
             config:{
                 name: 'precio_unitario',
-                currencyChar:' ',
+                currencyChar: ' ',
                 fieldLabel: 'Prec. Unit.',
                 allowBlank: false,
                 allowDecimals: true,
-                allowNegative:false,
-                decimalPrecision:2,
+                allowNegative: false,
+                decimalPrecision: 2,
+                renderer: function(value, p, record){
+                	var num = Number(record.data['precio_unitario'])
+                	return String.format('{0}', num.toFixed(2));
+                	
+                	},
                 width:100,
                 gwidth: 110
             },
             type:'NumberField',
-            filters:{pfiltro:'sold.precio_unitario',type:'numeric'},
+            filters:{ pfiltro: 'sold.precio_unitario', type:'numeric'},
             id_grupo:0,
             grid:true,
             form:true
