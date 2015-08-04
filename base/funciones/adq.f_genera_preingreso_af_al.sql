@@ -179,15 +179,30 @@ BEGIN
             insert into alm.tpreingreso_det(
               id_usuario_reg, fecha_reg, estado_reg,
               id_preingreso, id_cotizacion_det, cantidad_det, precio_compra,
-              id_usuario_ai,usuario_ai,estado
+              id_usuario_ai,usuario_ai,estado,nombre, descripcion, precio_compra_87,
+              id_lugar,ubicacion
             )
             select
               p_id_usuario, now(),'activo',        
               v_id_preingreso,cdet.id_cotizacion_det, cdet.cantidad_adju, cdet.precio_unitario_mb,
-              p_id_usuario_ai,p_usuario_ai,'orig'
+              p_id_usuario_ai,p_usuario_ai,'orig',cin.desc_ingas,sdet.descripcion,
+              (case when s.num_tramite like 'CNAPD%' THEN
+               cdet.precio_unitario_mb * 0.87
+               else
+               cdet.precio_unitario_mb * 0.87
+               end), lug.id_lugar,ofi.nombre	 
             from adq.tcotizacion_det cdet
             inner join adq.tsolicitud_det sdet
             on sdet.id_solicitud_det = cdet.id_solicitud_det
+            inner join adq.tsolicitud s
+            on s.id_solicitud = sdet.id_solicitud
+            left join orga.tuo_funcionario uofun
+            on s.id_funcionario = uofun.id_funcionario and uofun.estado_reg = 'activo' and
+            uofun.tipo = 'oficial' and uofun.fecha_asignacion < s.fecha_soli and 
+            ( uofun.fecha_finalizacion >= s.fecha_soli or uofun.fecha_finalizacion is null)
+            left join orga.tcargo car on car.id_cargo = uofun.id_cargo
+            left join orga.toficina ofi on ofi.if_oficina = car.id_oficina
+            left join param.tlugar lug on lug.id_lugar = ofi.id_lugar 
             inner join param.tconcepto_ingas cin
             on cin.id_concepto_ingas = sdet.id_concepto_ingas
             where cdet.id_cotizacion = p_id_cotizacion
