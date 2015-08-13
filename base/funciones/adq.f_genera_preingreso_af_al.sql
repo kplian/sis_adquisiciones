@@ -201,7 +201,7 @@ BEGIN
             uofun.tipo = 'oficial' and uofun.fecha_asignacion < s.fecha_soli and 
             ( uofun.fecha_finalizacion >= s.fecha_soli or uofun.fecha_finalizacion is null)
             left join orga.tcargo car on car.id_cargo = uofun.id_cargo
-            left join orga.toficina ofi on ofi.if_oficina = car.id_oficina
+            left join orga.toficina ofi on ofi.id_oficina = car.id_oficina
             left join param.tlugar lug on lug.id_lugar = ofi.id_lugar 
             inner join param.tconcepto_ingas cin
             on cin.id_concepto_ingas = sdet.id_concepto_ingas

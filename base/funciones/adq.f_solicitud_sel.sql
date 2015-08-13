@@ -113,7 +113,7 @@ BEGIN
             
             --la interface de vbpresupuestos mustra todas las solcitudes no importa el funcionario asignado
             IF  lower(v_parametros.tipo_interfaz) = 'solicitudvbpoa' and v_historico =  'no'  THEN
-                 v_filtro = v_filtro||' (lower(sol.estado)=''vbpoa'' ) and ';
+                 v_filtro = ' (lower(sol.estado)=''vbpoa'' ) and ';
             END IF;
             
             
@@ -310,7 +310,7 @@ BEGIN
             
             --la interface de vbpresupuestos mustra todas las solcitudes no importa el funcionario asignado
             IF  lower(v_parametros.tipo_interfaz) = 'solicitudvbpoa' and v_historico =  'no'  THEN
-                 v_filtro = v_filtro||' (lower(sol.estado)=''vbpoa'' ) and ';
+                 v_filtro = ' (lower(sol.estado)=''vbpoa'' ) and ';
             END IF;
             
             
