@@ -122,6 +122,8 @@ BEGIN
             inner join plani.tconsolidado c on c.id_planilla = p.id_planilla
             inner join param.tcentro_costo cc on c.id_presupuesto = cc.id_centro_costo
             where p.id_planilla = v_id_tabla;
+            v_cad_ep = '1';
+            v_cad_uo = '3';
         end if;
     
           raise notice '>>>> %,%',v_cad_uo,v_cad_ep;
