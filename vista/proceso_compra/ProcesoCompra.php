@@ -53,8 +53,8 @@ Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
 		this.addButton('btnCotizacion',{grupo:[0,1,2,3,4], text :'Cotizacion',iconCls:'bdocuments',disabled: true, handler : this.onButtonCotizacion,tooltip : '<b>Cotizacion de solicitud de Compra</b><br/><b>Cotizacion de solicitud de Compra</b>'});
   		this.addButton('btnChequeoDocumentos',{grupo:[0,1,2,3,4], text: 'Documentos',iconCls: 'bchecklist',disabled: true,handler: this.loadCheckDocumentosSol,tooltip: '<b>Documentos del Proceso</b><br/>Subir los documetos requeridos en el proceso seleccionada.'});
         this.addButton('btnCuadroComparativo',{grupo:[0,1,2,3,4], text :'Cuadro Comparativo',iconCls : 'bexcel',disabled: true,handler : this.onCuadroComparativo,tooltip : '<b>Cuadro Comparativo</b><br/><b>Cuadro Comparativo de Cotizaciones</b>'});
-	    this.addButton('btnRevePres',{grupo:[0,1,2,3], text:'Rev. Pre.',iconCls: 'balert',disabled:true,handler:this.onBtnRevPres,tooltip: '<b>Revertir Presupuesto</b> Revierte todo el presupuesto no adjudicado para la solicitud.'});
-        this.addButton('btnFinPro',{grupo:[0,1,2,3], text:'Fin Proc.',iconCls: 'balert',disabled:true,handler:this.onBtnFinPro,tooltip: '<b>Finzalizar Proceso</b> Finaliza el proceso y la solicitud y revierte el presupuesto. No  puede deshacerse'});
+	    this.addButton('btnRevePres',{grupo:[0,1,2,3,4], text:'Rev. Pre.',iconCls: 'balert',disabled:true,handler:this.onBtnRevPres,tooltip: '<b>Revertir Presupuesto</b> Revierte todo el presupuesto no adjudicado para la solicitud.'});
+        this.addButton('btnFinPro',{grupo:[0,1,2,3,4], text:'Fin Proc.',iconCls: 'balert',disabled:true,handler:this.onBtnFinPro,tooltip: '<b>Finzalizar Proceso</b> Finaliza el proceso y la solicitud y revierte el presupuesto. No  puede deshacerse'});
         this.addButton('diagrama_gantt',{grupo:[0,1,2,3,4,5], text:'Diagrama Gantt',iconCls: 'bgantt',disabled:true,handler:this.diagramGantt,tooltip: '<b>Diagrama Gantt de proceso macro</b>'});
         
         this.store.baseParams={};
