@@ -28,6 +28,7 @@ DECLARE
     v_id_tipo_estado_registro		integer;
     v_id_funcionario_responsable	integer;
     v_id_estado_registro			integer;
+    v_id_lugar						integer;
     		
     
     
@@ -36,7 +37,7 @@ BEGIN
 
 	v_nombre_funcion='adq.f_genera_contrato';
      select c.*,s.id_funcionario,s.id_funcionario_aprobador,
-     		s.id_funcionario_rpc 
+     		s.id_funcionario_rpc,s.fecha_inicio,s.justificacion 
      into 	v_cotizacion
      from adq.vcotizacion c
      inner join adq.tsolicitud s on s.id_solicitud = c.id_solicitud
@@ -44,6 +45,9 @@ BEGIN
      
      if (v_cotizacion.nombre_categoria = 'Compra Internacional') then
      	v_tipo = 'administrativo_internacional';
+        if (lower(coalesce(v_cotizacion.precontrato,'no')) = 'si') THEN
+        	v_id_lugar = 2;
+        end if;
      elsif (v_cotizacion.tipo_concepto = 'alquiler_inmueble') then
      	v_tipo = 'administrativo_alquiler';
      ELSE
@@ -84,7 +88,10 @@ BEGIN
           id_concepto_ingas,
           id_orden_trabajo,
           id_funcionario,
-          rpc_regional
+          rpc_regional,
+          id_lugar,
+          fecha_inicio,
+          objeto
         ) 
         VALUES (
           p_id_usuario,          
@@ -100,11 +107,14 @@ BEGIN
           v_cotizacion.monto_total_adjudicado,
           v_cotizacion.id_moneda,
           p_id_cotizacion,
-          coalesce(v_cotizacion.precontrato,'no'),
+          lower(coalesce(v_cotizacion.precontrato,'no')),
           string_to_array(v_cotizacion.conceptos,',')::integer[],
           string_to_array(v_cotizacion.ots,',')::integer[],
           v_cotizacion.id_funcionario,
-          (case when v_cotizacion.id_funcionario_aprobador = v_cotizacion.id_funcionario_rpc then 'si' else 'no' end)
+          (case when v_cotizacion.id_funcionario_aprobador = v_cotizacion.id_funcionario_rpc then 'si' else 'no' end),
+          v_id_lugar,
+          v_cotizacion.fecha_inicio,
+          v_cotizacion.justificacion
         );
         
         

@@ -782,7 +782,7 @@ Phx.vista.FormSolicitud=Ext.extend(Phx.frmInterfaz,{
 		{
 			config:{
 				name: 'justificacion',
-				fieldLabel: 'Justificacion',
+				fieldLabel: 'Justificacion/Objeto del Contrato',
 				qtip:'Justifique, ¿por que la necesidad de esta compra?',
 				allowBlank: false,
 				width: '100%',
