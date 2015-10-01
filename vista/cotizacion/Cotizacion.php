@@ -299,7 +299,7 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
             grid:true,
             form:false
         },
-          {
+        {
             config:{
                 name: 'fecha_coti',
                 fieldLabel: 'Fecha Cotiz.',
@@ -314,7 +314,7 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
             id_grupo:1,
             grid:true,
             form:true
-          },
+        },
 		{
             config:{
                 name:'id_moneda',
