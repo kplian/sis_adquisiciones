@@ -45,14 +45,13 @@ class MODProveedor extends MODbase{
 		$this->captura('rotulo_comercial','varchar');
 		$this->captura('ci','varchar');
 		$this->captura('desc_dir_proveedor','varchar');
-		
+		$this->captura('contacto','text');
 		
 				
 		//Ejecuta la instruccion
 		$this->armarConsulta();
 		//echo $this->consulta;exit;
 		$this->ejecutarConsulta();
-		
 		//Devuelve la respuesta
 		return $this->respuesta;
 	}
@@ -103,6 +102,7 @@ class MODProveedor extends MODbase{
 		$this->setParametro('fecha_nacimiento','fecha_nacimiento','date');
 		$this->setParametro('direccion','direccion','varchar');
 		$this->setParametro('rotulo_comercial','rotulo_comercial','varchar');
+		$this->setParametro('contacto','contacto','text');
 		//Ejecuta la instruccion
 		$this->armarConsulta();
 		$this->ejecutarConsulta();
@@ -159,7 +159,7 @@ class MODProveedor extends MODbase{
 		$this->setParametro('fecha_nacimiento','fecha_nacimiento','date');
 		$this->setParametro('direccion','direccion','varchar');
 		$this->setParametro('rotulo_comercial','rotulo_comercial','varchar');
-		
+		$this->setParametro('contacto','contacto','text');
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();
