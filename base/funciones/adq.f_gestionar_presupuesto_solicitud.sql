@@ -53,6 +53,7 @@ DECLARE
   v_monto_a_revertir_mb  numeric;
   v_ano_1 integer;
   v_ano_2 integer;
+  v_reg_sol				record;
   
 
   
@@ -61,6 +62,15 @@ BEGIN
   v_nombre_funcion = 'adq.f_gestionar_presupuesto_solicitud';
    
   v_id_moneda_base =  param.f_get_moneda_base();
+  
+  select 
+    s.*
+  into
+   v_reg_sol
+  from adq.tsolicitud s
+  where s.id_solicitud = p_id_solicitud_compra;
+  
+  
   
       IF p_operacion = 'comprometer' THEN
         
@@ -81,7 +91,8 @@ BEGIN
                               s.presu_comprometido,
                               s.id_moneda,
                               sd.precio_ga,
-                              s.fecha_soli
+                              s.fecha_soli,
+                              s.num_tramite as nro_tramite
                               
                               FROM  adq.tsolicitud s 
                               INNER JOIN adq.tsolicitud_det sd on s.id_solicitud = sd.id_solicitud
@@ -91,10 +102,8 @@ BEGIN
                                      and sd.cantidad > 0 ) LOOP
                                      
                                 
-                     IF(v_registros.presu_comprometido='si') THEN
-                     
-                        raise exception 'El presupuesto ya se encuentra comprometido';
-                     
+                     IF(v_registros.presu_comprometido='si') THEN                     
+                        raise exception 'El presupuesto ya se encuentra comprometido';                     
                      END IF;
                      
                      
@@ -137,7 +146,9 @@ BEGIN
               IF v_i > 0 THEN 
               
                     --llamada a la funcion de compromiso
-                    va_resp_ges =  pre.f_gestionar_presupuesto(va_id_presupuesto, 
+                    va_resp_ges =  pre.f_gestionar_presupuesto(p_id_usuario,
+                    										   NULL, --tipo cambio
+                                                               va_id_presupuesto, 
                                                                va_id_partida, 
                                                                va_id_moneda, 
                                                                va_monto, 
@@ -146,6 +157,7 @@ BEGIN
                                                                NULL,--  p_id_partida_ejecucion 
                                                                va_columna_relacion, 
                                                                va_fk_llave,
+                                                               v_reg_sol.num_tramite,--nro_tramite
                                                                NULL,
                                                                p_conexion);
                  
@@ -191,7 +203,8 @@ BEGIN
                               sd.revertido_mo,
                               s.id_moneda,
                               sd.precio_ga,
-                              s.fecha_soli
+                              s.fecha_soli,
+                              s.num_tramite as nro_tramite
                               
                               FROM  adq.tsolicitud s 
                               INNER JOIN adq.tsolicitud_det sd on s.id_solicitud = sd.id_solicitud and sd.estado_reg = 'activo'
@@ -266,7 +279,9 @@ BEGIN
              
              --llamada a la funcion de para reversion
                IF v_i > 0 THEN 
-                  va_resp_ges =  pre.f_gestionar_presupuesto(va_id_presupuesto, 
+                  va_resp_ges =  pre.f_gestionar_presupuesto(p_id_usuario,
+                    										 NULL, --tipo cambio
+                  											 va_id_presupuesto, 
                                                              va_id_partida, 
                                                              va_id_moneda, 
                                                              va_monto, 
@@ -275,6 +290,7 @@ BEGIN
                                                              va_id_partida_ejecucion,--  p_id_partida_ejecucion 
                                                              va_columna_relacion, 
                                                              va_fk_llave,
+                                                             v_reg_sol.num_tramite,--nro_tramite
                                                              NULL,
                                                              p_conexion);
                END IF;
@@ -407,7 +423,9 @@ BEGIN
                        IF v_i > 0 THEN                  
                      
                        --llamada a la funcion de para reversion
-                        va_resp_ges =  pre.f_gestionar_presupuesto(va_id_presupuesto, 
+                        va_resp_ges =  pre.f_gestionar_presupuesto(p_id_usuario,
+                    										       NULL, --tipo cambio
+                                                                   va_id_presupuesto, 
                                                                    va_id_partida, 
                                                                    va_id_moneda, 
                                                                    va_monto, 
@@ -416,6 +434,7 @@ BEGIN
                                                                    va_id_partida_ejecucion,--  p_id_partida_ejecucion 
                                                                    va_columna_relacion, 
                                                                    va_fk_llave,
+                                                                   v_reg_sol.num_tramite,--nro_tramite
                                                                    NULL,
                                                                    p_conexion);
                       END IF;

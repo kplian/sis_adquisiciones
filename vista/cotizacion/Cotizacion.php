@@ -430,7 +430,7 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
         {
             config:{
                 name: 'tiempo_entrega',
-                qtip:'Dias en que se espera la entrega a partir de la emision de la OC',
+                qtip:'Dias en que se espera la entrega a partir del dia siguiente de la emision de la OC',
                 fieldLabel: 'Tiempo de entrega',
                 allowBlank: true,
                 anchor: '80%',
@@ -439,7 +439,7 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
             },
             type:'TextField',
             filters:{pfiltro:'cot.tiempo_entrega',type:'string'},
-            valorInicial:'5 días  de emitida la presente orden',
+            valorInicial:'5 días a partir del dia siguiente de emitida la presente orden',
             id_grupo:1,
             grid:true,
             form:true
