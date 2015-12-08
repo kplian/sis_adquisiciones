@@ -371,7 +371,8 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
                 allowBlank: false,
                 anchor: '80%',
                 hidden: true,
-                gwidth: 100
+                gwidth: 100,
+				decimalPrecision : 10
             },
             type:'NumberField',
             filters:{pfiltro:'cot.tipo_cambio_conv',type:'numeric'},
