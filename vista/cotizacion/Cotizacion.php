@@ -299,7 +299,7 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
             grid:true,
             form:false
         },
-          {
+        {
             config:{
                 name: 'fecha_coti',
                 fieldLabel: 'Fecha Cotiz.',
@@ -314,7 +314,7 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
             id_grupo:1,
             grid:true,
             form:true
-          },
+        },
 		{
             config:{
                 name:'id_moneda',
@@ -371,7 +371,8 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
                 allowBlank: false,
                 anchor: '80%',
                 hidden: true,
-                gwidth: 100
+                gwidth: 100,
+				decimalPrecision : 10
             },
             type:'NumberField',
             filters:{pfiltro:'cot.tipo_cambio_conv',type:'numeric'},
@@ -430,7 +431,7 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
         {
             config:{
                 name: 'tiempo_entrega',
-                qtip:'Dias en que se espera la entrega a partir de la emision de la OC',
+                qtip:'Dias en que se espera la entrega a partir del dia siguiente de la emision de la OC',
                 fieldLabel: 'Tiempo de entrega',
                 allowBlank: true,
                 anchor: '80%',
@@ -439,7 +440,7 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
             },
             type:'TextField',
             filters:{pfiltro:'cot.tiempo_entrega',type:'string'},
-            valorInicial:'5 días  de emitida la presente orden',
+            valorInicial:'5 días a partir del dia siguiente de emitida la presente orden',
             id_grupo:1,
             grid:true,
             form:true

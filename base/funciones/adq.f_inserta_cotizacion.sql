@@ -311,7 +311,7 @@ BEGIN
             END IF;
             
             IF  v_tiempo_entrega is NULL or v_tiempo_entrega = '' THEN
-               v_tiempo_entrega  = v_dias_plazo_entrega_sol||' días de emitida la presente orden';
+               v_tiempo_entrega  = v_dias_plazo_entrega_sol||' días a partir del dia siguiente de emitida la presente orden';
              END IF;
             
             --lugar de entrega

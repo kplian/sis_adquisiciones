@@ -111,8 +111,8 @@ BEGIN
            IF  exists(select 
                          1
                        from adq.tsolicitud_det sd 
-                       inner join pre.tpartida p on p.id_partida = sd.id_partida
-                       where   sd.id_solicitud = p_id_solicitud 
+                       inner join pre.tpartida p on p.id_partida = sd.id_partida 
+                       where   sd.id_solicitud = p_id_solicitud and sd.estado_reg = 'activo'
                               and TRIM(p.codigo) =ANY (va_obs)) THEN
                  return;
                   

@@ -1,3 +1,5 @@
+--------------- SQL ---------------
+
 CREATE OR REPLACE FUNCTION adq.f_genera_preingreso_af_al (
   p_id_usuario integer,
   p_id_usuario_ai integer,
@@ -33,7 +35,7 @@ DECLARE
     v_id_estado_wf integer;
     v_codigo_estado varchar;
     v_id_moneda integer;
-    v_resp boolean;
+    v_resp varchar;
     v_precio_compra numeric;
     v_nombre_funcion varchar;
     v_estado_cuota varchar;
@@ -45,10 +47,13 @@ DECLARE
     v_activo_fijo  varchar;
     v_tipo   varchar;
     v_mensaje varchar;
+   
 
 BEGIN
 
-  v_nombre_funcion='adq.f_genera_preingreso_af';
+ 
+  
+  v_nombre_funcion='adq.f_genera_preingreso_af_al';
     v_af = 0;
     
     --inicia variable
@@ -72,8 +77,9 @@ BEGIN
     
     END IF;
     
-    --raise exception 'pancananita: % % %',v_almacenable,v_activo_fijo,v_tipo;
-  
+   
+   
+    
     ---------------------
     --OBTENCION DE DATOS
     ---------------------
@@ -97,13 +103,16 @@ BEGIN
     --Moneda Base
     v_id_moneda = param.f_get_moneda_base();
     
+    
     ---------------
     --VALIDACIONES
     ---------------
+    
   --Existencia de la cotización en estado 'pago_habilitado'
   if v_rec_cot.id_cotizacion is null then
       raise exception 'Cotización no encontrada';
-    end if;
+  end if;
+  
     
      if exists(select 1
               from alm.tpreingreso pi
@@ -114,8 +123,8 @@ BEGIN
               and estado in ('borrador','finalizado')) then
       raise exception 'El Preingreso ya fue generado anteriormente.';
     end if;
-  
-     if exists(select 1
+    
+     if EXISTS(select 1
                   from adq.tcotizacion_det cdet
                   inner join adq.tsolicitud_det sdet
                   on sdet.id_solicitud_det = cdet.id_solicitud_det
@@ -130,18 +139,19 @@ BEGIN
         v_af = 1;
     end if;
     
+    
     if  v_af = 0 then
-      raise exception 'La cotización no tiene ningún %. Nada que hacer.', v_mensaje;
+     raise exception 'El concepto esta marcado como activo y almacenable simultaneamente';
     end if;
-
-  
+    
+    
     --------------------------
     -- CREACIÓN DE PREINGRESO
     --------------------------
-    
+     
     
     --Preingreso para Activos Fijos
-    if v_af>0 then
+    if v_af > 0 then
     
            insert into alm.tpreingreso(
               id_usuario_reg, 
@@ -211,15 +221,21 @@ BEGIN
             and lower(cin.almacenable) = v_almacenable;
     end if;
 
-    return true;
-    
+
+
+ return true;
+
 EXCEPTION
-  WHEN OTHERS THEN
-      v_resp='';
-      v_resp = pxp.f_agrega_clave(v_resp,'mensaje',SQLERRM);
-      v_resp = pxp.f_agrega_clave(v_resp,'codigo_error',SQLSTATE);
-      v_resp = pxp.f_agrega_clave(v_resp,'procedimientos',v_nombre_funcion);
-      raise exception '%',v_resp;
+				
+	WHEN OTHERS THEN
+		v_resp='';
+        v_resp = pxp.f_agrega_clave(v_resp,'mensaje',SQLERRM);
+		v_resp = pxp.f_agrega_clave(v_resp,'codigo_error',SQLSTATE);
+		v_resp = pxp.f_agrega_clave(v_resp,'procedimientos',v_nombre_funcion);
+		raise exception '%',v_resp;
+    
+        
+				        
 END;
 $body$
 LANGUAGE 'plpgsql'

@@ -64,7 +64,7 @@ Phx.vista.CotizacionOC = {
                 iconCls : 'bassign',
                 disabled : true,
                 handler : this.onBtnForm500,
-                tooltip : '<b>Tiene de Form500</b><br>Evita que le lleguen mas alertas solicitando el formulario 500'
+                tooltip : '<b>Cambia estado de Form500</b><br>(requiere, si, no), Cuando esta marcado como “REQUIERE” llegara todos los días un correo de recordatorio, hasta que se cambie a “SI”. “SI” significa que se hizo el formulario en SICOES'
             });
             
             

@@ -643,5 +643,27 @@ IS 'Observacion en visto bueno POA';
 
 /***********************************F-SCP-RAC-ADQ-0-08/05/2015****************************************/
 
+/***********************************I-SCP-GSS-ADQ-0-04/11/2015****************************************/
 
+--------------- SQL ---------------
+
+ALTER TABLE param.tproveedor
+  ADD COLUMN contacto TEXT;
+  
+COMMENT ON COLUMN param.tproveedor.contacto
+IS 'contacto del proveedor';
+
+/***********************************F-SCP-GSS-ADQ-0-04/11/2015****************************************/
+
+
+/***********************************I-SCP-RAV-ADQ-0-08/12/2015****************************************/
+
+--------------- SQL ---------------
+
+ALTER TABLE adq.tcotizacion
+  ALTER COLUMN tipo_cambio_conv TYPE NUMERIC;
+  
+/***********************************F-SCP-RAC-ADQ-0-08/12/2015****************************************/
+
+  
 
