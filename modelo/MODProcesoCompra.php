@@ -274,6 +274,64 @@ function listarProcesoCompraPedido(){
         //Devuelve la respuesta
         return $this->respuesta;
     }
+	
+	function listarReporteTiemposProcesoCompra(){
+		//Definicion de variables para ejecucion del procedimientp
+		$this->procedimiento='adq.f_proceso_compra_sel';
+		$this->transaccion='ADQ_PROCESTIE_SEL';
+		$this->tipo_procedimiento='SEL';//tipo de transaccion
+		
+		$this->setParametro('fecha_ini','fecha_ini','date');
+		$this->setParametro('fecha_fin','fecha_fin','date');
+		$this->setParametro('id_depto','id_depto','integer');
+		$this->setParametro('tipo','tipo','varchar');
+				
+		//Definicion de la lista del resultado del query
+		$this->captura('num_tramite','varchar');
+		$this->captura('justificacion','varchar');
+		$this->captura('proveedor','varchar');
+		$this->captura('empleado','varchar');
+		$this->captura('fecha_inicio','date');
+		$this->captura('mayor_20','varchar');
+		$this->captura('tiempo_asignacion','numeric');
+		$this->captura('tiempo_atencion','numeric');
+		$this->captura('tiempo_legal','integer');		
+		
+		//Ejecuta la instruccion
+		$this->armarConsulta();
+		$this->ejecutarConsulta();
+		
+		//Devuelve la respuesta
+		return $this->respuesta;
+	}
+
+	function listarReporteTiemposProcesoCompraResumen(){
+		//Definicion de variables para ejecucion del procedimientp
+		$this->procedimiento='adq.f_proceso_compra_sel';
+		$this->transaccion='ADQ_PROCESTIE_SEL';
+		$this->tipo_procedimiento='SEL';//tipo de transaccion
+		
+		$this->setParametro('fecha_ini','fecha_ini','date');
+		$this->setParametro('fecha_fin','fecha_fin','date');
+		$this->setParametro('id_depto','id_depto','integer');
+		$this->setParametro('tipo','tipo','varchar');
+				
+		//Definicion de la lista del resultado del query
+		$this->captura('empleado','varchar');
+		$this->captura('mayor_20','varchar');
+		$this->captura('num_atendidos','integer');
+		$this->captura('tiempo_asignacion','numeric');
+		$this->captura('tiempo_atencion','numeric');
+		$this->captura('tiempo_legal','numeric');
+				
+		
+		//Ejecuta la instruccion
+		$this->armarConsulta();
+		$this->ejecutarConsulta();
+		
+		//Devuelve la respuesta
+		return $this->respuesta;
+	}
     
 	
 	

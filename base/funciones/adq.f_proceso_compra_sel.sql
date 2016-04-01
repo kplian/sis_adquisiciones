@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION adq.f_proceso_compra_sel (
   p_administrador integer,
   p_id_usuario integer,
@@ -290,6 +288,242 @@ BEGIN
 			return v_consulta;
 
 		end;
+    /*********************************    
+ 	#TRANSACCION:  'ADQ_PROCESTIE_SEL'
+ 	#DESCRIPCION:	Obtener detalle y resumen de tiempos por proceso de compra atendido
+ 	#AUTOR:		Gonzalo Sarmiento Sejas
+ 	#FECHA:		10-04-2013 12:55:30
+	***********************************/
+
+	elsif(p_transaccion='ADQ_PROCESTIE_SEL')then
+     				
+    	begin
+        
+        	v_consulta = 
+            'with observaciones as (
+				select o.id_estado_wf , round((EXTRACT(EPOCH FROM (coalesce(o.fecha_fin,now()) - o.fecha_reg))/3600)::numeric,0) as tiempo_observacion
+    			from wf.tobs o
+    			where o.estado_reg = ''activo''
+    			group by o.id_estado_wf,o.fecha_fin,o.fecha_reg
+			),
+			
+            borrador as (
+				select 
+				distinct on (sol.num_tramite) sol.num_tramite,
+				sol.justificacion,
+				prov.desc_proveedor,
+				usu.desc_persona as usuario_asignado,
+                pc.fecha_ini_proc as fecha_inicio_proceso,
+                co.id_cotizacion,
+                esso.id_estado_wf,
+                round ((EXTRACT(EPOCH FROM (essosi.fecha_reg - esso.fecha_reg))/3600)::numeric,0) as tiempo_asignacion,
+                coalesce(obssol.tiempo_observacion,0) as tiempo_observacion_asignacion,
+                tes.codigo as estado_cotizacion,
+                round ((case when essi.id_estado_wf is null then
+                    EXTRACT(EPOCH FROM (now() - es.fecha_reg))/3600
+                else
+                    EXTRACT(EPOCH FROM (essi.fecha_reg - es.fecha_reg))/3600
+                end)::numeric,0) as tiempo_estado_cotizacion,
+                coalesce(obsco.tiempo_observacion,0) as tiempo_observacion_estado,
+                (case when cot.precio_total_mb >= 20000 then
+                    ''si''
+                else
+                    ''no''
+                end) as mayor_20
+
+
+                from adq.tproceso_compra pc
+                inner join adq.tsolicitud sol on pc.id_solicitud = sol.id_solicitud
+                inner join wf.testado_wf esso on esso.id_proceso_wf = sol.id_proceso_wf
+                inner join wf.ttipo_estado tesso on tesso.id_tipo_estado = esso.id_tipo_estado and
+                    tesso.codigo in (''aprobado'')
+                left join observaciones obssol on obssol.id_estado_wf = esso.id_estado_wf
+                inner join wf.testado_wf essosi on essosi.id_estado_anterior = esso.id_estado_wf
+                inner join wf.ttipo_estado tessosi on tessosi.id_tipo_estado = essosi.id_tipo_estado and
+                    tessosi.codigo in (''proceso'')
+                inner join param.vproveedor prov on prov.id_proveedor = sol.id_proveedor
+                inner join adq.tcotizacion co on pc.id_proceso_compra = co.id_proceso_compra
+                inner join adq.vcotizacion cot on cot.id_cotizacion = co.id_cotizacion
+                inner join wf.testado_wf es on es.id_proceso_wf = co.id_proceso_wf
+                left join observaciones obsco on obsco.id_estado_wf = es.id_estado_wf
+                left join wf.testado_wf essi on essi.id_estado_anterior = es.id_estado_wf
+                inner join wf.ttipo_estado tes on tes.id_tipo_estado = es.id_tipo_estado and
+                    tes.codigo in (''borrador'')
+                inner join segu.vusuario usu on usu.id_usuario = pc.id_usuario_auxiliar
+                where pc.fecha_ini_proc::date >= ''' || v_parametros.fecha_ini || '''::date and
+                	pc.fecha_ini_proc::date <= ''' || v_parametros.fecha_fin || '''::date and 
+                	pc.id_depto = ' || v_parametros.id_depto ||' and co.estado!= ''anulado''
+                order by sol.num_tramite,esso.fecha_reg DESC
+			),
+
+			cotizado as (
+                select 
+                distinct on (co.id_cotizacion) co.id_cotizacion,
+                round ((case when essi.id_estado_wf is null then
+                    EXTRACT(EPOCH FROM (now() - es.fecha_reg))/3600
+                else
+                    EXTRACT(EPOCH FROM (essi.fecha_reg - es.fecha_reg))/3600
+                end)::numeric,0) as tiempo_estado_cotizacion,
+                coalesce(obsco.tiempo_observacion,0) as tiempo_observacion_estado
+
+                from adq.tproceso_compra pc
+                inner join adq.tcotizacion co on pc.id_proceso_compra = co.id_proceso_compra
+                inner join wf.testado_wf es on es.id_proceso_wf = co.id_proceso_wf
+                left join observaciones obsco on obsco.id_estado_wf = es.id_estado_wf
+                left join wf.testado_wf essi on essi.id_estado_anterior = es.id_estado_wf
+                inner join wf.ttipo_estado tes on tes.id_tipo_estado = es.id_tipo_estado and
+                    tes.codigo in (''cotizado'')
+                where pc.fecha_ini_proc::date >= ''' || v_parametros.fecha_ini || '''::date and
+                	pc.fecha_ini_proc::date <= ''' || v_parametros.fecha_fin || '''::date and 
+                	pc.id_depto = ' || v_parametros.id_depto ||' and co.estado!= ''anulado''
+                order by co.id_cotizacion,es.fecha_reg DESC),
+
+			recomendado as (
+
+                select 
+
+                distinct on (co.id_cotizacion) co.id_cotizacion,
+                round ((case when essi.id_estado_wf is null then
+                    EXTRACT(EPOCH FROM (now() - es.fecha_reg))/3600
+                else
+                    EXTRACT(EPOCH FROM (essi.fecha_reg - es.fecha_reg))/3600
+                end)::numeric,0) as tiempo_estado_cotizacion,
+                coalesce(obsco.tiempo_observacion,0) as tiempo_observacion_estado
+
+                from adq.tproceso_compra pc
+                inner join adq.tcotizacion co on pc.id_proceso_compra = co.id_proceso_compra
+                inner join wf.testado_wf es on es.id_proceso_wf = co.id_proceso_wf
+                left join observaciones obsco on obsco.id_estado_wf = es.id_estado_wf
+                left join wf.testado_wf essi on essi.id_estado_anterior = es.id_estado_wf
+                inner join wf.ttipo_estado tes on tes.id_tipo_estado = es.id_tipo_estado and
+                    tes.codigo in (''recomendado'')
+                where pc.fecha_ini_proc::date >= ''' || v_parametros.fecha_ini || '''::date and
+                	pc.fecha_ini_proc::date <= ''' || v_parametros.fecha_fin || '''::date and 
+                	pc.id_depto = ' || v_parametros.id_depto ||' and co.estado!= ''anulado''
+                order by co.id_cotizacion,es.fecha_reg DESC),
+
+			adjudicado as (
+
+                select 
+
+                distinct on (co.id_cotizacion) co.id_cotizacion,
+                round ((case when essi.id_estado_wf is null then
+                    EXTRACT(EPOCH FROM (now() - es.fecha_reg))/3600
+                else
+                    EXTRACT(EPOCH FROM (essi.fecha_reg - es.fecha_reg))/3600
+                end)::numeric,0) as tiempo_estado_cotizacion,
+                coalesce(obsco.tiempo_observacion,0) as tiempo_observacion_estado
+
+                from adq.tproceso_compra pc
+                inner join adq.tcotizacion co on pc.id_proceso_compra = co.id_proceso_compra
+                inner join wf.testado_wf es on es.id_proceso_wf = co.id_proceso_wf
+                left join observaciones obsco on obsco.id_estado_wf = es.id_estado_wf
+                left join wf.testado_wf essi on essi.id_estado_anterior = es.id_estado_wf
+                inner join wf.ttipo_estado tes on tes.id_tipo_estado = es.id_tipo_estado and
+                    tes.codigo in (''adjudicado'')
+                where pc.fecha_ini_proc::date >= ''' || v_parametros.fecha_ini || '''::date and
+                	pc.fecha_ini_proc::date <= ''' || v_parametros.fecha_fin || '''::date and 
+                	pc.id_depto = ' || v_parametros.id_depto ||' and co.estado!= ''anulado''
+                order by co.id_cotizacion,es.fecha_reg DESC),
+
+			contrato_pendiente as (
+
+                select 
+
+                distinct on (co.id_cotizacion) co.id_cotizacion,
+                round ((case when essi.id_estado_wf is null then
+                    EXTRACT(EPOCH FROM (now() - es.fecha_reg))/3600
+                else
+                    EXTRACT(EPOCH FROM (essi.fecha_reg - es.fecha_reg))/3600
+                end)::numeric,0) as tiempo_estado_cotizacion,
+                coalesce(obsco.tiempo_observacion,0) as tiempo_observacion_estado
+
+                from adq.tproceso_compra pc
+                inner join adq.tcotizacion co on pc.id_proceso_compra = co.id_proceso_compra
+                inner join wf.testado_wf es on es.id_proceso_wf = co.id_proceso_wf
+                left join observaciones obsco on obsco.id_estado_wf = es.id_estado_wf
+                left join wf.testado_wf essi on essi.id_estado_anterior = es.id_estado_wf
+                inner join wf.ttipo_estado tes on tes.id_tipo_estado = es.id_tipo_estado and
+                    tes.codigo in (''contrato_pendiente'')
+                where pc.fecha_ini_proc::date >= ''' || v_parametros.fecha_ini || '''::date and
+                	pc.fecha_ini_proc::date <= ''' || v_parametros.fecha_fin || '''::date and 
+                	pc.id_depto = ' || v_parametros.id_depto ||' and co.estado!= ''anulado''
+                order by co.id_cotizacion,es.fecha_reg DESC),
+
+			contrato_elaborado as (
+
+                select 
+
+                distinct on (co.id_cotizacion) co.id_cotizacion,
+                round ((case when essi.id_estado_wf is null then
+                    EXTRACT(EPOCH FROM (now() - es.fecha_reg))/3600
+                else
+                    EXTRACT(EPOCH FROM (essi.fecha_reg - es.fecha_reg))/3600
+                end)::numeric,0) as tiempo_estado_cotizacion,
+                coalesce(obsco.tiempo_observacion,0) as tiempo_observacion_estado
+
+                from adq.tproceso_compra pc
+                inner join adq.tcotizacion co on pc.id_proceso_compra = co.id_proceso_compra
+                inner join wf.testado_wf es on es.id_proceso_wf = co.id_proceso_wf
+                left join observaciones obsco on obsco.id_estado_wf = es.id_estado_wf
+                left join wf.testado_wf essi on essi.id_estado_anterior = es.id_estado_wf
+                inner join wf.ttipo_estado tes on tes.id_tipo_estado = es.id_tipo_estado and
+                    tes.codigo in (''contrato_elaborado'')
+                where pc.fecha_ini_proc::date >= ''' || v_parametros.fecha_ini || '''::date and
+                	pc.fecha_ini_proc::date <= ''' || v_parametros.fecha_fin || '''::date and 
+                	pc.id_depto = ' || v_parametros.id_depto ||' and co.estado!= ''anulado''
+                order by co.id_cotizacion,es.fecha_reg DESC)';
+                
+		if (v_parametros.tipo = 'resumen') then
+        	v_consulta = v_consulta || ', detalle as (';
+        end if;                
+		
+        v_consulta = v_consulta || '
+            select
+            b.num_tramite::varchar,
+            b.justificacion::varchar,
+            b.desc_proveedor::varchar,
+            b.usuario_asignado::varchar,
+            b.fecha_inicio_proceso::date,
+            b.mayor_20::varchar,
+            coalesce (b.tiempo_asignacion,0) - coalesce (b.tiempo_observacion_asignacion,0)::integer as tiempo_asignacion,
+
+            (coalesce(b.tiempo_estado_cotizacion,0)+
+            coalesce(c.tiempo_estado_cotizacion,0)+
+            coalesce(r.tiempo_estado_cotizacion,0)+
+            coalesce(a.tiempo_estado_cotizacion,0)+
+            coalesce(ce.tiempo_estado_cotizacion,0))
+            -
+            (coalesce(b.tiempo_observacion_estado,0)+
+            coalesce(c.tiempo_observacion_estado,0)+
+            coalesce(r.tiempo_observacion_estado,0)+
+            coalesce(a.tiempo_observacion_estado,0)+
+            coalesce(ce.tiempo_observacion_estado,0))::integer as tiempo_total_atencion,
+            cp.tiempo_estado_cotizacion::integer as tiempo_total_legal
+
+            from borrador b
+            left join cotizado c on c.id_cotizacion = b.id_cotizacion
+            left join recomendado r  on r.id_cotizacion = b.id_cotizacion
+            left join adjudicado a  on a.id_cotizacion = b.id_cotizacion
+            left join contrato_pendiente cp  on cp.id_cotizacion = b.id_cotizacion
+            left join contrato_elaborado ce  on ce.id_cotizacion = b.id_cotizacion
+
+            order by b.usuario_asignado,b.fecha_inicio_proceso,b.num_tramite';
+       if (v_parametros.tipo = 'resumen') then
+        	v_consulta = v_consulta || ')
+                select usuario_asignado::varchar,mayor_20::varchar,
+                count(*)::integer as cantidad_atendidos,
+                round(avg(tiempo_asignacion),2)::numeric as promedio_asignacion,
+                round(avg(tiempo_total_atencion),2)::numeric as promedio_atencion,
+                round(avg(tiempo_total_legal),2)::numeric as promedio_legal_sin_0
+                from detalle
+                group by usuario_asignado, mayor_20
+                order by usuario_asignado, mayor_20';
+       end if;     
+		
+		return v_consulta;
+						
+	end;
 					
 	else
 					     
