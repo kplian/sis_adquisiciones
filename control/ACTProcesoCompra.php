@@ -10,6 +10,7 @@
 require_once(dirname(__FILE__).'/../../pxp/pxpReport/ReportWriter.php');
 require_once(dirname(__FILE__).'/../reportes/RCuadroComparativo.php');
 require_once(dirname(__FILE__).'/../../pxp/pxpReport/DataSource.php');
+require_once(dirname(__FILE__).'/../reportes/RTiemposProcesoCompra.php');
 
 class ACTProcesoCompra extends ACTbase{    
 			
@@ -94,6 +95,41 @@ class ACTProcesoCompra extends ACTbase{
         $this->res=$this->objFunc->finalizarProceso($this->objParam);
         $this->res->imprimirRespuesta($this->res->generarJson());
     }
+	
+	function listarReporteTiemposProcesoCompra(){
+		
+		$this->objParam->addParametro('tipo','detalle');
+		$this->objFunc=$this->create('MODProcesoCompra');				
+		$this->res=$this->objFunc->listarReporteTiemposProcesoCompra($this->objParam);
+		$this->objParam->addParametro('datos',$this->res->datos);
+		
+		
+		$this->objParam->addParametro('tipo','resumen');
+		$this->objFunc=$this->create('MODProcesoCompra');		
+		$this->res=$this->objFunc->listarReporteTiemposProcesoCompraResumen($this->objParam);		
+		
+		$this->objParam->addParametro('datos_resumen',$this->res->datos);	
+		
+		//obtener titulo del reporte
+		$titulo = 'RepTiemposProcesoCompra';
+		
+		//Genera el nombre del archivo (aleatorio + titulo)
+		$nombreArchivo=uniqid(md5(session_id()).$titulo);
+		$nombreArchivo.='.xls';
+		$this->objParam->addParametro('nombre_archivo',$nombreArchivo);			
+		
+		$this->objReporteFormato=new RTiemposProcesoCompra($this->objParam);			
+		$this->objReporteFormato->imprimeDetalle();
+		$this->objReporteFormato->imprimeResumen();	
+		
+		$this->objReporteFormato->generarReporte();
+		$this->mensajeExito=new Mensaje();
+		$this->mensajeExito->setMensaje('EXITO','Reporte.php','Reporte generado',
+										'Se generó con éxito el reporte: '.$nombreArchivo,'control');
+										
+		$this->mensajeExito->setArchivoGenerado($nombreArchivo);
+		$this->mensajeExito->imprimirRespuesta($this->mensajeExito->generarJson());			
+	}
     
     
 	function cuadroComparativo(){
