@@ -683,7 +683,8 @@ BEGIN
        				cot.correo_contacto,
                     tppc.codigo as codigo_proceso,
                     cot.forma_pago,
-                    pc.objeto
+                    pc.objeto,
+                    uo.codigo as codigo_uo
               from adq.tcotizacion cot 
               inner join param.vproveedor pv on pv.id_proveedor=cot.id_proveedor
               left join segu.tpersona per on per.id_persona=pv.id_persona
@@ -695,6 +696,7 @@ BEGIN
 		      inner join segu.vpersona persol on persol.id_persona=fun.id_persona
               inner join wf.tproceso_wf pcwf on pcwf.id_proceso_wf=pc.id_proceso_wf
 		      inner join wf.ttipo_proceso tppc on tppc.id_tipo_proceso=pcwf.id_tipo_proceso
+              inner join orga.tuo uo on uo.id_uo=sol.id_uo
               where '||v_filtro;
           
           --Definicion de la respuesta
