@@ -133,7 +133,7 @@ Phx.vista.SolicitudDet=Ext.extend(Phx.gridInterfaz,{
 				allowBlank: false,
 				anchor: '80%',
 				gwidth: 250,
-				maxLength:1200
+				maxLength:5000
 			},
 			type:'TextArea',
 			filters:{pfiltro:'sold.descripcion',type:'string'},

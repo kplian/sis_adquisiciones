@@ -25,13 +25,27 @@ require_once dirname(__FILE__).'/../../pxp/pxpReport/Report.php';
         $this->SetFontSize(16);
         $this->SetFont('','B');
 								$tipo=$this->getDataSource()->getParameter('tipo');
-								if($tipo=='Bien')
-								  $tipo='Compra';
-                                elseif($tipo=='Bien - Servicio')
-								  $tipo='Compra - Servicio'; 
-                                else
-                                  $tipo='Servicio';       
-                                
+								$codigo_uo=$this->getDataSource()->getParameter('codigo_uo');
+								
+								if($tipo=='Bien'){
+									if($codigo_uo=='MM')
+										$tipo='Compra/Reparación';
+									else
+										$tipo='Compra';
+								}
+                                elseif($tipo=='Bien - Servicio'){
+									if($codigo_uo=='MM')
+										$tipo='Compra/Reparación - Servicio/Reparación';
+									else
+										$tipo='Compra - Servicio';
+								}  
+                                else{
+									if($codigo_uo=='MM')
+										$tipo='Servicio/Reparación';
+									else
+										$tipo='Servicio';
+                                }
+								
                                 $this->Cell(145, $height, 'Orden de '.$tipo, 0, 0, 'C', false, '', 1, false, 'T', 'C');        
         
 								$x=$this->getX();
@@ -331,6 +345,8 @@ Class ROrdenCompra extends Report {
 			$pdf->Cell($width4+$width3+$width2, $height, $this->getDataSource()->getParameter('email_contacto'), $white, 1, 'L', true, '', 0, false, 'T', 'C');
 		}
 		//$mensaje = $mensaje.', ante cualquier demora BOLIVIANA DE AVIACIÓN – BOA se reserva el derecho de retener el UNO PORCIENTO (1%) del monto total por día de retraso hasta un 20%.';
+		$pdf->Ln($height);
+		$pdf->MultiCell(0, $height, 'NOTA: La cuenta bancaria de todo proveedor debe estar registrada en SIGEP para compras nacionales', 0,'L', false ,1);
 		$pdf->Ln($height);
 		if($this->getDataSource()->getParameter('codigo_proceso')!='PROCINPD'){
 			$pdf->MultiCell(0, $height, 'Ante cualquier demora BOLIVIANA DE AVIACIÓN – BOA se reserva el derecho de retener el UNO PORCIENTO (1%) del monto total por día de retraso hasta un 20%.', 0,'L', false ,1);

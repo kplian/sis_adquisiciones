@@ -100,7 +100,7 @@ Phx.vista.FormSolicitud=Ext.extend(Phx.frmInterfaz,{
 										fieldLabel: 'Descripcion',
 										allowBlank: false,
 										anchor: '80%',
-										maxLength:1200
+										maxLength:5000
 								}),
 					'cantidad_sol': new Ext.form.NumberField({
 										name: 'cantidad_sol',
@@ -715,6 +715,7 @@ Phx.vista.FormSolicitud=Ext.extend(Phx.frmInterfaz,{
                 fieldLabel: 'Fecha Solicitud',
                 allowBlank: false,
                 disabled: false,
+                readOnly: true,
                 width: 105,
                 format: 'd/m/Y'
             },
@@ -742,7 +743,7 @@ Phx.vista.FormSolicitud=Ext.extend(Phx.frmInterfaz,{
                 name: 'dias_plazo_entrega',
                 fieldLabel: 'Dias de Entrega (Calendario)',
                 qtip: '¿Después de cuantos días calendario de emitida  la orden de compra se hara la entrega de los bienes?. EJM. Quedara de esta forma en la orden de Compra:  (Tiempo de entrega: X días calendario  a partir del dia siguiente de emitida la presente orden)',
-                allowBlank: true,
+                allowBlank: false,
                 allowDecimals: false,
                 width: 100,
                 minValue:1,
