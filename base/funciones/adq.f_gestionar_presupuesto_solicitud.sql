@@ -54,6 +54,10 @@ DECLARE
   v_ano_1 integer;
   v_ano_2 integer;
   v_reg_sol				record;
+  va_num_tramite		varchar[];
+  v_mensage_error		varchar;
+  v_sw_error			boolean;
+  v_resp_pre 			varchar;
   
 
   
@@ -121,6 +125,7 @@ BEGIN
                     va_columna_relacion[v_i]= 'id_solicitud_compra';
                     va_fk_llave[v_i] = v_registros.id_solicitud;
                     va_id_solicitud_det[v_i]= v_registros.id_solicitud_det;
+                    va_num_tramite[v_i] = v_reg_sol.num_tramite;
                     
                     
                    
@@ -157,7 +162,7 @@ BEGIN
                                                                NULL,--  p_id_partida_ejecucion 
                                                                va_columna_relacion, 
                                                                va_fk_llave,
-                                                               v_reg_sol.num_tramite,--nro_tramite
+                                                               va_num_tramite,--nro_tramite
                                                                NULL,
                                                                p_conexion);
                  
@@ -250,6 +255,7 @@ BEGIN
                         va_columna_relacion[v_i]= 'id_solicitud_compra';
                         va_fk_llave[v_i] = v_registros.id_solicitud;
                         va_id_solicitud_det[v_i]= v_registros.id_solicitud_det;
+                        va_num_tramite[v_i] = v_reg_sol.num_tramite;
                         
                         
                          -- la fecha de solictud es la fecha de compromiso 
@@ -290,7 +296,7 @@ BEGIN
                                                              va_id_partida_ejecucion,--  p_id_partida_ejecucion 
                                                              va_columna_relacion, 
                                                              va_fk_llave,
-                                                             v_reg_sol.num_tramite,--nro_tramite
+                                                             va_num_tramite,--nro_tramite
                                                              NULL,
                                                              p_conexion);
                END IF;
@@ -299,7 +305,7 @@ BEGIN
        
        -- revierte el sobrante no adjudicado en el proceso
                
-           --1)  lista todos los detalle de las solcitudes
+           --1)  lista todos los detalle de las solicitudes agrupatadas por partida y presupeusto
              
             
             v_i = 0;
@@ -439,6 +445,76 @@ BEGIN
                                                                    p_conexion);
                       END IF;
        
+       ELSIF p_operacion = 'verificar' THEN
+        
+         --verifica si tenemos suficiente presupeusto para comprometer
+           v_i = 0;
+           v_mensage_error = '';
+           v_sw_error = false;
+           
+           -- verifica que solicitud       
+          FOR v_registros in (
+          
+                               SELECT
+                           
+                                    sd.id_centro_costo,
+                                    s.id_gestion,
+                                    s.id_solicitud,
+                                    sd.id_partida,
+                                    sum(sd.precio_ga_mb) as precio_ga_mb,
+                                    p.id_presupuesto,
+                                    s.id_moneda,
+                                    sum(sd.precio_ga) as precio_ga,
+                                    par.codigo,
+                                    par.nombre_partida,
+                                    p.codigo_cc
+                                    
+                                                    
+                              FROM  adq.tsolicitud s 
+                              INNER JOIN adq.tsolicitud_det sd on s.id_solicitud = sd.id_solicitud
+                              inner join pre.tpartida par on par.id_partida = sd.id_partida
+                              inner join pre.vpresupuesto_cc   p  on p.id_centro_costo = sd.id_centro_costo and sd.estado_reg = 'activo'
+                              WHERE  sd.id_solicitud = p_id_solicitud_compra
+                                     and sd.estado_reg = 'activo' 
+                                     and sd.cantidad > 0
+                              
+                              group by 
+                              
+                              sd.id_centro_costo,
+                              s.id_gestion,
+                              s.id_solicitud,
+                              sd.id_partida,
+                              p.id_presupuesto,
+                              s.id_moneda,
+                              par.codigo,
+                              par.nombre_partida,
+                              p.codigo_cc) LOOP
+                                     
+                                
+                              v_resp_pre = pre.f_verificar_presupuesto_partida ( v_registros.id_presupuesto,
+                                                        v_registros.id_partida,
+                                                        v_registros.id_moneda,
+                                                        v_registros.precio_ga);
+                                                        
+                                                        
+                              IF   v_resp_pre = 'false' THEN        
+                                   v_mensage_error = v_mensage_error||format('Presupuesto:  %s, partida (%s) %s <BR/>', v_registros.codigo_cc, v_registros.codigo,v_registros.nombre_partida);    
+                                   v_sw_error = true;
+                              
+                              END IF;                         
+                   
+             
+             
+             END LOOP;
+             
+             
+             
+             IF v_sw_error THEN
+                 raise exception 'No se tiene suficiente presupeusto para; <BR/>%', v_mensage_error;
+             END IF;
+              
+       
+             return TRUE;
        
        ELSE
        

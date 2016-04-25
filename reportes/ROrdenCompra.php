@@ -24,70 +24,70 @@ require_once dirname(__FILE__).'/../../pxp/pxpReport/Report.php';
 								
         $this->SetFontSize(16);
         $this->SetFont('','B');
-								$tipo=$this->getDataSource()->getParameter('tipo');
-								$codigo_uo=$this->getDataSource()->getParameter('codigo_uo');
+		$tipo=$this->getDataSource()->getParameter('tipo');
+		$codigo_uo=$this->getDataSource()->getParameter('codigo_uo');
 								
-								if($tipo=='Bien'){
-									if($codigo_uo=='MM')
-										$tipo='Compra/Reparación';
-									else
-										$tipo='Compra';
-								}
-                                elseif($tipo=='Bien - Servicio'){
-									if($codigo_uo=='MM')
-										$tipo='Compra/Reparación - Servicio/Reparación';
-									else
-										$tipo='Compra - Servicio';
-								}  
-                                else{
-									if($codigo_uo=='MM')
-										$tipo='Servicio/Reparación';
-									else
-										$tipo='Servicio';
-                                }
-								
-                                $this->Cell(145, $height, 'Orden de '.$tipo, 0, 0, 'C', false, '', 1, false, 'T', 'C');        
-        
-								$x=$this->getX();
-								$y=$this->getY();
-								$this->setXY($x,$y-10);
-								$this->SetFontSize(8);
-								$this->SetFont('', 'B');
-								$this->Cell(20, $height, $this->getDataSource()->getParameter('numero_oc'), 0, 0, 'L', false, '', 1, false, 'T', 'C');
-								
-								$this->setXY($x,$y-7);
-								$this->SetFontSize(8);
-								$this->SetFont('', 'B');
-								$this->Cell(20, $height, $this->getDataSource()->getParameter('num_tramite'), 0, 0, 'L', false, '', 1, false, 'T', 'C');
-								
-								$this->setXY($x,$y-4);
-								$this->SetFontSize(6);
-								$this->SetFont('', 'B');
-								$this->Cell(20, $height, '', 0, 0, 'L', false, '', 1, false, 'T', 'C');
-								$this->setXY($x,$y-1);
-								$this->SetFontSize(7);
-								$this->setFont('','');
-								$this->Cell(20, $height, '', 0, 0, 'L', false, '', 1, false, 'T', 'C');
-								$this->setXY($x,$y+11);
-								$this->setFont('','');
-								$this->Cell(6, $height/5, 'Dia', 1, 0, 'L', false, '', 1, false, 'T', 'C');
-								$this->Cell(6, $height/5, 'Mes', 1, 0, 'L', false, '', 1, false, 'T', 'C');
-								$this->Cell(7, $height/5, 'Año', 1, 0, 'L', false, '', 1, false, 'T', 'C');
-								$this->setXY($x,$y+15);
-								
-																
-								$fecha_oc = explode('-', $this->getDataSource()->getParameter('fecha_oc'));
-								$this->Cell(6, $height/4, $fecha_oc[2], 1, 0, 'C', false, '', 1, false, 'T', 'C');
-								$this->Cell(6, $height/4, $fecha_oc[1], 1, 0, 'C', false, '', 1, false, 'T', 'C');
-								$this->Cell(7, $height/4, $fecha_oc[0], 1, 0, 'C', false, '', 1, false, 'T', 'C');
-								$this->Ln();		
-								if($tipo=='adjudicado'){
-								  $this->SetFontSize(9);
-                                $this->SetFont('','B');						
-										$this->Cell(30, $height, 'Numero de O.C. :', 0, 0, 'L', false, '', 1, false, 'T', 'C');
-										$this->SetFont('','');	
-										$this->Cell(30, $height, $this->getDataSource()->getParameter('numero_oc'), 0, 0, 'L', false, '', 1, false, 'T', 'C');
-								}
+		if($tipo=='Bien'){
+			if($codigo_uo=='MM')
+				$tipo='Compra / Reparación';
+			else
+				$tipo='Compra';
+		}
+        elseif($tipo=='Bien - Servicio'){
+			if($codigo_uo=='MM')
+				$tipo='Compra / Reparación - Servicio / Reparación';
+			else
+				$tipo='Compra - Servicio';
+		}  
+        else{
+			if($codigo_uo=='MM')
+				$tipo='Servicio / Reparación';
+			else
+				$tipo='Servicio';
+        }
+		
+        $this->Cell(145, $height, 'Orden de '.$tipo, 0, 0, 'C', false, '', 1, false, 'T', 'C');        
+
+		$x=$this->getX();
+		$y=$this->getY();
+		$this->setXY($x,$y-10);
+		$this->SetFontSize(8);
+		$this->SetFont('', 'B');
+		$this->Cell(20, $height, $this->getDataSource()->getParameter('numero_oc'), 0, 0, 'L', false, '', 1, false, 'T', 'C');
+		
+		$this->setXY($x,$y-7);
+		$this->SetFontSize(8);
+		$this->SetFont('', 'B');
+		$this->Cell(20, $height, $this->getDataSource()->getParameter('num_tramite'), 0, 0, 'L', false, '', 1, false, 'T', 'C');
+		
+		$this->setXY($x,$y-4);
+		$this->SetFontSize(6);
+		$this->SetFont('', 'B');
+		$this->Cell(20, $height, '', 0, 0, 'L', false, '', 1, false, 'T', 'C');
+		$this->setXY($x,$y-1);
+		$this->SetFontSize(7);
+		$this->setFont('','');
+		$this->Cell(20, $height, '', 0, 0, 'L', false, '', 1, false, 'T', 'C');
+		$this->setXY($x,$y+11);
+		$this->setFont('','');
+		$this->Cell(6, $height/5, 'Dia', 1, 0, 'L', false, '', 1, false, 'T', 'C');
+		$this->Cell(6, $height/5, 'Mes', 1, 0, 'L', false, '', 1, false, 'T', 'C');
+		$this->Cell(7, $height/5, 'Año', 1, 0, 'L', false, '', 1, false, 'T', 'C');
+		$this->setXY($x,$y+15);
+		
+										
+		$fecha_oc = explode('-', $this->getDataSource()->getParameter('fecha_oc'));
+		$this->Cell(6, $height/4, $fecha_oc[2], 1, 0, 'C', false, '', 1, false, 'T', 'C');
+		$this->Cell(6, $height/4, $fecha_oc[1], 1, 0, 'C', false, '', 1, false, 'T', 'C');
+		$this->Cell(7, $height/4, $fecha_oc[0], 1, 0, 'C', false, '', 1, false, 'T', 'C');
+		$this->Ln();		
+		if($tipo=='adjudicado'){
+		  $this->SetFontSize(9);
+        $this->SetFont('','B');						
+				$this->Cell(30, $height, 'Numero de O.C. :', 0, 0, 'L', false, '', 1, false, 'T', 'C');
+				$this->SetFont('','');	
+				$this->Cell(30, $height, $this->getDataSource()->getParameter('numero_oc'), 0, 0, 'L', false, '', 1, false, 'T', 'C');
+		}
     }
     
     public function Footer() {

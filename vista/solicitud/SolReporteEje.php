@@ -89,11 +89,11 @@ Phx.vista.SolReporteEje=Ext.extend(Phx.frmInterfaz,{
    				fieldLabel:'Partida',
    				width: 350,
    				listWidth: 350,
-   				baseParams:{_adicionar:'Todos'},
+   				baseParams:{ _adicionar: 'Todos' },
 	   			renderer:function (value, p, record){return String.format('{0}',record.data['desc_partida']);}
        	     },
    			type:'ComboRec',
-   			id_grupo:0,
+   			id_grupo: 0,
    			form:true
 	   	},
            

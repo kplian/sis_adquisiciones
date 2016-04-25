@@ -114,9 +114,7 @@ BEGIN
                   
                    --raise exception '%', v_registros_sol.codigo_uo;
                   IF  v_total_soli  >= v_tope_compra  and (v_registros.codigo_uo != ANY( string_to_array(v_tope_compra_lista,',')))  THEN
-                  
-                    raise exception 'Las compras por encima de % (moneda base) no pueden realizarse  por el sistema de adquisiciones',v_tope_compra;
-                  
+                       raise exception 'Las compras por encima de % (moneda base) no pueden realizarse  por el sistema de adquisiciones',v_tope_compra;
                   END IF;
               
               
@@ -125,10 +123,8 @@ BEGIN
               -- Comprometer Presupuesto
               
               
-                 IF not adq.f_gestionar_presupuesto_solicitud(v_registros.id_solicitud, p_id_usuario, 'comprometer')  THEN
-                 
-                   raise exception 'Error al comprometer el presupeusto';
-                 
+                 IF not adq.f_gestionar_presupuesto_solicitud(v_registros.id_solicitud, p_id_usuario, 'comprometer')  THEN                 
+                   raise exception 'Error al comprometer el presupeusto';                 
                  END IF;
               
               

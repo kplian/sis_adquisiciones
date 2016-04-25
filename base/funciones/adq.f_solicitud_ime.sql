@@ -163,9 +163,7 @@ BEGIN
             
          
         IF v_codigo_tipo_proceso is NULL THEN
-        
            raise exception 'No existe un proceso inicial para el proceso macro indicado (Revise la configuración)';
-        
         END IF;
         
         -- recupera la uo gerencia del funcionario
@@ -588,7 +586,7 @@ BEGIN
         begin
           
        
-        
+          
           IF  v_parametros.operacion = 'verificar' THEN
           
               --recupera datos de la solicitud
@@ -793,7 +791,7 @@ BEGIN
           
           ELSEIF  v_parametros.operacion = 'finalizar' THEN
           
-           raise exception 'fin';
+          
         
              v_resp =  adq.f_finalizar_reg_solicitud(p_administrador, 
                                            p_id_usuario, 
@@ -825,6 +823,8 @@ BEGIN
         begin
         
         --obtenermos datos basicos
+        
+           raise exception 'cccc';
           
           select
             s.id_proceso_wf,
@@ -1020,15 +1020,10 @@ BEGIN
                      --v_acceso_directo = '../../../sis_adquisiciones/vista/solicitud/SolicitudVb.php';
                      --v_clases_acceso_directo = 'SolicitudVb';
                     
-                   if v_obs ='' THEN
-                   
+                   IF v_obs ='' THEN                   
                       v_obs = ' Cambio de estado de la solicitud '||COALESCE(v_numero_sol,'S/N')||'  de  la uo '||COALESCE(v_uo_sol,'-');
-                   
                    ELSE
-                   
-                      v_obs = 'Solicitud  de compra '||COALESCE(v_numero_sol,'S/N')||'  para  la uo OBS:'||COALESCE(v_uo_sol,'-')||' ('|| COALESCE(v_obs,'S/O')||')';
-                   
-                   
+                    v_obs = 'Solicitud  de compra '||COALESCE(v_numero_sol,'S/N')||'  para  la uo OBS:'||COALESCE(v_uo_sol,'-')||' ('|| COALESCE(v_obs,'S/O')||')';
                    END IF;
                    
                    
@@ -1051,8 +1046,6 @@ BEGIN
                     END IF;
                     
                     
-                    
-                   
                    -- registra nuevo estado
                    v_id_estado_actual =  wf.f_registra_estado_wf(v_parametros.id_tipo_estado, 
                                                                    v_parametros.id_funcionario, 
@@ -1074,8 +1067,7 @@ BEGIN
                      IF v_estado_actual = 'vbpresupuestos' THEN
                            update adq.tsolicitud  s set 
                             obs_presupuestos = v_parametros.obs
-                           where id_solicitud = v_parametros.id_solicitud;
-                     
+                           where id_solicitud = v_parametros.id_solicitud;                     
                      END IF;
                   
                      IF  not adq.f_fun_inicio_solicitud_wf(p_id_usuario, 
@@ -1086,8 +1078,7 @@ BEGIN
                                                    v_codigo_estado_siguiente,
                                                    v_parametros.instruc_rpc) THEN
             
-                             raise exception 'Error al retroceder estado';
-            
+                             raise exception 'Error al retroceder estado';            
                     END IF;
                     
                   
@@ -1156,7 +1147,7 @@ BEGIN
           where ew.id_estado_wf = v_parametros.id_estado_wf_act;
         
          
-          
+       
          
            -- obtener datos tipo estado
            select
