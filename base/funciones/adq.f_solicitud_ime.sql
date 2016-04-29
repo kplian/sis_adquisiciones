@@ -620,10 +620,14 @@ BEGIN
                     raise exception ' La Solicitud  tiene que ser por un valor mayor a 0';
                   END IF;
                   
-                  -- validamos que el monsto de la solicitud no supere el tope configurado
+                  -- validamos que el monto de la solicitud no supere el tope configurado
                   
                   v_tope_compra = pxp.f_get_variable_global('adq_tope_compra')::numeric; 
                   v_tope_compra_lista = pxp.f_get_variable_global('adq_tope_compra_lista_blanca'); 
+                  
+                  IF v_tope_compra is NULL or  v_tope_compra_lista is NULL THEN
+                      raise exception 'revise la configuracion global de la variable adq_tope_compra y adq_tope_compra_lista_blanca  no pueden ser nulas';
+                  END IF;
                   
                    --raise exception '%', v_registros_sol.codigo_uo;
                   IF  v_total_soli  >= v_tope_compra  and (v_registros_sol.codigo_uo != ANY( string_to_array(v_tope_compra_lista,',')))  THEN
@@ -680,7 +684,7 @@ BEGIN
                   v_tope_compra = pxp.f_get_variable_global('adq_tope_compra_regional')::integer; 
                   
                   IF v_tope_compra is NULL THEN
-                    raise exception 'revise la configuracion globar de la variable adq_tope_compra_regional para compras en regioanles no puede ser nula';
+                    raise exception 'revise la configuracion global de la variable adq_tope_compra_regional para compras en regioanles no puede ser nula';
                   END IF;
                   
                   --prioridad 2 regionales nacioanles, 3 internacionales, 1 central,  0 reservado
