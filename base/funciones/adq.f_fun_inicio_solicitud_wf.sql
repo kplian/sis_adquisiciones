@@ -48,14 +48,13 @@ BEGIN
             s.presu_comprometido,
             uo.codigo as codigo_uo,
             dep.prioridad,
-            uo.codigo as codigo_uo,
-            s.cod
+            uo.codigo as codigo_uo
           into 
             v_registros
             
           from adq.tsolicitud s
           inner join orga.tuo uo on uo.id_uo = s.id_uo
-          inner join param.tdepto dep on dep.id_depto = sol.id_depto
+          inner join param.tdepto dep on dep.id_depto = s.id_depto
           where id_proceso_wf = p_id_proceso_wf;
      
           IF p_instrucciones_rpc = '' THEN
@@ -91,7 +90,7 @@ BEGIN
               into  
               v_total_soli
               from adq.tsolicitud_det sd
-              where sd.id_solicitud = v_parametros.id_solicitud
+              where sd.id_solicitud = v_registros.id_solicitud
               and sd.estado_reg = 'activo';
                   
               v_total_soli =  COALESCE(v_total_soli,0);
