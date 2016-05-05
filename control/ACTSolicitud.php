@@ -399,22 +399,14 @@ class ACTSolicitud extends ACTbase{
     //agrupa el detalle de la solcitud por centros de costos y partidas
     
     $solicitudDetAgrupado = $this->groupArray($resultSolicitudDet->getDatos(), 'codigo_partida','desc_centro_costo', $datosSolicitud[0]['id_moneda'],$datosSolicitud[0]['estado'],$onlyData);
-    
     $solicitudDetDataSource = new DataSource();
-    
     $solicitudDetDataSource->setDataSet($solicitudDetAgrupado);
 	
-	
-	
-    
-    //inserta el detalle de la colistud como origen de datos
-    
+	//inserta el detalle de la colistud como origen de datos
     $dataSource->putParameter('detalleDataSource', $solicitudDetDataSource);
     
-    
     if ($onlyData){
-    	
-		return $dataSource;
+    	return $dataSource;
 	} 
 	$nombreArchivo = uniqid(md5(session_id()).'SolicitudCompra') . '.pdf'; 
 	$this->objParam->addParametro('orientacion','P');
@@ -428,13 +420,11 @@ class ACTSolicitud extends ACTbase{
     $reporte = new RSolicitudCompra($this->objParam);
     
     $reporte->setDataSource($dataSource);
-    
-	$datos_firma = $reporte->write();
+    $datos_firma = $reporte->write();
 	
 		if(!$create_file){
 	                $mensajeExito = new Mensaje();
-				    $mensajeExito->setMensaje('EXITO','Reporte.php','Reporte generado',
-				                                    'Se generó con éxito el reporte: '.$nombreArchivo,'control');
+				    $mensajeExito->setMensaje('EXITO','Reporte.php','Reporte generado','Se generó con éxito el reporte: '.$nombreArchivo,'control');
 				    $mensajeExito->setArchivoGenerado($nombreArchivo);
 					//anade los datos de firma a la respuesta
 					if ($firmar == 'si') {
@@ -444,9 +434,7 @@ class ACTSolicitud extends ACTbase{
 				    $this->res->imprimirRespuesta($this->res->generarJson());
 		}
         else{
-                    
             return dirname(__FILE__).'/../../reportes_generados/'.$nombreArchivo;  
-            
         }
   } 
 

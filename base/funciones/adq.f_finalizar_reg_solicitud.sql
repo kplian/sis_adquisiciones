@@ -319,6 +319,18 @@ p_hstore->'id_solicitud'
                v_titulo  = 'Visto Bueno';
                        
             END IF;
+            
+            
+            
+           -- si ele estado es borrador verificamos que el presupuesto sea suficiente
+            
+             IF v_codigo_estado =  'borrador' THEN             
+                  IF not adq.f_gestionar_presupuesto_solicitud(p_id_solicitud, p_id_usuario, 'verificar')  THEN                     
+                       raise exception 'Error al verificar  el presupeusto';                     
+                  END IF;
+             
+             END IF;
+            
            
            -- registra nuevo estado
           

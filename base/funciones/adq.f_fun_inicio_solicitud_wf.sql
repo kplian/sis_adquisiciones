@@ -46,12 +46,15 @@ BEGIN
             s.numero,
             s.estado,
             s.presu_comprometido,
+            uo.codigo as codigo_uo,
+            dep.prioridad,
             uo.codigo as codigo_uo
           into 
             v_registros
             
           from adq.tsolicitud s
           inner join orga.tuo uo on uo.id_uo = s.id_uo
+          inner join param.tdepto dep on dep.id_depto = s.id_depto
           where id_proceso_wf = p_id_proceso_wf;
      
           IF p_instrucciones_rpc = '' THEN
@@ -82,9 +85,45 @@ BEGIN
       
              v_sw_presu_comprometido = 'no';
              
+              select 
+              sum( COALESCE( sd.precio_ga_mb,0)  + COALESCE(sd.precio_sg_mb,0)) 
+              into  
+              v_total_soli
+              from adq.tsolicitud_det sd
+              where sd.id_solicitud = v_registros.id_solicitud
+              and sd.estado_reg = 'activo';
+                  
+              v_total_soli =  COALESCE(v_total_soli,0);
              
+             
+             
+             --valida que no se compre por encima de 40 000 en la regionales
+             v_tope_compra = pxp.f_get_variable_global('adq_tope_compra_regional')::integer;
+              
+             IF v_tope_compra is NULL THEN
+                raise exception 'revise la configuracion globa de la variable adq_tope_compra_regional para compras en regioanles no puede ser nula';
+             END IF;
+           
+             IF  v_registros.prioridad = 2 and  (v_total_soli  >= v_tope_compra and v_tope_compra != 0)   THEN
+                 raise exception 'Las compras en las regionales no pueden estar por encima de % (moneda base)',v_tope_compra;
+             END IF;
+            
+                  
+             -- validamos que el monsto de la oslicitud no supere el tope configurado
+             v_tope_compra = pxp.f_get_variable_global('adq_tope_compra')::numeric; 
+             v_tope_compra_lista = pxp.f_get_variable_global('adq_tope_compra_lista_blanca');
+             
+             IF v_tope_compra is NULL or  v_tope_compra_lista is NULL THEN
+                raise exception 'revise la configuracion global de la variable adq_tope_compra y adq_tope_compra_lista_blanca  no pueden ser nulas';
+             END IF;
+             
+             --raise exception '%', v_registros_sol.codigo_uo;
+            IF  v_total_soli  >= v_tope_compra  and (v_registros.codigo_uo != ANY( string_to_array(v_tope_compra_lista,',')))  THEN
+              raise exception 'Las compras por encima de % (moneda base) no pueden realizarse  por el sistema de adquisiciones',v_tope_compra;
+            END IF;
+            
       
-      -- comprometer presupuesto cuando el estado anterior es el vbpresupuestos)
+          -- comprometer presupuesto cuando el estado anterior es el vbpresupuestos)
              IF v_estado_anterior =  'vbpresupuestos'  and v_registros.presu_comprometido = 'no' THEN 
 
                -- como en presupeustos puede mover los montos validamos que nose pase del monto tope
@@ -104,35 +143,16 @@ BEGIN
                   END IF;
                   
                   
-                  
-                  -- validamos que el monsto de la oslicitud no supere el tope configurado
-                  
-                  
-                  
-                  v_tope_compra = pxp.f_get_variable_global('adq_tope_compra')::numeric; 
-                  v_tope_compra_lista = pxp.f_get_variable_global('adq_tope_compra_lista_blanca'); 
-                  
-                   --raise exception '%', v_registros_sol.codigo_uo;
-                  IF  v_total_soli  >= v_tope_compra  and (v_registros.codigo_uo != ANY( string_to_array(v_tope_compra_lista,',')))  THEN
-                  
-                    raise exception 'Las compras por encima de % (moneda base) no pueden realizarse  por el sistema de adquisiciones',v_tope_compra;
-                  
-                  END IF;
+              
+                 -- Comprometer Presupuesto
               
               
-              
-              
-              -- Comprometer Presupuesto
-              
-              
-                 IF not adq.f_gestionar_presupuesto_solicitud(v_registros.id_solicitud, p_id_usuario, 'comprometer')  THEN
-                 
-                   raise exception 'Error al comprometer el presupeusto';
-                 
+                 IF not adq.f_gestionar_presupuesto_solicitud(v_registros.id_solicitud, p_id_usuario, 'comprometer')  THEN                 
+                   raise exception 'Error al comprometer el presupeusto';                 
                  END IF;
               
               
-              --modifca bandera de comprometido  
+                 --modifca bandera de comprometido  
            
                    update adq.tsolicitud  s set 
                      presu_comprometido =  'si',
