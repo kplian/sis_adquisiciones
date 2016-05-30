@@ -86,35 +86,35 @@ BEGIN
                
             END IF;
             
-            IF  lower(v_parametros.tipo_interfaz) in ('solicitudvb','solicitudvbwzd','solicitudvbpoa','solicitudvbpresupuestos') THEN
+          IF  lower(v_parametros.tipo_interfaz) in ('solicitudvb','solicitudvbwzd','solicitudvbpoa','solicitudvbpresupuestos') THEN
             
-          IF v_historico =  'no' THEN       
-                
-                IF p_administrador !=1 THEN
-                  v_filtro = ' (ew.id_funcionario='||v_parametros.id_funcionario_usu::varchar||' ) and  (lower(sol.estado)!=''borrador'') and (lower(sol.estado)!=''proceso'' ) and ';
+                IF v_historico =  'no' THEN       
+                    
+                    IF p_administrador !=1 THEN
+                      v_filtro = ' (ew.id_funcionario='||v_parametros.id_funcionario_usu::varchar||' ) and  (lower(sol.estado)!=''borrador'') and (lower(sol.estado)!=''proceso'' ) and ';
+                    ELSE
+                        v_filtro = ' (lower(sol.estado)!=''borrador''  and lower(sol.estado)!=''proceso'' and lower(sol.estado)!=''finalizado'') and ';
+                    END IF;
                 ELSE
-                    v_filtro = ' (lower(sol.estado)!=''borrador''  and lower(sol.estado)!=''proceso'' and lower(sol.estado)!=''finalizado'') and ';
-                END IF;
-           ELSE
-                IF p_administrador !=1 THEN
-                  v_filtro = ' (ew.id_funcionario='||v_parametros.id_funcionario_usu::varchar||' ) and  (lower(sol.estado)!=''borrador'') ) and ';
-                ELSE
-                    v_filtro = ' (lower(sol.estado)!=''borrador'') and ';
-                END IF;
-              END IF;
-                
-                
-            END IF;
+                    IF p_administrador !=1 THEN
+                      v_filtro = ' (ew.id_funcionario='||v_parametros.id_funcionario_usu::varchar||' ) and  (lower(sol.estado)!=''borrador'') ) and ';
+                    ELSE
+                        v_filtro = ' (lower(sol.estado) != ''borrador'') and ';
+                    END IF;
+               END IF;
+                    
+                    
+         END IF;
             
-            --la interface de vbpresupuestos mustra todas las solcitudes no importa el funcionario asignado
-            IF  lower(v_parametros.tipo_interfaz) = 'solicitudvbpresupuestos' and v_historico =  'no' THEN
-                 v_filtro = v_filtro||' (lower(sol.estado)=''vbpresupuestos'' ) and ';
-            END IF;
-            
-            --la interface de vbpresupuestos mustra todas las solcitudes no importa el funcionario asignado
-            IF  lower(v_parametros.tipo_interfaz) = 'solicitudvbpoa' and v_historico =  'no'  THEN
-                 v_filtro = ' (lower(sol.estado)=''vbpoa'' ) and ';
-            END IF;
+         --la interface de vbpresupuestos mustra todas las solcitudes no importa el funcionario asignado
+         IF  lower(v_parametros.tipo_interfaz) = 'solicitudvbpresupuestos' and v_historico =  'no' THEN
+             v_filtro = v_filtro||' (lower(sol.estado)=''vbpresupuestos'' ) and ';
+         END IF;
+              
+         --la interface de vbpresupuestos mustra todas las solcitudes no importa el funcionario asignado
+         IF  lower(v_parametros.tipo_interfaz) = 'solicitudvbpoa' and v_historico =  'no'  THEN
+             v_filtro = ' (lower(sol.estado)=''vbpoa'' ) and ';
+         END IF;
             
             
             
@@ -371,7 +371,9 @@ BEGIN
 			
 			--Definicion de la respuesta		   
 			v_consulta:=v_consulta||v_parametros.filtro;
-            -- 
+            
+           
+             
 			--Devuelve la respuesta
 			return v_consulta;
 
@@ -442,7 +444,8 @@ BEGIN
                         sol.id_proceso_macro,
                         sol.numero,
                         funrpc.desc_funcionario1 as desc_funcionario_rpc,
-                        COALESCE(sol.usuario_ai,'''')::varchar as nombre_usuario_ai
+                        COALESCE(sol.usuario_ai,'''')::varchar as nombre_usuario_ai,
+                        uo.codigo as codigo_uo
                         	
 						from adq.tsolicitud sol
 						inner join segu.tusuario usu1 on usu1.id_usuario = sol.id_usuario_reg

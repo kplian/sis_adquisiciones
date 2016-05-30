@@ -382,7 +382,8 @@ class ACTSolicitud extends ACTbase{
     $dataSource->putParameter('desc_funcionario_rpc', $datosSolicitud[0]['desc_funcionario_rpc']);
     $dataSource->putParameter('desc_funcionario_apro', $datosSolicitud[0]['desc_funcionario_apro']);
     $dataSource->putParameter('nombre_usuario_ai', $datosSolicitud[0]['nombre_usuario_ai']);
-                
+    $dataSource->putParameter('codigo_uo', $datosSolicitud[0]['codigo_uo']);
+            
     //get detalle
     //Reset all extra params:
     $this->objParam->defecto('ordenacion', 'id_solicitud_det');

@@ -15,11 +15,16 @@ require_once dirname(__FILE__).'/../../pxp/pxpReport/Report.php';
     
     public function Header() {
         $height = 20;        
-        		
+        $codigo_uo=$this->getDataSource()->getParameter('codigo_uo');
+		
 		$this->Cell(40, $height, '', 0, 0, 'C', false, '', 0, false, 'T', 'C');
         $this->SetFontSize(16);
-        $this->SetFont('','B');        
-        $this->Cell(105, $height, 'SOLICITUD DE COMPRA', 0, 0, 'C', false, '', 0, false, 'T', 'C');								
+        $this->SetFont('','B');
+		if($codigo_uo=='MM'){
+			$this->Cell(105, $height, 'SOLICITUD DE COMPRA/REPARACION', 0, 0, 'C', false, '', 0, false, 'T', 'C');								
+		}else{
+			$this->Cell(105, $height, 'SOLICITUD DE COMPRA', 0, 0, 'C', false, '', 0, false, 'T', 'C');								
+		}
 		$this->firmar();
 		/*jrr:cambio para firmas*/
         //$this->Image(dirname(__FILE__).'/../../pxp/lib'.$_SESSION['_DIR_LOGO'], $x, $y, 36);
