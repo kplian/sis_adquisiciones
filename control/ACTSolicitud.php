@@ -16,6 +16,8 @@ include_once(dirname(__FILE__).'/../../lib/PHPMailer/class.phpmailer.php');
 include_once(dirname(__FILE__).'/../../lib/PHPMailer/class.smtp.php');
 include_once(dirname(__FILE__).'/../../lib/lib_general/cls_correo_externo.php');
 
+include_once(dirname(__FILE__).'/../../sis_seguridad/modelo/MODSubsistema.php');
+
 
 class ACTSolicitud extends ACTbase{    
 			
@@ -332,8 +334,21 @@ class ACTSolicitud extends ACTbase{
 		}
      }
 
+   function obtenerCategoriaProg(){		
+		//crea el objetoFunSeguridad que contiene todos los metodos del sistema de seguridad
+		$this->objFunSeguridad=$this->create('sis_seguridad/MODSubsistema');					
+		$objParam = new CTParametro($aPostData['p'],null,$aPostFiles);
+		$objParam->addParametro('codigo','pre_verificar_categoria');
+		$objFunc=new MODSubsistema($objParam);
+		$this->res=$objFunc->obtenerVariableGlobal($this->objParam);
+				
+		return $this->res->getDatos();
+   }
+
   function reporteSolicitud($create_file=false, $onlyData = false){
     $dataSource = new DataSource();
+	$sw_cat = $this->obtenerCategoriaProg();
+	//var_dump($sw_cat); exit;
     //captura datos de firma
     if ($this->objParam->getParametro('firmar') == 'si') {
     	$firmar = 'si';
@@ -399,7 +414,15 @@ class ACTSolicitud extends ACTbase{
     
     //agrupa el detalle de la solcitud por centros de costos y partidas
     
-    $solicitudDetAgrupado = $this->groupArray($resultSolicitudDet->getDatos(), 'codigo_partida','desc_centro_costo', $datosSolicitud[0]['id_moneda'],$datosSolicitud[0]['estado'],$onlyData);
+    if($sw_cat["valor"] == 'si'){
+    	//si la categoria esta habilita tenemos que agrupar la verificacion presupeustaria por categoria
+    	$solicitudDetAgrupado = $this->groupArray($resultSolicitudDet->getDatos(), 'codigo_partida','id_categoria_prog', $datosSolicitud[0]['id_moneda'],$datosSolicitud[0]['estado'],$onlyData);
+    }
+	else{
+		//de lo contrario agrupamos por centro de costo
+		$solicitudDetAgrupado = $this->groupArray($resultSolicitudDet->getDatos(), 'codigo_partida','desc_centro_costo', $datosSolicitud[0]['id_moneda'],$datosSolicitud[0]['estado'],$onlyData);
+    }
+    
     $solicitudDetDataSource = new DataSource();
     $solicitudDetDataSource->setDataSet($solicitudDetAgrupado);
 	
@@ -471,9 +494,8 @@ function groupArray($array,$groupkey,$groupkeyTwo,$id_moneda,$estado_sol, $onlyD
 	 		//buscar si el grupo ya se incerto
 	 	 	$busca = array_search($value[$groupkey].$value[$groupkeyTwo], $groupcriteria);
 	 		
-	 		if ($busca === false)
-	 		{
-	 		     //si el grupo no existe lo crea
+	 		if ($busca === false){	 		    	
+	 		    //si el grupo no existe lo crea
 	 		    //en la siguiente posicicion de crupcriteria agrega el identificador del grupo
 	 			$groupcriteria[]=$value[$groupkey].$value[$groupkeyTwo];
 	 			
@@ -485,15 +507,32 @@ function groupArray($array,$groupkey,$groupkeyTwo,$id_moneda,$estado_sol, $onlyD
 	 			//coloca el indice en la ultima posicion insertada
 	 			$busca=count($arrayResp)-1;
 	 			
-	 			
-	 			
 	 		}
 	 		
 	 		//inserta el registro en el subgrupo correspondiente
 	 		$arrayResp[$busca]['groupeddata'][]=$item;
 	 		
 	 	}
-	 	
+        
+		
+		$cont_grup = 0;		
+		foreach($arrayResp as $value2)
+        {
+        	 $grup_desc_centro_costo = "";
+			 $cc_array = array();
+         	 foreach($value2['groupeddata'] as $value_det){
+         	 	
+				     
+				      if(!in_array($value_det["desc_centro_costo"], $cc_array)){
+				      	 $grup_desc_centro_costo = $grup_desc_centro_costo ."\n". $value_det["desc_centro_costo"];
+						 $cc_array[] = $value_det["desc_centro_costo"];
+				      }
+                      //sumamos el monto a comprometer   
+                      
+             }
+             $arrayResp[$cont_grup]["grup_desc_centro_costo"] =  trim ($grup_desc_centro_costo);
+             $cont_grup++;
+		}
 	 	//solo verificar si el estado es borrador o pendiente 
 	 	//suma y verifica el presupuesto
 	 	
@@ -506,15 +545,17 @@ function groupArray($array,$groupkey,$groupkeyTwo,$id_moneda,$estado_sol, $onlyD
             {
                   
                   $total_pre = 0;
+				  $grup_desc_centro_costo = "";
                   
                  $busca = array_search($value2[$groupkey].$value2[$groupkeyTwo], $groupcriteria);
                  
-                 foreach($value2[groupeddata] as $value_det){
+                 foreach($value2['groupeddata'] as $value_det){
                        //sumamos el monto a comprometer   
                       $total_pre = $total_pre + $value_det["precio_ga"];
+					  $grup_desc_centro_costo = $grup_desc_centro_costo ."\n". $value_det["desc_centro_costo"];
                  }
                  
-                 $value_det = $value2[groupeddata][0];
+                 $value_det = $value2['groupeddata'][0];
                  
                  $this->objParam = new CTParametro(null,null,null);
                  $this->objParam->addParametro('id_presupuesto',$value_det["id_presupuesto"]);
@@ -528,6 +569,7 @@ function groupArray($array,$groupkey,$groupkeyTwo,$id_moneda,$estado_sol, $onlyD
                  
                  $arrayResp[$cont_grup]["presu_verificado"] = $resultSolicitud->datos["presu_verificado"];
 				 $arrayResp[$cont_grup]["total_presu_verificado"] =  $total_pre;
+				 $arrayResp[$cont_grup]["grup_desc_centro_costo"] =  $grup_desc_centro_costo;
                  $cont_grup++;
                  
                  
@@ -543,7 +585,9 @@ function groupArray($array,$groupkey,$groupkeyTwo,$id_moneda,$estado_sol, $onlyD
             
         }
 	 	
+		//var_dump($arrayResp);exit;
 	 	return $arrayResp;
+		
 	 }
 	 else
 	 	return array();
@@ -623,9 +667,9 @@ function groupArray($array,$groupkey,$groupkeyTwo,$id_moneda,$estado_sol, $onlyD
 			exit;
 		 }
 		 
-		 ///////////////////////////////////////////////////
-		 //manda el correo electronicos al rea de presupeustos
-		 ///////////////////////////////////////////////////
+		 /////////////////////////////////////////////////////////
+		 //manda el correo electronicos al rea de presupuestos
+		 /////////////////////////////////////////////////////////
 		   
 		   
 		    $correo=new CorreoExterno();
@@ -666,8 +710,15 @@ function groupArray($array,$groupkey,$groupkeyTwo,$id_moneda,$estado_sol, $onlyD
         $correo->addDestinatario($email);
         $email_cc = $this->objParam->getParametro('email_cc');
         $correo->addCC($email_cc);
-        
-        
+		
+		$email_cc = $this->objParam->getParametro('email_cc');
+        $correo->setMensaje($email_cc);
+		
+		$body = $this->objParam->getParametro('body');
+        $correo->setMensaje($body);
+		
+		$asunto = $this->objParam->getParametro('asunto');
+        $correo->setAsunto($asunto);
 		
 		//genera archivo adjunto
         $file = $this->reporteSolicitud(true);
@@ -682,22 +733,14 @@ function groupArray($array,$groupkey,$groupkeyTwo,$id_moneda,$estado_sol, $onlyD
                 'Se mando el correo con exito: OK','control' );
                 $this->res = $mensajeExito;
                 $this->res->imprimirRespuesta($this->res->generarJson());
-            
-        }  
-        else{
-              //echo $resp;      
+                //echo $file; 
+		        unlink($file);
+         }  
+         else{
               echo "{\"ROOT\":{\"error\":true,\"detalle\":{\"mensaje\":\" Error al enviar correo\"}}}";  
-              
-        }  
+         }  
         
-		
-        
-		//echo $file; 
-		
-        //unlink($file);
-        exit;
-           
-       
+		exit;
    }
 
    function siguienteEstadoSolicitudWzd(){

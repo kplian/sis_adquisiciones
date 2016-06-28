@@ -509,18 +509,6 @@ ALTER TABLE adq.tcotizacion
 
 
 
-/***********************************I-SCP-RAC-ADQ-0-05/10/2014****************************************/
-
---------------- SQL ---------------
-
-ALTER TABLE param.tconcepto_ingas
-  ADD COLUMN id_grupo_ots INTEGER[];
-
-COMMENT ON COLUMN param.tconcepto_ingas.id_grupo_ots
-IS 'lamacena las ot que pueden relacionarce con este el concepto de gasto';
-
-/***********************************F-SCP-RAC-ADQ-0-05/10/2014****************************************/
-
 /***********************************I-SCP-RAC-ADQ-0-21/10/2014****************************************/
 
 --------------- SQL ---------------

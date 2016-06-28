@@ -3,8 +3,7 @@ require_once dirname(__FILE__).'/../../pxp/lib/lib_reporte/ReportePDFFormulario.
 require_once dirname(__FILE__).'/../../pxp/pxpReport/Report.php';
  class CustomReport extends ReportePDFFormulario{
     
-    private $dataSource;
-    
+    private $dataSource;    
     public function setDataSource(DataSource $dataSource) {
         $this->dataSource = $dataSource;
     }
@@ -174,8 +173,6 @@ Class RSolicitudCompra extends Report {
            
        }
        
-                
-        
         //imprime el detalle de la solicitud
         
         $this->writeDetalles($this->getDataSource()->getParameter('detalleDataSource'), $pdf);
@@ -330,8 +327,10 @@ Class RSolicitudCompra extends Report {
             $RowArray = array(
                         'codigo_partida'  => $row['groupeddata'][0]['codigo_partida'],
                         'nombre_partida'  => $row['groupeddata'][0]['nombre_partida'],
-                        'desc_centro_costo'    => $row['groupeddata'][0]['desc_centro_costo'],
-                       // 'totalRef' => $row['totalRef'],
+                        'desc_centro_costo'    => $row['grup_desc_centro_costo']. "\nCP: ".$row['groupeddata'][0]['codigo_categoria'],
+                        //'desc_centro_costo'    => $row['groupeddata'][0]['desc_centro_costo']. "\n".$row['groupeddata'][0]['codigo_categoria'],
+                        //'desc_centro_costo'    => $row['groupeddata'][0]['codigo_categoria'],
+                        // 'totalRef' => $row['totalRef'],
                         'ejecutado' =>  $disponibilida
                     );     
                          

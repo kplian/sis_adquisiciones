@@ -348,7 +348,7 @@ Phx.vista.Proveedor=Ext.extend(Phx.gridInterfaz,{
 					fields: ['id_lugar','id_lugar_fk','codigo','nombre','tipo','sw_municipio','sw_impuesto','codigo_largo'],
 					// turn on remote sorting
 					remoteSort: true,
-					baseParams:{tipos:"''departamento'',''pais''",par_filtro:'nombre'}
+					baseParams:{tipos:"''departamento'',''pais'',''localidad''",par_filtro:'nombre'}
 				}),
 				valueField: 'id_lugar',
 				displayField: 'nombre',
