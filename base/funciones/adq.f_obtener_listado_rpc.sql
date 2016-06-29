@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION adq.f_obtener_listado_rpc (
   p_id_usuario integer,
   p_id_uo integer,
@@ -135,7 +133,7 @@ BEGIN
                         from orga.tcargo c 
                         where  c.id_cargo = v_id_cargo_identificado;
                         
-                        raise exception 'No se encontraron funcionarios par el  cargo, revise la asignacion del cargo (%) en el organigrama %', v_cargo_nombre;
+                        raise exception 'No se encontraron funcionarios par el  cargo, revise la asignacion del cargo (%) en el organigrama', v_cargo_nombre;
                    
                    END IF;
                 

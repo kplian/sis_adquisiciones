@@ -66,6 +66,9 @@ class MODSolicitudDet extends MODbase{
         
         $this->captura('id_presupuesto','integer');
 		
+		$this->captura('id_categoria_prog','integer');
+		$this->captura('codigo_categoria','varchar');
+		
 		//Ejecuta la instruccion
 		$this->armarConsulta();
 		$this->ejecutarConsulta();

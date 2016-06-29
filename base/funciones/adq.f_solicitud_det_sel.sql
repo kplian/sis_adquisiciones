@@ -48,45 +48,45 @@ BEGIN
        begin
     		--Sentencia de la consulta
 			v_consulta:='select
-						sold.id_solicitud_det,
-						sold.id_centro_costo,
-						sold.descripcion,
-						sold.precio_unitario,
-						sold.id_solicitud,
-						sold.id_partida,
-						sold.id_orden_trabajo,
-						sold.precio_sg,
-						sold.id_concepto_ingas,
-						sold.id_cuenta,
-						sold.precio_total,
-						sold.cantidad,
-						sold.id_auxiliar,
-						sold.precio_ga_mb,
-						sold.estado_reg,
-						sold.id_partida_ejecucion,
-						''false''::varchar as disponible,
-						sold.precio_ga,
-						sold.id_usuario_reg,
-						sold.fecha_reg,
-						sold.fecha_mod,
-						sold.id_usuario_mod,
-						usu1.cuenta as usr_reg,
-						usu2.cuenta as usr_mod,
-                        cc.codigo_cc as desc_centro_costo,
-                        par.codigo as codigo_partida,
-                        par.nombre_partida,
-                        cta.nro_cuenta,
-                        cta.nombre_cuenta,
-                        aux.codigo_auxiliar,
-                        aux.nombre_auxiliar,
-                        cig.desc_ingas as desc_concepto_ingas,
-                        ot.desc_orden as desc_orden_trabajo,
-                        sold.revertido_mb,
-                        sold.revertido_mo,
-                        pre.id_presupuesto
-                       
-                         
-						from adq.tsolicitud_det sold
+                            sold.id_solicitud_det,
+                            sold.id_centro_costo,
+                            sold.descripcion,
+                            sold.precio_unitario,
+                            sold.id_solicitud,
+                            sold.id_partida,
+                            sold.id_orden_trabajo,
+                            sold.precio_sg,
+                            sold.id_concepto_ingas,
+                            sold.id_cuenta,
+                            sold.precio_total,
+                            sold.cantidad,
+                            sold.id_auxiliar,
+                            sold.precio_ga_mb,
+                            sold.estado_reg,
+                            sold.id_partida_ejecucion,
+                            ''false''::varchar as disponible,
+                            sold.precio_ga,
+                            sold.id_usuario_reg,
+                            sold.fecha_reg,
+                            sold.fecha_mod,
+                            sold.id_usuario_mod,
+                            usu1.cuenta as usr_reg,
+                            usu2.cuenta as usr_mod,
+                            cc.codigo_cc as desc_centro_costo,
+                            par.codigo as codigo_partida,
+                            par.nombre_partida,
+                            cta.nro_cuenta,
+                            cta.nombre_cuenta,
+                            aux.codigo_auxiliar,
+                            aux.nombre_auxiliar,
+                            cig.desc_ingas as desc_concepto_ingas,
+                            ot.desc_orden as desc_orden_trabajo,
+                            sold.revertido_mb,
+                            sold.revertido_mo,
+                            pre.id_presupuesto,
+                            pre.id_categoria_prog,
+                            c.codigo_categoria
+                        from adq.tsolicitud_det sold
                         inner join param.tconcepto_ingas cig on cig.id_concepto_ingas = sold.id_concepto_ingas
 						inner join segu.tusuario usu1 on usu1.id_usuario = sold.id_usuario_reg
                         inner join param.vcentro_costo cc on cc.id_centro_costo = sold.id_centro_costo
@@ -96,6 +96,7 @@ BEGIN
                         inner join pre.tpresupuesto pre on pre.id_centro_costo = cc.id_centro_costo 
 						left join segu.tusuario usu2 on usu2.id_usuario = sold.id_usuario_mod
                         left join conta.torden_trabajo ot on ot.id_orden_trabajo = sold.id_orden_trabajo
+                        left join pre.vcategoria_programatica c on c.id_categoria_programatica = pre.id_categoria_prog
                         where sold.estado_reg= ''activo'' and  sold.id_solicitud='||v_parametros.id_solicitud||' and ';
 			
 			--Definicion de la respuesta
@@ -131,6 +132,7 @@ BEGIN
                         inner join pre.tpresupuesto pre on pre.id_centro_costo = cc.id_centro_costo 
 						left join segu.tusuario usu2 on usu2.id_usuario = sold.id_usuario_mod
                         left join conta.torden_trabajo ot on ot.id_orden_trabajo = sold.id_orden_trabajo
+                        left join pre.vcategoria_programatica c on c.id_categoria_programatica = pre.id_categoria_prog
                         where sold.estado_reg= ''activo'' and sold.id_solicitud='||v_parametros.id_solicitud||' and ';
 			
 			--Definicion de la respuesta		    

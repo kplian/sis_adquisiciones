@@ -603,8 +603,8 @@ Phx.vista.FormSolicitud=Ext.extend(Phx.frmInterfaz,{
                 name: 'tipo_concepto',
                 fieldLabel: 'Tipo',
                 allowBlank: false,
-                emptyText:'Tipo...',
-                store:new Ext.data.ArrayStore({
+                emptyText: 'Tipo...',
+                store: new Ext.data.ArrayStore({
                             fields :['variable','valor'],
                             data :  []}),
                
@@ -614,7 +614,6 @@ Phx.vista.FormSolicitud=Ext.extend(Phx.frmInterfaz,{
                 triggerAction: 'all',
                 lazyRender: true,
                 resizable:true,
-                //listWidth:'500',
                 mode: 'local',
                 width: '80%'
              },
@@ -649,7 +648,6 @@ Phx.vista.FormSolicitud=Ext.extend(Phx.frmInterfaz,{
    				width: '80%',
 		        baseParams: { estado:'activo', codigo_subsistema: 'ADQ' },
    			},
-   			//type:'TrigguerCombo',
    			type:'ComboRec',
    			id_grupo: 1,
    			form:true
@@ -659,9 +657,9 @@ Phx.vista.FormSolicitud=Ext.extend(Phx.frmInterfaz,{
             config:{
                 name:'id_moneda',
                 origen:'MONEDA',
-                allowBlank:false ,
+                allowBlank: false ,
                 width: '80%',
-                fieldLabel:'Moneda'
+                fieldLabel: 'Moneda'
              },
             type: 'ComboRec',
             id_grupo: 0,
