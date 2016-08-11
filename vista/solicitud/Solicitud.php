@@ -15,7 +15,7 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
 		this.maestro=config.maestro;
     	//llama al constructor de la clase padre
 		
-		Phx.vista.Solicitud.superclass.constructor.call(this,config);		
+		Phx.vista.Solicitud.superclass.constructor.call(this,config);
 		this.init();		
 		this.addBotones();
 
