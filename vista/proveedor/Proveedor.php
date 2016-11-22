@@ -333,7 +333,7 @@ Phx.vista.Proveedor=Ext.extend(Phx.gridInterfaz,{
 			config:{
 				name: 'id_lugar',
 				fieldLabel: 'Lugar',
-				allowBlank: true,
+				allowBlank: false,
 				emptyText:'Lugar...',
 				store:new Ext.data.JsonStore(
 				{
