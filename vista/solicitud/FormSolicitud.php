@@ -713,7 +713,7 @@ Phx.vista.FormSolicitud=Ext.extend(Phx.frmInterfaz,{
                 fieldLabel: 'Fecha Solicitud',
                 allowBlank: false,
                 disabled: false,
-                readOnly: true,
+                readOnly: false,
                 width: 105,
                 format: 'd/m/Y'
             },
