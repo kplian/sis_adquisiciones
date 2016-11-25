@@ -332,9 +332,64 @@ function listarProcesoCompraPedido(){
 		//Devuelve la respuesta
 		return $this->respuesta;
 	}
-    
-	
-	
-			
+
+	function procesosIniciadosAdjudicadosEjecutados(){
+		//Definicion de variables para ejecucion del procedimientp
+		$this->procedimiento='adq.f_proceso_compra_sel';
+		$this->transaccion='ADQ_PROINIADEJE_SEL';
+		$this->tipo_procedimiento='SEL';//tipo de transaccion
+
+		$this->setParametro('fecha_ini','fecha_ini','date');
+		$this->setParametro('fecha_fin','fecha_fin','date');
+		$this->setParametro('id_depto','id_depto','integer');
+		$this->setParametro('tipo','tipo','varchar');
+		$this->setParametro('monto_mayor','monto_mayor','varchar');
+
+		//Definicion de la lista del resultado del query
+		$this->captura('num_tramite','varchar');
+		$this->captura('justificacion','text');
+		$this->captura('proveedor_recomendado','varchar');
+		$this->captura('proveedor_adjudicado','text');
+		$this->captura('fecha_ini_proc','date');
+		$this->captura('precio_bs','numeric');
+		$this->captura('precio_moneda_solicitada','numeric');
+		$this->captura('moneda_solicitada','varchar');
+
+		//Ejecuta la instruccion
+		$this->armarConsulta();
+		$this->ejecutarConsulta();
+		//Devuelve la respuesta
+		return $this->respuesta;
+	}
+
+	function procesosIniAdjuEjecResumen(){
+		//Definicion de variables para ejecucion del procedimientp
+		$this->procedimiento='adq.f_proceso_compra_sel';
+		$this->transaccion='ADQ_INADEJRES_SEL';
+		$this->tipo_procedimiento='SEL';//tipo de transaccion
+
+		$this->setParametro('fecha_ini','fecha_ini','date');
+		$this->setParametro('fecha_fin','fecha_fin','date');
+		$this->setParametro('id_depto','id_depto','integer');
+		$this->setParametro('tipo','tipo','varchar');
+
+		//Definicion de la lista del resultado del query
+		$this->captura('num_tramite','varchar');
+		$this->captura('justificacion','varchar');
+		$this->captura('proveedor_recomendado','varchar');
+		$this->captura('proveedor_adjudicado','varchar');
+		$this->captura('fecha_ini_proc','date');
+		$this->captura('precio_bs','numeric');
+		$this->captura('precio_moneda_solicitada','numeric');
+		$this->captura('moneda_solicitada','varchar');
+
+		//Ejecuta la instruccion
+		$this->armarConsulta();
+		$this->ejecutarConsulta();
+
+		//Devuelve la respuesta
+		return $this->respuesta;
+	}
+
 }
 ?>

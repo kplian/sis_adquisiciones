@@ -31,42 +31,43 @@ DECLARE
     v_filadd 			varchar;
     
     va_id_depto integer[];
-			    
+    v_filtro			varchar;
+
 BEGIN
 
 	v_nombre_funcion = 'adq.f_proceso_compra_sel';
     v_parametros = pxp.f_get_record(p_tabla);
 
-	/*********************************    
+	/*********************************
  	#TRANSACCION:  'ADQ_PROC_SEL'
  	#DESCRIPCION:	Consulta de datos
- 	#AUTOR:		admin	
+ 	#AUTOR:		admin
  	#FECHA:		19-03-2013 12:55:30
 	***********************************/
 
 	if(p_transaccion='ADQ_PROC_SEL')then
-     				
+
     	begin
-        
+
         v_filadd='';
-        
+
            IF   p_administrador != 1 THEN
-           
-               select  
+
+               select
                    pxp.aggarray(depu.id_depto)
-                into 
+                into
                    va_id_depto
-               from param.tdepto_usuario depu 
-               where depu.id_usuario =  p_id_usuario and depu.cargo = 'responsable'; 
-          
-               
+               from param.tdepto_usuario depu
+               where depu.id_usuario =  p_id_usuario and depu.cargo = 'responsable';
+
+
                v_filadd='( (id_depto  in ('|| COALESCE(array_to_string(va_id_depto,','),'0')||'))   or   id_usuario_auxiliar = '||p_id_usuario::varchar ||' ) and ';
-            
+
           END IF;
-        
-        
+
+
     		--Sentencia de la consulta
-			v_consulta:='select 
+			v_consulta:='select
                               id_proceso_compra,
                               id_depto,
                               num_convocatoria,
@@ -100,9 +101,9 @@ BEGIN
                               estados_cotizacion,
                               numeros_oc,
                               proveedores_cot
-                   from adq.vproceso_compra  
+                   from adq.vproceso_compra
                    where  '||v_filadd||'  ';
-			
+
 			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;
 			v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
@@ -110,13 +111,13 @@ BEGIN
             --raise exception 'sss';
 			--Devuelve la respuesta
 			return v_consulta;
-            
-         
-						
+
+
+
 		end;
-        
-        
-    /*********************************    
+
+
+    /*********************************
  	#TRANSACCION:  'ADQ_PROCPED_SEL'
  	#DESCRIPCION:	Consulta de datos
  	#AUTOR:		Gonzalo Sarmiento Sejas
@@ -124,43 +125,43 @@ BEGIN
 	***********************************/
 
 	elsif(p_transaccion='ADQ_PROCPED_SEL')then
-     				
+
     	begin
-        
+
         v_filadd='';
-        
+
            --TODO, RAC, me parece que el codigo comentado no es util,.... que fue solo una copia del proceso consulta para grilla
-           --si se habilitar evita que otros usuarios que no sean del depto de adquisiciones vean 
+           --si se habilitar evita que otros usuarios que no sean del depto de adquisiciones vean
            --el reporte de cuadro comparativo...
-        
+
            /*IF   p_administrador != 1 THEN
-           
+
                -- recupera los usuarios miembros del depto
-               select  
+               select
                    pxp.aggarray(depu.id_depto)
-                into 
+                into
                    va_id_depto
-               from param.tdepto_usuario depu 
-               where depu.id_usuario =  p_id_usuario; 
-        
-            
+               from param.tdepto_usuario depu
+               where depu.id_usuario =  p_id_usuario;
+
+
               if va_id_depto is null then
-               
+
                  raise exception 'El usuario no se encuetra asignado a nigun depto de adquisiciones';
-              
+
               end if;
-            
-            
-            
-            --recupera el cargo del usuario 
-        
-        
-        
+
+
+
+            --recupera el cargo del usuario
+
+
+
           	 v_filadd='(dep.id_depto  in ('|| COALESCE(array_to_string(va_id_depto,','),'0')||')) and';
-          
+
           END IF;*/
-        
-        
+
+
     		--Sentencia de la consulta
 			v_consulta:='select proc.id_proceso_compra,
                          proc.id_depto,
@@ -187,24 +188,24 @@ BEGIN
                          mon.codigo as desc_moneda
                    from adq.tproceso_compra proc
                        inner join segu.tusuario usu1 on usu1.id_usuario = proc.id_usuario_reg
-                       inner join param.tdepto dep on dep.id_depto = proc.id_depto 
+                       inner join param.tdepto dep on dep.id_depto = proc.id_depto
                        inner join adq.tsolicitud sol on sol.id_solicitud = proc.id_solicitud
                        inner join orga.vfuncionario fun on  fun.id_funcionario = sol.id_funcionario
                        inner join param.tmoneda mon on mon.id_moneda = sol.id_moneda
                        left join segu.tusuario usu2 on usu2.id_usuario = proc.id_usuario_mod
                        where proc.id_proceso_compra='||v_parametros.id_proceso_compra||' and '||v_filadd||'  ';
-			
+
 			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;
 			v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
 
 			--Devuelve la respuesta
 			return v_consulta;
-						
+
 		end;
 
 
-    /*********************************    
+    /*********************************
  	#TRANSACCION:  'ADQ_PROCSOL_SEL'
  	#DESCRIPCION:	Consulta de datos
  	#AUTOR:		Gonzalo Sarmiento Sejas
@@ -212,44 +213,44 @@ BEGIN
 	***********************************/
 
 	elsif(p_transaccion='ADQ_PROCSOL_SEL')then
-     				
+
     	begin
-        
+
         v_filadd='';
-        
+
            IF   p_administrador != 1 THEN
-           
-             select  
+
+             select
                  pxp.aggarray(depu.id_depto)
-              into 
+              into
                  va_id_depto
-             from param.tdepto_usuario depu 
-             where depu.id_usuario =  p_id_usuario; 
-        
+             from param.tdepto_usuario depu
+             where depu.id_usuario =  p_id_usuario;
+
            v_filadd='(dep.id_depto  in ('|| COALESCE(array_to_string(va_id_depto,','),'0')||')) and';
-          
+
           END IF;
-        
-        
+
+
     		--Sentencia de la consulta
 			v_consulta:='select proc.id_proceso_compra
                    from adq.tproceso_compra proc
                        inner join adq.tsolicitud sol on sol.id_solicitud = proc.id_solicitud
                        where sol.id_solicitud='||v_parametros.id_solicitud||' and '||v_filadd||'  ';
-			
+
 			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;
 			v_consulta:=v_consulta||' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
-			
+
 			--Devuelve la respuesta
 			return v_consulta;
-						
+
 		end;
 
-	/*********************************    
+	/*********************************
  	#TRANSACCION:  'ADQ_PROC_CONT'
  	#DESCRIPCION:	Conteo de registros
- 	#AUTOR:		admin	
+ 	#AUTOR:		admin
  	#FECHA:		19-03-2013 12:55:30
 	***********************************/
 
@@ -257,30 +258,30 @@ BEGIN
 
 		begin
            v_filadd='';
-        
+
            IF   p_administrador != 1 THEN
-          
-        
+
+
              --seleciona los departamentos donde el usuario es responsable
-              select  
+              select
                  pxp.aggarray(depu.id_depto)
-              into 
+              into
                  va_id_depto
-             from param.tdepto_usuario depu 
-             where depu.id_usuario =  p_id_usuario and depu.cargo = 'responsable'; 
-        
+             from param.tdepto_usuario depu
+             where depu.id_usuario =  p_id_usuario and depu.cargo = 'responsable';
+
              v_filadd='( (id_depto  in ('|| COALESCE(array_to_string(va_id_depto,','),'0')||'))   or   id_usuario_auxiliar = '||p_id_usuario::varchar ||' ) and ';
-          
-          
+
+
           END IF;
-        
+
 			--Sentencia de la consulta de conteo de registros
 			v_consulta:='select count(id_proceso_compra)
-					    
-                        from adq.vproceso_compra 
+
+                        from adq.vproceso_compra
                         where  '||v_filadd||'  ';
-			
-			--Definicion de la respuesta		    
+
+			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;
 
             raise notice '%',v_consulta;
@@ -288,7 +289,7 @@ BEGIN
 			return v_consulta;
 
 		end;
-    /*********************************    
+    /*********************************
  	#TRANSACCION:  'ADQ_PROCESTIE_SEL'
  	#DESCRIPCION:	Obtener detalle y resumen de tiempos por proceso de compra atendido
  	#AUTOR:		Gonzalo Sarmiento Sejas
@@ -296,19 +297,19 @@ BEGIN
 	***********************************/
 
 	elsif(p_transaccion='ADQ_PROCESTIE_SEL')then
-     				
+
     	begin
-        
-        	v_consulta = 
+
+        	v_consulta =
             'with observaciones as (
 				select o.id_estado_wf , round((EXTRACT(EPOCH FROM (coalesce(o.fecha_fin,now()) - o.fecha_reg))/3600)::numeric,0) as tiempo_observacion
     			from wf.tobs o
     			where o.estado_reg = ''activo''
     			group by o.id_estado_wf,o.fecha_fin,o.fecha_reg
 			),
-			
+
             borrador as (
-				select 
+				select
 				distinct on (sol.num_tramite) sol.num_tramite,
 				sol.justificacion,
 				prov.desc_proveedor,
@@ -351,13 +352,13 @@ BEGIN
                     tes.codigo in (''borrador'')
                 inner join segu.vusuario usu on usu.id_usuario = pc.id_usuario_auxiliar
                 where pc.fecha_ini_proc::date >= ''' || v_parametros.fecha_ini || '''::date and
-                	pc.fecha_ini_proc::date <= ''' || v_parametros.fecha_fin || '''::date and 
+                	pc.fecha_ini_proc::date <= ''' || v_parametros.fecha_fin || '''::date and
                 	pc.id_depto = ' || v_parametros.id_depto ||' and co.estado!= ''anulado''
                 order by sol.num_tramite,esso.fecha_reg DESC
 			),
 
 			cotizado as (
-                select 
+                select
                 distinct on (co.id_cotizacion) co.id_cotizacion,
                 round ((case when essi.id_estado_wf is null then
                     EXTRACT(EPOCH FROM (now() - es.fecha_reg))/3600
@@ -374,13 +375,13 @@ BEGIN
                 inner join wf.ttipo_estado tes on tes.id_tipo_estado = es.id_tipo_estado and
                     tes.codigo in (''cotizado'')
                 where pc.fecha_ini_proc::date >= ''' || v_parametros.fecha_ini || '''::date and
-                	pc.fecha_ini_proc::date <= ''' || v_parametros.fecha_fin || '''::date and 
+                	pc.fecha_ini_proc::date <= ''' || v_parametros.fecha_fin || '''::date and
                 	pc.id_depto = ' || v_parametros.id_depto ||' and co.estado!= ''anulado''
                 order by co.id_cotizacion,es.fecha_reg DESC),
 
 			recomendado as (
 
-                select 
+                select
 
                 distinct on (co.id_cotizacion) co.id_cotizacion,
                 round ((case when essi.id_estado_wf is null then
@@ -398,13 +399,13 @@ BEGIN
                 inner join wf.ttipo_estado tes on tes.id_tipo_estado = es.id_tipo_estado and
                     tes.codigo in (''recomendado'')
                 where pc.fecha_ini_proc::date >= ''' || v_parametros.fecha_ini || '''::date and
-                	pc.fecha_ini_proc::date <= ''' || v_parametros.fecha_fin || '''::date and 
+                	pc.fecha_ini_proc::date <= ''' || v_parametros.fecha_fin || '''::date and
                 	pc.id_depto = ' || v_parametros.id_depto ||' and co.estado!= ''anulado''
                 order by co.id_cotizacion,es.fecha_reg DESC),
 
 			adjudicado as (
 
-                select 
+                select
 
                 distinct on (co.id_cotizacion) co.id_cotizacion,
                 round ((case when essi.id_estado_wf is null then
@@ -422,13 +423,13 @@ BEGIN
                 inner join wf.ttipo_estado tes on tes.id_tipo_estado = es.id_tipo_estado and
                     tes.codigo in (''adjudicado'')
                 where pc.fecha_ini_proc::date >= ''' || v_parametros.fecha_ini || '''::date and
-                	pc.fecha_ini_proc::date <= ''' || v_parametros.fecha_fin || '''::date and 
+                	pc.fecha_ini_proc::date <= ''' || v_parametros.fecha_fin || '''::date and
                 	pc.id_depto = ' || v_parametros.id_depto ||' and co.estado!= ''anulado''
                 order by co.id_cotizacion,es.fecha_reg DESC),
 
 			contrato_pendiente as (
 
-                select 
+                select
 
                 distinct on (co.id_cotizacion) co.id_cotizacion,
                 round ((case when essi.id_estado_wf is null then
@@ -446,13 +447,13 @@ BEGIN
                 inner join wf.ttipo_estado tes on tes.id_tipo_estado = es.id_tipo_estado and
                     tes.codigo in (''contrato_pendiente'')
                 where pc.fecha_ini_proc::date >= ''' || v_parametros.fecha_ini || '''::date and
-                	pc.fecha_ini_proc::date <= ''' || v_parametros.fecha_fin || '''::date and 
+                	pc.fecha_ini_proc::date <= ''' || v_parametros.fecha_fin || '''::date and
                 	pc.id_depto = ' || v_parametros.id_depto ||' and co.estado!= ''anulado''
                 order by co.id_cotizacion,es.fecha_reg DESC),
 
 			contrato_elaborado as (
 
-                select 
+                select
 
                 distinct on (co.id_cotizacion) co.id_cotizacion,
                 round ((case when essi.id_estado_wf is null then
@@ -470,14 +471,14 @@ BEGIN
                 inner join wf.ttipo_estado tes on tes.id_tipo_estado = es.id_tipo_estado and
                     tes.codigo in (''contrato_elaborado'')
                 where pc.fecha_ini_proc::date >= ''' || v_parametros.fecha_ini || '''::date and
-                	pc.fecha_ini_proc::date <= ''' || v_parametros.fecha_fin || '''::date and 
+                	pc.fecha_ini_proc::date <= ''' || v_parametros.fecha_fin || '''::date and
                 	pc.id_depto = ' || v_parametros.id_depto ||' and co.estado!= ''anulado''
                 order by co.id_cotizacion,es.fecha_reg DESC)';
-                
+
 		if (v_parametros.tipo = 'resumen') then
         	v_consulta = v_consulta || ', detalle as (';
-        end if;                
-		
+        end if;
+
         v_consulta = v_consulta || '
             select
             b.num_tramite::varchar,
@@ -519,12 +520,45 @@ BEGIN
                 from detalle
                 group by usuario_asignado, mayor_20
                 order by usuario_asignado, mayor_20';
-       end if;     
-		
+       end if;
+
 		return v_consulta;
-						
+
 	end;
-					
+	/*********************************
+ 	#TRANSACCION:  'ADQ_PROINIADEJE_SEL'
+ 	#DESCRIPCION:	Obtener procesos iniciados, adjudicados y ejecutados
+ 	#AUTOR:		Gonzalo Sarmiento Sejas
+ 	#FECHA:		24-11-2016
+	***********************************/
+
+	elsif(p_transaccion='ADQ_PROINIADEJE_SEL')then
+
+    	begin
+        	IF v_parametros.tipo='iniciados' THEN
+	        	v_filtro = 'and (pro.estados_cotizacion not like ''%adjudicado%'' and pro.estados_cotizacion not like ''%contrato_pendiente%''
+            				and pro.estados_cotizacion not like ''%contrato_elaborado%'' and pro.estados_cotizacion not like ''%pago_habilitado%''
+            				and pro.estados_cotizacion not like ''%finalizada%'' or pro.estados_cotizacion is null)';
+            ELSIF v_parametros.tipo='adjudicados' THEN
+            	v_filtro = ' and (pro.estados_cotizacion like ''%adjudicado%'' or pro.estados_cotizacion like ''%contrato_pendiente%''
+                			or pro.estados_cotizacion like ''%contrato_elaborado%'')';
+            ELSIF v_parametros.tipo='ejecutados' THEN
+            	v_filtro = ' and (pro.estados_cotizacion like ''%pago_habilitado%'' or pro.estados_cotizacion like ''%finalizada%'')';
+            END IF;
+
+        	v_consulta = 'select sol.num_tramite, sol.justificacion, sol.desc_proveedor as proveedor_recomendado,
+            pro.proveedores_cot as proveedor_adjudicado,  pro.fecha_ini_proc, sol.precio_total_mb as precio_bs,
+            sol.precio_total as precio_moneda_solicitada, sol.codigo as moneda_solicitada
+            from adq.vsolicitud_compra sol
+            left join adq.vproceso_compra pro on pro.id_solicitud=sol.id_solicitud and pro.estados_cotizacion!=''anulado''
+            where pro.fecha_ini_proc BETWEEN '''||v_parametros.fecha_ini||''' and '''||v_parametros.fecha_fin ||'''
+            and sol.precio_total_mb > ' || v_parametros.monto_mayor ||'
+            and pro.estado != ''anulado'' and pro.id_depto='||v_parametros.id_depto||v_filtro||'
+            order by pro.fecha_ini_proc, pro.num_tramite';
+
+        	return v_consulta;
+        end;
+
 	else
 					     
 		raise exception 'Transaccion inexistente';
