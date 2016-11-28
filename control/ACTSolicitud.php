@@ -373,7 +373,7 @@ class ACTSolicitud extends ACTbase{
     $resultSolicitud = $this->objFunc->reporteSolicitud();
     
     $datosSolicitud = $resultSolicitud->getDatos();
-            
+
     //armamos el array parametros y metemos ahi los data sets de las otras tablas
     $dataSource->putParameter('estado', $datosSolicitud[0]['estado']);
     $dataSource->putParameter('id_solicitud', $datosSolicitud[0]['id_solicitud']);
@@ -398,7 +398,8 @@ class ACTSolicitud extends ACTbase{
     $dataSource->putParameter('desc_funcionario_apro', $datosSolicitud[0]['desc_funcionario_apro']);
     $dataSource->putParameter('nombre_usuario_ai', $datosSolicitud[0]['nombre_usuario_ai']);
     $dataSource->putParameter('codigo_uo', $datosSolicitud[0]['codigo_uo']);
-            
+    $dataSource->putParameter('fecha_reg', $datosSolicitud[0]['fecha_reg']);
+
     //get detalle
     //Reset all extra params:
     $this->objParam->defecto('ordenacion', 'id_solicitud_det');

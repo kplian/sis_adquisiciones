@@ -76,6 +76,9 @@ Class RSolicitudCompra extends Report {
         $pdf->SetFontSize(8.5);
         $pdf->SetFont('', 'B');
         $pdf->setTextColor(0,0,0);
+
+        $fecha_reg = substr($this->getDataSource()->getParameter('fecha_reg'),0,4);
+        $gestion = $this->getDataSource()->getParameter('desc_gestion');
        
         $pdf->Cell($width3, $height, 'Número de Solicitud', 0, 0, 'L', false, '', 0, false, 'T', 'C');
         $pdf->Cell($width3, $height, 'Fecha de Solicitud', 0, 0, 'C', false, '', 0, false, 'T', 'C');
@@ -96,7 +99,7 @@ Class RSolicitudCompra extends Report {
         $pdf->Cell($width2-3, $height, $this->getDataSource()->getParameter('desc_gestion'), 0, 0, 'C', false, '', 0, false, 'T', 'C');		
         $pdf->Ln();
         $pdf->Ln();
-    
+
         $white = array('LTRB' =>array('width' => 0.3, 'cap' => 'butt', 'join' => 'miter', 'dash' => 0, 'color' => array(255, 255, 255)));
         $black = array('T' =>array('width' => 0.3, 'cap' => 'butt', 'join' => 'miter', 'dash' => 0, 'color' => array(0, 0, 0)));
         //$pdf->setLineStyle($white);
@@ -202,18 +205,12 @@ Class RSolicitudCompra extends Report {
         
         $pdf->Ln();
         $pdf->Ln();
-        /*if($this->getDataSource()->getParameter('estado')!='borrador' && $this->getDataSource()->getParameter('estado')!='pendiente'){
-        	
-					$this->firmar(35);
-                    $pdf->Cell($width4-8, $height, '', 0, 0, 'L', false, '', 0, false, 'T', 'C');
-					
-                    $pdf->Cell($width3+$width1, $height, $this->getDataSource()->getParameter('desc_funcionario_rpc'), $black, 0, 'C', false, '', 0, false, 'T', 'C');
-                    $pdf->Cell($width4-8, $height, '', 0, 0, 'L', false, '', 0, false, 'T', 'C');
-                    $pdf->Ln();
-                    $pdf->Cell($width4-8, $height, '', 0, 0, 'L', false, '', 0, false, 'T', 'C');
-                    $pdf->Cell($width3+$width1, $height, 'Firma Autorizada', 0, 0, 'C', false, '', 0, false, 'T', 'C');
-                    $pdf->Cell($width4-8, $height, '', 0, 0, 'L', false, '', 0, false, 'T', 'C');
-        } */                          
+
+        if($fecha_reg != $gestion){
+            $pdf->setTextColor(248,0,0);
+            $pdf->MultiCell(185, $height, 'EN CUMPLIMIENTO A INSTRUCCIONES EMITIDAS POR EL ORGANO RECTOR  MEDIANTE CITE MEFP/VPCF/DGPGP/UEP/N° 355/2016, BOLIVIANA DE AVIACION EN FECHA 04 DE SEPTIEMBRE DEL AÑO EN CURSO, REMITE AL MINISTERIO DE ECONOMÍA Y FINANZAS PÚBLICAS  EL ANTEPROYECTO DE PRESUPUESTO INSTITUCIONAL DE BoA, A TRAVES DE LA NOTA OB.GG.NE.639.016, PARA SU CORRESPONDIENTE INCLUSIÓN EN EL PRESUPUESTO GENERAL DEL ESTADO - GESTION 2017, DONDE SE JUSTIFICO LA ASIGNACION PRESUPUESTARIA EN LAS DIFERENTES PARTIDAS DE GASTO, QUE COMPONEN EL MISMO, DE ACUERDO A LA PROGRAMACION REALIZADA EN MEMORIAS DE CALCULO.', 0,'J', false);
+        }
+
         $pdf->Ln();
 		/*jrr: Cambio para firmas*/
 		$res =$pdf->firma;
