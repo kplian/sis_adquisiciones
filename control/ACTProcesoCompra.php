@@ -135,7 +135,6 @@ class ACTProcesoCompra extends ACTbase{
     function procesosIniciadosAdjudicadosEjecutados(){
 
         $this->objParam->addParametro('tipo','iniciados');
-        $this->objParam->addParametro('monto_mayor',20000);
         $this->objFunc=$this->create('MODProcesoCompra');
         $this->res=$this->objFunc->procesosIniciadosAdjudicadosEjecutados($this->objParam);
         $this->objParam->addParametro('iniciados',$this->res->datos);
@@ -150,11 +149,9 @@ class ACTProcesoCompra extends ACTbase{
         $this->res=$this->objFunc->procesosIniciadosAdjudicadosEjecutados($this->objParam);
         $this->objParam->addParametro('ejecutados',$this->res->datos);
 
-        $this->objParam->addParametro('tipo','resumen');
         $this->objFunc=$this->create('MODProcesoCompra');
-        //$this->res=$this->objFunc->procesosIniciadosAdjudicadosEjecutadosResumen($this->objParam);
-
-        //$this->objParam->addParametro('datos_resumen',$this->res->datos);
+        $this->res=$this->objFunc->procesosIniAdjuEjecResumen($this->objParam);
+        $this->objParam->addParametro('datos_resumen',$this->res->datos);
 
         //obtener titulo del reporte
         $titulo = 'RepProcIniAdjEje';
@@ -168,7 +165,7 @@ class ACTProcesoCompra extends ACTbase{
         $this->objReporteFormato->imprimeIniciados();
         $this->objReporteFormato->imprimeAdjudicados();
         $this->objReporteFormato->imprimeEjecutados();
-        //$this->objReporteFormato->imprimeResumen();
+        $this->objReporteFormato->imprimeResumen();
 
         $this->objReporteFormato->generarReporte();
         $this->mensajeExito=new Mensaje();

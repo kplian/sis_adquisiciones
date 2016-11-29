@@ -32,43 +32,17 @@ header("content-type: text/javascript; charset=UTF-8");
                 form:true
             },
             {
-                config: {
-                    name: 'id_categoria_compra',
-                    hiddenName: 'id_categoria_compra',
-                    fieldLabel: 'Categoria de Compra',
-                    typeAhead: false,
-                    forceSelection: false,
-                    allowBlank: false,
-                    emptyText: 'Categorias...',
-                    store: new Ext.data.JsonStore({
-                        url: '../../sis_adquisiciones/control/CategoriaCompra/listarCategoriaCompra',
-                        id: 'id_categoria_compra',
-                        root: 'datos',
-                        sortInfo: {
-                            field: 'catcomp.nombre',
-                            direction: 'ASC'
-                        },
-                        totalProperty: 'total',
-                        fields: ['id_categoria_compra', 'nombre', 'codigo'],
-                        // turn on remote sorting
-                        remoteSort: true,
-                        baseParams: { par_filtro: 'catcomp.nombre#catcomp.codigo', codigo_subsistema: 'ADQ'}
-                    }),
-                    valueField: 'id_categoria_compra',
-                    displayField: 'nombre',
-                    triggerAction: 'all',
-                    lazyRender: true,
-                    mode: 'remote',
-                    pageSize: 20,
-                    queryDelay: 200,
-                    listWidth:280,
-                    minChars: 2,
-                    width: '80%',
-                    tpl: '<tpl for="."><div class="x-combo-list-item"><p>{nombre}</p>Codigo: <strong>{codigo}</strong> </div></tpl>'
+                config:{
+                    name: 'monto_mayor',
+                    fieldLabel: 'Montos mayor a',
+                    allowBlank: true,
+                    anchor: '35%',
+                    gwidth: 80,
+                    maxLength:6
                 },
-                type: 'ComboBox',
-                id_grupo: 0,
-                form: true
+                type:'NumberField',
+                grid:true,
+                form:true
             },
             {
                 config:{

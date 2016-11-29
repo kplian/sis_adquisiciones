@@ -536,7 +536,7 @@ BEGIN
 
     	begin
         	IF v_parametros.tipo='iniciados' THEN
-	        	v_filtro = 'and (pro.estados_cotizacion not like ''%adjudicado%'' and pro.estados_cotizacion not like ''%contrato_pendiente%''
+	        	v_filtro = ' and (pro.estados_cotizacion not like ''%adjudicado%'' and pro.estados_cotizacion not like ''%contrato_pendiente%''
             				and pro.estados_cotizacion not like ''%contrato_elaborado%'' and pro.estados_cotizacion not like ''%pago_habilitado%''
             				and pro.estados_cotizacion not like ''%finalizada%'' or pro.estados_cotizacion is null)';
             ELSIF v_parametros.tipo='adjudicados' THEN
@@ -555,6 +555,51 @@ BEGIN
             and sol.precio_total_mb > ' || v_parametros.monto_mayor ||'
             and pro.estado != ''anulado'' and pro.id_depto='||v_parametros.id_depto||v_filtro||'
             order by pro.fecha_ini_proc, pro.num_tramite';
+
+        	return v_consulta;
+        end;
+
+    /*********************************
+ 	#TRANSACCION:  'ADQ_INADEJRES_SEL'
+ 	#DESCRIPCION:	Obtener resumen de procesos iniciados, adjudicados y ejecutados
+ 	#AUTOR:		Gonzalo Sarmiento Sejas
+ 	#FECHA:		28-11-2016
+	***********************************/
+
+	elsif(p_transaccion='ADQ_INADEJRES_SEL')then
+
+    	begin
+
+            v_consulta = 'select ''Iniciados'' as estado, cc.nombre, count(pro.id_proceso_compra) as total
+						  from adq.vsolicitud_compra sol
+			left join adq.vproceso_compra pro on pro.id_solicitud=sol.id_solicitud and pro.estados_cotizacion!=''anulado''
+			inner join adq.tcategoria_compra cc on cc.id_categoria_compra=pro.id_categoria_compra
+			where pro.fecha_ini_proc BETWEEN '''||v_parametros.fecha_ini||''' and '''||v_parametros.fecha_fin||'''
+			and sol.precio_total_mb > ' || v_parametros.monto_mayor || '
+			and pro.estado != ''anulado'' and pro.id_depto=' ||v_parametros.id_depto||'
+			and (pro.estados_cotizacion not like ''%adjudicado%'' and pro.estados_cotizacion not like ''%contrato_pendiente%''
+			and pro.estados_cotizacion not like ''%contrato_elaborado%'' and pro.estados_cotizacion not like ''%pago_habilitado%''
+			and pro.estados_cotizacion not like ''%finalizada%'' or pro.estados_cotizacion is null)
+			group by cc.nombre UNION ALL
+			select ''Adjudicados'' as estado, cc.nombre, count(pro.id_proceso_compra) as total
+			from adq.vsolicitud_compra sol
+			left join adq.vproceso_compra pro on pro.id_solicitud=sol.id_solicitud and pro.estados_cotizacion!=''anulado''
+			inner join adq.tcategoria_compra cc on cc.id_categoria_compra=pro.id_categoria_compra
+			where pro.fecha_ini_proc BETWEEN '''||v_parametros.fecha_ini||''' and '''||v_parametros.fecha_fin||'''
+			and sol.precio_total_mb > '||v_parametros.monto_mayor||'
+            and pro.estado != ''anulado'' and pro.id_depto='||v_parametros.id_depto||'
+			and (pro.estados_cotizacion like ''%adjudicado%'' or pro.estados_cotizacion like ''%contrato_pendiente%''
+			or pro.estados_cotizacion like ''%contrato_elaborado%'')
+			group by cc.nombre UNION ALL
+			select ''Ejecutados'' as estado, cc.nombre, count(pro.id_proceso_compra) as total
+			from adq.vsolicitud_compra sol
+			left join adq.vproceso_compra pro on pro.id_solicitud=sol.id_solicitud and pro.estados_cotizacion!=''anulado''
+			inner join adq.tcategoria_compra cc on cc.id_categoria_compra=pro.id_categoria_compra
+			where pro.fecha_ini_proc BETWEEN '''||v_parametros.fecha_ini||''' and '''||v_parametros.fecha_fin||'''
+			and sol.precio_total_mb > '||v_parametros.monto_mayor||'
+			and pro.estado != ''anulado'' and pro.id_depto=' ||v_parametros.id_depto||'
+			and (pro.estados_cotizacion like ''%pago_habilitado%'' or pro.estados_cotizacion like ''%finalizada%'')
+			group by cc.nombre';
 
         	return v_consulta;
         end;

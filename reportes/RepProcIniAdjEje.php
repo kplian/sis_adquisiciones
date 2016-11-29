@@ -46,6 +46,9 @@ class RepProcIniAdjEje
 
         $this->docexcel->setActiveSheetIndex(0);
 
+        $this->docexcel->createSheet(NULL, 2);
+        $this->docexcel->createSheet(NULL, 3);
+
         $this->equivalencias=array(0=>'A',1=>'B',2=>'C',3=>'D',4=>'E',5=>'F',6=>'G',7=>'H',8=>'I',
             9=>'J',10=>'K',11=>'L',12=>'M',13=>'N',14=>'O',15=>'P',16=>'Q',17=>'R',
             18=>'S',19=>'T',20=>'U',21=>'V',22=>'W',23=>'X',24=>'Y',25=>'Z',
@@ -63,7 +66,6 @@ class RepProcIniAdjEje
     function imprimeIniciados(){
         $this->docexcel->getActiveSheet()->setTitle('Iniciados');
         $datos = $this->objParam->getParametro('iniciados');
-        $columnas = 0;
         $this->docexcel->setActiveSheetIndex(0);
 
         $this->docexcel->getActiveSheet()->getColumnDimension('A')->setWidth(20);
@@ -74,7 +76,6 @@ class RepProcIniAdjEje
         $this->docexcel->getActiveSheet()->getColumnDimension('F')->setWidth(20);
         $this->docexcel->getActiveSheet()->getColumnDimension('G')->setWidth(20);
         $this->docexcel->getActiveSheet()->getColumnDimension('H')->setWidth(20);
-        $this->docexcel->getActiveSheet()->getColumnDimension('I')->setWidth(20);
 
 
         $styleTitulos = array(
@@ -111,7 +112,6 @@ class RepProcIniAdjEje
         $this->docexcel->getActiveSheet()->setCellValue('F1','Precio en Bs');
         $this->docexcel->getActiveSheet()->setCellValue('G1','Precio del Proceso');
         $this->docexcel->getActiveSheet()->setCellValue('H1','Moneda del Proceso');
-        $this->docexcel->getActiveSheet()->setCellValue('I1','Tiempo legal');
 
 
         //*************************************Detalle*****************************************
@@ -133,11 +133,9 @@ class RepProcIniAdjEje
     }
 
     function imprimeAdjudicados(){
-        $this->docexcel->createSheet(NULL, 2);
         $this->docexcel->setActiveSheetIndex(1);
         $this->docexcel->getActiveSheet()->setTitle('Adjudicados');
         $datos = $this->objParam->getParametro('adjudicados');
-        $columnas = 0;
         $fila = 2;
         $this->docexcel->getActiveSheet()->getColumnDimension('A')->setWidth(20);
         $this->docexcel->getActiveSheet()->getColumnDimension('B')->setWidth(40);
@@ -147,7 +145,6 @@ class RepProcIniAdjEje
         $this->docexcel->getActiveSheet()->getColumnDimension('F')->setWidth(20);
         $this->docexcel->getActiveSheet()->getColumnDimension('G')->setWidth(20);
         $this->docexcel->getActiveSheet()->getColumnDimension('H')->setWidth(20);
-        $this->docexcel->getActiveSheet()->getColumnDimension('I')->setWidth(20);
 
 
         $styleTitulos = array(
@@ -171,9 +168,9 @@ class RepProcIniAdjEje
                     'style' => PHPExcel_Style_Border::BORDER_THIN
                 )
             ));
-        $this->docexcel->getActiveSheet()->getStyle('A1:I1')->getAlignment()->setWrapText(true);
+        $this->docexcel->getActiveSheet()->getStyle('A1:H1')->getAlignment()->setWrapText(true);
 
-        $this->docexcel->getActiveSheet()->getStyle('A1:I1')->applyFromArray($styleTitulos);
+        $this->docexcel->getActiveSheet()->getStyle('A1:H1')->applyFromArray($styleTitulos);
 
         //*************************************Cabecera*****************************************
         $this->docexcel->getActiveSheet()->setCellValue('A1','# Tramite');
@@ -184,7 +181,6 @@ class RepProcIniAdjEje
         $this->docexcel->getActiveSheet()->setCellValue('F1','Precio en Bs');
         $this->docexcel->getActiveSheet()->setCellValue('G1','Precio del Proceso');
         $this->docexcel->getActiveSheet()->setCellValue('H1','Moneda del Proceso');
-        $this->docexcel->getActiveSheet()->setCellValue('I1','Tiempo legal');
 
 
         //*************************************Detalle*****************************************
@@ -205,10 +201,10 @@ class RepProcIniAdjEje
     }
 
     function imprimeEjecutados(){
+
         $this->docexcel->setActiveSheetIndex(2);
         $this->docexcel->getActiveSheet()->setTitle('Ejecutados');
         $datos = $this->objParam->getParametro('ejecutados');
-        $columnas = 0;
 
         $this->docexcel->getActiveSheet()->getColumnDimension('A')->setWidth(20);
         $this->docexcel->getActiveSheet()->getColumnDimension('B')->setWidth(40);
@@ -218,7 +214,6 @@ class RepProcIniAdjEje
         $this->docexcel->getActiveSheet()->getColumnDimension('F')->setWidth(20);
         $this->docexcel->getActiveSheet()->getColumnDimension('G')->setWidth(20);
         $this->docexcel->getActiveSheet()->getColumnDimension('H')->setWidth(20);
-        $this->docexcel->getActiveSheet()->getColumnDimension('I')->setWidth(20);
 
 
         $styleTitulos = array(
@@ -242,9 +237,9 @@ class RepProcIniAdjEje
                     'style' => PHPExcel_Style_Border::BORDER_THIN
                 )
             ));
-        $this->docexcel->getActiveSheet()->getStyle('A1:I1')->getAlignment()->setWrapText(true);
+        $this->docexcel->getActiveSheet()->getStyle('A1:H1')->getAlignment()->setWrapText(true);
 
-        $this->docexcel->getActiveSheet()->getStyle('A1:I1')->applyFromArray($styleTitulos);
+        $this->docexcel->getActiveSheet()->getStyle('A1:H1')->applyFromArray($styleTitulos);
 
         //*************************************Cabecera*****************************************
         $this->docexcel->getActiveSheet()->setCellValue('A1','# Tramite');
@@ -255,7 +250,6 @@ class RepProcIniAdjEje
         $this->docexcel->getActiveSheet()->setCellValue('F1','Precio en Bs');
         $this->docexcel->getActiveSheet()->setCellValue('G1','Precio del Proceso');
         $this->docexcel->getActiveSheet()->setCellValue('H1','Moneda del Proceso');
-        $this->docexcel->getActiveSheet()->setCellValue('I1','Tiempo legal');
 
 
         //*************************************Detalle*****************************************
@@ -277,20 +271,12 @@ class RepProcIniAdjEje
     }
 
     function imprimeResumen(){
-
         $datos = $this->objParam->getParametro('datos_resumen');
-        $columnas = 0;
-        $this->docexcel->setActiveSheetIndex(1);
+        $this->docexcel->setActiveSheetIndex(3);
         $this->docexcel->getActiveSheet()->setTitle('Resumen');
         $this->docexcel->getActiveSheet()->getColumnDimension('A')->setWidth(30);
-
         $this->docexcel->getActiveSheet()->getColumnDimension('B')->setWidth(20);
         $this->docexcel->getActiveSheet()->getColumnDimension('C')->setWidth(20);
-        $this->docexcel->getActiveSheet()->getColumnDimension('D')->setWidth(20);
-        $this->docexcel->getActiveSheet()->getColumnDimension('E')->setWidth(20);
-        $this->docexcel->getActiveSheet()->getColumnDimension('F')->setWidth(20);
-
-
 
         $styleTitulos = array(
             'font'  => array(
@@ -313,21 +299,15 @@ class RepProcIniAdjEje
                     'style' => PHPExcel_Style_Border::BORDER_THIN
                 )
             ));
-        $this->docexcel->getActiveSheet()->getStyle('A1:F1')->getAlignment()->setWrapText(true);
+        $this->docexcel->getActiveSheet()->getStyle('A1:C1')->getAlignment()->setWrapText(true);
 
-        $this->docexcel->getActiveSheet()->getStyle('A1:F1')->applyFromArray($styleTitulos);
+        $this->docexcel->getActiveSheet()->getStyle('A1:C1')->applyFromArray($styleTitulos);
 
         //*************************************Cabecera*****************************************
 
-        $this->docexcel->getActiveSheet()->setCellValue('A1','Empleado Asignado');
-        $this->docexcel->getActiveSheet()->setCellValue('B1','Mayor 20 mil');
-        $this->docexcel->getActiveSheet()->setCellValue('C1','# Atendidos');
-        $this->docexcel->getActiveSheet()->setCellValue('D1','Tiempo asignacion');
-        $this->docexcel->getActiveSheet()->setCellValue('E1','Tiempo atencion');
-        $this->docexcel->getActiveSheet()->setCellValue('F1','Tiempo legal');
-
-
-
+        $this->docexcel->getActiveSheet()->setCellValue('A1','Estado');
+        $this->docexcel->getActiveSheet()->setCellValue('B1','Tipo Compra');
+        $this->docexcel->getActiveSheet()->setCellValue('C1','# Procesos');
 
         //*************************************Detalle*****************************************
         $columna = 0;
