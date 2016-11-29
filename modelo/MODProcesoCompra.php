@@ -371,22 +371,16 @@ function listarProcesoCompraPedido(){
 		$this->setParametro('fecha_ini','fecha_ini','date');
 		$this->setParametro('fecha_fin','fecha_fin','date');
 		$this->setParametro('id_depto','id_depto','integer');
-		$this->setParametro('tipo','tipo','varchar');
+		$this->setParametro('monto_mayor','monto_mayor','varchar');
 
 		//Definicion de la lista del resultado del query
-		$this->captura('num_tramite','varchar');
-		$this->captura('justificacion','varchar');
-		$this->captura('proveedor_recomendado','varchar');
-		$this->captura('proveedor_adjudicado','varchar');
-		$this->captura('fecha_ini_proc','date');
-		$this->captura('precio_bs','numeric');
-		$this->captura('precio_moneda_solicitada','numeric');
-		$this->captura('moneda_solicitada','varchar');
+		$this->captura('estado','text');
+		$this->captura('nombre','varchar');
+		$this->captura('total','bigint');
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();
 		$this->ejecutarConsulta();
-
 		//Devuelve la respuesta
 		return $this->respuesta;
 	}
