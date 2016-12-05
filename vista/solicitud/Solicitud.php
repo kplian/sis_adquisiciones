@@ -529,8 +529,8 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
 	    {
        		config:{
        			name: 'precontrato',
-       			fieldLabel: 'Contrato de adhesion',
-       			qtip: 'Si tine un contrato de adhesion',
+       			fieldLabel: 'Tipo de Contrato',
+       			qtip: 'Define si necesita un contrato y de que tipo',
        			allowBlank: false,
        			emptyText: 'Tipo...',
        			typeAhead: true,

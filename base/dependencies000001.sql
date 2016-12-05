@@ -5724,3 +5724,13 @@ AS
            sol.id_funcionario_rpc;
 
   /***********************************F-DEP-JRR-ADQ-0-08/08/2016*****************************************/
+
+/***********************************I-DEP-GVC-ADQ-0-05/12/2016*****************************************/
+DROP VIEW adq.vsolicitud_compra;
+DROP VIEW adq.vcotizacion;
+
+ALTER TABLE adq.tsolicitud
+  ALTER COLUMN precontrato TYPE VARCHAR(40) COLLATE pg_catalog."default";
+
+
+/***********************************F-DEP-GVC-ADQ-0-05/12/2016*****************************************/
