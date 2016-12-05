@@ -807,7 +807,7 @@ Phx.vista.FormSolicitud=Ext.extend(Phx.frmInterfaz,{
 	    {
        		config:{
        			name: 'precontrato',
-       			fieldLabel: 'Contrato de Adhesion',
+       			fieldLabel: 'Tipo de Contrato',
        			qtip: 'Si tine un contrato de adhesion',
        			allowBlank: false,
        			emptyText: 'Tipo...',
@@ -816,16 +816,16 @@ Phx.vista.FormSolicitud=Ext.extend(Phx.frmInterfaz,{
        		    lazyRender: true,
        		    mode: 'local',
        		    gwidth: 100,
-       		    store: ['si','no']
+       		    store: ['no_necesita','contrato_nuevo','contrato_adhesion','ampliacion_contrato']
        		},
        		type: 'ComboBox',
        		id_grupo: 2,
        		filters:{	
        		         type: 'list',
        		         pfiltro:'sol.tipo',
-       				 options: ['si','no'],	
+       				 options: ['no_necesita','contrato_nuevo','contrato_adhesion','ampliacion_contrato'],
        		 	},
-       		valorInicial: 'no',
+       		valorInicial: 'no_necesita',
        		grid:false,
        		form:true
        	}
