@@ -526,31 +526,31 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
 			grid: true,
 			form: false
 		},
-	    {
-       		config:{
-       			name: 'precontrato',
-       			fieldLabel: 'Tipo de Contrato',
-       			qtip: 'Define si necesita un contrato y de que tipo',
-       			allowBlank: false,
-       			emptyText: 'Tipo...',
-       			typeAhead: true,
-       		    triggerAction: 'all',
-       		    lazyRender: true,
-       		    mode: 'local',
-       		    gwidth: 100,
-       		    store: ['si','no']
-       		},
-       		type: 'ComboBox',
-       		id_grupo: 0,
-       		filters:{	
-       		         type: 'list',
-       		         pfiltro:'sol.tipo',
-       				 options: ['si','no'],	
-       		 	},
-       		valorInicial: 'no',
-       		grid:false,
-       		form:true
-       	},
+        {
+            config:{
+                name: 'precontrato',
+                fieldLabel: 'Tipo de Contrato',
+                qtip: 'Si tine un contrato de adhesion',
+                allowBlank: false,
+                emptyText: 'Tipo...',
+                typeAhead: true,
+                triggerAction: 'all',
+                lazyRender: true,
+                mode: 'local',
+                gwidth: 100,
+                store: ['no_necesita','contrato_nuevo','contrato_adhesion','ampliacion_contrato']
+            },
+            type: 'ComboBox',
+            id_grupo: 2,
+            filters:{
+                type: 'list',
+                pfiltro:'sol.tipo',
+                options: ['no_necesita','contrato_nuevo','contrato_adhesion','ampliacion_contrato'],
+            },
+            valorInicial: 'no_necesita',
+            grid:false,
+            form:true
+        },
          {
             config:{
                 name:'id_proveedor',
