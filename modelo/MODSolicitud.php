@@ -682,6 +682,31 @@ class MODSolicitud extends MODbase{
 	    
 	    return $this->respuesta;
 	}
+
+    function reporteCertificadoPoa(){
+        //Definicion de variables para ejecucion del procedimientp
+
+        $this->procedimiento='adq.f_solicitud_sel';
+        $this->transaccion='ADQ_CERT_SEL';
+        $this->tipo_procedimiento='SEL';
+
+        $this->setCount(false);
+        $this->setParametro('id_proceso_wf','id_proceso_wf','int4');
+
+        $this->captura('id_solicitud','int4');
+        $this->captura('num_tramite','varchar');
+        $this->captura('fecha_soli','text');
+        $this->captura('justificacion','text');
+        $this->captura('codigo_poa','varchar');
+        $this->captura('codigo_descripcion','text');
+        $this->captura('gestion','int4');
+
+        $this->armarConsulta();
+        $this->ejecutarConsulta();
+        //var_dump($this->respuesta); exit;
+        return $this->respuesta;
+    }
+
 			
 }
 ?>
