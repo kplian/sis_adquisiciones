@@ -17,6 +17,8 @@ include_once(dirname(__FILE__).'/../../lib/PHPMailer/class.smtp.php');
 include_once(dirname(__FILE__).'/../../lib/lib_general/cls_correo_externo.php');
 
 include_once(dirname(__FILE__).'/../../sis_seguridad/modelo/MODSubsistema.php');
+require_once(dirname(__FILE__).'/../reportes/RCertificadoPoaPDF.php');
+
 
 
 class ACTSolicitud extends ACTbase{    
@@ -760,6 +762,37 @@ function groupArray($array,$groupkey,$groupkeyTwo,$id_moneda,$estado_sol, $onlyD
         
         $this->res=$this->objFunc->verficarSigEstSolWf($this->objParam);
         $this->res->imprimirRespuesta($this->res->generarJson());
+    }
+
+    function reporteCertificado(){
+        $this->objFunc=$this->create('MODSolicitud');
+        $this->res=$this->objFunc->reporteCertificadoPoa($this->objParam);
+        //var_dump($this->res);exit;
+        //obtener titulo del reporte
+        $titulo = 'Informe de Reclamo';
+        //Genera el nombre del archivo (aleatorio + titulo)
+        $nombreArchivo=uniqid(md5(session_id()).$titulo);
+        $nombreArchivo.='.pdf';
+
+        $this->objParam->addParametro('orientacion','P');
+        $this->objParam->addParametro('tamano','LETTER');
+        $this->objParam->addParametro('nombre_archivo',$nombreArchivo);
+
+
+        $this->objReporteFormato=new RCertificadoPoaPDF($this->objParam);
+        $this->objReporteFormato->setDatos($this->res->datos);
+        $this->objReporteFormato->generarReporte();
+        $this->objReporteFormato->output($this->objReporteFormato->url_archivo,'F');
+
+
+        $this->mensajeExito=new Mensaje();
+        $this->mensajeExito->setMensaje('EXITO','Reporte.php','Reporte generado',
+            'Se generó con éxito el reporte: '.$nombreArchivo,'control');
+        $this->mensajeExito->setArchivoGenerado($nombreArchivo);
+        $this->mensajeExito->imprimirRespuesta($this->mensajeExito->generarJson());
+
+
+
     }
 
     
