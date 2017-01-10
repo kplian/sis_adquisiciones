@@ -76,6 +76,7 @@ class RepProcIniAdjEje
         $this->docexcel->getActiveSheet()->getColumnDimension('F')->setWidth(20);
         $this->docexcel->getActiveSheet()->getColumnDimension('G')->setWidth(20);
         $this->docexcel->getActiveSheet()->getColumnDimension('H')->setWidth(20);
+        $this->docexcel->getActiveSheet()->getColumnDimension('I')->setWidth(20);
 
 
         $styleTitulos = array(
@@ -112,6 +113,7 @@ class RepProcIniAdjEje
         $this->docexcel->getActiveSheet()->setCellValue('F1','Precio en Bs');
         $this->docexcel->getActiveSheet()->setCellValue('G1','Precio del Proceso');
         $this->docexcel->getActiveSheet()->setCellValue('H1','Moneda del Proceso');
+        $this->docexcel->getActiveSheet()->setCellValue('I1','Contrato');
 
 
         //*************************************Detalle*****************************************
@@ -145,6 +147,7 @@ class RepProcIniAdjEje
         $this->docexcel->getActiveSheet()->getColumnDimension('F')->setWidth(20);
         $this->docexcel->getActiveSheet()->getColumnDimension('G')->setWidth(20);
         $this->docexcel->getActiveSheet()->getColumnDimension('H')->setWidth(20);
+        $this->docexcel->getActiveSheet()->getColumnDimension('I')->setWidth(20);
 
 
         $styleTitulos = array(
@@ -168,9 +171,9 @@ class RepProcIniAdjEje
                     'style' => PHPExcel_Style_Border::BORDER_THIN
                 )
             ));
-        $this->docexcel->getActiveSheet()->getStyle('A1:H1')->getAlignment()->setWrapText(true);
+        $this->docexcel->getActiveSheet()->getStyle('A1:I1')->getAlignment()->setWrapText(true);
 
-        $this->docexcel->getActiveSheet()->getStyle('A1:H1')->applyFromArray($styleTitulos);
+        $this->docexcel->getActiveSheet()->getStyle('A1:I1')->applyFromArray($styleTitulos);
 
         //*************************************Cabecera*****************************************
         $this->docexcel->getActiveSheet()->setCellValue('A1','# Tramite');
@@ -181,6 +184,7 @@ class RepProcIniAdjEje
         $this->docexcel->getActiveSheet()->setCellValue('F1','Precio en Bs');
         $this->docexcel->getActiveSheet()->setCellValue('G1','Precio del Proceso');
         $this->docexcel->getActiveSheet()->setCellValue('H1','Moneda del Proceso');
+        $this->docexcel->getActiveSheet()->setCellValue('I1','Contrato');
 
 
         //*************************************Detalle*****************************************
@@ -214,6 +218,7 @@ class RepProcIniAdjEje
         $this->docexcel->getActiveSheet()->getColumnDimension('F')->setWidth(20);
         $this->docexcel->getActiveSheet()->getColumnDimension('G')->setWidth(20);
         $this->docexcel->getActiveSheet()->getColumnDimension('H')->setWidth(20);
+        $this->docexcel->getActiveSheet()->getColumnDimension('I')->setWidth(20);
 
 
         $styleTitulos = array(
@@ -237,9 +242,9 @@ class RepProcIniAdjEje
                     'style' => PHPExcel_Style_Border::BORDER_THIN
                 )
             ));
-        $this->docexcel->getActiveSheet()->getStyle('A1:H1')->getAlignment()->setWrapText(true);
+        $this->docexcel->getActiveSheet()->getStyle('A1:I1')->getAlignment()->setWrapText(true);
 
-        $this->docexcel->getActiveSheet()->getStyle('A1:H1')->applyFromArray($styleTitulos);
+        $this->docexcel->getActiveSheet()->getStyle('A1:I1')->applyFromArray($styleTitulos);
 
         //*************************************Cabecera*****************************************
         $this->docexcel->getActiveSheet()->setCellValue('A1','# Tramite');
@@ -250,6 +255,7 @@ class RepProcIniAdjEje
         $this->docexcel->getActiveSheet()->setCellValue('F1','Precio en Bs');
         $this->docexcel->getActiveSheet()->setCellValue('G1','Precio del Proceso');
         $this->docexcel->getActiveSheet()->setCellValue('H1','Moneda del Proceso');
+        $this->docexcel->getActiveSheet()->setCellValue('I1','Contrato');
 
 
         //*************************************Detalle*****************************************
