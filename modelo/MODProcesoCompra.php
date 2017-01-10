@@ -354,6 +354,7 @@ function listarProcesoCompraPedido(){
 		$this->captura('precio_bs','numeric');
 		$this->captura('precio_moneda_solicitada','numeric');
 		$this->captura('moneda_solicitada','varchar');
+		$this->captura('requiere_contrato','text');
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();

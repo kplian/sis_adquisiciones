@@ -548,7 +548,12 @@ BEGIN
 
         	v_consulta = 'select sol.num_tramite, sol.justificacion, sol.desc_proveedor as proveedor_recomendado,
             pro.proveedores_cot as proveedor_adjudicado,  pro.fecha_ini_proc, sol.precio_total_mb as precio_bs,
-            sol.precio_total as precio_moneda_solicitada, sol.codigo as moneda_solicitada
+            sol.precio_total as precio_moneda_solicitada, sol.codigo as moneda_solicitada,
+            case when pro.requiere_contrato = ''si'' then ''Contrato''
+                 else case when sol.tipo=''bien'' then ''Orden de Bien''
+                      when sol.tipo=''servicio'' then ''Orden de Servicio''
+                      end
+                 end as contrato_orden
             from adq.vsolicitud_compra sol
             left join adq.vproceso_compra pro on pro.id_solicitud=sol.id_solicitud and pro.estados_cotizacion!=''anulado''
             where pro.fecha_ini_proc BETWEEN '''||v_parametros.fecha_ini||''' and '''||v_parametros.fecha_fin ||'''
