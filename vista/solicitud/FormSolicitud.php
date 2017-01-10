@@ -1026,9 +1026,10 @@ Phx.vista.FormSolicitud=Ext.extend(Phx.frmInterfaz,{
 		
 		
    	    me.argumentExtraSubmit = { 'json_new_records': JSON.stringify(arra, function replacer(key, value) {
-   	    	           if (typeof value === 'string') {
+   	    	                     //10/01/2017 comentado ahora el framework se encarga de decodificar
+   	    	                    /*if (typeof value === 'string') {
 							        return String(value).replace(/&/g, "%26")
-							    }
+							    }*/
 							    return value;
 							}) };
 							
