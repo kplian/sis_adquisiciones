@@ -92,13 +92,13 @@ BEGIN
         
         v_operacion = 'UPDATE RPC';
    
-       IF  NEW.ai_habilitado = 'si' and OLD.ai_habilitado = 'no' then
+       /*IF  NEW.ai_habilitado = 'si' and OLD.ai_habilitado = 'no' then
           v_descripcion = 'Habilitar el RPC suplente'; 
        ELSIF  NEW.ai_habilitado = 'no' and OLD.ai_habilitado = 'si' then
           v_descripcion = 'Deshabilitar el RPC suplente'; 
-       ELSE
+       ELSE*/
           v_descripcion = 'Modifica el RPC'; 
-       END IF;
+       --END IF;
  
   
      ELSE
