@@ -377,7 +377,7 @@ Phx.vista.RpcUo=Ext.extend(Phx.gridInterfaz,{
 	},
 	bdel:true,
 	bsave:true,
-	bedit:false
+	bedit:true
 	}
 )
 </script>
