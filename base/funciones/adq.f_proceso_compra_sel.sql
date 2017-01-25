@@ -608,6 +608,33 @@ BEGIN
 
         	return v_consulta;
         end;
+  ELSIF (p_transaccion='ADQ_RMEMODCR_SEL')THEN
+    	BEGIN
+
+
+        	--Sentencia de la consulta
+			   v_consulta:='SELECT
+            vf.desc_funcionario1 as funcionario,
+            p.desc_proveedor as proveedor,
+            param.f_obtener_correlativo(
+                          ''MEM'',
+                           ts.id_gestion,
+                           NULL,
+                           tpc.id_depto,
+                           tc.id_usuario_reg,
+                           ''ADQ'',
+                           NULL) as tramite
+            FROM adq.tcotizacion tc
+            LEFT JOIN adq.tproceso_compra tpc ON tpc.id_proceso_compra = tc.id_proceso_compra
+            LEFT JOIN adq.tsolicitud ts ON ts.id_solicitud = tpc.id_solicitud
+            LEFT JOIN orga.vfuncionario vf ON vf.id_funcionario = ts.id_funcionario_rpc
+            LEFT JOIN param.vproveedor p ON p.id_proveedor = tc.id_proveedor
+            WHERE  tc.id_proceso_wf = '||v_parametros.id_proceso_wf;
+
+
+			  --Devuelve la respuesta
+			   return v_consulta;
+      END;
 
 	else
 					     
