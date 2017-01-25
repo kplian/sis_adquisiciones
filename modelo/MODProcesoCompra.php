@@ -39,7 +39,7 @@ class MODProcesoCompra extends MODbase{
 		$this->captura('id_usuario_mod','int4');
 		$this->captura('usr_reg','varchar');
 		$this->captura('usr_mod','varchar');
-		
+
 		$this->captura('desc_depto','varchar');
 		$this->captura('desc_funcionario','text');
 		$this->captura('desc_solicitud','varchar');
@@ -51,7 +51,7 @@ class MODProcesoCompra extends MODbase{
 		$this->captura('id_funcionario','integer');
 		$this->captura('id_usuario_auxiliar','integer');
 		$this->captura('objeto','varchar');
-		
+
 		$this->captura('estados_cotizacion','text');
 		$this->captura('numeros_oc','text');
 		$this->captura('proveedores_cot','text');
@@ -382,6 +382,36 @@ function listarProcesoCompraPedido(){
 		//Ejecuta la instruccion
 		$this->armarConsulta();
 		$this->ejecutarConsulta();
+		//Devuelve la respuesta
+		return $this->respuesta;
+	}
+
+	function recuperarComite(){
+		//Definicion de variables para ejecucion del procedimientp
+
+		$this->procedimiento='adq.f_proceso_compra_sel';
+		$this->transaccion='ADQ_RMEMODCR_SEL';
+		$this->tipo_procedimiento='SEL';//tipo de transaccion
+		$this->setCount(false);
+
+
+		$this->setParametro('id_proceso_wf','id_proceso_wf','int4');
+
+		//Definicion de la lista del resultado del query
+
+
+		$this->captura('funcionario','text');
+		$this->captura('proveedor','varchar');
+
+		$this->captura('tramite','varchar');
+		//$this->captura('numero','varchar');
+
+
+		//Ejecuta la instruccion
+		$this->armarConsulta();
+		//echo $this->consulta;exit;
+		$this->ejecutarConsulta();
+
 		//Devuelve la respuesta
 		return $this->respuesta;
 	}

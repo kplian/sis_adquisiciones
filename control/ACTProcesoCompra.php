@@ -13,6 +13,8 @@ require_once(dirname(__FILE__).'/../../pxp/pxpReport/DataSource.php');
 require_once(dirname(__FILE__).'/../reportes/RTiemposProcesoCompra.php');
 require_once(dirname(__FILE__).'/../reportes/RepProcIniAdjEje.php');
 
+require_once(dirname(__FILE__).'/../reportes/RMemoDesigCR.php');
+
 class ACTProcesoCompra extends ACTbase{    
 			
 	function listarProcesoCompra(){
@@ -303,6 +305,26 @@ class ACTProcesoCompra extends ACTbase{
              $this->res->imprimirRespuesta($this->res->generarJson());
 
   }
+
+    function reporteMemoDCR(){
+        
+        $this->objFunc = $this->create('MODProcesoCompra');
+        $dataSource = $this->objFunc->recuperarComite();
+        
+        $nombreArchivo = uniqid(md5(session_id()).'MemoDesignacionComiteR').'.docx';
+        //echo $this->objParam;exit;
+        $reporte = new RMemoDesigCR($this->objParam);
+        
+        $reporte->datosHeader($dataSource->getDatos());
+
+        $reporte->write(dirname(__FILE__).'/../../reportes_generados/'.$nombreArchivo);
+
+        $this->mensajeExito=new Mensaje();
+        $this->mensajeExito->setMensaje('EXITO','Reporte.php','Reporte generado','Se generó con éxito el reporte: '.$nombreArchivo,'control');
+        $this->mensajeExito->setArchivoGenerado($nombreArchivo);
+        $this->mensajeExito->imprimirRespuesta($this->mensajeExito->generarJson());
+
+    }
 }
 
 ?>

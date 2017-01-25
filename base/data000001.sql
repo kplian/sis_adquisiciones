@@ -898,3 +898,9 @@ select pxp.f_insert_tgui ('VoBo Solicitud (Poa)', 'VoBo Solicitud (Poa)', 'VBPOA
 select pxp.f_insert_tgui ('Visto Bueno Solicitud (Presupuestos)', 'Visto Bueno Solicitud (Presupuestos)', 'VBSOLP', 'si', 7, 'sis_adquisiciones/vista/solicitud/SolicitudVb.php', 2, '', 'SolicitudVb', 'ADQ');
 
 /***********************************F-DAT-RAC-ADQ-0-23/06/2015*****************************************/
+
+/***********************************I-DAT-FEA-ADQ-0-25/01/2017*****************************************/
+
+select wf.f_import_ttipo_documento ('insert','MEM','COTINPD','Memorándum de Designación Comité Recepcion','Memorándum de Designación Comité Recepcion','sis_adquisiciones/control/ProcesoCompra/reporteMemoDCR/','generado',1.00,'{}');
+
+/***********************************F-DAT-FEA-ADQ-0-25/01/2017*****************************************/
