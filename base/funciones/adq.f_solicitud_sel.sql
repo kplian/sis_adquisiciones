@@ -96,7 +96,7 @@ BEGIN
                     END IF;
                 ELSE
                     IF p_administrador !=1 THEN
-                      v_filtro = ' (ew.id_funcionario='||v_parametros.id_funcionario_usu::varchar||' ) and  (lower(sol.estado)!=''borrador'') ) and ';
+                      v_filtro = ' (ew.id_funcionario='||v_parametros.id_funcionario_usu::varchar||' ) and  (lower(sol.estado)!=''borrador'') and ';
                     ELSE
                         v_filtro = ' (lower(sol.estado) != ''borrador'') and ';
                     END IF;
@@ -292,7 +292,7 @@ BEGIN
                 END IF;
               ELSE
                 IF p_administrador !=1 THEN
-                  v_filtro = ' (ew.id_funcionario='||v_parametros.id_funcionario_usu::varchar||' ) and  (lower(sol.estado)!=''borrador'') ) and ';
+                  v_filtro = ' (ew.id_funcionario='||v_parametros.id_funcionario_usu::varchar||' ) and  (lower(sol.estado)!=''borrador'') and ';
                 ELSE
                     v_filtro = ' (lower(sol.estado)!=''borrador'') and ';
                 END IF;
