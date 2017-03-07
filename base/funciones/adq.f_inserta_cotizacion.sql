@@ -452,55 +452,56 @@ BEGIN
                      
                    IF v_id_proveedor_precoti = (p_hstore_cotizacion->'id_proveedor')::integer THEN
                    
-                      v_sw_precoti = TRUE;
-                      
-                      --capturamos la url del documento escaneado de la precotizacion en la solicitu....
-                      
-                      select 
-                        dwf.id_documento_wf , 
-                        dwf.url,
-                        dwf.extension
-                      into
-                         v_id_documento_wf_pc,
-                         v_url,
-                         v_extension
-                      from wf.tdocumento_wf dwf
-                      inner join wf.ttipo_documento td on td.id_tipo_documento = dwf.id_tipo_documento and td.codigo = 'precotizacion' 
-                      where dwf.id_proceso_wf = v_id_proceso_wf_sol;
-                      
-                      
-                      IF v_id_documento_wf_pc is NULL THEN
-                      
-                         raise exception 'No existe un documento dcodigo=precotizacion para la solicitud de compra';  
-                      
+                   	  IF 'ampliacion_contrato' != (p_hstore_cotizacion->'precontrato')::varchar THEN
+                          v_sw_precoti = TRUE;
+
+                          --capturamos la url del documento escaneado de la precotizacion en la solicitu....
+
+                          select
+                            dwf.id_documento_wf ,
+                            dwf.url,
+                            dwf.extension
+                          into
+                             v_id_documento_wf_pc,
+                             v_url,
+                             v_extension
+                          from wf.tdocumento_wf dwf
+                          inner join wf.ttipo_documento td on td.id_tipo_documento = dwf.id_tipo_documento and td.codigo = 'precotizacion'
+                          where dwf.id_proceso_wf = v_id_proceso_wf_sol;
+
+
+                          IF v_id_documento_wf_pc is NULL THEN
+
+                             raise exception 'No existe un documento dcodigo=precotizacion para la solicitud de compra';
+
+                          END IF;
+
+
+                          --capturamos el id  del documento escaneado de COTIZACION
+                          select
+                             dwf.id_documento_wf
+                          into
+                             v_id_documento_wf_co
+                          from wf.tdocumento_wf dwf
+                          inner join wf.ttipo_documento td
+                          on td.id_tipo_documento = dwf.id_tipo_documento and td.codigo = 'cotizacion'
+
+                          where dwf.id_proceso_wf = v_id_proceso_wf;
+
+
+                          IF v_id_documento_wf_co is NULL THEN
+
+                             raise exception 'No existe un documento de codigo=cotizacion para la cotización';
+
+                          END IF;
+
+                          --modificamos el documento escaneado de la cotizacion
+                          update wf.tdocumento_wf set
+                            url = v_url,
+                            chequeado = 'si',
+                            extension = v_extension
+                          where id_documento_wf = v_id_documento_wf_co;
                       END IF;
-                      
-                      
-                      --capturamos el id  del documento escaneado de COTIZACION
-                      select
-                         dwf.id_documento_wf  
-                      into 
-                         v_id_documento_wf_co
-                      from wf.tdocumento_wf dwf
-                      inner join wf.ttipo_documento td 
-                      on td.id_tipo_documento = dwf.id_tipo_documento and td.codigo = 'cotizacion' 
-                      
-                      where dwf.id_proceso_wf = v_id_proceso_wf; 
-                      
-                      
-                      IF v_id_documento_wf_co is NULL THEN
-                      
-                         raise exception 'No existe un documento de codigo=cotizacion para la cotización';  
-                      
-                      END IF;
-                      
-                      --modificamos el documento escaneado de la cotizacion
-                      update wf.tdocumento_wf set
-                        url = v_url,
-                        chequeado = 'si',
-                        extension = v_extension
-                      where id_documento_wf = v_id_documento_wf_co;
-                        
                    
                    END IF;
                    

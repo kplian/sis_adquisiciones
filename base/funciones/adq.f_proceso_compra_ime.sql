@@ -4,8 +4,8 @@ CREATE OR REPLACE FUNCTION adq.f_proceso_compra_ime (
   p_tabla varchar,
   p_transaccion varchar
 )
-  RETURNS varchar AS
-  $body$
+RETURNS varchar AS
+$body$
   /**************************************************************************
    SISTEMA:		Adquisiciones
    FUNCION: 		adq.f_proceso_compra_ime
@@ -69,6 +69,7 @@ CREATE OR REPLACE FUNCTION adq.f_proceso_compra_ime (
     v_tipo_cambio  numeric;
     v_id_alarma  integer;
     v_resp_doc  boolean;
+    v_precontrato varchar;
 
   BEGIN
 
@@ -323,7 +324,8 @@ CREATE OR REPLACE FUNCTION adq.f_proceso_compra_ime (
           'fecha_adju',NULL::varchar,
           'nro_contrato',NULL::varchar,
           '_id_usuario_ai',v_parametros._id_usuario_ai::varchar,
-          '_nombre_usuario_ai',v_parametros._nombre_usuario_ai::varchar
+          '_nombre_usuario_ai',v_parametros._nombre_usuario_ai::varchar,
+          'precontrato', v_precontrato::varchar
           ]);
 
 
@@ -770,10 +772,10 @@ CREATE OR REPLACE FUNCTION adq.f_proceso_compra_ime (
 
       end;
 
-    /*********************************    
+    /*********************************
  	#TRANSACCION:   'ADQ_REVPRE_IME'
  	#DESCRIPCION:	 Reversion del presupuesto sobrante no adjudicado en el proceso
- 	#AUTOR:		Rensi ARteaga Copari	
+ 	#AUTOR:		Rensi ARteaga Copari
  	#FECHA:		29-06-2013 12:55:29
 	***********************************/
 
@@ -837,7 +839,7 @@ CREATE OR REPLACE FUNCTION adq.f_proceso_compra_ime (
       raise exception '%',v_resp;
 
   END;
-  $body$
+$body$
 LANGUAGE 'plpgsql'
 VOLATILE
 CALLED ON NULL INPUT
