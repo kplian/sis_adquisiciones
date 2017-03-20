@@ -451,9 +451,9 @@ BEGIN
                    --  si es el mismo copiar las catidades y montos ofertadas de la solicitud de talle
                      
                    IF v_id_proveedor_precoti = (p_hstore_cotizacion->'id_proveedor')::integer THEN
-                   
-                   	  IF 'ampliacion_contrato' != (p_hstore_cotizacion->'precontrato')::varchar THEN
                           v_sw_precoti = TRUE;
+                          
+                   	  IF 'ampliacion_contrato' != (p_hstore_cotizacion->'precontrato')::varchar THEN
 
                           --capturamos la url del documento escaneado de la precotizacion en la solicitu....
 
