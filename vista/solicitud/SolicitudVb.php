@@ -240,8 +240,7 @@ Phx.vista.SolicitudVb = {
                                     disabled: true,
                                     anchor: '47%',
                                     gwidth: 100,
-                                    maxLength:255,
-                                    value: this.Cmp.nro_po.getValue()
+                                    maxLength:255
                                 },
                                 type:'TextField',
                                 id_grupo:1,
@@ -257,7 +256,7 @@ Phx.vista.SolicitudVb = {
                                     allowBlank: false,
                                     width: 188,
                                     gwidth: 100,
-                                    value: this.Cmp.fecha_po.getValue() | new Date(),
+                                    value: new Date(),
                                     format: 'd/m/Y',
                                     renderer:function (value,p,record){return value?value.dateFormat('d/m/Y'):''}
                                 },
@@ -311,7 +310,7 @@ Phx.vista.SolicitudVb = {
                                 form: true
                             }
 					     ];
-     	 }else{
+     	 }/*else{
 
                 configExtra = [
                     {
@@ -334,7 +333,7 @@ Phx.vista.SolicitudVb = {
                         form: true
                     }
                 ]
-        }
+        }*/
      	 
      	
      	this.objWizard = Phx.CP.loadWindows('../../../sis_workflow/vista/estado_wf/FormEstadoWf.php',
@@ -342,7 +341,7 @@ Phx.vista.SolicitudVb = {
                                 {
                                     modal: true,
                                     width: 700,
-                                    height: 450
+                                    height: 480
                                 }, {
                                 	configExtra: configExtra,
                                 	data:{
@@ -365,6 +364,7 @@ Phx.vista.SolicitudVb = {
 						                          	this.onButtonEdit();
 										        	this.window.setTitle('Registre los campos antes de pasar al siguiente estado');
 										        	this.formulario_wizard = 'si';
+                                                  this.Cmp.nro_po.setValue('ciris');
 					                          }
 					                          
 					                        }],
@@ -373,7 +373,9 @@ Phx.vista.SolicitudVb = {
                                  });        
      },
     onSaveWizard:function(wizard,resp){
+        console.log('wizard',wizard,'resp',resp);
         Phx.CP.loadingShow();
+
         Ext.Ajax.request({
             url:'../../sis_adquisiciones/control/Solicitud/siguienteEstadoSolicitudWzd',
             params:{
