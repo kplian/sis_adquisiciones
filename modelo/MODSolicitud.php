@@ -720,7 +720,7 @@ class MODSolicitud extends MODbase{
 		//Definicion de variables para ejecucion del procedimientp
 
 		$this->procedimiento='adq.f_solicitud_sel';
-		$this->transaccion='ADQ_RMEMODCR_SEL';
+		$this->transaccion='ADQ_RMEMOCOMDCR_SEL';
 		$this->tipo_procedimiento='SEL';//tipo de transaccion
 		$this->setCount(false);
 
