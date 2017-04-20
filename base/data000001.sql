@@ -900,7 +900,7 @@ select pxp.f_insert_tgui ('Visto Bueno Solicitud (Presupuestos)', 'Visto Bueno S
 /***********************************F-DAT-RAC-ADQ-0-23/06/2015*****************************************/
 
 /***********************************I-DAT-FEA-ADQ-0-25/01/2017*****************************************/
-
-select wf.f_import_ttipo_documento ('insert','MEM','COTINPD','Memorándum de Designación Comité Recepcion','Memorándum de Designación Comité Recepcion','sis_adquisiciones/control/ProcesoCompra/reporteMemoDCR/','generado',1.00,'{}');
+-- no existe este proceso en una restauracion limpia
+--select wf.f_import_ttipo_documento ('insert','MEM','COTINPD','Memorándum de Designación Comité Recepcion','Memorándum de Designación Comité Recepcion','sis_adquisiciones/control/ProcesoCompra/reporteMemoDCR/','generado',1.00,'{}');
 
 /***********************************F-DAT-FEA-ADQ-0-25/01/2017*****************************************/
