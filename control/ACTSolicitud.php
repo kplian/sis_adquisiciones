@@ -826,6 +826,12 @@ function groupArray($array,$groupkey,$groupkeyTwo,$id_moneda,$estado_sol, $onlyD
 		$this->res->imprimirRespuesta($this->res->generarJson());
 	}
 
+	function validarNroPo(){
+		$this->objFunc=$this->create('MODSolicitud');
+		$this->res=$this->objFunc->validarNroPo($this->objParam);
+		$this->res->imprimirRespuesta($this->res->generarJson());
+	}
+
 
 
 	/*

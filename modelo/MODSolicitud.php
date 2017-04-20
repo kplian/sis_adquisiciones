@@ -765,6 +765,27 @@ class MODSolicitud extends MODbase{
 		return $this->respuesta;
 	}
 
+	function validarNroPo(){
+		//Definicion de variables para ejecucion del procedimientp
+		$this->procedimiento='adq.f_solicitud_ime';
+		$this->transaccion='ADQ_NUMPO_GET';
+		$this->tipo_procedimiento='IME';//tipo de transaccion
+		$this->setCount(false);
+
+		$this->setParametro('nro_po','nro_po','varchar');
+		$this->setParametro('id_funcionario','id_funcionario','int4');
+
+		$this->captura('v_valid','varchar');
+		$this->captura('v_id_funcionario','varchar');
+
+
+		//Ejecuta la instruccion
+		$this->armarConsulta();
+		$this->ejecutarConsulta();
+		//Devuelve la respuesta
+		return $this->respuesta;
+	}
+
 			
 }
 ?>
