@@ -55,28 +55,26 @@ header("content-type: text/javascript; charset=UTF-8");
 
                     grid:true,
                     form:true
-                }/*,
+                },
                 {
                     config:{
-                        name:'id_depto',
-                        origen:'DEPTO',
-                        tinit:true,
-                        fieldLabel:'Departamento',
-                        gdisplayField:'desc_depto',//mapea al store del grid
+                        name:'orden',
+                        fieldLabel:'Orden',
+                        gdisplayField:'orden',//mapea al store del grid
                         anchor: '100%',
                         gwidth:200,
-                        renderer:function (value, p, record){return String.format('{0}', record.data['desc_depto']);}
+                        renderer:function (value, p, record){return String.format('{0}', record.data['orden']);}
                     },
-                    type:'ComboRec',
+                    type:'NumberField',
                     id_grupo:0,
                     filters:{
-                        pfiltro:'DEPTO.nombre',
-                        type:'string'
+                        pfiltro:'tc.orden',
+                        type:'numeric'
                     },
 
                     grid:true,
                     form:true
-                }*/
+                }
             ],
             tam_pag:50,
             title:'Comision',
@@ -87,12 +85,11 @@ header("content-type: text/javascript; charset=UTF-8");
             fields: [
                 {name:'id_integrante', type: 'numeric'},
                 {name:'id_funcionario', type: 'numeric'},
-                /*{name:'id_depto', type: 'string'},*/
-                {name:'desc_funcionario1', type: 'string'}/*,
-                {name:'desc_depto', type: 'string'}*/
+                {name:'orden', type: 'numeric'},
+                {name:'desc_funcionario1', type: 'string'}
             ],
             sortInfo:{
-                field: 'id_integrante',
+                field: 'orden',
                 direction: 'ASC'
             },
             bdel:true,
