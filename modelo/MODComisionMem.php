@@ -22,7 +22,7 @@ class MODComisionMem extends MODbase{
         //Definicion de la lista del resultado del query
         $this->captura('id_integrante','int4');
         $this->captura('id_funcionario','int4');
-        /*$this->captura('id_depto','int4');*/
+        $this->captura('orden','numeric');
         $this->captura('estado_reg','varchar');
         $this->captura('fecha_reg','timestamp');
         $this->captura('usuario_ai','varchar');
@@ -33,7 +33,6 @@ class MODComisionMem extends MODbase{
         $this->captura('usr_reg','varchar');
         $this->captura('usr_mod','varchar');
         $this->captura('desc_funcionario1','varchar');
-        $this->captura('desc_depto','varchar');
 
 
         //Ejecuta la instruccion
@@ -53,7 +52,7 @@ class MODComisionMem extends MODbase{
 
         //Define los parametros para la funcion
         $this->setParametro('id_funcionario','id_funcionario','int4');
-        /*$this->setParametro('id_depto','id_depto','int4');*/
+        $this->setParametro('orden','orden','int4');
 
         //Ejecuta la instruccion
         $this->armarConsulta();
@@ -72,7 +71,7 @@ class MODComisionMem extends MODbase{
         //Define los parametros para la funcion
         $this->setParametro('id_integrante','id_integrante','int4');
         $this->setParametro('id_funcionario','id_funcionario','int4');
-        /*$this->setParametro('id_depto','id_depto','int4');*/
+        $this->setParametro('orden','orden','numeric');
 
         //Ejecuta la instruccion
         $this->armarConsulta();

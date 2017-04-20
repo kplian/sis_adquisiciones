@@ -230,49 +230,86 @@ Phx.vista.SolicitudVb = {
 					   			id_grupo: 1,
 					   			form: true
 					       	},
-                             {
-                                 config: {
-                                     name: 'lista_comision',
-                                     fieldLabel: 'Lista de Comisión',
-                                     allowBlank: true,
-                                     emptyText: 'Seleccion...',
-                                     store: new Ext.data.JsonStore({
-                                         url: '../../sis_adquisiciones/control/ComisionMem/listarComision',
-                                         id: 'id_integrante',
-                                         root: 'datos',
-                                         sortInfo: {
-                                             field: 'desc_funcionario1',
-                                             direction: 'ASC'
-                                         },
-                                         totalProperty: 'total',
-                                         fields: ['id_integrante','desc_funcionario1','id_depto'],
-                                         remoteSort: true,
-                                         baseParams: {par_filtro: 'tc.desc_funcionario1'}//#FUNCAR.nombre_cargo
-                                     }),
-                                     valueField: 'id_integrante',
-                                     displayField: 'desc_funcionario1',
-                                     gdisplayField: 'desc_funcionario1',
-                                     hiddenName: 'id_integrante',
-                                     //tpl:'<tpl for="."><div class="x-combo-list-item"><p>{desc_funcionario1}</p><p style="color: green">{nombre_cargo}<br>{email_empresa}</p><p style="color:green">{oficina_nombre} - {lugar_nombre}</p></div></tpl>',
-                                     forceSelection: true,
-                                     typeAhead: false,
-                                     triggerAction: 'all',
-                                     lazyRender: true,
-                                     mode: 'remote',
-                                     pageSize: 10,
-                                     queryDelay: 1000,
-                                     anchor: '59%',
-                                     gwidth: 200,
-                                     minChars: 2,
-                                     resizable:true,
-                                     //listWidth:'240',
-                                     enableMultiSelect: true
-                                 },
 
-                                 type:'AwesomeCombo',
-                                 id_grupo: 1,
-                                 form: true
-                             }
+                            {
+                                config:{
+                                    name: 'nro_po',
+                                    fieldLabel: 'Nro. de P.O.',
+                                    qtip:'Ingrese el nro. de P.O.',
+                                    allowBlank: true,
+                                    disabled: true,
+                                    anchor: '47%',
+                                    gwidth: 100,
+                                    maxLength:255,
+                                    value: this.Cmp.nro_po.getValue()
+                                },
+                                type:'TextField',
+                                id_grupo:1,
+                                grid:false,
+                                form:true
+                            },
+
+                            {
+                                config:{
+                                    name: 'fecha_po',
+                                    fieldLabel: 'Fecha de P.O.',
+                                    qtip:'Fecha del P.O.',
+                                    allowBlank: false,
+                                    width: 188,
+                                    gwidth: 100,
+                                    value: this.Cmp.fecha_po.getValue() | new Date(),
+                                    format: 'd/m/Y',
+                                    renderer:function (value,p,record){return value?value.dateFormat('d/m/Y'):''}
+                                },
+                                type:'DateField',
+                                id_grupo:1,
+                                grid:false,
+                                form:true
+                            },
+
+                            {
+                                config: {
+                                    name: 'lista_comision',
+                                    fieldLabel: 'Lista de Comisión',
+                                    allowBlank: true,
+                                    emptyText: 'Seleccion...',
+                                    store: new Ext.data.JsonStore({
+                                        url: '../../sis_adquisiciones/control/ComisionMem/listarComision',
+                                        id: 'id_integrante',
+                                        root: 'datos',
+                                        sortInfo: {
+                                            field: 'orden',
+                                            direction: 'ASC'
+                                        },
+                                        totalProperty: 'total',
+                                        fields: ['id_integrante','desc_funcionario1','orden'],
+                                        remoteSort: true,
+                                        baseParams: {par_filtro: 'tc.desc_funcionario1'}//#FUNCAR.nombre_cargo
+                                    }),
+                                    valueField: 'id_integrante',
+                                    displayField: 'desc_funcionario1',
+                                    gdisplayField: 'desc_funcionario1',
+                                    hiddenName: 'id_integrante',
+                                    //tpl:'<tpl for="."><div class="x-combo-list-item"><p>{desc_funcionario1}</p><p style="color: green">{nombre_cargo}<br>{email_empresa}</p><p style="color:green">{oficina_nombre} - {lugar_nombre}</p></div></tpl>',
+                                    forceSelection: true,
+                                    typeAhead: false,
+                                    triggerAction: 'all',
+                                    lazyRender: true,
+                                    mode: 'remote',
+                                    pageSize: 10,
+                                    queryDelay: 1000,
+                                    anchor: '59%',
+                                    gwidth: 200,
+                                    minChars: 2,
+                                    resizable:true,
+                                    //listWidth:'240',
+                                    enableMultiSelect: true
+                                },
+
+                                type:'AwesomeCombo',
+                                id_grupo: 1,
+                                form: true
+                            }
 					     ];
      	 }else{
 
