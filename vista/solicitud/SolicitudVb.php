@@ -61,6 +61,7 @@ Phx.vista.SolicitudVb = {
     	this.addButton('ini_estado',{  argument: {estado: 'inicio'},text:'Dev. al Solicitante',iconCls: 'batras',disabled:true,handler:this.antEstado,tooltip: '<b>Retorna la Solcitud al estado borrador</b>'});
         this.addButton('ant_estado',{ argument: {estado: 'anterior'},text:'Rechazar',iconCls: 'batras',disabled:true,handler:this.antEstado,tooltip: '<b>Pasar al Anterior Estado</b>'});
         this.addButton('sig_estado',{ text:'Aprobar', iconCls: 'badelante', disabled: true, handler: this.sigEstado, tooltip: '<b>Pasar al Siguiente Estado</b>'});
+
         
                 
         this.store.baseParams={tipo_interfaz:this.nombreVista};
@@ -85,10 +86,8 @@ Phx.vista.SolicitudVb = {
         
 		console.log('configuracion',config, this.nombreVista)
 	},
-	
-   
-   
-     
+
+
   //deshabilitas botones para informacion historica
   desBotoneshistorico:function(){
       
@@ -206,8 +205,11 @@ Phx.vista.SolicitudVb = {
      	 if(this.nombreVista == 'solicitudvbpresupuestos') {
      	 	obsValorInicial = rec.data.obs_presupuestos;
      	 }
-     	
-     	if(rec.data.estado == 'vbrpc'){
+
+        //Obtenemos en codigo del proceso macro para verificar si es compra internacional
+
+
+     	if(rec.data.estado == 'vbrpc' && rec.data.num_tramite.split('-')[0] == 'CINTPD'){
      		 configExtra = [
 					       	{
 					   			config:{
@@ -227,9 +229,75 @@ Phx.vista.SolicitudVb = {
 					   			type:'ComboBox',
 					   			id_grupo: 1,
 					   			form: true
-					       	}
+					       	},
+                             {
+                                 config: {
+                                     name: 'lista_comision',
+                                     fieldLabel: 'Lista de Comisión',
+                                     allowBlank: true,
+                                     emptyText: 'Seleccion...',
+                                     store: new Ext.data.JsonStore({
+                                         url: '../../sis_adquisiciones/control/ComisionMem/listarComision',
+                                         id: 'id_integrante',
+                                         root: 'datos',
+                                         sortInfo: {
+                                             field: 'desc_funcionario1',
+                                             direction: 'ASC'
+                                         },
+                                         totalProperty: 'total',
+                                         fields: ['id_integrante','desc_funcionario1','id_depto'],
+                                         remoteSort: true,
+                                         baseParams: {par_filtro: 'tc.desc_funcionario1'}//#FUNCAR.nombre_cargo
+                                     }),
+                                     valueField: 'id_integrante',
+                                     displayField: 'desc_funcionario1',
+                                     gdisplayField: 'desc_funcionario1',
+                                     hiddenName: 'id_integrante',
+                                     //tpl:'<tpl for="."><div class="x-combo-list-item"><p>{desc_funcionario1}</p><p style="color: green">{nombre_cargo}<br>{email_empresa}</p><p style="color:green">{oficina_nombre} - {lugar_nombre}</p></div></tpl>',
+                                     forceSelection: true,
+                                     typeAhead: false,
+                                     triggerAction: 'all',
+                                     lazyRender: true,
+                                     mode: 'remote',
+                                     pageSize: 10,
+                                     queryDelay: 1000,
+                                     anchor: '59%',
+                                     gwidth: 200,
+                                     minChars: 2,
+                                     resizable:true,
+                                     //listWidth:'240',
+                                     enableMultiSelect: true
+                                 },
+
+                                 type:'AwesomeCombo',
+                                 id_grupo: 1,
+                                 form: true
+                             }
 					     ];
-     	 }
+     	 }else{
+
+                configExtra = [
+                    {
+                        config:{
+                            name: 'instruc_rpc',
+                            fieldLabel:'Intrucciones',
+                            allowBlank: false,
+                            emptyText:'Tipo...',
+                            typeAhead: true,
+                            triggerAction: 'all',
+                            lazyRender: true,
+                            mode: 'local',
+                            valueField: 'estilo',
+                            gwidth: 100,
+                            value: 'Orden de Bien/Servicio',
+                            store: ['Iniciar Contrato','Orden de Bien/Servicio','Cotizar']
+                        },
+                        type:'ComboBox',
+                        id_grupo: 1,
+                        form: true
+                    }
+                ]
+        }
      	 
      	
      	this.objWizard = Phx.CP.loadWindows('../../../sis_workflow/vista/estado_wf/FormEstadoWf.php',
@@ -279,6 +347,7 @@ Phx.vista.SolicitudVb = {
 	                id_depto_wf:        resp.id_depto_wf,
 	                obs:                resp.obs,
 	                instruc_rpc:		resp.instruc_rpc,
+                    lista_comision:     resp.lista_comision,
 	                json_procesos:      Ext.util.JSON.encode(resp.procesos)
                 },
             success: this.successWizard,

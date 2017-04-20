@@ -240,6 +240,7 @@ Phx.vista.SolicitudReq = {
 		    	
     },
     onButtonEdit:function(){
+
        this.cmpFechaSoli.disable();
        this.cmpIdDepto.disable();   
        this.Cmp.id_funcionario.disable();     
@@ -247,11 +248,22 @@ Phx.vista.SolicitudReq = {
        this.Cmp.precontrato.disable();
        this.Cmp.tipo_concepto.disable();
        this.Cmp.id_moneda.disable();
-       
+
+
        Phx.vista.SolicitudReq.superclass.onButtonEdit.call(this);
        this.Cmp.id_funcionario.store.baseParams.fecha = this.cmpFechaSoli.getValue().dateFormat(this.cmpFechaSoli.format);
        //this.Cmp.fecha_soli.fireEvent('change');  
-       
+
+        //nos permite habilitar para la categoria de compra internacional el campo nro_po, fecha_po
+       if(this.Cmp.id_categoria_compra.getValue()==4){
+           this.mostrarComponente(this.Cmp.nro_po);
+           this.mostrarComponente(this.Cmp.fecha_po);
+       }else{
+           this.ocultarComponente(this.Cmp.nro_po);
+           this.ocultarComponente(this.Cmp.fecha_po);
+       }
+
+
        if(this.Cmp.tipo.getValue() == 'Bien' ||  this.Cmp.tipo.getValue() == 'Bien - Servicio'){
             	this.ocultarComponente(this.Cmp.fecha_inicio);
             	this.Cmp.dias_plazo_entrega.allowBlank = false;

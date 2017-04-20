@@ -385,36 +385,7 @@ function listarProcesoCompraPedido(){
 		//Devuelve la respuesta
 		return $this->respuesta;
 	}
-
-	function recuperarComite(){
-		//Definicion de variables para ejecucion del procedimientp
-
-		$this->procedimiento='adq.f_proceso_compra_sel';
-		$this->transaccion='ADQ_RMEMODCR_SEL';
-		$this->tipo_procedimiento='SEL';//tipo de transaccion
-		$this->setCount(false);
-
-
-		$this->setParametro('id_proceso_wf','id_proceso_wf','int4');
-
-		//Definicion de la lista del resultado del query
-
-
-		$this->captura('funcionario','text');
-		$this->captura('proveedor','varchar');
-
-		$this->captura('tramite','varchar');
-		//$this->captura('numero','varchar');
-
-
-		//Ejecuta la instruccion
-		$this->armarConsulta();
-		//echo $this->consulta;exit;
-		$this->ejecutarConsulta();
-
-		//Devuelve la respuesta
-		return $this->respuesta;
-	}
+	
 
 }
 ?>
