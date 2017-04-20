@@ -88,7 +88,10 @@ class MODSolicitud extends MODbase{
 		$this->captura('codigo_poa','varchar');		
 		$this->captura('obs_poa','varchar');
 		$this->captura('contador_estados','bigint');
-		
+
+		$this->captura('nro_po','varchar');
+		$this->captura('fecha_po','date');
+
 		
 		
 		  
@@ -191,7 +194,10 @@ class MODSolicitud extends MODbase{
 		$this->setParametro('fecha_inicio','fecha_inicio','date');
 		$this->setParametro('dias_plazo_entrega','dias_plazo_entrega','integer');
 		$this->setParametro('precontrato','precontrato','varchar');
-        
+
+		$this->setParametro('nro_po','nro_po','varchar');
+		$this->setParametro('fecha_po','fecha_po','date');
+
 		
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -341,6 +347,7 @@ class MODSolicitud extends MODbase{
         $this->setParametro('obs','obs','text');
         $this->setParametro('json_procesos','json_procesos','text');
         $this->setParametro('instruc_rpc','instruc_rpc','varchar');
+        $this->setParametro('lista_comision','lista_comision','text');
 
         //Ejecuta la instruccion
         $this->armarConsulta();
@@ -586,7 +593,9 @@ class MODSolicitud extends MODbase{
 			$this->setParametro('dias_plazo_entrega','dias_plazo_entrega','integer');
 			$this->setParametro('precontrato','precontrato','varchar');
 			$this->setParametro('correo_proveedor','correo_proveedor','varchar');
-			
+			$this->setParametro('nro_po','nro_po','varchar');
+			$this->setParametro('fecha_po','fecha_po','date');
+
 			//Ejecuta la instruccion
             $this->armarConsulta();
 			$stmt = $link->prepare($this->consulta);		  
@@ -706,6 +715,55 @@ class MODSolicitud extends MODbase{
         //var_dump($this->respuesta); exit;
         return $this->respuesta;
     }
+
+	function recuperarComite(){
+		//Definicion de variables para ejecucion del procedimientp
+
+		$this->procedimiento='adq.f_solicitud_sel';
+		$this->transaccion='ADQ_RMEMODCR_SEL';
+		$this->tipo_procedimiento='SEL';//tipo de transaccion
+		$this->setCount(false);
+
+		$this->setParametro('id_proceso_wf','id_proceso_wf','int4');
+
+		//Definicion de la lista del resultado del query
+
+
+		$this->captura('funcionario','text');
+		$this->captura('proveedor','varchar');
+		$this->captura('tramite','varchar');
+		$this->captura('nombres','varchar');
+		$this->captura('fecha_po','varchar');
+
+
+		//Ejecuta la instruccion
+		$this->armarConsulta();
+		//var_dump($this->consulta);exit;
+		$this->ejecutarConsulta();
+
+		//Devuelve la respuesta
+		return $this->respuesta;
+	}
+
+	function listarMoneda(){
+		//Definicion de variables para ejecucion del procedimientp
+		$this->procedimiento='adq.f_solicitud_ime';
+		$this->transaccion='ADQ_MONEDA_GET';
+		$this->tipo_procedimiento='IME';//tipo de transaccion
+		$this->setCount(false);
+
+		$this->setParametro('nombre_moneda','nombre_moneda','varchar');
+
+		$this->captura('id_moneda','varchar');
+		$this->captura('moneda','varchar');
+
+
+		//Ejecuta la instruccion
+		$this->armarConsulta();
+		$this->ejecutarConsulta();
+		//Devuelve la respuesta
+		return $this->respuesta;
+	}
 
 			
 }

@@ -654,20 +654,6 @@ header("content-type: text/javascript; charset=UTF-8");
 			},
 
 			{
-				config:{
-					name:'id_moneda',
-					origen:'MONEDA',
-					allowBlank: false ,
-					width: '80%',
-					fieldLabel: 'Moneda'
-				},
-				type: 'ComboRec',
-				id_grupo: 0,
-				form: true
-			},
-
-
-			{
 				config: {
 					name: 'id_categoria_compra',
 					hiddenName: 'id_categoria_compra',
@@ -703,6 +689,19 @@ header("content-type: text/javascript; charset=UTF-8");
 					tpl: '<tpl for="."><div class="x-combo-list-item"><p>{nombre}</p>Codigo: <strong>{codigo}</strong> </div></tpl>'
 				},
 				type: 'ComboBox',
+				id_grupo: 0,
+				form: true
+			},
+
+			{
+				config:{
+					name:'id_moneda',
+					origen:'MONEDA',
+					allowBlank: false ,
+					width: '80%',
+					fieldLabel: 'Moneda'
+				},
+				type: 'ComboRec',
 				id_grupo: 0,
 				form: true
 			},
@@ -828,6 +827,38 @@ header("content-type: text/javascript; charset=UTF-8");
 				valorInicial: 'no_necesita',
 				grid:false,
 				form:true
+			},
+			{
+				config:{
+					name: 'nro_po',
+					fieldLabel: 'Nro. de P.O.',
+					qtip:'Ingrese el nro. de P.O.',
+					allowBlank: false,
+					disabled: false,
+					anchor: '80%',
+					gwidth: 100,
+					maxLength:255
+				},
+				type:'TextField',
+				id_grupo:2,
+				grid:false,
+				form:true
+			},
+
+			{
+				config:{
+					name: 'fecha_po',
+					fieldLabel: 'Fecha de P.O.',
+					qtip:'Fecha del P.O.',
+					allowBlank: false,
+					gwidth: 100,
+					format: 'd/m/Y',
+					renderer:function (value,p,record){return value?value.dateFormat('d/m/Y'):''}
+				},
+				type:'DateField',
+				id_grupo:2,
+				grid:false,
+				form:true
 			}
 		],
 		title: 'Frm solicitud',
@@ -838,7 +869,8 @@ header("content-type: text/javascript; charset=UTF-8");
 			this.cmpIdDepto = this.getComponente('id_depto');
 			this.cmpIdGestion = this.getComponente('id_gestion');
 
-
+			this.ocultarComponente(this.Cmp.nro_po);
+			this.ocultarComponente(this.Cmp.fecha_po);
 
 			//inicio de eventos
 			this.cmpFechaSoli.on('change',function(f){
@@ -906,6 +938,51 @@ header("content-type: text/javascript; charset=UTF-8");
 
 				this.Cmp.correo_proveedor.reset();
 				this.Cmp.correo_proveedor.setValue(record.data.email);
+
+
+			}, this);
+
+			this.Cmp.id_categoria_compra.on('select', function(combo, record, index){
+
+				if(combo.lastSelectionText=='Compra Internacional'){
+					this.mostrarComponente(this.Cmp.nro_po);
+					this.mostrarComponente(this.Cmp.fecha_po);
+
+					Ext.Ajax.request({
+						url:'../../sis_adquisiciones/control/Solicitud/listarMoneda',
+						params:{nombre_moneda:'$us'},
+						success:function (resp) {
+							var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
+							console.log(reg.ROOT.datos);
+							this.Cmp.id_moneda.setValue(reg.ROOT.datos.id_moneda);
+							this.Cmp.id_moneda.setRawValue(reg.ROOT.datos.moneda);
+						},
+						failure: this.conexionFailure,
+						timeout:this.timeout,
+						scope:this
+					});
+					
+				}else if(combo.lastSelectionText=='Compra Nacional'){
+					this.ocultarComponente(this.Cmp.nro_po);
+					this.ocultarComponente(this.Cmp.fecha_po);
+
+					Ext.Ajax.request({
+						url:'../../sis_adquisiciones/control/Solicitud/listarMoneda',
+						params:{nombre_moneda:'Bs'},
+						success:function (resp) {
+
+							var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
+							console.log(reg.ROOT.datos);
+							this.Cmp.id_moneda.setValue(reg.ROOT.datos.id_moneda);
+							this.Cmp.id_moneda.setRawValue(reg.ROOT.datos.moneda);
+						},
+						failure: this.conexionFailure,
+						timeout:this.timeout,
+						scope:this
+					});
+					
+				}
+
 
 
 			}, this);

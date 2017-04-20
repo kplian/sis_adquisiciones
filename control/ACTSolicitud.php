@@ -19,6 +19,9 @@ include_once(dirname(__FILE__).'/../../lib/lib_general/cls_correo_externo.php');
 include_once(dirname(__FILE__).'/../../sis_seguridad/modelo/MODSubsistema.php');
 require_once(dirname(__FILE__).'/../reportes/RCertificadoPoaPDF.php');
 
+//Reportes para generar el qr y el memorandum de designacion CRP
+require_once(dirname(__FILE__).'/../reportes/RMemoDesigCR.php');
+require_once(dirname(__FILE__).'/../reportes/RGenerarQRCR.php');
 
 
 class ACTSolicitud extends ACTbase{    
@@ -118,7 +121,7 @@ class ACTSolicitud extends ACTbase{
 	}
 	
 	function finalizarSolicitud(){
-            $this->objFunc=$this->create('MODSolicitud');   
+		$this->objFunc=$this->create('MODSolicitud');
         $this->res=$this->objFunc->finalizarSolicitud($this->objParam);
         $this->res->imprimirRespuesta($this->res->generarJson());
     }
@@ -791,12 +794,41 @@ function groupArray($array,$groupkey,$groupkeyTwo,$id_moneda,$estado_sol, $onlyD
         $this->mensajeExito->setArchivoGenerado($nombreArchivo);
         $this->mensajeExito->imprimirRespuesta($this->mensajeExito->generarJson());
 
+	}
+
+	function reporteMemoDCR(){
+
+		$this->objFunc = $this->create('MODSolicitud');
+		$dataSource = $this->objFunc->recuperarComite();
+
+		$nombreArchivo = uniqid(md5(session_id()).'MemoDesignacionComiteR').'.docx';
+
+		/*$this->objParam->addParametro('nombre_archivo',$nombreArchivo);
+		$grafico = new RGenerarQRCR($this->objParam);
+		$url_archivo = $grafico->generarImagen();*/
+
+		$reporte = new RMemoDesigCR($this->objParam);
+
+		$reporte->datosHeader($dataSource->getDatos());
+
+		$reporte->write(dirname(__FILE__).'/../../reportes_generados/'.$nombreArchivo/*, $url_archivo*/);
+
+		$this->mensajeExito=new Mensaje();
+		$this->mensajeExito->setMensaje('EXITO','Reporte.php','Reporte generado','Se generó con éxito el reporte: '.$nombreArchivo,'control');
+		$this->mensajeExito->setArchivoGenerado($nombreArchivo);
+		$this->mensajeExito->imprimirRespuesta($this->mensajeExito->generarJson());
+
+	}
+
+	function listarMoneda(){
+		$this->objFunc=$this->create('MODSolicitud');
+		$this->res=$this->objFunc->listarMoneda($this->objParam);
+		$this->res->imprimirRespuesta($this->res->generarJson());
+	}
 
 
-    }
 
-    
-    /*
+	/*
     
     Autor: GSS
     DESCRIPTION:  Agrupa los detalles de la solcitud
