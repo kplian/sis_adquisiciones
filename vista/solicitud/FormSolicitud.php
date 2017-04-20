@@ -833,7 +833,7 @@ header("content-type: text/javascript; charset=UTF-8");
 					name: 'nro_po',
 					fieldLabel: 'Nro. de P.O.',
 					qtip:'Ingrese el nro. de P.O.',
-					allowBlank: false,
+					allowBlank: true,
 					disabled: false,
 					anchor: '80%',
 					gwidth: 100,
@@ -850,7 +850,7 @@ header("content-type: text/javascript; charset=UTF-8");
 					name: 'fecha_po',
 					fieldLabel: 'Fecha de P.O.',
 					qtip:'Fecha del P.O.',
-					allowBlank: false,
+					allowBlank: true,
 					gwidth: 100,
 					format: 'd/m/Y',
 					renderer:function (value,p,record){return value?value.dateFormat('d/m/Y'):''}

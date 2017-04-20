@@ -55,7 +55,7 @@ header("content-type: text/javascript; charset=UTF-8");
 
                     grid:true,
                     form:true
-                },
+                }/*,
                 {
                     config:{
                         name:'id_depto',
@@ -76,7 +76,7 @@ header("content-type: text/javascript; charset=UTF-8");
 
                     grid:true,
                     form:true
-                }
+                }*/
             ],
             tam_pag:50,
             title:'Comision',
@@ -87,9 +87,9 @@ header("content-type: text/javascript; charset=UTF-8");
             fields: [
                 {name:'id_integrante', type: 'numeric'},
                 {name:'id_funcionario', type: 'numeric'},
-                {name:'id_depto', type: 'string'},
-                {name:'desc_funcionario1', type: 'string'},
-                {name:'desc_depto', type: 'string'}
+                /*{name:'id_depto', type: 'string'},*/
+                {name:'desc_funcionario1', type: 'string'}/*,
+                {name:'desc_depto', type: 'string'}*/
             ],
             sortInfo:{
                 field: 'id_integrante',
