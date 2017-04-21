@@ -240,7 +240,8 @@ Phx.vista.SolicitudVb = {
                                     disabled: true,
                                     anchor: '47%',
                                     gwidth: 100,
-                                    maxLength:255
+                                    maxLength:255,
+                                    value: rec.data.nro_po
                                 },
                                 type:'TextField',
                                 id_grupo:1,
@@ -256,7 +257,7 @@ Phx.vista.SolicitudVb = {
                                     allowBlank: false,
                                     width: 188,
                                     gwidth: 100,
-                                    value: new Date(),
+                                    value: rec.data.fecha_po || new Date() ,
                                     format: 'd/m/Y',
                                     renderer:function (value,p,record){return value?value.dateFormat('d/m/Y'):''}
                                 },
@@ -370,7 +371,10 @@ Phx.vista.SolicitudVb = {
 					                        }],
                                     
                                     scope:this
-                                 });        
+                                 });
+        /*Ext.getCmp(this.objWizard).autoLoad.params.configExtra[1].value = 'Bolivia';
+        console.log('sexo',(Ext.getCmp(this.objWizard).autoLoad.params.configExtra[1]))*/
+        //Ext.getCmp(this.objWizard).autoload.params.configExtra[1].config.name.setValue('sexo');
      },
     onSaveWizard:function(wizard,resp){
         console.log('wizard',wizard,'resp',resp);
