@@ -148,6 +148,10 @@ class MODSolicitud extends MODbase{
 		$this->setParametro('codigo_poa','codigo_poa','varchar');		
 		$this->setParametro('obs_poa','obs_poa','varchar');
 
+
+		$this->setParametro('nro_po','nro_po','varchar');
+		$this->setParametro('fecha_po','fecha_po','varchar');
+
 		//Ejecuta la instruccion
 		$this->armarConsulta();
 		$this->ejecutarConsulta();
@@ -155,7 +159,7 @@ class MODSolicitud extends MODbase{
 		//Devuelve la respuesta
 		return $this->respuesta;
 	}
-			
+
 	function modificarSolicitud(){
 		//Definicion de variables para ejecucion del procedimiento
 		$this->procedimiento='adq.f_solicitud_ime';
@@ -593,6 +597,7 @@ class MODSolicitud extends MODbase{
 			$this->setParametro('dias_plazo_entrega','dias_plazo_entrega','integer');
 			$this->setParametro('precontrato','precontrato','varchar');
 			$this->setParametro('correo_proveedor','correo_proveedor','varchar');
+
 			$this->setParametro('nro_po','nro_po','varchar');
 			$this->setParametro('fecha_po','fecha_po','date');
 
