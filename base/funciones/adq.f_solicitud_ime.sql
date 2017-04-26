@@ -110,9 +110,9 @@ DECLARE
 
        --VARIABLES PARA MONEDA Y PO VALIDO
        v_moneda						record;
-       v_contador					integer;
+       v_contador					integer = 0;
        v_valid						varchar;
-       v_funcionario				varchar;
+       v_funcionario				varchar = null;
 
 			    
 BEGIN
@@ -297,7 +297,7 @@ BEGIN
             v_parametros.fecha_inicio,
             v_parametros.dias_plazo_entrega,
             COALESCE(v_parametros.precontrato,'no'),
-            v_parametros.nro_po,
+            trim(both ' ' from v_parametros.nro_po),
             v_parametros.fecha_po
 							
 			)RETURNING id_solicitud into v_id_solicitud;
@@ -431,7 +431,7 @@ BEGIN
             fecha_inicio = v_parametros.fecha_inicio,
             dias_plazo_entrega = v_parametros.dias_plazo_entrega,
             precontrato = COALESCE(v_parametros.precontrato,'no'),
-            nro_po = v_parametros.nro_po,
+            nro_po = trim(both ' ' from v_parametros.nro_po),
             fecha_po = v_parametros.fecha_po
 			where id_solicitud = v_parametros.id_solicitud;
                
@@ -1807,23 +1807,24 @@ BEGIN
 
 		begin
 			--Sentencia de la modificacion
-            SELECT count(ts.id_solicitud)
-            INTO v_contador
-            FROM adq.tsolicitud ts
-            WHERE ts.nro_po = trim(both ' ' from upper(v_parametros.nro_po));
+            IF(v_parametros.nro_po IS NOT NULL OR v_parametros.nro_po::varchar <> '')THEN
+              SELECT count(ts.id_solicitud)
+              INTO v_contador
+              FROM adq.tsolicitud ts
+              WHERE ts.nro_po = trim(both ' ' from v_parametros.nro_po);
+            END IF;
 
             IF(v_contador>=1)THEN
         		v_valid = 'true';
+
+                SELECT vf.desc_funcionario1
+                INTO v_funcionario
+                FROM adq.tsolicitud ts
+                INNER JOIN orga.vfuncionario vf ON vf.id_funcionario = ts.id_funcionario
+                WHERE ts.nro_po = trim(both ' ' from v_parametros.nro_po);
             ELSE
             	v_valid = 'false';
 			END IF;
-
-
-			SELECT vf.desc_funcionario1
-            INTO v_funcionario
-            FROM adq.tsolicitud ts
-            INNER JOIN orga.vfuncionario vf ON vf.id_funcionario = ts.id_funcionario
-            WHERE ts.nro_po = trim(both ' ' from upper(v_parametros.nro_po));
 
 			--Definicion de la respuesta
             v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Datos de Nro. PO, descripcion funcionario');
