@@ -1111,29 +1111,34 @@ header("content-type: text/javascript; charset=UTF-8");
 
 			if( i > 0 &&  !this.editorDetail.isVisible()){
 				//Phx.vista.FormSolicitud.superclass.onSubmit.call(this, o, undefined, true);
-				
-					Ext.Ajax.request({
-						url: '../../sis_adquisiciones/control/Solicitud/validarNroPo',
-						params: {
-							nro_po: this.Cmp.nro_po.getValue(),
-							id_funcionario:this.Cmp.id_funcionario.getValue()
 
-						},
-						argument: {},
-						success: function (resp) {
-							var reg = Ext.decode(Ext.util.Format.trim(resp.responseText));
-							if (reg.ROOT.datos.v_valid == 'true') {
-								Ext.Msg.alert('Alerta','El P.O. Nro. <b>' + this.Cmp.nro_po.getValue() + '</b> ya fue registrado por el Funcionario <b> ' + reg.ROOT.datos.v_id_funcionario + '</b> , desea continuar el registro ');
-							}
-							else {
-								Phx.vista.FormSolicitud.superclass.onSubmit.call(this, o, undefined, true);
-							}
+			    if(this.Cmp.id_categoria_compra.getRawValue() == 'Compra Internacional') {
+                    Ext.Ajax.request({
+                        url: '../../sis_adquisiciones/control/Solicitud/validarNroPo',
+                        params: {
+                            nro_po: this.Cmp.nro_po.getValue(),
+                            id_funcionario: this.Cmp.id_funcionario.getValue()
 
-						},
-						failure: this.conexionFailure,
-						timeout: this.timeout,
-						scope: this
-					});
+                        },
+                        argument: {},
+                        success: function (resp) {
+                            var reg = Ext.decode(Ext.util.Format.trim(resp.responseText));
+                            if (reg.ROOT.datos.v_valid == 'true') {
+                                Ext.Msg.alert('Alerta', 'El P.O. Nro. <b>' + this.Cmp.nro_po.getValue() + '</b> ya fue registrado por el Funcionario <b> ' + reg.ROOT.datos.v_id_funcionario + '</b> , desea continuar el registro ');
+                            }
+                            else {
+                                Phx.vista.FormSolicitud.superclass.onSubmit.call(this, o, undefined, true);
+                            }
+
+                        },
+                        failure: this.conexionFailure,
+                        timeout: this.timeout,
+                        scope: this
+                    });
+                }
+                else{
+                    Phx.vista.FormSolicitud.superclass.onSubmit.call(this, o, undefined, true);
+                }
 				
 			}
 			else{
