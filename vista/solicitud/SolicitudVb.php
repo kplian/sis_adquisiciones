@@ -61,6 +61,7 @@ Phx.vista.SolicitudVb = {
     	this.addButton('ini_estado',{  argument: {estado: 'inicio'},text:'Dev. al Solicitante',iconCls: 'batras',disabled:true,handler:this.antEstado,tooltip: '<b>Retorna la Solcitud al estado borrador</b>'});
         this.addButton('ant_estado',{ argument: {estado: 'anterior'},text:'Rechazar',iconCls: 'batras',disabled:true,handler:this.antEstado,tooltip: '<b>Pasar al Anterior Estado</b>'});
         this.addButton('sig_estado',{ text:'Aprobar', iconCls: 'badelante', disabled: true, handler: this.sigEstado, tooltip: '<b>Pasar al Siguiente Estado</b>'});
+
         
                 
         this.store.baseParams={tipo_interfaz:this.nombreVista};
@@ -85,10 +86,8 @@ Phx.vista.SolicitudVb = {
         
 		console.log('configuracion',config, this.nombreVista)
 	},
-	
-   
-   
-     
+
+
   //deshabilitas botones para informacion historica
   desBotoneshistorico:function(){
       
@@ -206,8 +205,11 @@ Phx.vista.SolicitudVb = {
      	 if(this.nombreVista == 'solicitudvbpresupuestos') {
      	 	obsValorInicial = rec.data.obs_presupuestos;
      	 }
-     	
-     	if(rec.data.estado == 'vbrpc'){
+
+        //Obtenemos en codigo del proceso macro para verificar si es compra internacional
+
+
+     	if(rec.data.estado == 'vbrpc' && rec.data.num_tramite.split('-')[0] == 'CINTPD'){
      		 configExtra = [
 					       	{
 					   			config:{
@@ -227,9 +229,112 @@ Phx.vista.SolicitudVb = {
 					   			type:'ComboBox',
 					   			id_grupo: 1,
 					   			form: true
-					       	}
+					       	},
+
+                            {
+                                config:{
+                                    name: 'nro_po',
+                                    fieldLabel: 'Nro. de P.O.',
+                                    qtip:'Ingrese el nro. de P.O.',
+                                    allowBlank: true,
+                                    disabled: true,
+                                    anchor: '47%',
+                                    gwidth: 100,
+                                    maxLength:255,
+                                    value: rec.data.nro_po
+                                },
+                                type:'TextField',
+                                id_grupo:1,
+                                grid:false,
+                                form:true
+                            },
+
+                            {
+                                config:{
+                                    name: 'fecha_po',
+                                    fieldLabel: 'Fecha de P.O.',
+                                    qtip:'Fecha del P.O.',
+                                    allowBlank: false,
+                                    width: 188,
+                                    gwidth: 100,
+                                    value: rec.data.fecha_po || new Date() ,
+                                    format: 'd/m/Y',
+                                    renderer:function (value,p,record){return value?value.dateFormat('d/m/Y'):''}
+                                },
+                                type:'DateField',
+                                id_grupo:1,
+                                grid:false,
+                                form:true
+                            },
+
+                            {
+                                config: {
+                                    name: 'lista_comision',
+                                    fieldLabel: 'Lista de Comisión',
+                                    allowBlank: true,
+                                    emptyText: 'Seleccion...',
+                                    store: new Ext.data.JsonStore({
+                                        url: '../../sis_adquisiciones/control/ComisionMem/listarComision',
+                                        id: 'id_integrante',
+                                        root: 'datos',
+                                        sortInfo: {
+                                            field: 'orden',
+                                            direction: 'ASC'
+                                        },
+                                        totalProperty: 'total',
+                                        fields: ['id_integrante','desc_funcionario1','orden'],
+                                        remoteSort: true,
+                                        baseParams: {par_filtro: 'tc.desc_funcionario1'}//#FUNCAR.nombre_cargo
+                                    }),
+                                    valueField: 'id_integrante',
+                                    displayField: 'desc_funcionario1',
+                                    gdisplayField: 'desc_funcionario1',
+                                    hiddenName: 'id_integrante',
+                                    //tpl:'<tpl for="."><div class="x-combo-list-item"><p>{desc_funcionario1}</p><p style="color: green">{nombre_cargo}<br>{email_empresa}</p><p style="color:green">{oficina_nombre} - {lugar_nombre}</p></div></tpl>',
+                                    forceSelection: true,
+                                    typeAhead: false,
+                                    triggerAction: 'all',
+                                    lazyRender: true,
+                                    mode: 'remote',
+                                    pageSize: 10,
+                                    queryDelay: 1000,
+                                    anchor: '59%',
+                                    gwidth: 200,
+                                    minChars: 2,
+                                    resizable:true,
+                                    //listWidth:'240',
+                                    enableMultiSelect: true
+                                },
+
+                                type:'AwesomeCombo',
+                                id_grupo: 1,
+                                form: true
+                            }
 					     ];
-     	 }
+     	 }/*else{
+
+                configExtra = [
+                    {
+                        config:{
+                            name: 'instruc_rpc',
+                            fieldLabel:'Intrucciones',
+                            allowBlank: false,
+                            emptyText:'Tipo...',
+                            typeAhead: true,
+                            triggerAction: 'all',
+                            lazyRender: true,
+                            mode: 'local',
+                            valueField: 'estilo',
+                            gwidth: 100,
+                            value: 'Orden de Bien/Servicio',
+                            store: ['Iniciar Contrato','Orden de Bien/Servicio','Cotizar']
+                        },
+                        type:'ComboBox',
+                        id_grupo: 1,
+                        form: true
+                    }
+                ]
+        }*/
      	 
      	
      	this.objWizard = Phx.CP.loadWindows('../../../sis_workflow/vista/estado_wf/FormEstadoWf.php',
@@ -237,7 +342,7 @@ Phx.vista.SolicitudVb = {
                                 {
                                     modal: true,
                                     width: 700,
-                                    height: 450
+                                    height: 480
                                 }, {
                                 	configExtra: configExtra,
                                 	data:{
@@ -260,15 +365,21 @@ Phx.vista.SolicitudVb = {
 						                          	this.onButtonEdit();
 										        	this.window.setTitle('Registre los campos antes de pasar al siguiente estado');
 										        	this.formulario_wizard = 'si';
+                                                  this.Cmp.nro_po.setValue('ciris');
 					                          }
 					                          
 					                        }],
                                     
                                     scope:this
-                                 });        
+                                 });
+        /*Ext.getCmp(this.objWizard).autoLoad.params.configExtra[1].value = 'Bolivia';
+        console.log('sexo',(Ext.getCmp(this.objWizard).autoLoad.params.configExtra[1]))*/
+        //Ext.getCmp(this.objWizard).autoload.params.configExtra[1].config.name.setValue('sexo');
      },
     onSaveWizard:function(wizard,resp){
+        console.log('wizard',wizard,'resp',resp);
         Phx.CP.loadingShow();
+
         Ext.Ajax.request({
             url:'../../sis_adquisiciones/control/Solicitud/siguienteEstadoSolicitudWzd',
             params:{
@@ -279,6 +390,7 @@ Phx.vista.SolicitudVb = {
 	                id_depto_wf:        resp.id_depto_wf,
 	                obs:                resp.obs,
 	                instruc_rpc:		resp.instruc_rpc,
+                    lista_comision:     resp.lista_comision,
 	                json_procesos:      Ext.util.JSON.encode(resp.procesos)
                 },
             success: this.successWizard,

@@ -18,7 +18,7 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
 		Phx.vista.Solicitud.superclass.constructor.call(this,config);
 		this.init();		
 		this.addBotones();
-
+        
 		
         /*
 		this.addButton('btnReporte',{
@@ -639,6 +639,38 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
             grid: true,
             form: false
         },
+        {
+            config:{
+                name: 'nro_po',
+                fieldLabel: 'Nro. de P.O.',
+                qtip:'Ingrese el nro. de P.O.',
+                allowBlank: true,
+                width: 100,
+                gwidth: 100,
+                maxLength:255
+            },
+            type:'TextField',
+            id_grupo:1,
+
+            grid: true,
+            form: true
+        },
+
+        {
+            config:{
+                name: 'fecha_po',
+                fieldLabel: 'Fecha de P.O.',
+                qtip:'Fecha del P.O.',
+                allowBlank: true,
+                gwidth: 100,
+                format: 'd/m/Y',
+                renderer:function (value,p,record){return value?value.dateFormat('d/m/Y'):''}
+            },
+            type:'DateField',
+            id_grupo:1,
+            grid: true,
+            form: true
+        },
 		{
 			config:{
 				name: 'posibles_proveedores',
@@ -841,7 +873,9 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
 		'dias_plazo_entrega', 
 		'obs_presupuestos',
 		'precontrato',
-		'update_enable','codigo_poa','obs_poa','contador_estados'
+		'update_enable','codigo_poa','obs_poa','contador_estados',
+        'nro_po',
+        {name:'fecha_po', type: 'date',dateFormat:'Y-m-d'}
 		
 	],
 	
@@ -1001,7 +1035,7 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
                     'Obs'
         )
     },
-
+    
 	sortInfo:{
 		field: 'fecha_reg',
 		direction: 'DESC'

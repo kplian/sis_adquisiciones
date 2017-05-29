@@ -108,6 +108,12 @@ DECLARE
        v_valid_campos				boolean;
        v_documentos					record;
 
+       --VARIABLES PARA MONEDA Y PO VALIDO
+       v_moneda						record;
+       v_contador					integer = 0;
+       v_valid						varchar;
+       v_funcionario				varchar = null;
+
 			    
 BEGIN
 
@@ -251,7 +257,9 @@ BEGIN
             tipo_concepto,
             fecha_inicio,
             dias_plazo_entrega,
-            precontrato
+            precontrato,
+            nro_po,
+            fecha_po
           	) values(
 			'activo',
 			--v_parametros.id_solicitud_ext,
@@ -288,7 +296,9 @@ BEGIN
             v_parametros.tipo_concepto,
             v_parametros.fecha_inicio,
             v_parametros.dias_plazo_entrega,
-            COALESCE(v_parametros.precontrato,'no')
+            COALESCE(v_parametros.precontrato,'no'),
+            trim(both ' ' from v_parametros.nro_po),
+            v_parametros.fecha_po
 							
 			)RETURNING id_solicitud into v_id_solicitud;
         
@@ -420,7 +430,9 @@ BEGIN
             tipo_concepto =  v_parametros.tipo_concepto,
             fecha_inicio = v_parametros.fecha_inicio,
             dias_plazo_entrega = v_parametros.dias_plazo_entrega,
-            precontrato = COALESCE(v_parametros.precontrato,'no')
+            precontrato = COALESCE(v_parametros.precontrato,'no'),
+            nro_po = trim(both ' ' from v_parametros.nro_po),
+            fecha_po = v_parametros.fecha_po
 			where id_solicitud = v_parametros.id_solicitud;
                
 			--Definicion de la respuesta
@@ -1262,7 +1274,14 @@ BEGIN
                        v_codigo_tipo_pro);
                        
                        
-           END LOOP; 
+           END LOOP;
+
+           -- ACTUALIZAMOS LISTA COMISION SI ES DISTINTO DE VACIO O DISTINTO DE NULL
+           IF(v_codigo_estado = 'vbrpc')THEN
+              update adq.tsolicitud set
+                 comite_calificacion= v_parametros.lista_comision
+               where id_proceso_wf = v_id_proceso_wf;
+           END IF;
            
            -- actualiza estado en la solicitud
            -- funcion para cambio de estado     
@@ -1752,9 +1771,73 @@ BEGIN
             --Devuelve la respuesta
             return v_resp;
             
-		end;    
+		end;
+	/*********************************
+ 	#TRANSACCION:  'ADQ_MONEDA_GET'
+ 	#DESCRIPCION:	OBTENEMOS EL ID_MONEDA Y MONEDA PARA CARGAR DIRECTAMENTE EN EL COMBOBOX
+ 	#AUTOR:		FEA
+ 	#FECHA:		07-04-2017 15:12:51
+	***********************************/
+
+	elsif(p_transaccion='ADQ_MONEDA_GET')then
+		begin
+			--Sentencia de la modificacion
+			SELECT tm.id_moneda, tm.moneda
+            INTO v_moneda
+            FROM param.tmoneda tm
+			WHERE tm.codigo = v_parametros.nombre_moneda;
+
+			--Definicion de la respuesta
+            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Datos de Moneda id_moneda, moneda');
+            v_resp = pxp.f_agrega_clave(v_resp,'id_moneda',v_moneda.id_moneda::varchar);
+            v_resp = pxp.f_agrega_clave(v_resp,'moneda',v_moneda.moneda::varchar);
+
+            --Devuelve la respuesta
+            return v_resp;
+
+		end;
+  /*********************************
+ 	#TRANSACCION:  'ADQ_NUMPO_GET'
+ 	#DESCRIPCION:	VERIFICAMOS SI EL NRO. PO YA FUE REGISTRADO Y RETORNAMOS DESC. FUNCIONARIO
+ 	#AUTOR:		FEA
+ 	#FECHA:		07-04-2017 15:12:51
+	***********************************/
+
+	elsif(p_transaccion='ADQ_NUMPO_GET')then
+
+		begin
+			--Sentencia de la modificacion
+            IF(v_parametros.nro_po IS NOT NULL OR v_parametros.nro_po::varchar <> '')THEN
+              SELECT count(ts.id_solicitud)
+              INTO v_contador
+              FROM adq.tsolicitud ts
+              WHERE ts.nro_po = trim(both ' ' from v_parametros.nro_po);
+            END IF;
+
+            IF(v_contador>=1)THEN
+        		v_valid = 'true';
+
+                SELECT vf.desc_funcionario1
+                INTO v_funcionario
+                FROM adq.tsolicitud ts
+                INNER JOIN orga.vfuncionario vf ON vf.id_funcionario = ts.id_funcionario
+                WHERE ts.nro_po = trim(both ' ' from v_parametros.nro_po);
+            ELSE
+            	v_valid = 'false';
+			END IF;
+
+			--Definicion de la respuesta
+            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Datos de Nro. PO, descripcion funcionario');
+            v_resp = pxp.f_agrega_clave(v_resp,'v_id_funcionario',v_funcionario::varchar);
+            v_resp = pxp.f_agrega_clave(v_resp,'v_valid',v_valid);
+
+
+            --Devuelve la respuesta
+            return v_resp;
+
+		end;
         
-    else
+  else
      
     	raise exception 'Transaccion inexistente: %',p_transaccion;
 

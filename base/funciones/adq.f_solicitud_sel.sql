@@ -41,6 +41,17 @@ DECLARE
     v_exception_detail   varchar;
     v_exception_context    varchar;
 
+    --variables para reporte MEMORANDUM RCP
+    v_comision 			varchar[];
+    v_tam				INTEGER;
+    v_valores 			varchar = '';
+    v_ids_comision		varchar;
+    cont				integer;
+    v_fecha_po			date;
+    v_valor				varchar;
+    v_nro_memo			varchar;
+    v_correlativo		varchar;
+
 BEGIN
 
 	v_nombre_funcion = 'adq.f_solicitud_sel';
@@ -216,7 +227,9 @@ BEGIN
                         sol.obs_poa,
                         (select count(*)
                              from unnest(id_tipo_estado_wfs) elemento
-                             where elemento = ew.id_tipo_estado) as contador_estados
+                             where elemento = ew.id_tipo_estado) as contador_estados,
+						            sol.nro_po,
+                        sol.fecha_po
 						from adq.tsolicitud sol
 						inner join segu.tusuario usu1 on usu1.id_usuario = sol.id_usuario_reg
                         inner join wf.tproceso_wf pwf on pwf.id_proceso_wf = sol.id_proceso_wf
@@ -643,7 +656,76 @@ BEGIN
         --Devuelve la respuesta
           return v_consulta;
         end;
+    /*********************************
+ 	#TRANSACCION:  'ADQ_RMEMOCOMDCR_SEL'
+ 	#DESCRIPCION:	Obtenemos datos para Reporte Memorandum RPC
+ 	#AUTOR:		FEA
+ 	#FECHA:		17-04-2017
+	***********************************/
+    ELSIF (p_transaccion='ADQ_RMEMOCOMDCR_SEL')THEN
+    	BEGIN
 
+            SELECT COALESCE(ts.comite_calificacion::text,''::text), COALESCE(ts.fecha_po, now()::date), ts.nro_cite_rpc
+            INTO v_ids_comision, v_fecha_po, v_nro_memo
+            FROM adq.tsolicitud ts
+            WHERE ts.id_proceso_wf = v_parametros.id_proceso_wf;
+
+       	    v_comision = string_to_array(v_ids_comision,',')::varchar[];
+            v_tam = array_length(v_comision,1);
+
+            if (v_tam>0)then
+            	for cont in 1..v_tam loop
+                    select vf.desc_funcionario1::varchar
+                    into  v_valor
+                    from adq.tcomision  com
+                    inner join orga.vfuncionario vf on vf.id_funcionario = com.id_funcionario
+                    where com.id_integrante = v_comision[cont]::integer;
+                    if (cont < v_tam) then
+                    	v_valores = v_valores || v_valor || ',';
+                    else
+                    	v_valores = v_valores || v_valor;
+                    end if;
+                end loop;
+			      end if;
+
+            if(v_nro_memo is not null)then
+           		v_correlativo = v_nro_memo;
+            else
+           		SELECT param.f_obtener_correlativo(
+                                              'MEM',
+                                               ts.id_gestion,
+                                               NULL,
+                                               ts.id_depto,
+                                               ts.id_usuario_reg,
+                                               'ADQ',
+                                               NULL)
+           		INTO v_correlativo
+        		  FROM  adq.tsolicitud ts
+            	WHERE  ts.id_proceso_wf = v_parametros.id_proceso_wf;
+
+              UPDATE adq.tsolicitud SET
+              nro_cite_rpc = v_correlativo
+              WHERE id_proceso_wf = v_parametros.id_proceso_wf;
+            end if;
+
+
+        	--Sentencia de la consulta
+            v_consulta:='SELECT
+            vf.desc_funcionario1 as funcionario,
+            p.desc_proveedor as proveedor,'''||
+            v_correlativo||'''::varchar as tramite,'''||
+        	v_valores||'''::varchar as nombres,'''||
+            to_char(v_fecha_po, 'DD-MM-YYYY')||'''::varchar as fecha_po
+            FROM  adq.tsolicitud ts
+            LEFT JOIN orga.vfuncionario vf ON vf.id_funcionario = ts.id_funcionario_rpc
+            LEFT JOIN param.vproveedor p ON p.id_proveedor = ts.id_proveedor
+            WHERE  ts.id_proceso_wf = '||v_parametros.id_proceso_wf;
+
+
+			--Devuelve la respuesta
+          RAISE NOTICE 'CONSULTA: %',v_consulta;
+			    return v_consulta;
+      END;
     else
 
 		raise exception 'Transaccion inexistente';
