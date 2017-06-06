@@ -104,7 +104,34 @@ class MODSolicitudDet extends MODbase{
 		//Devuelve la respuesta
 		return $this->respuesta;
 	}
-			
+
+	function insertarDetalleGastoSolicitud(){
+		//Definicion de variables para ejecucion del procedimiento
+		$this->procedimiento='adq.f_solicitud_det_ime';
+		$this->transaccion='ADQ_DGSTSOL_INS';
+		$this->tipo_procedimiento='IME';
+
+		//Define los parametros para la funcion
+		$this->setParametro('id_solicitud','id_solicitud','int4');
+		$this->setParametro('concepto_gasto','concepto_gasto','varchar');
+		$this->setParametro('id_centro_costo','id_centro_costo','int4');
+		$this->setParametro('centro_costo','centro_costo','varchar');
+		$this->setParametro('orden_trabajo','orden_trabajo','varchar');
+		$this->setParametro('descripcion','descripcion','text');
+		$this->setParametro('cantidad_sol','cantidad_sol','int4');
+		$this->setParametro('precio_unitario','precio_unitario','numeric');
+		$this->setParametro('precio_total','precio_total','numeric');
+		$this->setParametro('precio_sg','precio_sg','numeric');
+		$this->setParametro('precio_ga','precio_ga','numeric');
+
+		//Ejecuta la instruccion
+		$this->armarConsulta();
+		$this->ejecutarConsulta();
+
+		//Devuelve la respuesta
+		return $this->respuesta;
+	}
+
 	function modificarSolicitudDet(){
 		//Definicion de variables para ejecucion del procedimiento
 		$this->procedimiento='adq.f_solicitud_det_ime';
