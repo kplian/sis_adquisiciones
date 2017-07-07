@@ -132,6 +132,23 @@ class MODSolicitudDet extends MODbase{
 		return $this->respuesta;
 	}
 
+	function eliminarDetalleGastoSolicitud(){
+		//Definicion de variables para ejecucion del procedimiento
+		$this->procedimiento='adq.f_solicitud_det_ime';
+		$this->transaccion='ADQ_DGSTSOL_ELI';
+		$this->tipo_procedimiento='IME';
+
+		//Define los parametros para la funcion
+		$this->setParametro('id_solicitud','id_solicitud','int4');
+
+		//Ejecuta la instruccion
+		$this->armarConsulta();
+		$this->ejecutarConsulta();
+
+		//Devuelve la respuesta
+		return $this->respuesta;
+	}
+
 	function modificarSolicitudDet(){
 		//Definicion de variables para ejecucion del procedimiento
 		$this->procedimiento='adq.f_solicitud_det_ime';
