@@ -85,7 +85,15 @@ class ACTSolicitudDet extends ACTbase{
 			$archivoExcel->recuperarColumnasExcel();
 
 			$arrayArchivo = $archivoExcel->leerColumnasArchivoExcel();
-			//var_dump($arrayArchivo); exit;
+
+			$this->objParam->addParametro('id_solicitud', $id_solicitud);
+			$this->objFunc = $this->create('sis_adquisiciones/MODSolicitudDet');
+			$this->res = $this->objFunc->eliminarDetalleGastoSolicitud($this->objParam);
+
+			if($this->res->getTipo()=='ERROR'){
+				$error = 'error';
+				$mensaje_completo = "Error al eliminar detalle de gasto ". $this->res->getMensajeTec();
+			}
 			foreach ($arrayArchivo as $fila) {
 				$this->objParam->addParametro('id_solicitud', $id_solicitud);
 				$this->objParam->addParametro('concepto_gasto', $fila['concepto_gasto']);
