@@ -244,7 +244,7 @@ Phx.vista.Proveedor=Ext.extend(Phx.gridInterfaz,{
             config: {
                 name: 'tipo_prov',
                 fieldLabel: 'Tipo Proveedor',
-                allowBlank: false,
+                allowBlank: true,
                 anchor: '80%',
                 gwidth: 100,
                 maxLength: 25,
