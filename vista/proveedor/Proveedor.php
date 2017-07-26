@@ -239,6 +239,28 @@ Phx.vista.Proveedor=Ext.extend(Phx.gridInterfaz,{
 			form:true,
             bottom_filter : true
 		},
+
+        {
+            config: {
+                name: 'tipo_prov',
+                fieldLabel: 'Tipo Proveedor',
+                allowBlank: false,
+                anchor: '80%',
+                gwidth: 100,
+                maxLength: 25,
+                typeAhead:true,
+                forceSelection: true,
+                triggerAction:'all',
+                mode:'local',
+                store:['abastecimiento']/*,
+                style:'text-transform:uppercase;'*/
+            },
+            type: 'ComboBox',
+            filters: {pfiltro: 'provee.tipo', type: 'string'},
+            id_grupo: 0,
+            grid: true,
+            form: true
+        },
 		
 		{
 			config:{
@@ -847,7 +869,8 @@ Phx.vista.Proveedor=Ext.extend(Phx.gridInterfaz,{
 		{name:'lugar', type: 'string'},
 		{name:'pais', type: 'string'},
 		{name:'rotulo_comercial', type: 'string'},
-		{name:'nombre_proveedor', type: 'string'},'ci', 'desc_dir_proveedor','contacto'
+		{name:'nombre_proveedor', type: 'string'},'ci', 'desc_dir_proveedor','contacto',
+        'tipo_prov'
 	],
 	
 	cmbProveedor:new Ext.form.ComboBox({
