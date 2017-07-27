@@ -1,3 +1,5 @@
+--------------- SQL ---------------
+
 CREATE OR REPLACE FUNCTION adq.f_tproveedor_ime (
   p_administrador integer,
   p_id_usuario integer,
@@ -89,7 +91,9 @@ BEGIN
                      id_lugar,						rotulo_comercial, 			contacto)
                     values 
                     (p_id_usuario,					now(),						'activo',
-                    v_parametros.id_institucion,	v_parametros.id_persona,	case when v_parametros.id_persona is NULL THEN
+                    v_parametros.id_institucion,	v_parametros.id_persona,	case when v_parametros.tipo_prov <>'' THEN
+                        																 v_parametros.tipo_prov
+                																when v_parametros.id_persona is NULL THEN
                                                                                     'institucion'
                                                                                 else
                                                                                     'persona'
@@ -185,7 +189,9 @@ BEGIN
                          id_lugar,						rotulo_comercial,			contacto)
                         values 
                         (p_id_usuario,					now(),						'activo',
-                        v_id_institucion,				v_id_persona,				case when v_id_persona is NULL THEN
+                        v_id_institucion,				v_id_persona,				case when v_parametros.tipo_prov <>'' THEN
+                        																 v_parametros.tipo_prov
+                        															when v_id_persona is NULL THEN
                                                                                         'institucion'
                                                                                     else
                                                                                         'persona'
@@ -251,7 +257,8 @@ BEGIN
             id_usuario_mod = p_id_usuario,
             fecha_mod = now(),
             rotulo_comercial = v_parametros.rotulo_comercial,
-            contacto = v_parametros.contacto
+            contacto = v_parametros.contacto,
+            tipo = v_parametros.tipo_prov
             where id_proveedor=v_parametros.id_proveedor;
                
 			--Definicion de la respuesta

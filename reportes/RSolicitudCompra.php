@@ -252,7 +252,7 @@ Class RSolicitudCompra extends Report {
             
                     
                 
-        $conf_par_tablewidths=array($width2,$width2*2,$width2*2+10,$width2+$width2);
+        $conf_par_tablewidths=array($width2,$width2*2,$width2*2+15,$width1+$width2);
         $conf_par_tablealigns=array('L','L','L','R');
         $conf_par_tablenumbers=array(0,0,0,0);
         $conf_tableborders=array();
@@ -321,20 +321,27 @@ Class RSolicitudCompra extends Report {
             else{
                $disponibilida ='DISPONIBLE Y APROBADO';
                $pdf->tabletextcolor=$conf_par_tabletextcolor_verde;
-            } 
-            
+            }
+            if($this->getDataSource()->getParameter('sw_cat')=='si'){
+                $descCentroCosto =  'Cat. Prog.: '.$row['groupeddata'][0]['codigo_categoria']."\n".$row['grup_desc_centro_costo'];
+            }else{
+                $descCentroCosto =  $row['grup_desc_centro_costo'];
+            }
+
             // din chequeo disponibilidad
             $RowArray = array(
                         'codigo_partida'  => $row['groupeddata'][0]['codigo_partida'],
                         'nombre_partida'  => $row['groupeddata'][0]['nombre_partida'],
-                        'desc_centro_costo'    => $row['grup_desc_centro_costo']. "\nCP: ".$row['groupeddata'][0]['codigo_categoria'],
+                        //'desc_centro_costo'    => $row['groupeddata'][0]['desc_centro_costo'],
+                        'desc_centro_costo'    => $descCentroCosto,
+                        //'desc_centro_costo'    => $row['grup_desc_centro_costo']. "\nCP: ".$row['groupeddata'][0]['codigo_categoria'],
                         //'desc_centro_costo'    => $row['groupeddata'][0]['desc_centro_costo']. "\n".$row['groupeddata'][0]['codigo_categoria'],
                         //'desc_centro_costo'    => $row['groupeddata'][0]['codigo_categoria'],
                         // 'totalRef' => $row['totalRef'],
                         'ejecutado' =>  $disponibilida
                     );     
                          
-            $pdf-> MultiRow($RowArray,false,0); 
+            $pdf-> MultiRow($RowArray,false,0);
             
             /////////////////////////////////      
             //agregar detalle de la solicitud

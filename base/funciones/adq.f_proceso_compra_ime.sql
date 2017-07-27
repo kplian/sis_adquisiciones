@@ -96,14 +96,16 @@ $body$
           s.estado,
           s.id_funcionario,
           s.id_proveedor,
-          s.id_moneda
+          s.id_moneda,
+          s.precontrato
         into
           v_id_estado_wf_sol,
           v_id_proceso_wf_sol,
           v_estado_sol,
           v_id_funcionario,
           v_id_proveedor,
-          v_id_moneda
+          v_id_moneda,
+          v_precontrato
         from adq.tsolicitud s
         where s.id_solicitud = v_parametros.id_solicitud;
 
