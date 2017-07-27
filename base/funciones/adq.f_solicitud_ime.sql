@@ -1807,7 +1807,7 @@ BEGIN
 
 		begin
 			--Sentencia de la modificacion
-            IF(v_parametros.nro_po IS NOT NULL OR v_parametros.nro_po::varchar <> '')THEN
+            IF(v_parametros.nro_po::varchar <> '')THEN
               SELECT count(ts.id_solicitud)
               INTO v_contador
               FROM adq.tsolicitud ts

@@ -51,9 +51,17 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
                     handler : this.onOpenObs,
                     tooltip : '<b>Observaciones</b><br/><b>Observaciones del WF</b>'
          });
-        
-        
-        
+
+
+        this.addButton('btnDetalleGasto',
+            {
+                text: 'Subir Detalle Gasto',
+                iconCls: 'bdocuments',
+                disabled: true,
+                handler: this.onDetalleGasto,
+                tooltip: 'Subir archivo con el detalle de gasto'
+            }
+        );
         
         
        
@@ -651,7 +659,7 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
             },
             type:'TextField',
             id_grupo:1,
-
+            filters:{pfiltro:'sol.nro_po',type:'string'},
             grid: true,
             form: true
         },
@@ -928,8 +936,8 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
         Phx.vista.Solicitud.superclass.preparaMenu.call(this,n);
         //this.getBoton('btnReporte').setDisabled(false); 
         this.getBoton('diagrama_gantt').enable();
-        this.getBoton('btnObs').enable(); 
-        
+        this.getBoton('btnObs').enable();
+        this.getBoton('btnDetalleGasto').enable();
         
         
         return tb 
@@ -942,8 +950,8 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
             //this.getBoton('btnChequeoDocumentos').setDisabled(true);
             this.getBoton('btnChequeoDocumentosWf').setDisabled(true);
             this.getBoton('diagrama_gantt').disable();  
-            this.getBoton('btnObs').disable(); 
-              
+            this.getBoton('btnObs').disable();
+            this.getBoton('btnDetalleGasto').disable();
                     
         }
        return tb
@@ -960,6 +968,17 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
             scope:this
         });  
 	},
+
+    onDetalleGasto : function() {
+        var rec=this.sm.getSelected();
+        Phx.CP.loadWindows('../../../sis_adquisiciones/vista/solicitud_det/FormDetalleGastoSolicitud.php',
+            'Subir Detalle Gasto',
+            {
+                modal:true,
+                width:450,
+                height:200
+            },rec.data,this.idContenedor,'FormDetalleGastoSolicitud')
+    },
 	
 	onButtonRepOC: function(){
                 var rec=this.sm.getSelected();

@@ -381,7 +381,7 @@ Phx.vista.SolicitudApro = {
                         anchor: '90%',
                         //width: 350,
                         height:100,
-                        maxLength:450
+                        maxLength:1000
                     },
                     {
                         xtype: 'textfield',

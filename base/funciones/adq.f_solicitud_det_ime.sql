@@ -232,7 +232,8 @@ BEGIN
             into
             v_registros_cig
             from param.tconcepto_ingas cig
-            where upper(cig.desc_ingas) =  upper(v_parametros.concepto_gasto);
+            where upper(cig.desc_ingas) =  upper(v_parametros.concepto_gasto)
+            and 'adquisiciones' = ANY(cig.sw_autorizacion);
 
             IF v_registros_cig.id_concepto_ingas IS NULL THEN
             	raise exception 'No se encontro parametrizado el concepto de gasto %', v_parametros.concepto_gasto;

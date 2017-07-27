@@ -417,7 +417,7 @@ class ACTSolicitud extends ACTbase{
     $modSolicitudDet = $this->create('MODSolicitudDet');
     //lista el detalle de la solicitud
     $resultSolicitudDet = $modSolicitudDet->listarSolicitudDet();
-    
+
     //agrupa el detalle de la solcitud por centros de costos y partidas
     
     if($sw_cat["valor"] == 'si'){
@@ -428,12 +428,13 @@ class ACTSolicitud extends ACTbase{
 		//de lo contrario agrupamos por centro de costo
 		$solicitudDetAgrupado = $this->groupArray($resultSolicitudDet->getDatos(), 'codigo_partida','desc_centro_costo', $datosSolicitud[0]['id_moneda'],$datosSolicitud[0]['estado'],$onlyData);
     }
-    
+
     $solicitudDetDataSource = new DataSource();
     $solicitudDetDataSource->setDataSet($solicitudDetAgrupado);
 	
 	//inserta el detalle de la colistud como origen de datos
     $dataSource->putParameter('detalleDataSource', $solicitudDetDataSource);
+	$dataSource->putParameter('sw_cat', $sw_cat["valor"]);
     
     if ($onlyData){
     	return $dataSource;
@@ -549,16 +550,19 @@ function groupArray($array,$groupkey,$groupkeyTwo,$id_moneda,$estado_sol, $onlyD
     	 	    $cont_grup = 0;
     	 	foreach($arrayResp as $value2)
             {
-                  
+				  $cc_array = array();
                   $total_pre = 0;
 				  $grup_desc_centro_costo = "";
                   
                  $busca = array_search($value2[$groupkey].$value2[$groupkeyTwo], $groupcriteria);
                  
                  foreach($value2['groupeddata'] as $value_det){
-                       //sumamos el monto a comprometer   
-                      $total_pre = $total_pre + $value_det["precio_ga"];
-					  $grup_desc_centro_costo = $grup_desc_centro_costo ."\n". $value_det["desc_centro_costo"];
+                       //sumamos el monto a comprometer
+					 $total_pre = $total_pre + $value_det["precio_ga"];
+					 if(!in_array($value_det["desc_centro_costo"], $cc_array)){
+					  	$grup_desc_centro_costo = $grup_desc_centro_costo ."\n". $value_det["desc_centro_costo"];
+						 $cc_array[] = $value_det["desc_centro_costo"];
+					 }
                  }
                  
                  $value_det = $value2['groupeddata'][0];
