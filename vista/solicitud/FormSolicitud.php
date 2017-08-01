@@ -18,8 +18,8 @@ header("content-type: text/javascript; charset=UTF-8");
 		autoScroll: false,
 		breset: false,
 		labelSubmit: '<i class="fa fa-check"></i> Siguiente',
-		constructor:function(config)
-		{
+		
+		constructor:function(config){
 
 			//declaracion de eventos
 			this.addEvents('beforesave');
@@ -30,6 +30,7 @@ header("content-type: text/javascript; charset=UTF-8");
 			this.buildGrupos();
 
 			Phx.vista.FormSolicitud.superclass.constructor.call(this,config);
+			this.obtenerVariableGlobal('adq_precotizacion_obligatorio')
 			this.init();
 			this.iniciarEventos();
 			this.iniciarEventosDetalle();
@@ -1167,7 +1168,38 @@ header("content-type: text/javascript; charset=UTF-8");
 				'DocumentoWf'
 			);
 
-		}
+		},
+		
+		obtenerVariableGlobal: function(param){
+				
+				//Verifica que la fecha y la moneda hayan sido elegidos
+				Phx.CP.loadingShow();
+				Ext.Ajax.request({
+						url:'../../sis_seguridad/control/Subsistema/obtenerVariableGlobal',
+						params:{
+							codigo: param  
+						},
+						success: function(resp){
+							Phx.CP.loadingHide();
+							var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
+							
+							if (reg.ROOT.error) {
+								Ext.Msg.alert('Error','Error a recuperar la variable global')
+							} else {
+								if (param == 'adq_precotizacion_obligatorio'){	
+									   this.Cmp.id_proveedor.allowBlank = (reg.ROOT.datos.valor == 'no');
+								}
+								
+							}
+						},
+						failure: this.conexionFailure,
+						timeout: this.timeout,
+						scope:this
+					});
+		
+	    },
+		
+		
 
 
 	})

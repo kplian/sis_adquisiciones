@@ -654,4 +654,155 @@ ALTER TABLE adq.tcotizacion
 /***********************************F-SCP-RAC-ADQ-0-08/12/2015****************************************/
 
   
+  
+/***********************************I-SCP-RAC-ADQ-0-27/07/2017****************************************/  
+  --Algun chapulin (o varios) se olvido subir estos script al pacht
+  
+ CREATE SEQUENCE adq.tcomision_id_integrante_seq
+  INCREMENT 1 MINVALUE 1
+  MAXVALUE 9223372036854775807 START 1
+  CACHE 1;
 
+ALTER SEQUENCE adq.tcomision_id_integrante_seq RESTART WITH 5;
+
+ CREATE SEQUENCE adq.tinforme_especificacion_id_informe_especificacion_seq
+  INCREMENT 1 MINVALUE 1
+  MAXVALUE 9223372036854775807 START 1
+  CACHE 1;
+
+ALTER SEQUENCE adq.tinforme_especificacion_id_informe_especificacion_seq RESTART WITH 39;
+
+ 
+ ALTER SEQUENCE adq.tcomision_id_integrante_seq OWNED BY adq.tcomision.id_integrante;
+
+  
+  
+CREATE TABLE adq.tcomision (
+  id_usuario_reg INTEGER, 
+  id_usuario_mod INTEGER, 
+  fecha_reg TIMESTAMP WITHOUT TIME ZONE DEFAULT now(), 
+  fecha_mod TIMESTAMP WITHOUT TIME ZONE DEFAULT now(), 
+  estado_reg VARCHAR(10) DEFAULT 'activo'::character varying, 
+  id_usuario_ai INTEGER, 
+  usuario_ai VARCHAR(300), 
+  id_integrante INTEGER DEFAULT nextval('adq.tcomision_id_integrante_seq'::regclass) NOT NULL, 
+  id_funcionario INTEGER NOT NULL, 
+  orden NUMERIC(4,2), 
+  CONSTRAINT tcomision_pkey PRIMARY KEY(id_integrante)
+) INHERITS (pxp.tbase)
+;
+
+
+CREATE TABLE adq.tinformacion_secundaria (
+  id_usuario_reg INTEGER, 
+  id_usuario_mod INTEGER, 
+  fecha_reg TIMESTAMP WITHOUT TIME ZONE DEFAULT now(), 
+  fecha_mod TIMESTAMP WITHOUT TIME ZONE DEFAULT now(), 
+  estado_reg VARCHAR(10) DEFAULT 'activo'::character varying, 
+  id_usuario_ai INTEGER, 
+  usuario_ai VARCHAR(300), 
+  id_informacion_sec INTEGER DEFAULT nextval('adq.tinforme_especificacion_id_informe_especificacion_seq'::regclass) NOT NULL, 
+  id_solicitud INTEGER, 
+  nro_cite VARCHAR(25), 
+  antecedentes TEXT, 
+  necesidad_contra TEXT, 
+  beneficios_contra TEXT, 
+  resultados TEXT, 
+  concluciones_r TEXT, 
+  validez_oferta TEXT, 
+  garantias TEXT, 
+  multas TEXT, 
+  forma_pago TEXT, 
+  CONSTRAINT tinforme_especificacion_pkey PRIMARY KEY(id_informacion_sec)
+) INHERITS (pxp.tbase)
+;
+
+
+
+ALTER TABLE adq.tinformacion_secundaria
+  ADD CONSTRAINT tinforme_especificacion_fk FOREIGN KEY (id_solicitud)
+    REFERENCES adq.tsolicitud(id_solicitud)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+    NOT DEFERRABLE;
+
+
+
+ALTER TABLE adq.tsolicitud
+  ALTER COLUMN dias_plazo_entrega TYPE VARCHAR(50) COLLATE pg_catalog."default";
+
+ALTER TABLE adq.tsolicitud
+  ALTER COLUMN precontrato SET DEFAULT 'no_necesita'::character varying;
+
+
+COMMENT ON COLUMN adq.tsolicitud.obs_poa
+IS 'Observacion en bisto bueno POA';
+
+ALTER TABLE adq.tsolicitud
+  ADD COLUMN nro_po VARCHAR(25);
+
+ALTER TABLE adq.tsolicitud
+  ADD COLUMN fecha_po DATE;
+
+
+ALTER TABLE adq.tsolicitud
+  ADD COLUMN nro_cite_rpc VARCHAR(30);
+
+COMMENT ON COLUMN adq.tsolicitud.nro_cite_rpc
+IS 'Guarda el numero de cite para memorandum de designacion';
+
+ALTER TABLE adq.tsolicitud
+  ADD COLUMN nro_cite_informe VARCHAR(30);
+
+COMMENT ON COLUMN adq.tsolicitud.nro_cite_informe
+IS 'Guarda el numero de cite para Informe de una solicitud.';
+
+ALTER TABLE adq.tsolicitud
+  ADD COLUMN fecha_fin DATE;
+
+
+ALTER TABLE adq.tsolicitud
+  ADD COLUMN proveedor_unico BOOLEAN;
+
+ALTER TABLE adq.tsolicitud
+  ADD COLUMN nro_cuotas INTEGER;
+
+COMMENT ON COLUMN adq.tsolicitud.nro_cuotas
+IS 'Guarda el Nro. de Cuotas Totales para que luego sea copiado en obligaciones de pago';
+
+ALTER TABLE adq.tsolicitud
+  ADD COLUMN fecha_ini_cot DATE;
+
+
+ALTER TABLE adq.tsolicitud
+  ADD COLUMN fecha_ven_cot DATE;
+
+
+
+ALTER TABLE adq.tcotizacion
+  ALTER COLUMN lugar_entrega SET DEFAULT 'Oficinas Cochabamba'::character varying;
+
+
+
+ALTER TABLE adq.tcotizacion
+  ALTER COLUMN lugar_entrega SET DEFAULT 'Oficinas Cochabamba'::character varying;
+
+
+
+
+
+  
+/***********************************F-SCP-RAC-ADQ-0-27/07/2017****************************************/  
+
+
+/***********************************I-SCP-RAC-ADQ-0-28/07/2017****************************************/  
+
+
+--------------- SQL ---------------
+
+ALTER TABLE adq.tsolicitud_det
+  ALTER COLUMN id_auxiliar DROP NOT NULL;
+
+/***********************************F-SCP-RAC-ADQ-0-28/07/2017****************************************/  
+
+  

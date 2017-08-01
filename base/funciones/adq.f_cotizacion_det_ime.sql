@@ -73,6 +73,11 @@ DECLARE
      v_id_moneda integer;
      
      
+     v_adq_tolerancia_adjudicacion    varchar;
+     v_adq_comprometer_presupuesto    varchar;
+     
+     
+     
      
 			    
 BEGIN
@@ -337,6 +342,10 @@ BEGIN
             v_revertido_mb=0;
             v_id_moneda_base =  param.f_get_moneda_base();
             
+            
+            v_adq_tolerancia_adjudicacion  = pxp.f_get_variable_global('adq_tolerancia_adjudicacion');
+            v_adq_comprometer_presupuesto = pxp.f_get_variable_global('adq_comprometer_presupuesto');
+            
             select
                sd.id_solicitud_det, 
                sd.cantidad,
@@ -378,12 +387,8 @@ BEGIN
             
              
             
-            IF v_precio_unitario_coti > v_precio_unitario_sol THEN
-            
-            
+            IF v_precio_unitario_coti > v_precio_unitario_sol*( 1 + v_adq_tolerancia_adjudicacion::numeric) THEN 
               raise exception  'El precio referencial es menor que el precio cotizado ';
-            
-            
             END IF;
             
             
@@ -424,7 +429,7 @@ BEGIN
                      FROM pre.f_verificar_com_eje_pag(v_id_partida_ejecucion, v_id_moneda);
                     
                      --validamos que el total revertido no afecte la adjudicacion 
-                    IF  ((v_comprometido_ga + COALESCE(v_precio_sg,0)) - v_total_costo_mo)  >= (v_parametros.cantidad_adjudicada * v_precio_unitario_coti)   THEN
+                    IF  (((v_comprometido_ga + COALESCE(v_precio_sg,0)) - v_total_costo_mo)  >= (v_parametros.cantidad_adjudicada * v_precio_unitario_coti) ) OR v_adq_comprometer_presupuesto = 'no'  THEN
                        
                        update adq.tcotizacion_det set
                        cantidad_adju = v_parametros.cantidad_adjudicada

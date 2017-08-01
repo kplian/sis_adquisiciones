@@ -134,6 +134,7 @@ DECLARE
       v_requiere_contrato 				varchar;
       v_registros_cotizacion 			record;
       v_tiene_form500					varchar;
+      v_adq_comprometer_presupuesto		varchar;
      
 			    
 BEGIN
@@ -347,6 +348,7 @@ BEGIN
 			v_sw = FALSE;
             v_sw2 = FALSE;
             v_id_moneda_base =  param.f_get_moneda_base();
+            v_adq_comprometer_presupuesto = pxp.f_get_variable_global('adq_comprometer_presupuesto');
                
            --si ya tien item adjudicados no se los toca
            
@@ -411,7 +413,7 @@ BEGIN
                                 
                                  --validamos que el total revertido no afecte la adjudicacion            
                                  --en caso contrario no se adjudicada nada
-                                IF  ((v_comprometido_ga + COALESCE(v_registros.precio_sg,0)) - v_total_costo_mo)  >= (v_cantidad_adjudicada * v_registros.precio_unitario_coti)   THEN
+                                IF  (((v_comprometido_ga + COALESCE(v_registros.precio_sg,0)) - v_total_costo_mo)  >= (v_cantidad_adjudicada * v_registros.precio_unitario_coti) ) OR v_adq_comprometer_presupuesto = 'no'  THEN
                                      
                                      update adq.tcotizacion_det set
                                      cantidad_adju = v_cantidad_adjudicada

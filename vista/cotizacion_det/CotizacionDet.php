@@ -12,13 +12,16 @@ header("content-type: text/javascript; charset=UTF-8");
 <script>
 Phx.vista.CotizacionDet=Ext.extend(Phx.gridInterfaz,{
     bnew:false,
+    adq_tolerancia_adjudicacion: 0,
 	constructor:function(config){
 		this.maestro=config.maestro;
     	//llama al constructor de la clase padre
 		Phx.vista.CotizacionDet.superclass.constructor.call(this,config);
+		
 		this.init();
 		this.iniciarEventos();
 		this.bloquearMenus();
+		this.obtenerVariableGlobal('adq_tolerancia_adjudicacion');
 		//this.load({params:{start:0, limit:this.tam_pag}})
 		
 		this.addButton('adjudicar_det',{text:'Recomendar Item',iconCls: 'bchecklist',disabled:true,handler:this.adjudicar_det,tooltip: '<b>Adjudicar</b><p>Permite adjudicar de manera parcial</p>'});
@@ -111,7 +114,7 @@ Phx.vista.CotizacionDet=Ext.extend(Phx.gridInterfaz,{
 	     var data = this.getSelectedData();
 	     
 	     
-	     if(data.precio_unitario_mb*1 <= data.precio_unitario_mb_sol*1){
+	     if(data.precio_unitario_mb*1 <= data.precio_unitario_mb_sol* (1+this.adq_tolerancia_adjudicacion)){
 	        
 	        console.log('datos....',data)
 	        
@@ -133,7 +136,7 @@ Phx.vista.CotizacionDet=Ext.extend(Phx.gridInterfaz,{
             }); 
 	    }
 	    else{
-	        alert("Para adjidicar el precio unitario cotizado debe ser menor o igual al precio unitario referencial");
+	        alert("Para adjidicar el precio unitario cotizado debe ser menor o igual al precio unitario referencial, con una tolerancia de "+ (this.adq_tolerancia_adjudicacion*100)+' %');
 	    }
 	},
 	preparaFormAdj:function(resp){
@@ -625,9 +628,38 @@ Phx.vista.CotizacionDet=Ext.extend(Phx.gridInterfaz,{
              this.getBoton('save').disable();
           }
        
-      }
-	}
-)
+     },
+     
+     obtenerVariableGlobal: function(param){
+				
+				//Verifica que la fecha y la moneda hayan sido elegidos
+				Phx.CP.loadingShow();
+				Ext.Ajax.request({
+						url:'../../sis_seguridad/control/Subsistema/obtenerVariableGlobal',
+						params:{
+							codigo: param  
+						},
+						success: function(resp){
+							Phx.CP.loadingHide();
+							var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
+							
+							if (reg.ROOT.error) {
+								Ext.Msg.alert('Error','Error a recuperar la variable global')
+							} else {
+								if (param == 'adq_tolerancia_adjudicacion'){									  
+									  this.adq_tolerancia_adjudicacion = reg.ROOT.datos.valor*1;									  
+								}
+								
+							}
+						},
+						failure: this.conexionFailure,
+						timeout: this.timeout,
+						scope:this
+					});
+		
+	  }
+		
+})
 </script>
 		
 		
