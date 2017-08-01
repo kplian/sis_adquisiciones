@@ -147,8 +147,6 @@ p_hstore->'id_solicitud'
         v_num_estados= array_length(va_id_tipo_estado, 1);
         
         
-      
-         
                        
         IF v_num_estados = 1 then
                   -- si solo hay un estado,  verificamos si tiene mas de un funcionario por este estado
@@ -192,8 +190,7 @@ p_hstore->'id_solicitud'
         END IF;
         
        
-   
-                 
+  
         
         -- 15/04/2015, por qu ese agregan mas estado al flujo es nesario obtene el funcionari dinamicamente  
          v_num_estados= array_length(va_id_tipo_estado, 1);
@@ -223,6 +220,9 @@ p_hstore->'id_solicitud'
               raise exception 'No se encontro el estado de visto bueno gerencia';
            
             END IF;
+            
+            
+           
             
             v_num_estados= array_length(va_id_tipo_estado, 1);
             
@@ -277,7 +277,7 @@ p_hstore->'id_solicitud'
             
         END IF;
         
-         
+      
           
           --cambiamos estado de la solicitud
          
@@ -332,6 +332,7 @@ p_hstore->'id_solicitud'
              END IF;
             
            
+           
            -- registra nuevo estado
           
            v_id_estado_actual =  wf.f_registra_estado_wf(va_id_tipo_estado[1], 
@@ -348,7 +349,7 @@ p_hstore->'id_solicitud'
                                                          v_parametros_ad,
                                                          v_tipo_noti,
                                                          v_titulo);
-
+  
                                                          
            --si el estado  anteriro es vbpresupuestos  entonces comprometemos                                            
            IF v_codigo_estado =  'vbpresupuestos'  and presu_comprometido = 'no' THEN 

@@ -904,3 +904,30 @@ select pxp.f_insert_tgui ('Visto Bueno Solicitud (Presupuestos)', 'Visto Bueno S
 --select wf.f_import_ttipo_documento ('insert','MEM','COTINPD','Memorándum de Designación Comité Recepcion','Memorándum de Designación Comité Recepcion','sis_adquisiciones/control/ProcesoCompra/reporteMemoDCR/','generado',1.00,'{}');
 
 /***********************************F-DAT-FEA-ADQ-0-25/01/2017*****************************************/
+
+
+
+
+/***********************************I-DAT-RAC-ADQ-0-01/08/2017*****************************************/
+
+
+INSERT INTO pxp.variable_global ("variable", "valor", "descripcion")
+VALUES 
+  (E'adq_precotizacion_obligatorio', E'si', E'Obliga a registrar proveedor de precotizacion al solitar compras');
+
+
+INSERT INTO pxp.variable_global ("variable", "valor", "descripcion")
+VALUES 
+  (E'adq_comprometer_presupuesto', E'si', E'indica si el sistema de adq compromete presupeustos con la solictud de compra');
+  
+
+INSERT INTO pxp.variable_global ("variable", "valor", "descripcion")
+VALUES 
+  (E'adq_tolerancia_adjudicacion', E'0.2', E'% por el cual se puede adjudicar por demasia');  
+  
+  
+  
+  
+
+/***********************************F-DAT-RAC-ADQ-0-01/08/2017*****************************************/
+
