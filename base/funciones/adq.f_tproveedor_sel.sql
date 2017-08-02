@@ -82,7 +82,8 @@ BEGIN
                         else
                         	person.direccion
                         end):: varchar as desc_dir_proveedor,
-						provee.contacto
+						provee.contacto,
+                        provee.tipo as tipo_prov
                         from param.tproveedor provee
 						inner join segu.tusuario usu1 on usu1.id_usuario = provee.id_usuario_reg
 						left join segu.tusuario usu2 on usu2.id_usuario = provee.id_usuario_mod   
