@@ -1,6 +1,6 @@
 --------------- SQL ---------------
 
-CREATE OR REPLACE FUNCTION adq.f_genera_obligacion_pago (
+CREATE OR REPLACE FUNCTION adq.f_genera_obligacion_pago (   
   p_id_usuario integer,
   p_id_usuario_ai integer,
   p_usuario_ai varchar,
