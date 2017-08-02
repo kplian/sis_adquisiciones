@@ -92,12 +92,14 @@ BEGIN
                     values 
                     (p_id_usuario,					now(),						'activo',
                     v_parametros.id_institucion,	v_parametros.id_persona,	case when v_parametros.tipo_prov <>'' THEN
+
                         																 v_parametros.tipo_prov
-                																when v_parametros.id_persona is NULL THEN
+                																                            when v_parametros.id_persona is NULL THEN
+
                                                                                     'institucion'
-                                                                                else
+                                                                             else
                                                                                     'persona'
-                                                                                end,
+                                                                            end,
                     v_parametros.numero_sigma,		v_parametros.codigo,		v_parametros.nit,
                     v_parametros.id_lugar,			v_parametros.rotulo_comercial,	v_parametros.contacto)RETURNING id_proveedor into v_id_proveedor;
                 else
@@ -189,13 +191,15 @@ BEGIN
                          id_lugar,						rotulo_comercial,			contacto)
                         values 
                         (p_id_usuario,					now(),						'activo',
-                        v_id_institucion,				v_id_persona,				case when v_parametros.tipo_prov <>'' THEN
-                        																 v_parametros.tipo_prov
-                        															when v_id_persona is NULL THEN
-                                                                                        'institucion'
-                                                                                    else
-                                                                                        'persona'
-                                                                                    end,
+
+                        v_id_institucion,				v_id_persona,			case when v_parametros.tipo_prov <>'' THEN
+                                                                            v_parametros.tipo_prov
+                                                                       when v_id_persona is NULL THEN
+                                                                            'institucion'
+                                                                       else
+                                                                            'persona'
+                                                                  end,
+
                         v_parametros.numero_sigma,		v_parametros.codigo,		v_parametros.nit,
                         v_parametros.id_lugar,			v_parametros.rotulo_comercial, v_parametros.contacto)RETURNING id_proveedor into v_id_proveedor;
                 end if;
