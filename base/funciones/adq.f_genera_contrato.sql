@@ -1,3 +1,5 @@
+--------------- SQL ---------------
+
 CREATE OR REPLACE FUNCTION adq.f_genera_contrato (
   p_id_usuario integer,
   p_id_usuario_ai integer,
@@ -29,6 +31,19 @@ DECLARE
     v_id_funcionario_responsable	integer;
     v_id_estado_registro			integer;
     v_id_lugar						integer;
+    v_adq_estado_contrato_siguiente			varchar;
+    
+    
+    va_id_tipo_estado 			integer [];
+    va_codigo_estado 			varchar [];
+    va_disparador 				varchar [];
+    va_regla 					varchar [];
+    va_prioridad 				integer [];
+    v_num_estados				integer;
+    v_num_funcionarios			integer;
+    v_num_deptos				integer;
+    v_id_funcionario_estado		integer;
+    v_id_depto_estado			integer;
 
 
 
@@ -36,6 +51,9 @@ DECLARE
 BEGIN
 
 	v_nombre_funcion='adq.f_genera_contrato';
+  
+     
+     
      select c.*,s.id_funcionario,s.id_funcionario_aprobador,
      		s.id_funcionario_rpc,s.fecha_inicio,s.justificacion
      into 	v_cotizacion
@@ -58,7 +76,10 @@ BEGIN
      				v_cotizacion.num_tramite || '. Categoria : ' || v_cotizacion.nombre_categoria || '. Concepto : ' || v_cotizacion.tipo_concepto;
 
      /*Obtener el estado de registro*/
-     select te.id_tipo_estado into v_id_tipo_estado_registro
+     select 
+        te.id_tipo_estado 
+     into 
+        v_id_tipo_estado_registro
      from wf.ttipo_estado te
      inner join wf.ttipo_proceso tp
      	on te.id_tipo_proceso = tp.id_tipo_proceso
@@ -117,29 +138,128 @@ BEGIN
           v_cotizacion.fecha_inicio,
           v_cotizacion.justificacion
         );
-
-
-    /*Obtener el funcionario responsable para el siguiente estado*/
-     select id_funcionario  into v_id_funcionario_responsable
-     from wf.f_funcionario_wf_sel(p_id_usuario, v_id_tipo_estado_registro,now()::date,p_id_estado_wf) as (id_funcionario integer,desc_funcionario text,desc_cargo text,prioridad integer);
-
-
+        
+        
+     --obtener sigueinte estado
+     
+     SELECT 
+         *
+      into
+        va_id_tipo_estado,
+        va_codigo_estado,
+        va_disparador,
+        va_regla,
+        va_prioridad
+            
+    FROM wf.f_obtener_estado_wf(p_id_proceso_wf, p_id_estado_wf,NULL,'siguiente'); 
+    
+    v_num_estados= array_length(va_id_tipo_estado, 1);  
+    
+    
+    IF v_num_estados = 1 then
+          -- si solo hay un estado,  verificamos si tiene mas de un funcionario por este estado
+         SELECT 
+         *
+          into
+            v_num_funcionarios 
+         FROM wf.f_funcionario_wf_sel(
+             p_id_usuario, 
+             va_id_tipo_estado[1], 
+             now()::date,
+             p_id_estado_wf,
+             TRUE) AS (total bigint);
+                                   
+        IF v_num_funcionarios = 1 THEN
+        -- si solo es un funcionario, recuperamos el funcionario correspondiente
+             SELECT 
+                 id_funcionario
+                   into
+                 v_id_funcionario_estado
+             FROM wf.f_funcionario_wf_sel(
+                 p_id_usuario, 
+                 va_id_tipo_estado[1], 
+                 now()::date,
+                 p_id_estado_wf,
+                 FALSE) 
+                 AS (id_funcionario integer,
+                   desc_funcionario text,
+                   desc_funcionario_cargo text,
+                   prioridad integer);
+        END IF;    
+                                   
+                            
+      --verificamos el numero de deptos
+                            
+        SELECT 
+        *
+        into
+          v_num_deptos 
+       FROM wf.f_depto_wf_sel(
+           p_id_usuario, 
+           va_id_tipo_estado[1], 
+           now()::date,
+           p_id_estado_wf,
+           TRUE) AS (total bigint);
+                                 
+      IF v_num_deptos = 1 THEN
+          -- si solo es un funcionario, recuperamos el funcionario correspondiente
+               SELECT 
+                   id_depto
+                     into
+                   v_id_depto_estado
+              FROM wf.f_depto_wf_sel(
+                   p_id_usuario, 
+                   va_id_tipo_estado[1], 
+                   now()::date,
+                   p_id_estado_wf,
+                   FALSE) 
+                   AS (id_depto integer,
+                     codigo_depto varchar,
+                     nombre_corto_depto varchar,
+                     nombre_depto varchar,
+                     prioridad integer,
+                     subsistema varchar);
+        END IF;
+                            
+                            
+     ELSE  
+     
+          IF v_num_estados = 0 then                     
+                 raise exception 'No se encontro un estado sigueinte apra el contrato';               
+          ELSE
+                 raise exception 'Se encontraron variso estados posibiles para el contrato, revise sus reglas (%)', p_codigo_ewf;
+          END IF;
+          
+                           
+     END IF;
+                     
+                 
+        
+     
      /*Registrar el estado de registro*/
-     v_id_estado_registro =  wf.f_registra_estado_wf(v_id_tipo_estado_registro,   --p_id_tipo_estado_siguiente
-                                                         v_id_funcionario_responsable,
+     v_id_estado_registro =  wf.f_registra_estado_wf(va_id_tipo_estado[1],   --p_id_tipo_estado_siguiente
+                                                         v_id_funcionario_estado,
                                                          p_id_estado_wf,   --  p_id_estado_wf_anterior
                                                          p_id_proceso_wf,
                                                          p_id_usuario,
                                                          p_id_usuario_ai,
                                                          p_usuario_ai,
-                                                         31,
+                                                         v_id_depto_estado,
                                                          'Paso de estado automatico por proceso de adquisiciones');
+                                                         
+                                                         
+                                                         
+                                                         
 
-	 update leg.tcontrato
+	 
+     
+     update leg.tcontrato
      set id_estado_wf = v_id_estado_registro,
-     estado = 'revision'
+     estado = va_codigo_estado[1]
      where id_proceso_wf = p_id_proceso_wf;
-    return true;
+     
+     
+     return true;
 
 EXCEPTION
 	WHEN OTHERS THEN
