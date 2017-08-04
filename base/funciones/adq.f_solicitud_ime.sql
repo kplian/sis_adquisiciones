@@ -763,6 +763,32 @@ BEGIN
                      
                        v_cont = v_cont +1;
                        
+                      
+                       
+                       v_mensaje_resp = v_mensaje_resp||' - '||v_registros.desc_funcionario||' <br>';
+                       
+                    END LOOP;   
+                        
+                       
+                       
+                   
+                    
+                    
+                   IF v_adq_requiere_rpc = 'no'  THEN
+                    
+                    v_resp =  adq.f_finalizar_reg_solicitud(
+                                            p_administrador, 
+                                            p_id_usuario,
+                                            v_parametros._id_usuario_ai,
+                                            v_parametros._nombre_usuario_ai,
+                                            NULL, 
+                                            v_parametros.id_solicitud,
+                                            v_parametros.id_estado_wf,
+                                            NULL,
+                                            NULL,
+                                            'no');
+                   ELSE
+                   
                        IF v_cont = 1 THEN
                           
                          v_resp =  adq.f_finalizar_reg_solicitud(
@@ -778,31 +804,7 @@ BEGIN
                                             v_registros.ai_habilitado);
                                    
                         END IF;
-                       
-                       v_mensaje_resp = v_mensaje_resp||' - '||v_registros.desc_funcionario||' <br>';
-                       
-                    END LOOP;   
-                        
-                       
-                       
                    
-                    
-                    
-                   IF v_adq_requiere_rpc = 'no'  THEN
-                    
-                    
-                    
-                         v_resp =  adq.f_finalizar_reg_solicitud(
-                                            p_administrador, 
-                                            p_id_usuario,
-                                            v_parametros._id_usuario_ai,
-                                            v_parametros._nombre_usuario_ai,
-                                            NULL, 
-                                            v_parametros.id_solicitud,
-                                            v_parametros.id_estado_wf,
-                                            NULL,
-                                            NULL,
-                                            'no');
                     
                    END IF;
                        
