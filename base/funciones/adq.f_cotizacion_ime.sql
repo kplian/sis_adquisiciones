@@ -1289,7 +1289,7 @@ BEGIN
             return v_resp;
 
 		end;  
-    /*********************************    
+  /*********************************    
  	#TRANSACCION:  'ADQ_HABPAG_IME'
  	#DESCRIPCION:	Habilita los pagos en tesoreria en modulo de cuentas por pagar
  	#AUTOR:     	Rensi Arteaga Copari	
@@ -1330,7 +1330,6 @@ BEGIN
             --------------------------------------------------------------
             --registra procesos disparados , preingreso AF, alamecnes, OP
             ---------------------------------------------------------------
-            
             FOR v_registros_proc in ( select * from json_populate_recordset(null::wf.proceso_disparado_wf, v_parametros.json_procesos::json)) LOOP
      
                        -- get codigo tipo proceso
