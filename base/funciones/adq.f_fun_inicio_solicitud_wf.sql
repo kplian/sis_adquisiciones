@@ -32,12 +32,15 @@ DECLARE
     v_total_soli				numeric;
     v_tope_compra 				numeric;
     v_tope_compra_lista			varchar;
+    v_adq_comprometer_presupuesto		varchar;
    
 	
     
 BEGIN
 
 	 v_nombre_funcion = 'adq.f_fun_inicio_solicitud_wf';
+     v_adq_comprometer_presupuesto = pxp.f_get_variable_global('adq_comprometer_presupuesto');
+  
      
            select
             s.id_solicitud,
@@ -124,7 +127,7 @@ BEGIN
             
       
           -- comprometer presupuesto cuando el estado anterior es el vbpresupuestos)
-             IF v_estado_anterior =  'vbpresupuestos'  and v_registros.presu_comprometido = 'no' THEN 
+             IF v_estado_anterior =  'vbpresupuestos'  and v_registros.presu_comprometido = 'no' and v_adq_comprometer_presupuesto = 'si' THEN 
 
                -- como en presupeustos puede mover los montos validamos que nose pase del monto tope
                    select 
@@ -162,7 +165,29 @@ BEGIN
                    v_sw_presu_comprometido = 'si';
             
             
-            END IF; 
+            END IF;
+            
+            
+            --RAC 11/08/2017  
+           -- si llega al estado aprobacion y el presupeusto todavia noe sta comprometido, y el sistema esta configurado para comproemter,
+           -- comprometemos  
+            IF p_codigo_estado = 'aprobado' and v_registros.presu_comprometido = 'no' and v_adq_comprometer_presupuesto = 'si' THEN
+                  
+                  -- Comprometer Presupuesto                  
+                  IF not adq.f_gestionar_presupuesto_solicitud( v_registros.id_solicitud, p_id_usuario, 'comprometer')  THEN                     
+                       raise exception 'Error al comprometer el presupeusto';                     
+                  END IF;
+
+                  --modifca bandera de comprometido  
+                   update adq.tsolicitud  s set 
+                        presu_comprometido =  'si',
+                        fecha_apro = now()
+                   where id_solicitud =  v_registros.id_solicitud;
+                   
+                   v_sw_presu_comprometido = 'si';
+            
+            END IF;
+             
             
            
             

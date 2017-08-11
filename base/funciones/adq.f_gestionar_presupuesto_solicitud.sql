@@ -210,73 +210,74 @@ BEGIN
                               sd.precio_ga,
                               s.fecha_soli,
                               s.num_tramite as nro_tramite
-                              
-                              FROM  adq.tsolicitud s 
-                              INNER JOIN adq.tsolicitud_det sd on s.id_solicitud = sd.id_solicitud and sd.estado_reg = 'activo'
-                              inner join pre.tpresupuesto   p  on p.id_centro_costo = sd.id_centro_costo 
-                              WHERE  sd.id_solicitud = p_id_solicitud_compra
+                            FROM  adq.tsolicitud s 
+                            INNER JOIN adq.tsolicitud_det sd on s.id_solicitud = sd.id_solicitud and sd.estado_reg = 'activo'
+                            inner join pre.tpresupuesto   p  on p.id_centro_costo = sd.id_centro_costo 
+                            WHERE  sd.id_solicitud = p_id_solicitud_compra
                                      and sd.estado_reg = 'activo' 
                                      and sd.cantidad > 0 ) LOOP
                                      
-                     IF(v_registros.id_partida_ejecucion is NULL) THEN
-                     
-                        raise exception 'El presupuesto del detalle con el identificador (%)  no se encuntra comprometido',v_registros.id_solicitud_det;
-                     
-                     END IF;
-                     
-                     v_comprometido=0;
-                     v_ejecutado=0;
-                     
+                     IF(v_registros.id_partida_ejecucion is not  NULL) THEN                     
+                       
+                           
+                           v_comprometido=0;
+                           v_ejecutado=0;
+                           
+                                
+                           
+                           SELECT 
+                                 COALESCE(ps_comprometido,0), 
+                                 COALESCE(ps_ejecutado,0)  
+                             into 
+                                 v_comprometido,
+                                 v_ejecutado
+                           FROM pre.f_verificar_com_eje_pag(v_registros.id_partida_ejecucion,v_registros.id_moneda);   --  RAC,  v_id_moneda_base);
+                           
+                           
+                           v_monto_a_revertir = COALESCE(v_comprometido,0) - COALESCE(v_ejecutado,0);  
+                           
+                           
+                          --armamos los array para enviar a presupuestos          
+                          IF v_monto_a_revertir != 0 THEN
+                           
+                              v_i = v_i +1;                
+                             
+                              va_id_presupuesto[v_i] = v_registros.id_presupuesto;
+                              va_id_partida[v_i]= v_registros.id_partida;
+                              va_momento[v_i]	= 2; --el momento 2 con signo positivo es revertir
+                              va_monto[v_i]  = (v_monto_a_revertir)*-1;  -- considera la posibilidad de que a este item se le aya revertido algun monto
+                              va_id_moneda[v_i]  = v_registros.id_moneda; -- RAC,  v_id_moneda_base;
+                              va_id_partida_ejecucion[v_i]= v_registros.id_partida_ejecucion;
+                              va_columna_relacion[v_i]= 'id_solicitud_compra';
+                              va_fk_llave[v_i] = v_registros.id_solicitud;
+                              va_id_solicitud_det[v_i]= v_registros.id_solicitud_det;
+                              va_num_tramite[v_i] = v_reg_sol.num_tramite;
+                              
+                              
+                               -- la fecha de solictud es la fecha de compromiso 
+                              IF  now()  < v_registros.fecha_soli THEN
+                                va_fecha[v_i] = v_registros.fecha_soli::date;
+                              ELSE
+                                 -- la fecha de reversion como maximo puede ser el 31 de diciembre   
+                                 va_fecha[v_i] = now()::date;
+                                 v_ano_1 =  EXTRACT(YEAR FROM  now()::date);
+                                 v_ano_2 =  EXTRACT(YEAR FROM  v_registros.fecha_soli::date);
+                                 
+                                 IF  v_ano_1  >  v_ano_2 THEN
+                                   va_fecha[v_i] = ('31-12-'|| v_ano_2::varchar)::date;
+                                 END IF;
+                              END IF;
+                          
+                              
+                          END IF;
+                          
+                          
+                          v_men_presu = ' comprometido: '||COALESCE(v_comprometido,0)::varchar||'  ejecutado: '||COALESCE(v_ejecutado,0)::varchar||' \n'||v_men_presu;
                           
                      
-                     SELECT 
-                           COALESCE(ps_comprometido,0), 
-                           COALESCE(ps_ejecutado,0)  
-                       into 
-                           v_comprometido,
-                           v_ejecutado
-                     FROM pre.f_verificar_com_eje_pag(v_registros.id_partida_ejecucion,v_registros.id_moneda);   --  RAC,  v_id_moneda_base);
-                     
-                     
-                     v_monto_a_revertir = COALESCE(v_comprometido,0) - COALESCE(v_ejecutado,0);  
-                     
-                     
-                    --armamos los array para enviar a presupuestos          
-                    IF v_monto_a_revertir != 0 THEN
-                     
-                       	v_i = v_i +1;                
-                       
-                        va_id_presupuesto[v_i] = v_registros.id_presupuesto;
-                        va_id_partida[v_i]= v_registros.id_partida;
-                        va_momento[v_i]	= 2; --el momento 2 con signo positivo es revertir
-                        va_monto[v_i]  = (v_monto_a_revertir)*-1;  -- considera la posibilidad de que a este item se le aya revertido algun monto
-                        va_id_moneda[v_i]  = v_registros.id_moneda; -- RAC,  v_id_moneda_base;
-                        va_id_partida_ejecucion[v_i]= v_registros.id_partida_ejecucion;
-                        va_columna_relacion[v_i]= 'id_solicitud_compra';
-                        va_fk_llave[v_i] = v_registros.id_solicitud;
-                        va_id_solicitud_det[v_i]= v_registros.id_solicitud_det;
-                        va_num_tramite[v_i] = v_reg_sol.num_tramite;
-                        
-                        
-                         -- la fecha de solictud es la fecha de compromiso 
-                        IF  now()  < v_registros.fecha_soli THEN
-                          va_fecha[v_i] = v_registros.fecha_soli::date;
-                        ELSE
-                           -- la fecha de reversion como maximo puede ser el 31 de diciembre   
-                           va_fecha[v_i] = now()::date;
-                           v_ano_1 =  EXTRACT(YEAR FROM  now()::date);
-                           v_ano_2 =  EXTRACT(YEAR FROM  v_registros.fecha_soli::date);
-                           
-                           IF  v_ano_1  >  v_ano_2 THEN
-                             va_fecha[v_i] = ('31-12-'|| v_ano_2::varchar)::date;
-                           END IF;
-                        END IF;
-                    
-                        
-                    END IF;
-                    
-                    
-                    v_men_presu = ' comprometido: '||COALESCE(v_comprometido,0)::varchar||'  ejecutado: '||COALESCE(v_ejecutado,0)::varchar||' \n'||v_men_presu;
+                   ELSE  
+                        raise notice 'El presupuesto del detalle con el identificador (%)  no se encuntra comprometido',v_registros.id_solicitud_det;
+                   END IF;
                     
              
              END LOOP;

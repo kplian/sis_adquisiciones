@@ -931,3 +931,20 @@ VALUES
 
 /***********************************F-DAT-RAC-ADQ-0-01/08/2017*****************************************/
 
+
+
+
+/***********************************I-DAT-RAC-ADQ-0-03/08/2017*****************************************/
+
+
+INSERT INTO pxp.variable_global ("variable", "valor", "descripcion")
+VALUES 
+  (E'adq_requiere_rpc', E'si', E'Si requiere RPC al finzaliar al solicitud');
+  
+
+
+ 
+/***********************************F-DAT-RAC-ADQ-0-03/08/2017*****************************************/
+
+  
+  

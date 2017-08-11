@@ -1,3 +1,5 @@
+--------------- SQL ---------------
+
 CREATE OR REPLACE FUNCTION adq.f_proceso_compra_ime (
   p_administrador integer,
   p_id_usuario integer,
@@ -646,13 +648,13 @@ $body$
           into
             v_coun_num_cot
           from adq.tcotizacion c
-          where c.id_proceso_compra = v_parametros.id_proceso_compra and c.estado_reg = 'activo' and c.estado not in ('anulado','finalizado','contrato_elaborado');
+          where c.id_proceso_compra = v_parametros.id_proceso_compra and c.estado_reg = 'activo' and c.estado not in ('anulado','finalizado','finalizada', 'contrato_elaborado');
 
           /*jrr(18/10/2016): las cotizacion en contrato_elaborado tb se dejan finalizar ya q en algunos casos
                    el proceso terminara con la elaboracion del contrato y el pago se realizara por obligaciones de pago*/
           IF v_coun_num_cot >0 THEN
 
-            raise exception 'Todas las cotizaciones tienen que estar anuladas, finalizadas o con contrato_elaborado';
+            raise exception 'Todas las cotizaciones tienen que estar anuladas, finalizadas o con contrato_elaborado, idProceso =  %', v_parametros.id_proceso_compra;
 
           END IF;
 

@@ -113,6 +113,7 @@ DECLARE
        v_contador					integer = 0;
        v_valid						varchar;
        v_funcionario				varchar = null;
+       v_adq_requiere_rpc			varchar;
 
 			    
 BEGIN
@@ -597,7 +598,7 @@ BEGIN
 	elseif(p_transaccion='ADQ_FINSOL_IME')then   
         begin
           
-       
+         
           
           IF  v_parametros.operacion = 'verificar' THEN
           
@@ -609,6 +610,10 @@ BEGIN
                 v_registros_sol
                from  adq.tsolicitud sol 
                inner join orga.tuo uo on uo.id_uo = sol.id_uo;
+               
+               
+               
+                 v_adq_requiere_rpc = pxp.f_get_variable_global('adq_requiere_rpc');
               
           
           --  29/01/2014  RAC
@@ -706,7 +711,7 @@ BEGIN
                    raise exception 'Las compras en las regionales no pueden estar por encima de % (moneda base)',v_tope_compra;
                   END IF;
                   
-                  
+                  			
                   
                    v_cont = 0;
                    v_mensaje_resp = '';
@@ -758,8 +763,32 @@ BEGIN
                      
                        v_cont = v_cont +1;
                        
+                      
                        
+                       v_mensaje_resp = v_mensaje_resp||' - '||v_registros.desc_funcionario||' <br>';
+                       
+                    END LOOP;   
                         
+                       
+                       
+                   
+                    
+                    
+                   IF v_adq_requiere_rpc = 'no'  THEN
+                    
+                    v_resp =  adq.f_finalizar_reg_solicitud(
+                                            p_administrador, 
+                                            p_id_usuario,
+                                            v_parametros._id_usuario_ai,
+                                            v_parametros._nombre_usuario_ai,
+                                            NULL, 
+                                            v_parametros.id_solicitud,
+                                            v_parametros.id_estado_wf,
+                                            NULL,
+                                            NULL,
+                                            'no');
+                   ELSE
+                   
                        IF v_cont = 1 THEN
                           
                          v_resp =  adq.f_finalizar_reg_solicitud(
@@ -774,29 +803,22 @@ BEGIN
                                             v_registros.id_cargo_ai,
                                             v_registros.ai_habilitado);
                                    
-                       END IF;
+                        END IF;
+                   
+                    
+                   END IF;
                        
-                       v_mensaje_resp = v_mensaje_resp||' - '||v_registros.desc_funcionario||' <br>';
                    
-                   
-                   
-                   END LOOP;
                   
                   
                   -- si existe mas de un posible aprobador lanzamos un error
-                  IF v_cont > 1 THEN
-                  
+                  IF v_cont > 1 and v_adq_requiere_rpc = 'si' THEN                  
                       raise exception 'Existe mas de un aprobador para el monto (%), revice la configuracion para los funcionarios: <br> %',v_total_soli,v_mensaje_resp;
-                  
-                  
                   END IF;
                   
                   -- si existe mas de un posible aprobador lanzamos un error
-                  IF v_cont = 0 THEN
-                  
+                  IF v_cont = 0  and v_adq_requiere_rpc = 'si' THEN                  
                       raise exception 'No se encontro RPC para esta solicitud';
-                  
-                  
                   END IF;
                   
                
@@ -822,13 +844,14 @@ BEGIN
           
           END IF;
         
+          
         
         --Devuelve la respuesta
             return v_resp;
         
         end;   
     
-      /*********************************    
+    /*********************************    
  	#TRANSACCION:  'ADQ_SIGESOL_IME'
  	#DESCRIPCION:	funcion que controla el cambio al Siguiente esado de la solicitud, integrado con el WF
  	#AUTOR:		RAC	
@@ -1360,6 +1383,8 @@ BEGIN
           
           --validacion de documentos
           
+         
+          
           for v_documentos in (
           		select
                     dwf.id_documento_wf,                    
@@ -1419,11 +1444,10 @@ BEGIN
             
                  --  raise exception 'Estados...  %',v_registros.pedir_obs;
            
-              
+             
                                    
                  --verificamos el numero de deptos
                  raise notice 'verificamos el numero de deptos';
-                             
                             
                   SELECT 
                   *
@@ -1436,7 +1460,9 @@ BEGIN
                      v_registros.id_estado_wf,
                      TRUE) AS (total bigint);
                 
+              
                 
+                 
                 --recupera el depto   
                 IF v_num_deptos >= 1 THEN
                   
@@ -1458,6 +1484,10 @@ BEGIN
                          subsistema varchar);
                
                 END IF;
+                
+                 
+                
+                
                 -- si solo hay un estado,  verificamos si tiene mas de un funcionario por este estado
                  raise notice ' si solo hay un estado';
                    SELECT 

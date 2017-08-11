@@ -65,6 +65,7 @@ DECLARE
     v_num_funcionarios integer;
     presu_comprometido varchar;
     v_id_tipo_estado	integer;
+    v_adq_comprometer_presupuesto		varchar;
     
     
    
@@ -84,6 +85,7 @@ p_hstore->'id_solicitud'
 
 
   v_nombre_funcion = 'adq.f_finalizar_reg_solicitud';
+  v_adq_comprometer_presupuesto = pxp.f_get_variable_global('adq_comprometer_presupuesto');
           
         --obtenermos datos basicos
           
@@ -349,35 +351,43 @@ p_hstore->'id_solicitud'
                                                          v_parametros_ad,
                                                          v_tipo_noti,
                                                          v_titulo);
-  
+             
                                                          
            --si el estado  anteriro es vbpresupuestos  entonces comprometemos                                            
-           IF v_codigo_estado =  'vbpresupuestos'  and presu_comprometido = 'no' THEN 
+           IF v_codigo_estado =  'vbpresupuestos'  and presu_comprometido = 'no' and v_adq_comprometer_presupuesto = 'si' THEN 
               
-                   -- Comprometer Presupuesto
-                  
-                  IF not adq.f_gestionar_presupuesto_solicitud(p_id_solicitud, p_id_usuario, 'comprometer')  THEN
-                     
-                       raise exception 'Error al comprometer el presupeusto';
-                     
+                  -- Comprometer Presupuesto                  
+                  IF not adq.f_gestionar_presupuesto_solicitud(p_id_solicitud, p_id_usuario, 'comprometer')  THEN                     
+                       raise exception 'Error al comprometer el presupeusto';                     
                   END IF;
 
                   --modifca bandera de comprometido  
+                   update adq.tsolicitud  s set 
+                        presu_comprometido =  'si',
+                        fecha_apro = now()
+                   where id_solicitud = p_id_solicitud;
+             END IF;
+             
+           
+           --RAC 11/08/2017  
+           -- si llega al estado aprobacion y el presupeusto todavia noe sta comprometido, y el sistema esta configurado para comproemter,
+           -- comprometemos  
+            IF va_codigo_estado[1] = 'aprobado' and presu_comprometido = 'no' and v_adq_comprometer_presupuesto = 'si' THEN
                   
-               
-               
-                       update adq.tsolicitud  s set 
-                         presu_comprometido =  'si',
-                         fecha_apro = now()
-                         
-                         
-                       where id_solicitud = p_id_solicitud;
-            
-            
+                  -- Comprometer Presupuesto                  
+                  IF not adq.f_gestionar_presupuesto_solicitud(p_id_solicitud, p_id_usuario, 'comprometer')  THEN                     
+                       raise exception 'Error al comprometer el presupeusto';                     
+                  END IF;
 
-            END IF;
+                  --modifca bandera de comprometido  
+                   update adq.tsolicitud  s set 
+                        presu_comprometido =  'si',
+                        fecha_apro = now()
+                   where id_solicitud = p_id_solicitud;
+            
+            END IF; 
 
-        
+       
           
            -- actualiza estado en la solicitud
           
@@ -397,7 +407,7 @@ p_hstore->'id_solicitud'
           v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Solicitud de compra finalizada'); 
         
         
-
+  
          return v_resp;
 
 EXCEPTION
