@@ -851,7 +851,7 @@ BEGIN
         
         end;   
     
-      /*********************************    
+    /*********************************    
  	#TRANSACCION:  'ADQ_SIGESOL_IME'
  	#DESCRIPCION:	funcion que controla el cambio al Siguiente esado de la solicitud, integrado con el WF
  	#AUTOR:		RAC	
