@@ -24,7 +24,39 @@ Phx.vista.SolicitudVb = {
 	constructor: function(config) {
 	    
 	    this.maestro=config.maestro;
-	    
+
+        this.Atributos.splice(7,0, {
+            config:{
+                name: 'importe_total',
+                fieldLabel: 'Importe',
+                allowBlank: false,
+                anchor: '80%',
+                gwidth: 200,
+                maxLength:100,
+                renderer:function (value,p,record){
+
+                    Number.prototype.formatDinero = function(c, d, t){
+                        var n = this,
+                            c = isNaN(c = Math.abs(c)) ? 2 : c,
+                            d = d == undefined ? "." : d,
+                            t = t == undefined ? "," : t,
+                            s = n < 0 ? "-" : "",
+                            i = parseInt(n = Math.abs(+n || 0).toFixed(c)) + "",
+                            j = (j = i.length) > 3 ? j % 3 : 0;
+                        return s + (j ? i.substr(0, j) + t : "") + i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + t) + (c ? d + Math.abs(n - i).toFixed(c).slice(2) : "");
+                    };
+
+                    return  String.format('<div style="vertical-align:middle;text-align:right; color:green;"><b><span >{0}</span></b></div>',(parseFloat(value)).formatDinero(2, ',', '.'));
+                }
+            },
+            type:'MoneyField',
+            filters:{pfiltro:'res.nro_respuesta',type:'numeric'},
+            /*id_grupo:1,*/
+            grid:true,
+            form:false,
+            bottom_filter : true
+        });
+
 	    this.Atributos[this.getIndAtributo('id_funcionario')].form=false;
         this.Atributos[this.getIndAtributo('id_funcionario_aprobador')].form=false;
         this.Atributos[this.getIndAtributo('id_moneda')].form=false;

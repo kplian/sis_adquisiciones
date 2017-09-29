@@ -883,8 +883,8 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
 		'precontrato',
 		'update_enable','codigo_poa','obs_poa','contador_estados',
         'nro_po',
-        {name:'fecha_po', type: 'date',dateFormat:'Y-m-d'}
-		
+        {name:'fecha_po', type: 'date',dateFormat:'Y-m-d'},
+        {name:'importe_total', type: 'numeric'}
 	],
 	
 	arrayDefaultColumHidden:['id_fecha_reg','id_fecha_mod',
