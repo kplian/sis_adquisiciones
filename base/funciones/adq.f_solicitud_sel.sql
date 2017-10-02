@@ -229,7 +229,8 @@ BEGIN
                              from unnest(id_tipo_estado_wfs) elemento
                              where elemento = ew.id_tipo_estado) as contador_estados,
 						            sol.nro_po,
-                        sol.fecha_po
+                        sol.fecha_po,
+                        adq.f_calcular_importe_detalle(sol.id_solicitud) as importe_total
 						from adq.tsolicitud sol
 						inner join segu.tusuario usu1 on usu1.id_usuario = sol.id_usuario_reg
                         inner join wf.tproceso_wf pwf on pwf.id_proceso_wf = sol.id_proceso_wf

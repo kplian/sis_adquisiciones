@@ -50,11 +50,8 @@ Phx.vista.SolicitudVb = {
                 }
             },
             type:'MoneyField',
-            filters:{pfiltro:'res.nro_respuesta',type:'numeric'},
-            /*id_grupo:1,*/
             grid:true,
-            form:false,
-            bottom_filter : true
+            form:false
         });
 
 	    this.Atributos[this.getIndAtributo('id_funcionario')].form=false;
