@@ -31,7 +31,7 @@ Phx.vista.SolicitudVb = {
                 fieldLabel: 'Importe',
                 allowBlank: false,
                 anchor: '80%',
-                gwidth: 200,
+                gwidth: 120,
                 maxLength:100,
                 renderer:function (value,p,record){
 
