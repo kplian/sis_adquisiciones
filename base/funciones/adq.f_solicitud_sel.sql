@@ -1,5 +1,7 @@
+--------------- SQL ---------------
+
 CREATE OR REPLACE FUNCTION adq.f_solicitud_sel (
-  p_administrador integer,
+  p_administrador integer, 
   p_id_usuario integer,
   p_tabla varchar,
   p_transaccion varchar
@@ -230,7 +232,7 @@ BEGIN
                              where elemento = ew.id_tipo_estado) as contador_estados,
 						            sol.nro_po,
                         sol.fecha_po,
-                        adq.f_calcular_importe_detalle(sol.id_solicitud) as importe_total
+                        sum(tsd.precio_total) as importe_total
 						from adq.tsolicitud sol
 						inner join segu.tusuario usu1 on usu1.id_usuario = sol.id_usuario_reg
                         inner join wf.tproceso_wf pwf on pwf.id_proceso_wf = sol.id_proceso_wf
@@ -248,12 +250,19 @@ BEGIN
 
 						left join segu.tusuario usu2 on usu2.id_usuario = sol.id_usuario_mod
                         left join param.vproveedor pro on pro.id_proveedor = sol.id_proveedor
+                        
+                        left join adq.tsolicitud_det tsd on tsd.id_solicitud = sol.id_solicitud
+                        
                         '||v_inner||'
-                        where  '||v_filtro;
+                        where  tsd.estado_reg = ''activo'' and '||v_filtro;
 
 			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;
-			v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
+			v_consulta:=v_consulta||' group by sol.id_solicitud, usu1.cuenta, usu2.cuenta, 
+             fun.desc_funcionario1, funa.desc_funcionario1, uo.codigo, uo.nombre_unidad,
+             ges.gestion, mon.codigo, dep.codigo, pm.nombre, cat.nombre, funrpc.desc_funcionario1,
+             ew.obs, pro.desc_proveedor, funs.desc_funcionario1, ew.id_tipo_estado,
+             pwf.id_tipo_estado_wfs order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
 
 			--Devuelve la respuesta
 			return v_consulta;

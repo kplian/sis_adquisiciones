@@ -84,7 +84,7 @@ DECLARE
    v_requiere_contrato varchar;
    v_id_funcionario_aux integer;
    v_id_usuario_auxiliar     integer;
- 
+   v_tipo             varchar;
     
     
     
@@ -165,7 +165,8 @@ BEGIN
              sol.fecha_inicio,
              sol.dias_plazo_entrega,
              sol.lugar_entrega,
-             sol.instruc_rpc
+             sol.instruc_rpc,
+             sol.tipo
            into
             v_id_proveedor_precoti,
             v_id_proceso_wf_sol,
@@ -173,8 +174,8 @@ BEGIN
             v_fecha_inicio_sol,
             v_dias_plazo_entrega_sol,
             v_lugar_entrega_sol,
-            v_instruc_rpc
-                    
+            v_instruc_rpc,
+            v_tipo
            from  adq.tsolicitud sol where sol.id_solicitud = v_id_solicitud;
            
          
@@ -466,13 +467,13 @@ BEGIN
                           inner join wf.ttipo_documento td on td.id_tipo_documento = dwf.id_tipo_documento and td.codigo = 'precotizacion'
                           where dwf.id_proceso_wf = v_id_proceso_wf_sol;
 
+                          IF v_tipo!='Boa' THEN
+                              IF v_id_documento_wf_pc is NULL THEN
 
-                          IF v_id_documento_wf_pc is NULL THEN
+                                 raise exception 'No existe un documento dcodigo=precotizacion para la solicitud de compra';
 
-                             raise exception 'No existe un documento dcodigo=precotizacion para la solicitud de compra';
-
+                              END IF;
                           END IF;
-
 
                           --capturamos el id  del documento escaneado de COTIZACION
                           select

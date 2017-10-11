@@ -348,6 +348,8 @@ function listarProcesoCompraPedido(){
 		//Definicion de la lista del resultado del query
 		$this->captura('num_tramite','varchar');
 		$this->captura('justificacion','text');
+		$this->captura('solicitante','text');
+		$this->captura('tecnico_adquisiciones','text');
 		$this->captura('proveedor_recomendado','varchar');
 		$this->captura('proveedor_adjudicado','text');
 		$this->captura('fecha_ini_proc','date');
