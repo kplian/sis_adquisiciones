@@ -71,12 +71,14 @@ class RepProcIniAdjEje
         $this->docexcel->getActiveSheet()->getColumnDimension('A')->setWidth(20);
         $this->docexcel->getActiveSheet()->getColumnDimension('B')->setWidth(40);
         $this->docexcel->getActiveSheet()->getColumnDimension('C')->setWidth(40);
-        $this->docexcel->getActiveSheet()->getColumnDimension('D')->setWidth(30);
-        $this->docexcel->getActiveSheet()->getColumnDimension('E')->setWidth(20);
-        $this->docexcel->getActiveSheet()->getColumnDimension('F')->setWidth(20);
+        $this->docexcel->getActiveSheet()->getColumnDimension('D')->setWidth(40);
+        $this->docexcel->getActiveSheet()->getColumnDimension('E')->setWidth(40);
+        $this->docexcel->getActiveSheet()->getColumnDimension('F')->setWidth(30);
         $this->docexcel->getActiveSheet()->getColumnDimension('G')->setWidth(20);
         $this->docexcel->getActiveSheet()->getColumnDimension('H')->setWidth(20);
         $this->docexcel->getActiveSheet()->getColumnDimension('I')->setWidth(20);
+        $this->docexcel->getActiveSheet()->getColumnDimension('J')->setWidth(20);
+        $this->docexcel->getActiveSheet()->getColumnDimension('K')->setWidth(20);
 
 
         $styleTitulos = array(
@@ -100,20 +102,22 @@ class RepProcIniAdjEje
                     'style' => PHPExcel_Style_Border::BORDER_THIN
                 )
             ));
-        $this->docexcel->getActiveSheet()->getStyle('A1:I1')->getAlignment()->setWrapText(true);
+        $this->docexcel->getActiveSheet()->getStyle('A1:K1')->getAlignment()->setWrapText(true);
 
-        $this->docexcel->getActiveSheet()->getStyle('A1:I1')->applyFromArray($styleTitulos);
+        $this->docexcel->getActiveSheet()->getStyle('A1:K1')->applyFromArray($styleTitulos);
 
         //*************************************Cabecera*****************************************
         $this->docexcel->getActiveSheet()->setCellValue('A1','# Tramite');
         $this->docexcel->getActiveSheet()->setCellValue('B1','Justificacion');
-        $this->docexcel->getActiveSheet()->setCellValue('C1','Proveedor Recomendado');
-        $this->docexcel->getActiveSheet()->setCellValue('D1','Proveedor Adjudicado');
-        $this->docexcel->getActiveSheet()->setCellValue('E1','Inicio Proceso');
-        $this->docexcel->getActiveSheet()->setCellValue('F1','Precio en Bs');
-        $this->docexcel->getActiveSheet()->setCellValue('G1','Precio del Proceso');
-        $this->docexcel->getActiveSheet()->setCellValue('H1','Moneda del Proceso');
-        $this->docexcel->getActiveSheet()->setCellValue('I1','Contrato');
+        $this->docexcel->getActiveSheet()->setCellValue('C1','Solicitante');
+        $this->docexcel->getActiveSheet()->setCellValue('D1','Tecnico Adquisiciones');
+        $this->docexcel->getActiveSheet()->setCellValue('E1','Proveedor Recomendado');
+        $this->docexcel->getActiveSheet()->setCellValue('F1','Proveedor Adjudicado');
+        $this->docexcel->getActiveSheet()->setCellValue('G1','Inicio Proceso');
+        $this->docexcel->getActiveSheet()->setCellValue('H1','Precio en Bs');
+        $this->docexcel->getActiveSheet()->setCellValue('I1','Precio del Proceso');
+        $this->docexcel->getActiveSheet()->setCellValue('J1','Moneda del Proceso');
+        $this->docexcel->getActiveSheet()->setCellValue('K1','Contrato');
 
 
         //*************************************Detalle*****************************************
@@ -142,12 +146,14 @@ class RepProcIniAdjEje
         $this->docexcel->getActiveSheet()->getColumnDimension('A')->setWidth(20);
         $this->docexcel->getActiveSheet()->getColumnDimension('B')->setWidth(40);
         $this->docexcel->getActiveSheet()->getColumnDimension('C')->setWidth(40);
-        $this->docexcel->getActiveSheet()->getColumnDimension('D')->setWidth(30);
-        $this->docexcel->getActiveSheet()->getColumnDimension('E')->setWidth(20);
-        $this->docexcel->getActiveSheet()->getColumnDimension('F')->setWidth(20);
+        $this->docexcel->getActiveSheet()->getColumnDimension('D')->setWidth(40);
+        $this->docexcel->getActiveSheet()->getColumnDimension('E')->setWidth(40);
+        $this->docexcel->getActiveSheet()->getColumnDimension('F')->setWidth(30);
         $this->docexcel->getActiveSheet()->getColumnDimension('G')->setWidth(20);
         $this->docexcel->getActiveSheet()->getColumnDimension('H')->setWidth(20);
         $this->docexcel->getActiveSheet()->getColumnDimension('I')->setWidth(20);
+        $this->docexcel->getActiveSheet()->getColumnDimension('J')->setWidth(20);
+        $this->docexcel->getActiveSheet()->getColumnDimension('K')->setWidth(20);
 
 
         $styleTitulos = array(
@@ -171,20 +177,22 @@ class RepProcIniAdjEje
                     'style' => PHPExcel_Style_Border::BORDER_THIN
                 )
             ));
-        $this->docexcel->getActiveSheet()->getStyle('A1:I1')->getAlignment()->setWrapText(true);
+        $this->docexcel->getActiveSheet()->getStyle('A1:K1')->getAlignment()->setWrapText(true);
 
-        $this->docexcel->getActiveSheet()->getStyle('A1:I1')->applyFromArray($styleTitulos);
+        $this->docexcel->getActiveSheet()->getStyle('A1:K1')->applyFromArray($styleTitulos);
 
         //*************************************Cabecera*****************************************
         $this->docexcel->getActiveSheet()->setCellValue('A1','# Tramite');
         $this->docexcel->getActiveSheet()->setCellValue('B1','Justificacion');
-        $this->docexcel->getActiveSheet()->setCellValue('C1','Proveedor Recomendado');
-        $this->docexcel->getActiveSheet()->setCellValue('D1','Proveedor Adjudicado');
-        $this->docexcel->getActiveSheet()->setCellValue('E1','Inicio Proceso');
-        $this->docexcel->getActiveSheet()->setCellValue('F1','Precio en Bs');
-        $this->docexcel->getActiveSheet()->setCellValue('G1','Precio del Proceso');
-        $this->docexcel->getActiveSheet()->setCellValue('H1','Moneda del Proceso');
-        $this->docexcel->getActiveSheet()->setCellValue('I1','Contrato');
+        $this->docexcel->getActiveSheet()->setCellValue('C1','Solicitante');
+        $this->docexcel->getActiveSheet()->setCellValue('D1','Tecnico Adquisiciones');
+        $this->docexcel->getActiveSheet()->setCellValue('E1','Proveedor Recomendado');
+        $this->docexcel->getActiveSheet()->setCellValue('F1','Proveedor Adjudicado');
+        $this->docexcel->getActiveSheet()->setCellValue('G1','Inicio Proceso');
+        $this->docexcel->getActiveSheet()->setCellValue('H1','Precio en Bs');
+        $this->docexcel->getActiveSheet()->setCellValue('I1','Precio del Proceso');
+        $this->docexcel->getActiveSheet()->setCellValue('J1','Moneda del Proceso');
+        $this->docexcel->getActiveSheet()->setCellValue('K1','Contrato');
 
 
         //*************************************Detalle*****************************************
@@ -213,12 +221,14 @@ class RepProcIniAdjEje
         $this->docexcel->getActiveSheet()->getColumnDimension('A')->setWidth(20);
         $this->docexcel->getActiveSheet()->getColumnDimension('B')->setWidth(40);
         $this->docexcel->getActiveSheet()->getColumnDimension('C')->setWidth(40);
-        $this->docexcel->getActiveSheet()->getColumnDimension('D')->setWidth(30);
-        $this->docexcel->getActiveSheet()->getColumnDimension('E')->setWidth(20);
-        $this->docexcel->getActiveSheet()->getColumnDimension('F')->setWidth(20);
+        $this->docexcel->getActiveSheet()->getColumnDimension('D')->setWidth(40);
+        $this->docexcel->getActiveSheet()->getColumnDimension('E')->setWidth(40);
+        $this->docexcel->getActiveSheet()->getColumnDimension('F')->setWidth(30);
         $this->docexcel->getActiveSheet()->getColumnDimension('G')->setWidth(20);
         $this->docexcel->getActiveSheet()->getColumnDimension('H')->setWidth(20);
         $this->docexcel->getActiveSheet()->getColumnDimension('I')->setWidth(20);
+        $this->docexcel->getActiveSheet()->getColumnDimension('J')->setWidth(20);
+        $this->docexcel->getActiveSheet()->getColumnDimension('K')->setWidth(20);
 
 
         $styleTitulos = array(
@@ -242,20 +252,22 @@ class RepProcIniAdjEje
                     'style' => PHPExcel_Style_Border::BORDER_THIN
                 )
             ));
-        $this->docexcel->getActiveSheet()->getStyle('A1:I1')->getAlignment()->setWrapText(true);
+        $this->docexcel->getActiveSheet()->getStyle('A1:K1')->getAlignment()->setWrapText(true);
 
-        $this->docexcel->getActiveSheet()->getStyle('A1:I1')->applyFromArray($styleTitulos);
+        $this->docexcel->getActiveSheet()->getStyle('A1:K1')->applyFromArray($styleTitulos);
 
         //*************************************Cabecera*****************************************
         $this->docexcel->getActiveSheet()->setCellValue('A1','# Tramite');
         $this->docexcel->getActiveSheet()->setCellValue('B1','Justificacion');
-        $this->docexcel->getActiveSheet()->setCellValue('C1','Proveedor Recomendado');
-        $this->docexcel->getActiveSheet()->setCellValue('D1','Proveedor Adjudicado');
-        $this->docexcel->getActiveSheet()->setCellValue('E1','Inicio Proceso');
-        $this->docexcel->getActiveSheet()->setCellValue('F1','Precio en Bs');
-        $this->docexcel->getActiveSheet()->setCellValue('G1','Precio del Proceso');
-        $this->docexcel->getActiveSheet()->setCellValue('H1','Moneda del Proceso');
-        $this->docexcel->getActiveSheet()->setCellValue('I1','Contrato');
+        $this->docexcel->getActiveSheet()->setCellValue('C1','Solicitante');
+        $this->docexcel->getActiveSheet()->setCellValue('D1','Tecnico Adquisiciones');
+        $this->docexcel->getActiveSheet()->setCellValue('E1','Proveedor Recomendado');
+        $this->docexcel->getActiveSheet()->setCellValue('F1','Proveedor Adjudicado');
+        $this->docexcel->getActiveSheet()->setCellValue('G1','Inicio Proceso');
+        $this->docexcel->getActiveSheet()->setCellValue('H1','Precio en Bs');
+        $this->docexcel->getActiveSheet()->setCellValue('I1','Precio del Proceso');
+        $this->docexcel->getActiveSheet()->setCellValue('J1','Moneda del Proceso');
+        $this->docexcel->getActiveSheet()->setCellValue('K1','Contrato');
 
 
         //*************************************Detalle*****************************************

@@ -546,7 +546,8 @@ BEGIN
             	v_filtro = ' and (pro.estados_cotizacion like ''%pago_habilitado%'' or pro.estados_cotizacion like ''%finalizada%'')';
             END IF;
 
-        	v_consulta = 'select sol.num_tramite, sol.justificacion, sol.desc_proveedor as proveedor_recomendado,
+        	v_consulta = 'select sol.num_tramite, sol.justificacion, sol.desc_funcionario1 as solicitante,
+       		  usu.desc_persona as tecnico_adquisiciones, sol.desc_proveedor as proveedor_recomendado,
             pro.proveedores_cot as proveedor_adjudicado,  pro.fecha_ini_proc, sol.precio_total_mb as precio_bs,
             sol.precio_total as precio_moneda_solicitada, sol.codigo as moneda_solicitada,
             case when pro.requiere_contrato = ''si'' then ''Contrato''
@@ -556,6 +557,7 @@ BEGIN
                  end as contrato_orden
             from adq.vsolicitud_compra sol
             left join adq.vproceso_compra pro on pro.id_solicitud=sol.id_solicitud and pro.estados_cotizacion!=''anulado''
+            inner join segu.vusuario usu on usu.cuenta=pro.usr_aux
             where pro.fecha_ini_proc BETWEEN '''||v_parametros.fecha_ini||''' and '''||v_parametros.fecha_fin ||'''
             and sol.precio_total_mb > ' || v_parametros.monto_mayor ||'
             and pro.estado != ''anulado'' and pro.id_depto='||v_parametros.id_depto||v_filtro||'

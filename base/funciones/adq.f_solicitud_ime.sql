@@ -127,11 +127,12 @@ BEGIN
  	#AUTOR:		RAC	
  	#FECHA:		19-02-2013 12:12:51
 	***********************************/
+    
+    --raise exception 'LLEGA .... %', p_transaccion;
 
 	if (p_transaccion='ADQ_SOL_INS') then
 					
         begin
-        
         -- determina la fecha del periodo
         
          select id_periodo into v_id_periodo from
@@ -1566,7 +1567,7 @@ BEGIN
         -------------------------------------------------
          IF  v_parametros.operacion = 'cambiar' THEN
                
-              
+         --raise exception 'cambiar';
               
                       --recuperaq estado anterior segun Log del WF
                         SELECT  
@@ -1585,7 +1586,7 @@ BEGIN
                            v_id_estado_wf_ant 
                         FROM wf.f_obtener_estado_ant_log_wf(v_parametros.id_estado_wf);
                         
-                        
+                       
                         --
                       select 
                            ew.id_proceso_wf 
@@ -1595,8 +1596,8 @@ BEGIN
                       where ew.id_estado_wf= v_id_estado_wf_ant;
                       
                       
-                       
-                     
+                       ---
+                      
                        IF  v_codigo_estado_siguiente in ('vbpresupuestos')   THEN    
                            v_acceso_directo = '../../../sis_adquisiciones/vista/solicitud/SolicitudVb.php';
                            v_clase = 'SolicitudVb';
@@ -1632,7 +1633,7 @@ BEGIN
                         
                         
                        
-                      
+                     --raise exception 'test %',v_id_tipo_estado;
                        -- registra nuevo estado
                       
                       v_id_estado_actual = wf.f_registra_estado_wf(
@@ -1650,14 +1651,16 @@ BEGIN
                            v_parametros_ad,
                            v_tipo_noti,
                            v_titulo);
-                      
-                    
-               -- raise exception 'test';
+         
+                   
+              --  raise exception 'test ';
                         
            ----------------------------------------------------------------------
            -- PAra retornar al estado borrador de la solicitud de manera directa
            ---------------------------------------------------------------------
            ELSEIF  v_parametros.operacion = 'inicio' THEN
+           
+             
              
              -- recuperamos el estado inicial segun tipo_proceso
              
@@ -1685,6 +1688,8 @@ BEGIN
              FROM wf.f_obtener_estado_segun_log_wf(v_id_estado_wf, v_id_tipo_estado);
             
               raise notice 'CODIGO ESTADO ENCONTRADO %',v_codigo_estado ;
+             
+            
               
               
               IF   v_codigo_estado  = 'borrador'  THEN
@@ -1713,7 +1718,9 @@ BEGIN
                   v_parametros_ad,
                   v_tipo_noti,
                   v_titulo);
-                      
+                  
+              
+                     
              
            ELSE
            
@@ -1721,7 +1728,7 @@ BEGIN
            
            END IF;
            
-          
+           
          
             IF  not adq.f_fun_regreso_solicitud_wf(p_id_usuario, 
                                                    v_parametros._id_usuario_ai, 
@@ -1733,6 +1740,8 @@ BEGIN
                raise exception 'Error al retroceder estado';
             
             END IF;
+            
+            
            
              IF v_estado_actual = 'vbpresupuestos' THEN
                 update adq.tsolicitud  s set 

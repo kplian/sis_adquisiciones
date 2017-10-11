@@ -92,6 +92,7 @@ class MODSolicitud extends MODbase{
 		$this->captura('nro_po','varchar');
 		$this->captura('fecha_po','date');
 
+		$this->captura('importe_total','numeric');
 		
 		
 		  

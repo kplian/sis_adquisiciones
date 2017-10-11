@@ -60,7 +60,7 @@ BEGIN
             	v_consulta = 'SELECT * 
                 FROM compro.f_tad_nuevo_proveedor_pxp_iud(
                 		''insert'',NULL, '|| coalesce (v_parametros.id_persona::text, 'NULL') || ',''' ||  v_parametros.codigo || ''',''' ||  
-                        v_parametros.numero_sigma || ''',''' ||  v_parametros.tipo || ''',' ||  coalesce (v_parametros.id_institucion::text, 'NULL') || ',' || 
+                        v_parametros.numero_sigma || ''',''' ||  CASE WHEN v_parametros.tipo_prov <>'' THEN v_parametros.tipo_prov ELSE v_parametros.tipo END || ''',' ||  coalesce (v_parametros.id_institucion::text, 'NULL') || ',' || 
                         coalesce (v_parametros.doc_id::text, 'NULL') || ',''' ||  v_parametros.nombre_institucion || ''',''' ||  v_parametros.direccion_institucion || ''',' || 
                          coalesce (v_parametros.casilla::text, 'NULL') || ',' ||   coalesce (v_parametros.telefono1_institucion::text, 'NULL') || ',' ||   coalesce (v_parametros.telefono2_institucion::text, 'NULL') || ',' ||  
                          coalesce (v_parametros.celular1_institucion::text, 'NULL') || ',' ||   coalesce (v_parametros.celular2_institucion::text, 'NULL') || ',' ||   coalesce (v_parametros.fax::text, 'NULL') || ',''' ||  
@@ -224,12 +224,13 @@ BEGIN
 	elsif(p_transaccion='ADQ_PROVEE_MOD')then
 		
 		begin
+        	
 			if (pxp.f_get_variable_global('sincronizar') = 'true') then
             	
                v_consulta = 'SELECT * 
                 FROM compro.f_tad_nuevo_proveedor_pxp_iud(
                 		''update'',' || v_parametros.id_proveedor || ', '|| coalesce (v_parametros.id_persona::text, 'NULL') || ',''' ||  v_parametros.codigo || ''',''' ||  
-                        v_parametros.numero_sigma || ''',''' ||  v_parametros.tipo || ''',' ||  coalesce (v_parametros.id_institucion::text, 'NULL') || ',' || 
+                        v_parametros.numero_sigma || ''',''' || CASE WHEN v_parametros.tipo_prov <>'' THEN v_parametros.tipo_prov ELSE v_parametros.tipo END || ''',' ||  coalesce (v_parametros.id_institucion::text, 'NULL') || ',' || 
                         coalesce (v_parametros.doc_id::text, 'NULL') || ',''' ||  v_parametros.nombre_institucion || ''',''' ||  v_parametros.direccion_institucion || ''',' || 
                          coalesce (v_parametros.casilla::text, 'NULL') || ',' ||   coalesce (v_parametros.telefono1_institucion::text, 'NULL') || ',' ||   coalesce (v_parametros.telefono2_institucion::text, 'NULL') || ',' ||  
                          coalesce (v_parametros.celular1_institucion::text, 'NULL') || ',' ||   coalesce (v_parametros.celular2_institucion::text, 'NULL') || ',' ||   coalesce (v_parametros.fax::text, 'NULL') || ',''' ||  
@@ -261,8 +262,7 @@ BEGIN
             id_usuario_mod = p_id_usuario,
             fecha_mod = now(),
             rotulo_comercial = v_parametros.rotulo_comercial,
-            contacto = v_parametros.contacto,
-            tipo = v_parametros.tipo_prov
+            contacto = v_parametros.contacto
             where id_proveedor=v_parametros.id_proveedor;
                
 			--Definicion de la respuesta
