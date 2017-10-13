@@ -24,48 +24,43 @@ $body$
 ***************************************************************************
  HISTORIAL DE MODIFICACIONES:
 
- DESCRIPCION:	
- AUTOR:			
- FECHA:		
+ ISSUE            FECHA:		      AUTOR       DESCRIPCION
+ 0				12/10/2017			RAC			Adciona verificacion   de mosnto por categoria programatica opcionalmente segun variable global
 ***************************************************************************/
 
 DECLARE
 
    
-    v_resp		            varchar;
-    v_nombre_funcion        text;
-    v_mensaje_error         text;
-    
-    v_id_proceso_wf integer;
-    v_id_estado_wf integer;
-    v_codigo_estado  varchar;
-    v_id_funcionario_aprobador  integer;
-    v_numero_sol  varchar;
-     v_id_estado_actual  integer;
-    
-    
-    
-    va_id_tipo_estado integer [];
-    va_codigo_estado varchar [];
-    va_disparador varchar [];
-    va_regla varchar [];
-    va_prioridad integer [];
-    v_id_funcionario_supervisor integer;
-    
-    v_id_funcionario_estado_sig   integer;
-    
-    v_acceso_directo  	varchar;
-    v_clase   			varchar;
-    v_parametros_ad   		varchar;
-    v_tipo_noti  			varchar;
-    v_titulo   			varchar;
-    
-    v_num_estados  integer;
-    v_fecha_soli date;
-    v_num_funcionarios integer;
-    presu_comprometido varchar;
-    v_id_tipo_estado	integer;
+    v_resp		            			varchar;
+    v_nombre_funcion        			text;
+    v_mensaje_error         			text;
+    v_id_proceso_wf 					integer;
+    v_id_estado_wf 						integer;
+    v_codigo_estado  					varchar;
+    v_id_funcionario_aprobador  		integer;
+    v_numero_sol  						varchar;
+    v_id_estado_actual  				integer;
+    va_id_tipo_estado 					integer [];
+    va_codigo_estado					varchar [];
+    va_disparador 						varchar [];
+    va_regla 							varchar [];
+    va_prioridad 						integer [];
+    v_id_funcionario_supervisor 		integer;
+    v_id_funcionario_estado_sig   		integer;
+    v_acceso_directo  					varchar;
+    v_clase   							varchar;
+    v_parametros_ad   					varchar;
+    v_tipo_noti  						varchar;
+    v_titulo   							varchar;
+    v_num_estados  						integer;
+    v_fecha_soli 						date;
+    v_num_funcionarios 					integer;
+    presu_comprometido 					varchar;
+    v_id_tipo_estado					integer;
     v_adq_comprometer_presupuesto		varchar;
+    v_adq_revisar_montos_categoria		varchar;
+    v_id_categoria_compra				integer;
+    v_total_mb							numeric;
     
     
    
@@ -86,6 +81,9 @@ p_hstore->'id_solicitud'
 
   v_nombre_funcion = 'adq.f_finalizar_reg_solicitud';
   v_adq_comprometer_presupuesto = pxp.f_get_variable_global('adq_comprometer_presupuesto');
+  v_adq_revisar_montos_categoria = pxp.f_get_variable_global('adq_revisar_montos_categoria');
+  
+ 
           
         --obtenermos datos basicos
           
@@ -97,7 +95,8 @@ p_hstore->'id_solicitud'
             s.id_funcionario_supervisor,
             s.numero,
             s.fecha_soli,
-            s.presu_comprometido
+            s.presu_comprometido,
+            s.id_categoria_compra
           into 
           
             v_id_proceso_wf,
@@ -107,10 +106,13 @@ p_hstore->'id_solicitud'
             v_id_funcionario_supervisor,
             v_numero_sol,
             v_fecha_soli,
-            presu_comprometido
+            presu_comprometido,
+            v_id_categoria_compra
             
           from adq.tsolicitud s
           where s.id_solicitud=p_id_solicitud;
+          
+         
           
           select 
             ew.id_tipo_estado 
@@ -231,16 +233,11 @@ p_hstore->'id_solicitud'
             
             IF v_num_estados = 1 then
                     -- si solo hay un estado,  verificamos si tiene mas de un funcionario por este estado
-                   
-                   
                     
-          
-          
                    SELECT 
-                   *
+                       *
                     into
-                    v_num_funcionarios
-                    
+                       v_num_funcionarios
                    FROM wf.f_funcionario_wf_sel(
                        p_id_usuario, 
                        va_id_tipo_estado[1], 
@@ -248,28 +245,26 @@ p_hstore->'id_solicitud'
                        v_id_estado_wf,
                        TRUE) AS (total bigint);
                        
-                       
-               
                                      
-                        IF v_num_funcionarios = 1 THEN
-                        -- si solo es un funcionario, recuperamos el funcionario correspondiente
-                             SELECT 
-                                 id_funcionario
-                                   into
-                                 v_id_funcionario_estado_sig
-                             FROM wf.f_funcionario_wf_sel(
-                                 p_id_usuario, 
-                                 va_id_tipo_estado[1], 
-                                 v_fecha_soli,
-                                 v_id_estado_wf,
-                                 FALSE) 
-                                 AS (id_funcionario integer,
-                                   desc_funcionario text,
-                                   desc_funcionario_cargo text,
-                                   prioridad integer);
-                        ELSE
-                            raise exception 'El estado % , solo puede tener un funcionario registrado id =  %', va_codigo_estado,  va_id_tipo_estado;
-                        END IF;  
+                  IF v_num_funcionarios = 1 THEN
+                  -- si solo es un funcionario, recuperamos el funcionario correspondiente
+                       SELECT 
+                           id_funcionario
+                             into
+                           v_id_funcionario_estado_sig
+                       FROM wf.f_funcionario_wf_sel(
+                           p_id_usuario, 
+                           va_id_tipo_estado[1], 
+                           v_fecha_soli,
+                           v_id_estado_wf,
+                           FALSE) 
+                           AS (id_funcionario integer,
+                             desc_funcionario text,
+                             desc_funcionario_cargo text,
+                             prioridad integer);
+                  ELSE
+                      raise exception 'El estado % , solo puede tener un funcionario registrado id =  %', va_codigo_estado,  va_id_tipo_estado;
+                  END IF;  
           
           ELSE
           
@@ -368,6 +363,34 @@ p_hstore->'id_solicitud'
                    where id_solicitud = p_id_solicitud;
              END IF;
              
+             
+            --12/20/2017 RAC, 
+            -- Preguntar si es necesario validar lso mosnto por categoria de compra 
+            IF v_adq_revisar_montos_categoria = 'si' THEN   
+                --la validacion se hace en moenda base
+                 select
+                    sum(sd.precio_ga_mb + sd.precio_sg_mb )
+                  into
+                    v_total_mb
+                 from adq.tsolicitud_det sd   
+                 where sd.estado_reg = 'activo' and sd.id_solicitud = p_id_solicitud;
+                 
+                IF not EXISTS (select
+                                  1 
+                               from adq.tcategoria_compra cat
+                               where      cat.id_categoria_compra =  v_id_categoria_compra
+                                     and     
+                                            ((v_total_mb >= cat.min and v_total_mb <= cat.max)
+                                        or 
+                                            (v_total_mb >= cat.min and cat.max is null))) THEN
+                        
+                       raise exception 'El monto %  (Moneda Base) no se correponde con la categoria seleccionada (%)', v_total_mb,v_id_categoria_compra ;
+                                    
+                 END IF;
+              
+            END IF;
+             
+           
            
            --RAC 11/08/2017  
            -- si llega al estado aprobacion y el presupeusto todavia noe sta comprometido, y el sistema esta configurado para comproemter,

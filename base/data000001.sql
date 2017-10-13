@@ -946,5 +946,15 @@ VALUES
  
 /***********************************F-DAT-RAC-ADQ-0-03/08/2017*****************************************/
 
+
+
+/***********************************I-DAT-RAC-ADQ-0-12/10/2017*****************************************/
+  
+INSERT INTO pxp.variable_global ("variable", "valor", "descripcion")
+VALUES 
+  (E'adq_revisar_montos_categoria', E'no', E'revisar si el monto de la solcitud es coherente con la categoria seleccionado al fianlzar la  solicitud de compra');
+  
+/***********************************F-DAT-RAC-ADQ-0-12/10/2017*****************************************/
+  
   
   
