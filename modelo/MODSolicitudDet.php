@@ -238,6 +238,73 @@ class MODSolicitudDet extends MODbase{
 		//var_dump($this->respuesta); exit;
 		return $this->respuesta;
 	}	
+	
+	function listarSolicitudDetReporte(){
+		//Definicion de variables para ejecucion del procedimientp
+		$this->procedimiento='adq.f_solicitud_det_sel';
+		$this->transaccion='ADQ_SOLDREP_SEL';
+		$this->tipo_procedimiento='SEL';//tipo de transaccion
+		
+		$this->setCount(false);
+		
+		$this->setParametro('id_solicitud','id_solicitud','int4');	
+		
+		//Definicion de la lista del resultado del query
+		$this->captura('id_solicitud_det','int4');
+		$this->captura('id_centro_costo','int4');
+		$this->captura('descripcion','text');
+		$this->captura('precio_unitario','numeric');
+		$this->captura('id_solicitud','int4');
+		$this->captura('id_partida','int4');
+		$this->captura('id_orden_trabajo','int4');
+		$this->captura('precio_sg','numeric');
+		$this->captura('id_concepto_ingas','int4');
+		$this->captura('id_cuenta','int4');
+		$this->captura('precio_total','numeric');
+		$this->captura('cantidad','int4');
+		$this->captura('id_auxiliar','int4');
+		$this->captura('precio_ga_mb','numeric');
+		$this->captura('estado_reg','varchar');
+		$this->captura('id_partida_ejecucion','int4');
+		$this->captura('disponible','varchar');
+		$this->captura('precio_ga','numeric');
+		$this->captura('id_usuario_reg','int4');
+		$this->captura('fecha_reg','timestamp');
+		$this->captura('fecha_mod','timestamp');
+		$this->captura('id_usuario_mod','int4');
+		$this->captura('usr_reg','varchar');
+		$this->captura('usr_mod','varchar');		
+		$this->captura('desc_centro_costo','text');
+        $this->captura('codigo_partida','varchar');
+        $this->captura('nombre_partida','varchar');
+        $this->captura('nro_cuenta','varchar');
+        $this->captura('nombre_cuenta','varchar');
+        $this->captura('codigo_auxiliar','varchar');
+        $this->captura('nombre_auxiliar','varchar');
+        $this->captura('desc_concepto_ingas','varchar');        
+        $this->captura('desc_orden_trabajo','varchar');         
+        $this->captura('revertido_mb','numeric');
+        $this->captura('revertido_mo','numeric');        
+        $this->captura('id_presupuesto','integer');		
+		$this->captura('id_categoria_prog','integer');
+		$this->captura('codigo_categoria','varchar');		
+		$this->captura('id_tipo_cc_techo','integer');
+		$this->captura('descripcion_techo','varchar');
+		$this->captura('control_partida','varchar');
+		$this->captura('id_partida_control','integer');
+		$this->captura('desc_control_partida','varchar');
+		
+		
+		
+		
+		//Ejecuta la instruccion
+		$this->armarConsulta();
+		$this->ejecutarConsulta();
+		
+		//Devuelve la respuesta
+		return $this->respuesta;
+	}
+	
 			
 }
 ?>

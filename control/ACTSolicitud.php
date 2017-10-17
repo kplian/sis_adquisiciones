@@ -304,7 +304,7 @@ class ACTSolicitud extends ACTbase{
 
 		$modCotizacionDet = $this->create('MODSolicitudDet');
 		$resultCotizacionDet = $modCotizacionDet->reportePreOrdenCompra();
-		//$solicitudDetAgrupado = $this->groupArray($resultSolicitudDet->getDatos(), 'codigo_partida','desc_centro_costo');
+		
 		$cotizacionDetDataSource = new DataSource();
 		$cotizacionDetDataSource->setDataSet($resultCotizacionDet->getDatos());
 		$dataSource->putParameter('detalleDataSource', $cotizacionDetDataSource);
@@ -350,11 +350,23 @@ class ACTSolicitud extends ACTbase{
 		return $this->res->getDatos();
    }
 
+ function obtenerTipoCC(){		
+		//crea el objetoFunSeguridad que contiene todos los metodos del sistema de seguridad
+		$this->objFunSeguridad=$this->create('sis_seguridad/MODSubsistema');					
+		$objParam = new CTParametro($aPostData['p'],null,$aPostFiles);
+		$objParam->addParametro('codigo','pre_verificar_tipo_cc');
+		$objFunc=new MODSubsistema($objParam);
+		$this->res=$objFunc->obtenerVariableGlobal($this->objParam);
+				
+		return $this->res->getDatos();
+   }
+
   function reporteSolicitud($create_file=false, $onlyData = false){
     $dataSource = new DataSource();
 	$sw_cat = $this->obtenerCategoriaProg();
-	//var_dump($sw_cat); exit;
-    //captura datos de firma
+	$sw_tcc = $this->obtenerTipoCC();
+	
+    //captura datos de firma    
     if ($this->objParam->getParametro('firmar') == 'si') {
     	$firmar = 'si';
 		$fecha_firma = $this->objParam->getParametro('fecha_firma');
@@ -404,6 +416,7 @@ class ACTSolicitud extends ACTbase{
     $dataSource->putParameter('nombre_usuario_ai', $datosSolicitud[0]['nombre_usuario_ai']);
     $dataSource->putParameter('codigo_uo', $datosSolicitud[0]['codigo_uo']);
     $dataSource->putParameter('fecha_reg', $datosSolicitud[0]['fecha_reg']);
+	$dataSource->putParameter('presu_comprometido', $datosSolicitud[0]['presu_comprometido']);
 
     //get detalle
     //Reset all extra params:
@@ -416,25 +429,47 @@ class ACTSolicitud extends ACTbase{
     
     $modSolicitudDet = $this->create('MODSolicitudDet');
     //lista el detalle de la solicitud
-    $resultSolicitudDet = $modSolicitudDet->listarSolicitudDet();
+    $resultSolicitudDet = $modSolicitudDet->listarSolicitudDetReporte();
 
     //agrupa el detalle de la solcitud por centros de costos y partidas
     
+    $solicitudDetDataSource = new DataSource();
+    $solicitudDetDataSourcePres = new DataSource();
+	
+	
+    
     if($sw_cat["valor"] == 'si'){
     	//si la categoria esta habilita tenemos que agrupar la verificacion presupeustaria por categoria
-    	$solicitudDetAgrupado = $this->groupArray($resultSolicitudDet->getDatos(), 'codigo_partida','id_categoria_prog', $datosSolicitud[0]['id_moneda'],$datosSolicitud[0]['estado'],$onlyData);
+    	$solicitudDetAgrupado = $this->groupArray($resultSolicitudDet->getDatos(), 'codigo_partida','id_categoria_prog', $datosSolicitud[0]['id_moneda'],$datosSolicitud[0]['estado'],$onlyData, $datosSolicitud[0]['presu_comprometido'], $sw_cat["valor"], $sw_tcc["valor"],'no');
     }
 	else{
-		//de lo contrario agrupamos por centro de costo
-		$solicitudDetAgrupado = $this->groupArray($resultSolicitudDet->getDatos(), 'codigo_partida','desc_centro_costo', $datosSolicitud[0]['id_moneda'],$datosSolicitud[0]['estado'],$onlyData);
-    }
+		
+		
+		 if($sw_tcc["valor"] == 'si'){
+		 		
+				//agrupa para lsitado de reprote	
+		 		$solicitudDetAgrupado = $this->groupArray($resultSolicitudDet->getDatos(), 'codigo_partida','desc_centro_costo', $datosSolicitud[0]['id_moneda'],$datosSolicitud[0]['estado'],$onlyData, 'si', $sw_cat["valor"], $sw_tcc["valor"],'no');
+		 		//agrupa apra resumen de presupeusto
+		 		$solicitudDetPresupuesto = $this->groupArray($resultSolicitudDet->getDatos(), 'id_partida_control','id_tipo_cc_techo', $datosSolicitud[0]['id_moneda'],$datosSolicitud[0]['estado'],$onlyData, $datosSolicitud[0]['presu_comprometido'], $sw_cat["valor"], $sw_tcc["valor"],'si');
+		        
+				$solicitudDetDataSourcePres->setDataSet($solicitudDetPresupuesto);
+				$dataSource->putParameter('detalleDataSourcePres', $solicitudDetDataSourcePres);
 
-    $solicitudDetDataSource = new DataSource();
-    $solicitudDetDataSource->setDataSet($solicitudDetAgrupado);
+         }
+		 else{
+		 	 //de lo contrario agrupamos por centro de costo
+		     $solicitudDetAgrupado = $this->groupArray($resultSolicitudDet->getDatos(), 'codigo_partida','desc_centro_costo', $datosSolicitud[0]['id_moneda'],$datosSolicitud[0]['estado'],$onlyData, $datosSolicitud[0]['presu_comprometido'], $sw_cat["valor"], $sw_tcc["valor"],'no');
+		 }
+		
+    }
+	
+	$solicitudDetDataSource->setDataSet($solicitudDetAgrupado);
 	
 	//inserta el detalle de la colistud como origen de datos
     $dataSource->putParameter('detalleDataSource', $solicitudDetDataSource);
+	
 	$dataSource->putParameter('sw_cat', $sw_cat["valor"]);
+	$dataSource->putParameter('sw_tcc', $sw_tcc["valor"]);
     
     if ($onlyData){
     	return $dataSource;
@@ -469,7 +504,7 @@ class ACTSolicitud extends ACTbase{
         }
   } 
 
-function groupArray($array,$groupkey,$groupkeyTwo,$id_moneda,$estado_sol, $onlyData){
+function groupArray($array,$groupkey,$groupkeyTwo,$id_moneda,$estado_sol, $onlyData, $presu_comprometido, $sw_cat, $sw_tcc,$mostrar_tcc){
 	 if (count($array)>0)
 	 {
 	 	//recupera las llaves del array    
@@ -531,13 +566,19 @@ function groupArray($array,$groupkey,$groupkeyTwo,$id_moneda,$estado_sol, $onlyD
          	 	
 				     
 				      if(!in_array($value_det["desc_centro_costo"], $cc_array)){
-				      	 $grup_desc_centro_costo = $grup_desc_centro_costo ."\n". $value_det["desc_centro_costo"];
+				      	 $grup_desc_centro_costo = $grup_desc_centro_costo."\n". $value_det["desc_centro_costo"];
 						 $cc_array[] = $value_det["desc_centro_costo"];
 				      }
-                      //sumamos el monto a comprometer   
+                      //sumamos el monto a comprometer  
+                     $total_pre = $total_pre + $value_det["precio_ga"];
+					 $total_pre_gs = $total_pre_gs + $value_det["precio_sg"]; 
+                       
                       
              }
              $arrayResp[$cont_grup]["grup_desc_centro_costo"] =  trim ($grup_desc_centro_costo);
+			 $arrayResp[$cont_grup]["monto_total_ga"] =  $total_pre;
+			 $arrayResp[$cont_grup]["monto_total_sg"] =  $total_pre_gs;
+			 
              $cont_grup++;
 		}
 	 	//solo verificar si el estado es borrador o pendiente 
@@ -545,13 +586,14 @@ function groupArray($array,$groupkey,$groupkeyTwo,$id_moneda,$estado_sol, $onlyD
 	 	
 	 	$estado_sin_presupuesto = array("borrador", "pendiente", "vbgerencia", "vbpresupuestos");
 	 	
-         if (in_array($estado_sol, $estado_sin_presupuesto) ||  $onlyData){
+         if ( $presu_comprometido == 'no' ||  $onlyData){
 
-    	 	    $cont_grup = 0;
+    	 	$cont_grup = 0;
     	 	foreach($arrayResp as $value2)
             {
 				  $cc_array = array();
                   $total_pre = 0;
+				  $total_pre_gs = 0;
 				  $grup_desc_centro_costo = "";
                   
                  $busca = array_search($value2[$groupkey].$value2[$groupkeyTwo], $groupcriteria);
@@ -559,9 +601,12 @@ function groupArray($array,$groupkey,$groupkeyTwo,$id_moneda,$estado_sol, $onlyD
                  foreach($value2['groupeddata'] as $value_det){
                        //sumamos el monto a comprometer
 					 $total_pre = $total_pre + $value_det["precio_ga"];
+					 $total_pre_gs = $total_pre_gs + $value_det["precio_sg"];
 					 if(!in_array($value_det["desc_centro_costo"], $cc_array)){
-					  	$grup_desc_centro_costo = $grup_desc_centro_costo ."\n". $value_det["desc_centro_costo"];
-						 $cc_array[] = $value_det["desc_centro_costo"];
+					  	$grup_desc_centro_costo = $value_det["desc_centro_costo"];
+						$grup_desc_centro_costo_cat = $grup_desc_centro_costo."\n". $value_det["desc_centro_costo"];
+						$grup_desc_centro_costo_tcc = $value_det["descripcion_techo"];
+						$cc_array[] = $value_det["desc_centro_costo"];
 					 }
                  }
                  
@@ -572,6 +617,7 @@ function groupArray($array,$groupkey,$groupkeyTwo,$id_moneda,$estado_sol, $onlyD
                  $this->objParam->addParametro('id_partida',$value_det["id_partida"]);
                  $this->objParam->addParametro('id_moneda',$id_moneda);
                  $this->objParam->addParametro('monto_total',$total_pre);
+				 
                  
                  
                  $this->objFunc = $this->create('sis_presupuestos/MODPresupuesto');
@@ -579,7 +625,22 @@ function groupArray($array,$groupkey,$groupkeyTwo,$id_moneda,$estado_sol, $onlyD
                  
                  $arrayResp[$cont_grup]["presu_verificado"] = $resultSolicitud->datos["presu_verificado"];
 				 $arrayResp[$cont_grup]["total_presu_verificado"] =  $total_pre;
-				 $arrayResp[$cont_grup]["grup_desc_centro_costo"] =  $grup_desc_centro_costo;
+				
+				 
+				 if ($sw_cat =='si'){
+				 	$arrayResp[$cont_grup]["grup_desc_centro_costo"] =  $grup_desc_centro_costo_cat;
+				 }
+				 else{
+				 	if($sw_tcc == 'si' && $mostrar_tcc == 'si'){
+				 		$arrayResp[$cont_grup]["grup_desc_centro_costo"] =  $grup_desc_centro_costo_tcc;
+				 	}
+					else{
+						$arrayResp[$cont_grup]["grup_desc_centro_costo"] = $grup_desc_centro_costo;
+					}
+				 }
+				 
+				
+				 
                  $cont_grup++;
                  
                  
@@ -838,16 +899,6 @@ function groupArray($array,$groupkey,$groupkeyTwo,$id_moneda,$estado_sol, $onlyD
 
 
 
-	/*
-    
-    Autor: GSS
-    DESCRIPTION:  Agrupa los detalles de la solcitud
-    $solicitudDetAgrupado = $this->groupArray(
-        $resultSolicitudDet->getDatos(), 
-        'codigo_partida',
-        'desc_centro_costo');
-    
-    */
     
    		
 }

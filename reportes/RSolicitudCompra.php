@@ -179,7 +179,11 @@ Class RSolicitudCompra extends Report {
         //imprime el detalle de la solicitud
         
         $this->writeDetalles($this->getDataSource()->getParameter('detalleDataSource'), $pdf);
-        
+		
+		//imprime el detalle de  presupeustos  
+		if($this->getDataSource()->getParameter('sw_tcc')=='si'){      
+           $this->writeDetallesPres($this->getDataSource()->getParameter('detalleDataSourcePres'), $pdf);
+		}
         //imprime el pie del reporte
         
         $pdf->SetFontSize(8);
@@ -206,14 +210,7 @@ Class RSolicitudCompra extends Report {
         $pdf->Ln();
         $pdf->Ln();
 
-        //presupuestos para la sisguiente gestion
-        /*
-        if($fecha_reg != $gestion){
-            $pdf->setTextColor(248,0,0);
-            $pdf->MultiCell(185, $height, 'EN CUMPLIMIENTO A INSTRUCCIONES EMITIDAS POR EL ORGANO RECTOR  MEDIANTE CITE MEFP/VPCF/DGPGP/UEP/N° 355/2016, BOLIVIANA DE AVIACION EN FECHA 04 DE SEPTIEMBRE DEL AÑO EN CURSO, REMITE AL MINISTERIO DE ECONOMÍA Y FINANZAS PÚBLICAS  EL ANTEPROYECTO DE PRESUPUESTO INSTITUCIONAL DE BoA, A TRAVES DE LA NOTA OB.GG.NE.639.016, PARA SU CORRESPONDIENTE INCLUSIÓN EN EL PRESUPUESTO GENERAL DEL ESTADO - GESTION 2017, DONDE SE JUSTIFICO LA ASIGNACION PRESUPUESTARIA EN LAS DIFERENTES PARTIDAS DE GASTO, QUE COMPONEN EL MISMO, DE ACUERDO A LA PROGRAMACION REALIZADA EN MEMORIAS DE CALCULO.', 0,'J', false);
-        }
-        */
-
+       
         $pdf->Ln();
 		/*jrr: Cambio para firmas*/
 		$res =$pdf->firma;
@@ -232,47 +229,46 @@ Class RSolicitudCompra extends Report {
         $pdf->SetDrawColor    (  0,-1,-1,-1,false,'');   
         
          
-         //$pdf->Cell($width3+$width2, $height, $this->getDataSource()->getParameter('desc_proceso_macro'), $white, 0, 'L', true, '', 0, false, 'T', 'C');
-        
-                    
-        //$blackAll = array('LTRB' =>array('width' => 0.3, 'cap' => 'butt', 'join' => 'miter', 'dash' => 0, 'color' => array(0, 0, 0)));  
-        //$blackSide = array('LR' =>array('width' => 0.3, 'cap' => 'butt', 'join' => 'miter', 'dash' => 0, 'color' => array(0, 0, 0)));
-        //$blackBottom = array('B' =>array('width' => 0.3, 'cap' => 'butt', 'join' => 'miter', 'dash' => 0, 'color' => array(0, 0, 0)));
-        //$blackTop = array('T' =>array('width' => 0.3, 'cap' => 'butt', 'join' => 'miter', 'dash' => 0, 'color' => array(0, 0, 0)));
-        //$widthMarginLeft = 1;
         
         $width1 = 15;
         $width2 = 25;
         $width3 = 20;
         
-        //$pdf->SetFontSize(7.5);
-        //$pdf->SetFont('', 'B');
+        
         $height = 5;
         $pdf->Ln();       
             
                     
-                
-        $conf_par_tablewidths=array($width2,$width2*2,$width2*2+15,$width1+$width2);
-        $conf_par_tablealigns=array('L','L','L','R');
-        $conf_par_tablenumbers=array(0,0,0,0);
+             
+		if($this->getDataSource()->getParameter('sw_tcc')=='si'){
+			$conf_par_tablewidths=array($width2,$width2*2,$width2*2+15+40);
+            $conf_par_tablealigns=array('L','L','L');
+            $conf_par_tablenumbers=array(0,0,0);
+			
+		}	
+		else{
+	      $conf_par_tablewidths=array($width2,$width2*2,$width2*2+15,$width1+$width2);
+          $conf_par_tablealigns=array('L','L','L','R');
+          $conf_par_tablenumbers=array(0,0,0,0);
+		}    
+        
+		
+		
+		
         $conf_tableborders=array();
-        $conf_tabletextcolor=array();
-        
+        $conf_tabletextcolor=array();        
         $conf_par_tabletextcolor_rojo=array(array(0,0,0),array(0,0,0),array(0,0,0),array(255,0,0));
-        $conf_par_tabletextcolor_verde=array(array(0,0,0),array(0,0,0),array(0,0,0),array(35,142,35));
-        
+        $conf_par_tabletextcolor_verde=array(array(0,0,0),array(0,0,0),array(0,0,0),array(35,142,35));        
         
         
         $conf_det_tablewidths=array($width2+$width1,$width2+25+$width3*2,$width1,$width3,$width3);
         $conf_det_tablealigns=array('L','L','L','R','R');
-        $conf_det_tablenumbers=array(0,0,0,0,0);
-        
+        $conf_det_tablenumbers=array(0,0,0,0,0);       
         
         
         $conf_det2_tablewidths=array($width2+$width1,$width2+25+$width3*2,$width1,$width3,$width3);
         $conf_det2_tablealigns=array('L','L','L','R','R');
-        $conf_det2_tablenumbers=array(0,0,0,2,2);
-        
+        $conf_det2_tablenumbers=array(0,0,0,2,2);        
         
         $conf_tp_tablewidths=array($width2+$width1+$width2+25+($width3*2)+$width1+$width3,$width3);
         $conf_tp_tablealigns=array('R','R');
@@ -293,21 +289,33 @@ Class RSolicitudCompra extends Report {
             
            
         
+		   if($this->getDataSource()->getParameter('sw_tcc')=='si'){
+		   	
+				$RowArray = array(
+	                        'codigo_partida'  =>  'Código Partida',
+	                        'nombre_partida'  =>  'Nombre Partida',
+	                        'desc_centro_costo'    => 'Centro de Costo',
+	                        'totalRef' => ''
+	                        
+	                    );  
+			
+		   }
+		   else{
+		   		$RowArray = array(
+	                        'codigo_partida'  =>  'Código Partida',
+	                        'nombre_partida'  => 'Nombre Partida',
+	                        'desc_centro_costo'    => 'Centro de Costo',
+	                        'ejecutado' => 'Presupuesto'
+	                    );  
+		   	
+		   }
                     
-            $RowArray = array(
-                        'codigo_partida'  =>  'Código Partida',
-                        'nombre_partida'  => 'Nombre Partida',
-                        'desc_centro_costo'    => 'Centro de Costo',
-                        //'totalRef' => '',
-                        'ejecutado' => 'Presupuesto'
-                    );     
                          
-             $pdf-> MultiRow($RowArray,false,0); 
+            $pdf-> MultiRow($RowArray,false,0); 
             
-            //chequear disponibilidad
-            
-            $estado_sin_presupuesto = array("borrador", "pendiente", "vbgerencia", "vbpresupuestos");
-	 	    if (in_array($this->getDataSource()->getParameter('estado'), $estado_sin_presupuesto)){
+            //chequear disponibilidad  
+			
+	 	    if ( $this->getDataSource()->getParameter('presu_comprometido')=='no' ){
                 //verifica la disponibilidad de presupeusto para el  agrupador     
                 if($row['presu_verificado']=="true"){
                     $disponibilida = 'DISPONIBLE';
@@ -322,25 +330,31 @@ Class RSolicitudCompra extends Report {
                $disponibilida ='DISPONIBLE Y APROBADO';
                $pdf->tabletextcolor=$conf_par_tabletextcolor_verde;
             }
+
+
             if($this->getDataSource()->getParameter('sw_cat')=='si'){
                 $descCentroCosto =  'Cat. Prog.: '.$row['groupeddata'][0]['codigo_categoria']."\n".$row['grup_desc_centro_costo'];
             }else{
-                $descCentroCosto =  $row['grup_desc_centro_costo'];
+            	$descCentroCosto =  $row['grup_desc_centro_costo'];				 
             }
 
             // din chequeo disponibilidad
-            $RowArray = array(
-                        'codigo_partida'  => $row['groupeddata'][0]['codigo_partida'],
-                        'nombre_partida'  => $row['groupeddata'][0]['nombre_partida'],
-                        //'desc_centro_costo'    => $row['groupeddata'][0]['desc_centro_costo'],
-                        'desc_centro_costo'    => $descCentroCosto,
-                        //'desc_centro_costo'    => $row['grup_desc_centro_costo']. "\nCP: ".$row['groupeddata'][0]['codigo_categoria'],
-                        //'desc_centro_costo'    => $row['groupeddata'][0]['desc_centro_costo']. "\n".$row['groupeddata'][0]['codigo_categoria'],
-                        //'desc_centro_costo'    => $row['groupeddata'][0]['codigo_categoria'],
-                        // 'totalRef' => $row['totalRef'],
-                        'ejecutado' =>  $disponibilida
-                    );     
-                         
+            if($this->getDataSource()->getParameter('sw_tcc')=='si'){
+	            $RowArray = array(
+	                        'codigo_partida'  => $row['groupeddata'][0]['codigo_partida'],
+	                        'nombre_partida'  => $row['groupeddata'][0]['nombre_partida'],                       
+	                        'desc_centro_costo'    => $descCentroCosto
+	                    ); 
+	        }
+			else{
+			    $RowArray = array(
+	                        'codigo_partida'  => $row['groupeddata'][0]['codigo_partida'],
+	                        'nombre_partida'  => $row['groupeddata'][0]['nombre_partida'],                       
+	                        'desc_centro_costo'    => $descCentroCosto,                       
+	                        'ejecutado' =>  $disponibilida
+	                    ); 
+	  	
+			}             
             $pdf-> MultiRow($RowArray,false,0);
             
             /////////////////////////////////      
@@ -361,7 +375,8 @@ Class RSolicitudCompra extends Report {
                         'precio_total' => 'Precio Total'
                     );     
                          
-            $pdf-> MultiRow($RowArray,false,1); 
+           
+			 $pdf-> MultiRow($RowArray,false,1); 
             
             //$pdf->Ln();
             $totalRef=0;
@@ -432,6 +447,112 @@ Class RSolicitudCompra extends Report {
                 
         }
         
-    }      
+    }   
+
+
+ 
+
+function writeDetallesPres (DataSource $dataSource, TCPDF $pdf) {
+	
+	
+	
+	    $pdf->SetFont('', 'B');
+        $pdf->Cell(75, 5, 'PRESUPUESTO:', 0, 0, 'L', false, '', 1, false, 'T', 'C');
+            
+         $pdf->setTextColor(0,0,0);
+         $pdf->setFont('','B');
+         $pdf->setFont('','');
+        //cambia el color de lienas
+        $pdf->SetDrawColor    (  0,-1,-1,-1,false,'');  
+		$conf_par_tabletextcolor_rojo=array(array(0,0,0),array(0,0,0),array(255,0,0),array(0,0,0));
+        $conf_par_tabletextcolor_verde=array(array(0,0,0),array(0,0,0),array(35,142,35),array(0,0,0));   
+        
+        $width1 = 15;
+        $width2 = 25;
+        $width3 = 20;        
+        
+        $height = 5;
+        $pdf->Ln();         
+		
+        $conf_tableborders=array();
+        $conf_tabletextcolor=array(); 
+        $count_partidas = 0;
+		
+		$pdf->tablewidths=array(100 , 25, 25, 25 );
+        $pdf->tablealigns=array('L','L','L','L');
+        $pdf->tablenumbers=array(0,0,0,0);
+		
+        $pdf->tableborders=$conf_tableborders;
+        $pdf->tabletextcolor=$conf_tabletextcolor;
+            
+          $RowArray = array(
+	                                             
+	                        'desc_centro_costo'    => 'Centro Costo',
+	                        'monto_gesa'    => 'Monto GA',
+	                        'monto_gess'    => 'Estado GA',
+	                        'estado' => 'Monto SG'
+	                        
+	                    );  
+			
+		$pdf-> MultiRow($RowArray,false,1); 
+        
+        foreach($dataSource->getDataset() as $row) {
+                    
+                
+            //chequear disponibilidad  
+			
+	 	    if ( $this->getDataSource()->getParameter('presu_comprometido')=='no' ){
+                //verifica la disponibilidad de presupeusto para el  agrupador     
+                if($row['presu_verificado']=="true"){
+                    $disponibilida = 'DISPONIBLE';
+                    $pdf->tabletextcolor=$conf_tabletextcolor;
+                }
+                else{
+                   $disponibilida ='NO DISPONIBLE';
+                   $pdf->tabletextcolor=$conf_par_tabletextcolor_rojo;
+                }
+            }
+            else{
+               $disponibilida ='DISPONIBLE Y APROBADO';
+               $pdf->tabletextcolor=$conf_par_tabletextcolor_verde;
+            }
+
+
+           
+            $descCentroCosto =  $row['grup_desc_centro_costo'];	
+			
+			$pdf->tablewidths=array(100 , 25, 25, 25 );
+            $pdf->tablealigns=array('L','L','L','L');
+            $pdf->tablenumbers=array(0,2,0,2);			 
+            
+
+            // din chequeo disponibilidad
+           
+			   $RowArray = array(	                       
+	                        'desc_centro_costo'    => "CC: ".$descCentroCosto."\n".$row['groupeddata'][0]['desc_control_partida'], 
+	                        'monto_total_ga'    => $row['monto_total_ga'],
+	                        'ejecutado' =>  $disponibilida,
+	                        'monto_total_sg'    => $row['monto_total_sg']                    
+	                        
+	                    ); 
+	  	
+			           
+             $pdf-> MultiRow($RowArray,false,1); 
+            
+           
+           
+        } 
+
+         $pdf->Ln();
+		 $pdf->Ln();         
+		
+        
+        
+        
+    }   
+
+
+
+  
 }
 ?>

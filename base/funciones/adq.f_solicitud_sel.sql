@@ -1,7 +1,7 @@
 --------------- SQL ---------------
 
 CREATE OR REPLACE FUNCTION adq.f_solicitud_sel (
-  p_administrador integer, 
+  p_administrador integer,
   p_id_usuario integer,
   p_tabla varchar,
   p_transaccion varchar
@@ -466,7 +466,8 @@ BEGIN
                         sol.numero,
                         funrpc.desc_funcionario1 as desc_funcionario_rpc,
                         COALESCE(sol.usuario_ai,'''')::varchar as nombre_usuario_ai,
-                        uo.codigo as codigo_uo
+                        uo.codigo as codigo_uo,
+                        sol.presu_comprometido
 
 						from adq.tsolicitud sol
 						inner join segu.tusuario usu1 on usu1.id_usuario = sol.id_usuario_reg
