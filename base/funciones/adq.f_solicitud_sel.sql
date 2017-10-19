@@ -16,11 +16,10 @@ $body$
  FECHA:	        19-02-2013 12:12:51
  COMENTARIOS:
 ***************************************************************************
- HISTORIAL DE MODIFICACIONES:
-
- DESCRIPCION:
- AUTOR:
- FECHA:
+* ISSUE            FECHA:		      AUTOR       DESCRIPCION
+* 0, BOA	  	10/06/2013          RAC         Funcion que devuelve conjuntos de registros de las consultas relacionadas con la tabla 'adq.tsolicitud'
+* 0, ETR	    19/10/2017          RAC			no se muestra en visto bueno solicitud el estado desierto, ADQ_SOL_SEL
+*
 ***************************************************************************/
 
 DECLARE
@@ -73,9 +72,6 @@ BEGIN
 
     	begin
           --si es administrador
-
-
-
             v_filtro='';
             if (v_parametros.id_funcionario_usu is null) then
               	v_parametros.id_funcionario_usu = -1;
@@ -103,9 +99,9 @@ BEGIN
                 IF v_historico =  'no' THEN
 
                     IF p_administrador !=1 THEN
-                      v_filtro = ' (ew.id_funcionario='||v_parametros.id_funcionario_usu::varchar||' ) and  (lower(sol.estado)!=''borrador'') and (lower(sol.estado)!=''proceso'' ) and ';
+                      v_filtro = ' (ew.id_funcionario='||v_parametros.id_funcionario_usu::varchar||' ) and  (lower(sol.estado)!=''borrador'') and (lower(sol.estado)!=''proceso''  and lower(sol.estado)!=''desierto'') and ';
                     ELSE
-                        v_filtro = ' (lower(sol.estado)!=''borrador''  and lower(sol.estado)!=''proceso'' and lower(sol.estado)!=''finalizado'') and ';
+                        v_filtro = ' (lower(sol.estado)!=''borrador''  and lower(sol.estado)!=''proceso'' and lower(sol.estado)!=''finalizado'' and lower(sol.estado)!=''desierto'' ) and ';
                     END IF;
                 ELSE
                     IF p_administrador !=1 THEN
@@ -309,9 +305,9 @@ BEGIN
               IF v_historico =  'no' THEN
 
                 IF p_administrador !=1 THEN
-                  v_filtro = ' (ew.id_funcionario='||v_parametros.id_funcionario_usu::varchar||' ) and  (lower(sol.estado)!=''borrador'') and (lower(sol.estado)!=''proceso'' ) and ';
+                  v_filtro = ' (ew.id_funcionario='||v_parametros.id_funcionario_usu::varchar||' ) and  (lower(sol.estado)!=''borrador'') and (lower(sol.estado)!=''proceso'' and lower(sol.estado)!=''finalizado'' and lower(sol.estado)!=''desierto'') and ';
                 ELSE
-                    v_filtro = ' (lower(sol.estado)!=''borrador''  and lower(sol.estado)!=''proceso'' and lower(sol.estado)!=''finalizado'') and ';
+                    v_filtro = ' (lower(sol.estado)!=''borrador''  and lower(sol.estado)!=''proceso'' and lower(sol.estado)!=''finalizado'' and lower(sol.estado)!=''desierto'') and ';
                 END IF;
               ELSE
                 IF p_administrador !=1 THEN

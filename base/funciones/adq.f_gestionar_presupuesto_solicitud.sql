@@ -345,10 +345,8 @@ BEGIN
                                              and sd.cantidad > 0 
                                              ) LOOP
                                              
-                             IF(v_registros.id_partida_ejecucion is NULL) THEN
-                             
-                                raise exception 'El presupuesto del detalle con el identificador (%)  no se encuntra comprometido',v_registros.id_solicitud_det;
-                             
+                             IF(v_registros.id_partida_ejecucion is NULL) THEN                             
+                                raise exception 'El presupuesto del detalle con el identificador (%)  no se encuntra comprometido',v_registros.id_solicitud_det;                             
                              END IF;
                              
                              --calculamos el total adudicado
@@ -393,7 +391,6 @@ BEGIN
                                 va_columna_relacion[v_i]= 'id_solicitud_compra';
                                 va_fk_llave[v_i] = v_registros.id_solicitud;
                                 va_id_solicitud_det[v_i]= v_registros.id_solicitud_det;
-                                
                                 
                                 
                                  -- la fecha de solictud es la fecha de compromiso 

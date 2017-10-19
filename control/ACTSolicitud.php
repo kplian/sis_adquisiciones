@@ -5,6 +5,11 @@
 *@author  (admin)
 *@date 19-02-2013 12:12:51
 *@description Clase que recibe los parametros enviados por la vista para mandar a la capa de Modelo
+ ** ISSUE            FECHA:		      AUTOR       DESCRIPCION
+ *   0, ETR          19/10/2017         RAC       Se considera el estado desierto en finalizados
+ *   0, ETR          19/10/2017			RAC		  Para reporte de solicitud se agrega la posibilidad de verificacion por tipo de centro de csotos	
+ * 
+ * 
 */
 require_once(dirname(__FILE__).'/../../pxp/pxpReport/ReportWriter.php');
 require_once(dirname(__FILE__).'/../reportes/RSolicitudCompra.php');
@@ -42,10 +47,10 @@ class ACTSolicitud extends ACTbase{
              $this->objParam->addFiltro("sol.estado in (''borrador'')");
         }
         if($this->objParam->getParametro('pes_estado')=='proceso'){
-             $this->objParam->addFiltro("sol.estado not in (''borrador'',''finalizado'',''anulado'')");
+             $this->objParam->addFiltro("sol.estado not in (''borrador'',''finalizado'',''anulado'',''desierto'')");
         }
         if($this->objParam->getParametro('pes_estado')=='finalizados'){
-             $this->objParam->addFiltro("sol.estado in (''finalizado'',''anulado'')");
+             $this->objParam->addFiltro("sol.estado in (''finalizado'',''anulado'',''desierto'')");  //#0 se agrega estado desierto
         }
 
         if($this->objParam->getParametro('filtro_aprobadas')==1){
@@ -562,6 +567,8 @@ function groupArray($array,$groupkey,$groupkeyTwo,$id_moneda,$estado_sol, $onlyD
         {
         	 $grup_desc_centro_costo = "";
 			 $cc_array = array();
+			 $total_pre = 0;
+			 $total_pre_gs = 0;
          	 foreach($value2['groupeddata'] as $value_det){
          	 	
 				     

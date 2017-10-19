@@ -957,4 +957,13 @@ VALUES
 /***********************************F-DAT-RAC-ADQ-0-12/10/2017*****************************************/
   
   
+ 
+/***********************************I-DAT-RAC-ADQ-0-19/10/2017*****************************************/
   
+INSERT INTO pxp.variable_global ("variable", "valor", "descripcion")
+VALUES 
+  (E'adq_estado_reversion', E'desierto', E'codigo de estado de solicitud de compra donde se revierte el presupuesto, por ejemplo desierto');
+   
+/***********************************F-DAT-RAC-ADQ-0-19/10/2017*****************************************/
+  
+    

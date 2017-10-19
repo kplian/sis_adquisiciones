@@ -13,9 +13,10 @@ RETURNS boolean AS
 $body$
 /*
 *
-*  Autor:   RAC
-*  DESC:    funcion que actualiza los estados despues del registro de un retroceso en el plan de pago
-*  Fecha:   10/06/2013
+* ISSUE            FECHA:		      AUTOR       DESCRIPCION
+* 0, BOA	  			10/06/2013          RAC         funcion que actualiza los estados despues del registro de un retroceso en el plan de pago
+* 0, ETR				11/08/2017 			RAC			si llega al estado aprobacion y el presupeusto todavia noe sta comprometido, y el sistema esta configurado para comproemter
+* 0, ETR				19/10/2017			RAC			se aumenta reversion segun estado configurado de presupeusto, por ejemplo estado desierto
 *
 */
 
@@ -33,6 +34,7 @@ DECLARE
     v_tope_compra 				numeric;
     v_tope_compra_lista			varchar;
     v_adq_comprometer_presupuesto		varchar;
+    v_adq_estado_reversion				varchar;
    
 	
     
@@ -40,6 +42,7 @@ BEGIN
 
 	 v_nombre_funcion = 'adq.f_fun_inicio_solicitud_wf';
      v_adq_comprometer_presupuesto = pxp.f_get_variable_global('adq_comprometer_presupuesto');
+     v_adq_estado_reversion = pxp.f_get_variable_global('adq_estado_reversion');
   
      
            select
@@ -168,6 +171,26 @@ BEGIN
             END IF;
             
             
+            
+            --19/10/2017 RAC, revisa si tiene estado de reversion  y esta  comprometidfo          
+            IF p_codigo_estado = v_adq_estado_reversion   and v_registros.presu_comprometido = 'si' and v_adq_comprometer_presupuesto = 'si' THEN
+            
+                  -- Revertir  Presupuesto                  
+                  IF not adq.f_gestionar_presupuesto_solicitud( v_registros.id_solicitud, p_id_usuario, 'revertir')  THEN                     
+                       raise exception 'Error al comprometer el presupeusto';                     
+                  END IF;
+            
+                   --modifca bandera de comprometido  
+                   update adq.tsolicitud  s set 
+                        presu_comprometido =  'no',
+                        fecha_apro = now()
+                   where id_solicitud =  v_registros.id_solicitud;
+                   
+                   v_sw_presu_comprometido = 'no';
+            
+            
+            END IF;
+            
             --RAC 11/08/2017  
            -- si llega al estado aprobacion y el presupeusto todavia noe sta comprometido, y el sistema esta configurado para comproemter,
            -- comprometemos  
@@ -191,10 +214,8 @@ BEGIN
             
            
             
-            IF  p_codigo_estado = 'vbrpc' and  ( v_registros.presu_comprometido !=  'si' and  v_sw_presu_comprometido != 'si') THEN
-            
-                raise exception 'No puede pasar al VoBo del RPC si el presupuesto no esta comprometido, comuniquese con el administrador de sistemas';
-            
+            IF  p_codigo_estado = 'vbrpc' and  ( v_registros.presu_comprometido !=  'si' and  v_sw_presu_comprometido != 'si') THEN            
+                raise exception 'No puede pasar al VoBo del RPC si el presupuesto no esta comprometido, comuniquese con el administrador de sistemas';            
             END IF;
      
    

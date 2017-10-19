@@ -13,21 +13,13 @@ CREATE OR REPLACE FUNCTION adq.f_obtener_sig_estado_sol_rec (
 RETURNS record AS
 $body$
 /**************************************************************************
- FUNCION: 		adq.f_obtener_sig_estado_sol_rec
- DESCRIPCION: 	funcion que busca resursivamente el siguiente estado 
- 
- 
- AUTOR: 		KPLIAN(RAC)
- FECHA:			21/02/2013
- COMENTARIOS:	
-***************************************************************************
- HISTORIA DE MODIFICACIONES:
-
- DESCRIPCION:	
- AUTOR:			
- FECHA:			
-
-***************************************************************************/
+* FUNCION: 		adq.f_obtener_sig_estado_sol_rec
+*
+* ISSUE            FECHA:		      AUTOR       DESCRIPCION
+* 0, BOA	  			21/02/2013          RAC      funcion que busca resursivamente el siguiente estado 
+* 0, ETR				19/10/2017			RAC		 Se elimina la validacion para que decia: El flujo de adquisiciones solo admite un estado sin bifurcacion, configuracion de WF inadecuada	
+*
+*/
 DECLARE
 
     va_id_tipo_estado integer [];
@@ -45,7 +37,7 @@ DECLARE
 BEGIN
    --buscamos siguiente estado correpondiente al proceso del WF
    
-   v_nombre_funcion = 'f_obtener_sig_estado_sol_rec';
+   v_nombre_funcion = 'adq.f_obtener_sig_estado_sol_rec';
                SELECT 
                  *
               into
@@ -63,15 +55,7 @@ BEGIN
              ps_regla=  va_regla;
              ps_prioridad= va_prioridad; 
             
-    --   raise notice 'xxx  -> % % % % % ', va_id_tipo_estado,   va_codigo_estado,va_disparador, va_regla,  va_prioridad  ;  
-    
-   if va_id_tipo_estado[2] is not null then
-   
-    raise exception 'El flujo de adquisiciones solo admite un estado sin bifurcacion, configuracion de WF inadecuada';
-   
-   end if; 
-   
-   
+  
 
    --si el estado siguiente es de activos dijo o de la uti verificamos
    --verificamos las partida en el detalle de la solicitud correponden con las configuradas para su revision

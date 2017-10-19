@@ -1,4 +1,10 @@
 <?php
+/*
+*  
+*   ISSUE             FECHA:		      AUTOR           DESCRIPCION
+*    0, ETR          19/10/2017			   RAC		  Para reporte de solicitud se agrega la posibilidad de verificacion por tipo de centro de costos	
+* 
+*/
 require_once dirname(__FILE__).'/../../pxp/lib/lib_reporte/ReportePDFFormulario.php';
 require_once dirname(__FILE__).'/../../pxp/pxpReport/Report.php';
  class CustomReport extends ReportePDFFormulario{
@@ -495,6 +501,8 @@ function writeDetallesPres (DataSource $dataSource, TCPDF $pdf) {
 	                    );  
 			
 		$pdf-> MultiRow($RowArray,false,1); 
+		$total_ga = 0;
+		$total_sg = 0;
         
         foreach($dataSource->getDataset() as $row) {
                     
@@ -522,37 +530,41 @@ function writeDetallesPres (DataSource $dataSource, TCPDF $pdf) {
             $descCentroCosto =  $row['grup_desc_centro_costo'];	
 			
 			$pdf->tablewidths=array(100 , 25, 25, 25 );
-            $pdf->tablealigns=array('L','L','L','L');
-            $pdf->tablenumbers=array(0,2,0,2);			 
-            
+            $pdf->tablealigns=array('L','R','L','R');
+            $pdf->tablenumbers=array(0,2,0,2);	
+			
 
             // din chequeo disponibilidad
-           
-			   $RowArray = array(	                       
+              $RowArray = array(	                       
 	                        'desc_centro_costo'    => "CC: ".$descCentroCosto."\n".$row['groupeddata'][0]['desc_control_partida'], 
 	                        'monto_total_ga'    => $row['monto_total_ga'],
 	                        'ejecutado' =>  $disponibilida,
-	                        'monto_total_sg'    => $row['monto_total_sg']                    
-	                        
+	                        'monto_total_sg'    => $row['monto_total_sg'] 
 	                    ); 
-	  	
+						
+				$total_ga = $total_ga + $row['monto_total_ga'];
+				$total_sg = $total_sg +$row['monto_total_sg'];
 			           
              $pdf-> MultiRow($RowArray,false,1); 
-            
-           
-           
         } 
 
+         $pdf->tableborders=array(0,1,0,1);	
+		 $pdf->tablealigns=array('R','R','R','R');
+		 $pdf->tabletextcolor=$conf_tabletextcolor;
+
+
+         $RowArray = array(	                       
+	                        'desc_centro_costo'    => "Total Gestión Actual", 
+	                        'monto_total_ga'    => $total_ga,
+	                        'ejecutado' =>  'Total Siguientes Gestiones',
+	                        'monto_total_sg'    => $total_sg 
+	                    ); 
+						
+		 $pdf-> MultiRow($RowArray,false,1); 
+
          $pdf->Ln();
-		 $pdf->Ln();         
-		
-        
-        
-        
-    }   
-
-
-
+		 $pdf->Ln();  
+    }  
   
 }
 ?>
