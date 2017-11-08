@@ -570,6 +570,7 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
                 gwidth:200,
                 valueField: 'id_proveedor',
                 gdisplayField: 'desc_proveedor',
+                inputType:'hidden',
                 renderer:function(value, p, record){return String.format('{0}', record.data['desc_proveedor']);}
              },
             type:'ComboRec',//ComboRec

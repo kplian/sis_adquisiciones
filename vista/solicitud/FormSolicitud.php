@@ -757,7 +757,7 @@ header("content-type: text/javascript; charset=UTF-8");
 					name:'id_proveedor',
 					hiddenName: 'id_proveedor',
 					origen:'PROVEEDOR',
-					fieldLabel:'Proveedor Precotizacion',
+					fieldLabel:'Proveedor Precotizacion',					
 					allowBlank:false,
 					tinit:false,
 					width: '80%',
@@ -781,7 +781,7 @@ header("content-type: text/javascript; charset=UTF-8");
 			{
 				config:{
 					name: 'justificacion',
-					fieldLabel: 'Justificacion/Objeto del Contrato',
+					fieldLabel: 'Justificacion',
 					qtip:'Justifique, ¿por que la necesidad de esta compra?',
 					allowBlank: false,
 					width: '100%',
@@ -1187,7 +1187,8 @@ header("content-type: text/javascript; charset=UTF-8");
 								Ext.Msg.alert('Error','Error a recuperar la variable global')
 							} else {
 								if (param == 'adq_precotizacion_obligatorio'){	
-									   this.Cmp.id_proveedor.allowBlank = (reg.ROOT.datos.valor == 'no');
+									   this.ocultarComponente(this.Cmp.id_proveedor);
+									   //this.Cmp.id_proveedor.allowBlank = (reg.ROOT.datos.valor == 'no');
 								}
 								
 							}
