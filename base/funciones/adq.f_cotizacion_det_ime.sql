@@ -336,8 +336,6 @@ BEGIN
 
 		begin
         
-          
-           
             --recupera datos de la solicitud y la cotizacion
             v_revertido_mb=0;
             v_id_moneda_base =  param.f_get_moneda_base();
@@ -401,10 +399,8 @@ BEGIN
              
             
             
-            IF v_parametros.cantidad_adjudicada < 0 THEN
-            
+            IF v_parametros.cantidad_adjudicada < 0 THEN            
               raise exception 'No se admiten adjudicaciones negativas';
-            
             END IF;
             
             --raise exception 'c% o %  sol %,  adj  %',v_cantidad_coti,v_parametros.cantidad_adjudicada,v_cantidad_sol,v_total_adj;
@@ -426,7 +422,10 @@ BEGIN
                        into 
                            v_comprometido_ga,    --esta en moneda base
                            v_ejecutado
-                     FROM pre.f_verificar_com_eje_pag(v_id_partida_ejecucion, v_id_moneda);
+                     FROM pre.f_verificar_com_eje_pag(v_id_partida_ejecucion, v_id_moneda); --13/11/2017 cambia la funcion para control por nro de tramite
+                     
+                     
+                     --raise exception 'LLega...';
                     
                      --validamos que el total revertido no afecte la adjudicacion 
                     IF  (((v_comprometido_ga + COALESCE(v_precio_sg,0)) - v_total_costo_mo)  >= (v_parametros.cantidad_adjudicada * v_precio_unitario_coti) ) OR v_adq_comprometer_presupuesto = 'no'  THEN
@@ -437,7 +436,7 @@ BEGIN
                     
                     ELSE
                       
-                       raise exception 'La reversiones realizadas sobre este item no permiten adjudicar a este precio, solo dispone de un total  de: %',((v_comprometido_ga+ COALESCE(v_precio_sg,0)) - v_total_costo_mo) ;
+                       raise exception 'El presupeusto comprometido para esta gestión no permiten adjudicar a este precio, solo dispone de un total  de: %',((v_comprometido_ga+ COALESCE(v_precio_sg,0)) - v_total_costo_mo) ;
                     
                     END IF;
                  

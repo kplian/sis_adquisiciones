@@ -63,6 +63,16 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
             }
         );
         
+         this.addButton('chkpresupuesto',   {
+	     	    grupo:[0,1,2,3,4],               
+                text: 'Presup',
+                iconCls: 'blist',
+                tooltip: '<b>Revisar Presupuesto</b><p>Revisar estado de ejecución presupeustaria para este  tramite</p>',
+                handler:this.checkPresupuesto,               
+                scope: this
+            });
+	    
+        
         
        
 	},
@@ -939,6 +949,8 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
         this.getBoton('diagrama_gantt').enable();
         this.getBoton('btnObs').enable();
         this.getBoton('btnDetalleGasto').enable();
+        this.getBoton('chkpresupuesto').enable();
+        
         
         
         return tb 
@@ -953,6 +965,7 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
             this.getBoton('diagrama_gantt').disable();  
             this.getBoton('btnObs').disable();
             this.getBoton('btnDetalleGasto').disable();
+            this.getBoton('chkpresupuesto').disable();
                     
         }
        return tb
@@ -1055,6 +1068,23 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
                     'Obs'
         )
     },
+    
+    checkPresupuesto:function(){                   
+			  var rec=this.sm.getSelected();
+			  var configExtra = [];
+			  this.objChkPres = Phx.CP.loadWindows('../../../sis_presupuestos/vista/presup_partida/ChkPresupuesto.php',
+										'Estado del Presupuesto',
+										{
+											modal:true,
+											width:700,
+											height:450
+										}, {
+											data:{
+											   nro_tramite: rec.data.num_tramite								  
+											}}, this.idContenedor,'ChkPresupuesto');
+			   
+	 },
+    
     
 	sortInfo:{
 		field: 'fecha_reg',

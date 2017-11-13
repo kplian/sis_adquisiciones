@@ -53,6 +53,16 @@ Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
 		this.addButton('btnCotizacion',{grupo:[0,1,2,3,4], text :'Cotizacion',iconCls:'bdocuments',disabled: true, handler : this.onButtonCotizacion,tooltip : '<b>Cotizacion de solicitud de Compra</b><br/><b>Cotizacion de solicitud de Compra</b>'});
   		this.addButton('btnChequeoDocumentos',{grupo:[0,1,2,3,4], text: 'Documentos',iconCls: 'bchecklist',disabled: true,handler: this.loadCheckDocumentosSol,tooltip: '<b>Documentos del Proceso</b><br/>Subir los documetos requeridos en el proceso seleccionada.'});
         this.addButton('btnCuadroComparativo',{grupo:[0,1,2,3,4], text :'Cuadro Comparativo',iconCls : 'bexcel',disabled: true,handler : this.onCuadroComparativo,tooltip : '<b>Cuadro Comparativo</b><br/><b>Cuadro Comparativo de Cotizaciones</b>'});
+	    this.addButton('chkpresupuesto',   {
+	     	    grupo:[0,1,2,3,4],               
+                text: 'Presup',
+                iconCls: 'blist',
+                tooltip: '<b>Revisar Presupuesto</b><p>Revisar estado de ejecución presupeustaria para este  tramite</p>',
+                handler:this.checkPresupuesto,               
+                scope: this
+            });
+	    
+	    
 	    this.addButton('btnRevePres',{grupo:[0,1,2,3,4], text:'Rev. Pre.',iconCls: 'balert',disabled:true,handler:this.onBtnRevPres,tooltip: '<b>Revertir Presupuesto</b> Revierte todo el presupuesto no adjudicado para la solicitud.'});
         this.addButton('btnFinPro',{grupo:[0,1,2,3,4], text:'Fin Proc.',iconCls: 'balert',disabled:true,handler:this.onBtnFinPro,tooltip: '<b>Finzalizar Proceso</b> Finaliza el proceso y la solicitud y revierte el presupuesto. No  puede deshacerse'});
         this.addButton('diagrama_gantt',{grupo:[0,1,2,3,4,5], text:'Diagrama Gantt',iconCls: 'bgantt',disabled:true,handler:this.diagramGantt,tooltip: '<b>Diagrama Gantt de proceso macro</b>'});
@@ -69,6 +79,22 @@ Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
 	    this.finCons = true;
 	
 	},
+	
+	checkPresupuesto:function(){                   
+			  var rec=this.sm.getSelected();
+			  var configExtra = [];
+			  this.objChkPres = Phx.CP.loadWindows('../../../sis_presupuestos/vista/presup_partida/ChkPresupuesto.php',
+										'Estado del Presupuesto',
+										{
+											modal:true,
+											width:700,
+											height:450
+										}, {
+											data:{
+											   nro_tramite: rec.data.num_tramite								  
+											}}, this.idContenedor,'ChkPresupuesto');
+			   
+	 },
 	
 	diagramGantt:function(){  
 		
@@ -737,6 +763,8 @@ Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
         Phx.vista.ProcesoCompra.superclass.preparaMenu.call(this,n);
         this.getBoton('btnChequeoDocumentos').enable();
         this.getBoton('diagrama_gantt').enable();
+        this.getBoton('chkpresupuesto').enable();
+        
         
         if(data.estado=='anulado' || data.estado=='desierto'|| data.estado=='finalizado'){
             this.getBoton('edit').disable();
@@ -776,7 +804,8 @@ Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
             this.getBoton('btnChequeoDocumentos').disable(); 
             this.getBoton('btnCuadroComparativo').disable();
             this.getBoton('diagrama_gantt').disable(); 
-            this.getBoton('btnReporte').disable();       
+            this.getBoton('btnReporte').disable(); 
+            this.getBoton('chkpresupuesto').disable();      
         }
        return tb
     },
