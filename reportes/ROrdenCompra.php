@@ -302,9 +302,9 @@ Class ROrdenCompra extends Report {
 		$pdf->setFontSize(7);								
         
 		if($this->getDataSource()->getParameter('codigo_proceso')!='PROCINPD'){
-			$pdf->MultiCell(0, $height, 'La suma de dinero será cancelada de la forma establecida, debiendo ustedes emitir la factura respectiva a nombre de BOLIVIANA DE AVIACIÓN – BOA, NIT 154422029,  de no emitirse la misma, BOA se reserva del derecho de efectuar las retenciones impositivas respectivas.', 0,'L', false ,1);
+			//$pdf->MultiCell(0, $height, 'La suma de dinero será cancelada de la forma establecida, debiendo ustedes emitir la factura respectiva a nombre de ENDE TRANSIMISION S.A., NIT 10230097024,  de no emitirse la misma, ENDE TRANSMISION S.A. se reserva del derecho de efectuar las retenciones impositivas respectivas.', 0,'L', false ,1);
 		}else{
-			$pdf->MultiCell(0, $height, 'La suma de dinero será cancelada de acuerdo a su oferta, el pedido deberá cumplir con todas las especificaciones solicitadas por Boliviana de Aviación, asimismo, solicitamos nos remita la nota fiscal correspondiente o similar de su país de origen.', 0,'L', false ,1);
+			//$pdf->MultiCell(0, $height, 'La suma de dinero será cancelada de acuerdo a su oferta, el pedido deberá cumplir con todas las especificaciones solicitadas por ENDE TRANSIMISION S.A., asimismo, solicitamos nos remita la nota fiscal correspondiente o similar de su país de origen.', 0,'L', false ,1);
 		}
 		
 		$pdf->Ln($height);
@@ -349,7 +349,7 @@ Class ROrdenCompra extends Report {
 		$pdf->MultiCell(0, $height, 'NOTA: La cuenta bancaria de todo proveedor debe estar registrada en SIGEP para compras nacionales', 0,'L', false ,1);
 		$pdf->Ln($height);
 		if($this->getDataSource()->getParameter('codigo_proceso')!='PROCINPD'){
-			$pdf->MultiCell(0, $height, 'Ante cualquier demora BOLIVIANA DE AVIACIÓN – BOA se reserva el derecho de retener el UNO PORCIENTO (1%) del monto total por día de retraso hasta un 20%.', 0,'L', false ,1);
+			//$pdf->MultiCell(0, $height, 'Ante cualquier demora ENDE TRANSIMISION S.A. se reserva el derecho de retener el UNO PORCIENTO (1%) del monto total por día de retraso hasta un 20%.', 0,'L', false ,1);
 			$pdf->Ln($height);
 		}		
 		
@@ -378,8 +378,8 @@ Class ROrdenCompra extends Report {
 		$pdf->SetFontSize(6.5);
 		$totalOrdenCompra=0.00;
 		
-		$conf_par_tablewidths=array($width1-5,$width2,$width1,$width1);
-        $conf_par_tablealigns=array('L','L','L','R');
+		$conf_par_tablewidths=array($width2,$width1-5,$width1,$width1);
+        $conf_par_tablealigns=array('L','L','C','R');
         $conf_par_tablenumbers=array(0,0,0,0);
         $conf_tableborders=array($blackAll,$blackAll,$blackAll,$blackAll);
         $conf_tabletextcolor=array();
@@ -389,9 +389,9 @@ Class ROrdenCompra extends Report {
 		$pdf->tablenumbers=$conf_par_tablenumbers;
 		$pdf->tableborders=$conf_tableborders;
 		
-		$RowArray = array(
-					'cantidad'  => 'Cantidad',
+		$RowArray = array(					
 					'item'  => 'Item',
+					'cantidad'  => 'Cantidad',
 					'precio_unitario' => 'Precio Unitario',
 					'total' => 'Total'
 				);     
@@ -402,11 +402,11 @@ Class ROrdenCompra extends Report {
 			            
 			 if($row['cantidad_adju']>0){
 				 $RowArray = array(
-							'cantidad'  => $row['cantidad_adju'],
 							'item'  => $row['desc_solicitud_det']."\r\n".'  - '.$row['descripcion_sol'],
-							'precio_unitario'    => number_format($row['precio_unitario'],2),                       
-							'total' =>  ($row['cantidad_adju']*$row['precio_unitario'])
-						);     
+							'cantidad'  => $row['cantidad_adju'],							
+							'precio_unitario' => number_format($row['precio_unitario'],2),                       
+							'total' => number_format(($row['cantidad_adju']*$row['precio_unitario']),2)
+						);
 				$totalOrdenCompra=$totalOrdenCompra + ($row['cantidad_adju']*$row['precio_unitario']);			 
 				$pdf-> MultiRow($RowArray,false,1) ; 
 			}
@@ -415,7 +415,7 @@ Class ROrdenCompra extends Report {
     	$height=5;		 								
     	$obj = new Numbers_Words_es_AR;
     	$numero=explode('.', number_format($totalOrdenCompra,2));
-    	$pdf->Cell($width2+$width1+$width1/2+$width1/4, $height, 'SON: '. strtoupper(trim($obj->toWords(str_replace(',', '', $numero[0])))).' '.$numero[1].'/'.'100 '.strtoupper($this->getDataSource()->getParameter('moneda')), 1, 0, 'L', false, '', 1, false, 'T', 'C');
+    	$pdf->Cell($width2+$width1+$width1/2+$width1/4, $height, 'SON: '. strtoupper(trim($obj->toWords(str_replace(',', '', $numero[0])))).' '.$numero[1].'/'.'100 '.strtoupper($this->getDataSource()->getParameter('moneda')).'S', 1, 0, 'L', false, '', 1, false, 'T', 'C');
     	$pdf->Cell($width1, $height, number_format($totalOrdenCompra,2), 1, 0, 'R', false, '', 1, false, 'T', 'C');
     	$pdf->Ln();       									
     }     

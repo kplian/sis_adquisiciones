@@ -51,7 +51,7 @@ Phx.vista.SolicitudReq = {
 		
 		
     		Phx.vista.SolicitudReq.superclass.constructor.call(this,config);
-    		this.addButton('fin_requerimiento',{ grupo:[0],text:'Finalizar', iconCls: 'badelante', disabled: true, handler: this.fin_requerimiento, tooltip: '<b>Finalizar</b>'});
+    		this.addButton('fin_requerimiento',{ grupo:[0],text:'Siguiente', iconCls: 'badelante', disabled: true, handler: this.fin_requerimiento, tooltip: '<b>Finalizar</b>'});
             this.addButton('btnSolpre',{ grupo:[0,],text:'Sol Pre.',iconCls: 'bemail', disabled: true, handler: this.onSolModPresupuesto, tooltip: '<b>Solicitar Presuuesto</b><p>Emite un correo para solicitar traspaso presupuestario</p>'});
        
         

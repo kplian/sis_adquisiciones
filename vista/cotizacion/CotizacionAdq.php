@@ -22,7 +22,7 @@ Phx.vista.CotizacionAdq = {
           
          
         
-         this.addButton('fin_registro',{text:'Fin Reg.',iconCls: 'badelante',disabled:true,handler:this.fin_registro,tooltip: '<b>Finalizar</b><p>Finalizar registro de cotización</p>'});
+         this.addButton('fin_registro',{text:'Finalizar Registro de Cotizacion',iconCls: 'badelante',disabled:true,handler:this.fin_registro,tooltip: '<b>Finalizar</b><p>Finalizar registro de cotización</p>'});
          
          
          this.addButton('btnAdjudicar',{

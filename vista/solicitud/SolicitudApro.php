@@ -90,7 +90,7 @@ Phx.vista.SolicitudApro = {
     	
     	this.addButton('ini_estado',{  argument: {estado: 'inicio'},text:'Dev. a Borrador',iconCls: 'batras',disabled:true,handler:this.antEstado,tooltip: '<b>Retorna la Solcitud al estado borrador</b>'});
         this.addButton('ant_estado',{argument: {estado: 'anterior'},text:'Anterior',iconCls: 'batras',disabled:true,handler:this.antEstado,tooltip: '<b>Pasar al Anterior Estado</b>'});
-        this.addButton('ini_proc',{text:'Ini Proc',iconCls: 'badelante',disabled:true,handler:this.initProceso,tooltip: '<b>Iniciar un nuevo Proceso</b>'});
+        this.addButton('ini_proc',{text:'Iniciar Nuevo Proceso',iconCls: 'badelante',disabled:true,handler:this.initProceso,tooltip: '<b>Iniciar un nuevo Proceso</b>'});
         this.addButton('asig_usu',{text:'Asig. Usu.',iconCls:'blist',disabled:true,handler:this.initAsigUsu,tooltip: '<b>Asigna un Usuario encargado del proceso de Compra</b>'});
         
         

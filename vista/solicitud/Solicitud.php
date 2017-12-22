@@ -9,17 +9,13 @@
 header("content-type: text/javascript; charset=UTF-8");
 ?>
 <script>
-Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
-   
+Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{   
 	constructor:function(config){
 		this.maestro=config.maestro;
-    	//llama al constructor de la clase padre
-		
+    	//llama al constructor de la clase padre		
 		Phx.vista.Solicitud.superclass.constructor.call(this,config);
 		this.init();		
-		this.addBotones();
-        
-		
+		this.addBotones(); 
         /*
 		this.addButton('btnReporte',{
             text :'',
@@ -68,13 +64,10 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
                 text: 'Presup',
                 iconCls: 'blist',
                 tooltip: '<b>Revisar Presupuesto</b><p>Revisar estado de ejecución presupeustaria para este  tramite</p>',
-                handler:this.checkPresupuesto,               
+                handler:this.wndowsCheckPresupuesto,               
                 scope: this
             });
 	    
-        
-        
-       
 	},
 	
 	diagramGantt: function (){			
@@ -1069,7 +1062,7 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
         )
     },
     
-    checkPresupuesto:function(){                   
+    wndowsCheckPresupuesto:function(){                   
 			  var rec=this.sm.getSelected();
 			  var configExtra = [];
 			  this.objChkPres = Phx.CP.loadWindows('../../../sis_presupuestos/vista/presup_partida/ChkPresupuesto.php',
