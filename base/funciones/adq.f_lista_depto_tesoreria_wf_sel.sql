@@ -1,3 +1,5 @@
+--------------- SQL ---------------
+
 CREATE OR REPLACE FUNCTION adq.f_lista_depto_tesoreria_wf_sel (
   p_id_usuario integer,
   p_id_tipo_estado integer,
@@ -130,8 +132,6 @@ BEGIN
    
           v_a_eps = string_to_array(v_cad_ep, ',');
           v_a_uos = string_to_array(v_cad_uo, ',');
-          
-          
           v_size :=array_upper(v_a_eps,1);
            
           
@@ -170,11 +170,10 @@ BEGIN
                                  or 
                                 (due.id_ep is null and  due.id_uo in ('||v_cad_uo||') )
                                )
-                              and (SUBSIS.codigo = ''TES'') and '||p_filtro||'
+                              and (SUBSIS.codigo = ''TES'' and DEPPTO.modulo=''OP'') and '||p_filtro||'
                       limit '|| p_limit::varchar||' offset '||p_start::varchar; 
                       
-                   
-                                          
+                                         
                    FOR g_registros in execute (v_consulta)LOOP     
                      RETURN NEXT g_registros;
                    END LOOP;
@@ -194,7 +193,7 @@ BEGIN
                                          or 
                                         (due.id_ep is null and  due.id_uo in ('||v_cad_uo||') )
                                        )
-                                      and (SUBSIS.codigo = ''TES'') and '||p_filtro;   
+                                      and (SUBSIS.codigo = ''TES''  and DEPPTO.modulo=''OP'') and '||p_filtro;   
                                           
                    FOR g_registros in execute (v_consulta)LOOP     
                      RETURN NEXT g_registros;

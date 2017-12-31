@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION adq.f_gestionar_presupuesto_solicitud (
   p_id_solicitud_compra integer,
   p_id_usuario integer,
@@ -9,19 +7,19 @@ CREATE OR REPLACE FUNCTION adq.f_gestionar_presupuesto_solicitud (
 RETURNS boolean AS
 $body$
 /**************************************************************************
- SISTEMA:		Sistema de Adquisiciones
- FUNadq.f_gestionar_presupuesto_solicitud(p_id_solicitud_compra integer, p_id_usuario integer, p_operacion varchar)CION: 		adq.f_gestionar_presupuesto_solicitud
+ SISTEMA:   Sistema de Adquisiciones
+ FUNadq.f_gestionar_presupuesto_solicitud(p_id_solicitud_compra integer, p_id_usuario integer, p_operacion varchar)CION:    adq.f_gestionar_presupuesto_solicitud
                 
  DESCRIPCION:   Esta funcion a partir del id SOlicitud de COmpra se encarga de gestion el presupuesto,
                 compromenter
                 revertir
                 adcionar comprometido (revertido ne negativo)
- AUTOR: 		Rensi Arteaga Copari
- FECHA:	        25-06-2013
- COMENTARIOS:	
+ AUTOR:     Rensi Arteaga Copari
+ FECHA:         25-06-2013
+ COMENTARIOS: 
  
- ISSUE            FECHA:		      AUTOR       DESCRIPCION
- 0				12/10/2017			RAC			Se adciona verificacion pro tipo de centro de costo, segun configuración de control de partidas
+ ISSUE            FECHA:          AUTOR       DESCRIPCION
+ 0        12/10/2017      RAC     Se adciona verificacion pro tipo de centro de costo, segun configuración de control de partidas
 ***************************************************************************/
 
 DECLARE
@@ -31,41 +29,41 @@ DECLARE
  
   va_id_presupuesto integer[];
   va_id_partida     integer[];
-  va_momento		INTEGER[];
+  va_momento    INTEGER[];
   va_monto          numeric[];
-  va_id_moneda    	integer[];
+  va_id_moneda      integer[];
   va_id_partida_ejecucion integer[];
   va_columna_relacion     varchar[];
   va_fk_llave             integer[];
-  v_i   				  integer;
-  v_cont				  integer;
-  va_id_solicitud_det	  integer[];
-  v_id_moneda_base		  integer;
+  v_i             integer;
+  v_cont          integer;
+  va_id_solicitud_det   integer[];
+  v_id_moneda_base      integer;
   va_resp_ges              numeric[];
   
   va_fecha                date[];
   
-  v_monto_a_revertir 	numeric;
-  v_total_adjudicado  	numeric;
-  v_aux 				numeric;
-  v_comprometido  	    numeric;
+  v_monto_a_revertir  numeric;
+  v_total_adjudicado    numeric;
+  v_aux         numeric;
+  v_comprometido        numeric;
   v_comprometido_ga     numeric;
-  v_ejecutado     	    numeric;
+  v_ejecutado           numeric;
   
-  v_men_presu			varchar;
+  v_men_presu     varchar;
   v_monto_a_revertir_mb  numeric;
   v_ano_1 integer;
   v_ano_2 integer;
-  v_reg_sol						record;
-  va_num_tramite				varchar[];
-  v_mensage_error				varchar;
-  v_sw_error					boolean;
-  v_resp_pre 					varchar;  
- v_pre_verificar_categoria 		varchar;
- v_pre_verificar_tipo_cc 		varchar;
- v_control_partida 				varchar;
- v_consulta						varchar;
- v_id_centro_costo				integer;
+  v_reg_sol           record;
+  va_num_tramite        varchar[];
+  v_mensage_error       varchar;
+  v_sw_error          boolean;
+  v_resp_pre          varchar;  
+ v_pre_verificar_categoria    varchar;
+ v_pre_verificar_tipo_cc    varchar;
+ v_control_partida        varchar;
+ v_consulta           varchar;
+ v_id_centro_costo        integer;
   
 
   
@@ -126,7 +124,7 @@ BEGIN
            
                     va_id_presupuesto[v_i] = v_registros.id_presupuesto;
                     va_id_partida[v_i]= v_registros.id_partida;
-                    va_momento[v_i]	= 1; --el momento 1 es el comprometido
+                    va_momento[v_i] = 1; --el momento 1 es el comprometido
                     va_monto[v_i]  = v_registros.precio_ga; --RAC Cambio por moneda de la solicitud , v_registros.precio_ga_mb;
                     va_id_moneda[v_i]  = v_registros.id_moneda;        --  RAC Cambio por moneda de la solicitud , v_id_moneda_base;
                   
@@ -160,7 +158,7 @@ BEGIN
               
                     --llamada a la funcion de compromiso
                     va_resp_ges =  pre.f_gestionar_presupuesto(p_id_usuario,
-                    										   NULL, --tipo cambio
+                                           NULL, --tipo cambio
                                                                va_id_presupuesto, 
                                                                va_id_partida, 
                                                                va_id_moneda, 
@@ -252,7 +250,7 @@ BEGIN
                              
                               va_id_presupuesto[v_i] = v_registros.id_presupuesto;
                               va_id_partida[v_i]= v_registros.id_partida;
-                              va_momento[v_i]	= 2; --el momento 2 con signo positivo es revertir
+                              va_momento[v_i] = 2; --el momento 2 con signo positivo es revertir
                               va_monto[v_i]  = (v_monto_a_revertir)*-1;  -- considera la posibilidad de que a este item se le aya revertido algun monto
                               va_id_moneda[v_i]  = v_registros.id_moneda; -- RAC,  v_id_moneda_base;
                               va_id_partida_ejecucion[v_i]= v_registros.id_partida_ejecucion;
@@ -295,8 +293,8 @@ BEGIN
              --llamada a la funcion de para reversion
                IF v_i > 0 THEN 
                   va_resp_ges =  pre.f_gestionar_presupuesto(p_id_usuario,
-                    										 NULL, --tipo cambio
-                  											 va_id_presupuesto, 
+                                         NULL, --tipo cambio
+                                         va_id_presupuesto, 
                                                              va_id_partida, 
                                                              va_id_moneda, 
                                                              va_monto, 
@@ -384,7 +382,7 @@ BEGIN
                        
                                 va_id_presupuesto[v_i] = v_registros.id_presupuesto;
                                 va_id_partida[v_i]= v_registros.id_partida;
-                                va_momento[v_i]	= 2; --el momento 2 con signo positivo es revertir
+                                va_momento[v_i] = 2; --el momento 2 con signo positivo es revertir
                                 va_monto[v_i]  = (v_monto_a_revertir)*-1;
                                 va_id_moneda[v_i]  =  v_registros.id_moneda;
                                 va_id_partida_ejecucion[v_i]= v_registros.id_partida_ejecucion;
@@ -436,7 +434,7 @@ BEGIN
                      
                        --llamada a la funcion de para reversion
                         va_resp_ges =  pre.f_gestionar_presupuesto(p_id_usuario,
-                    										       NULL, --tipo cambio
+                                               NULL, --tipo cambio
                                                                    va_id_presupuesto, 
                                                                    va_id_partida, 
                                                                    va_id_moneda, 
@@ -465,7 +463,7 @@ BEGIN
           
           IF   v_pre_verificar_categoria = 'si' THEN
           
-            		-- verifica  por categoria programatica     
+                -- verifica  por categoria programatica     
                       FOR v_registros in (
                                          SELECT                                   
                                             p.id_categoria_prog ,
@@ -533,6 +531,7 @@ BEGIN
                   
                    --la verificacion sea por tipo de centro de costo del tipo techo, ademas se verifica si es necesario validar por partida 
                  
+                   --RAC  03/01/2017 se comenta la funcion de verificacion
                    FOR v_registros in (SELECT                                   
                                           tcc.id_tipo_cc_techo, 
                                           s.id_gestion,
@@ -544,9 +543,11 @@ BEGIN
                                           CASE
                                              WHEN  tcc.control_partida::text = 'no' THEN
                                                 0
-                                            ELSE 
+                                          ELSE 
                                               sd.id_partida
-                                         END AS id_par,
+                                          END 
+                                         
+                                         AS id_par,
                                          CASE
                                              WHEN  tcc.control_partida::text = 'no' THEN
                                                 'No se considera partida'::varchar
@@ -684,13 +685,13 @@ BEGIN
 
 
 EXCEPTION
-					
-	WHEN OTHERS THEN
-			v_resp='';
-			v_resp = pxp.f_agrega_clave(v_resp,'mensaje',SQLERRM);
-			v_resp = pxp.f_agrega_clave(v_resp,'codigo_error',SQLSTATE);
-			v_resp = pxp.f_agrega_clave(v_resp,'procedimientos',v_nombre_funcion);
-			raise exception '%',v_resp;
+          
+  WHEN OTHERS THEN
+      v_resp='';
+      v_resp = pxp.f_agrega_clave(v_resp,'mensaje',SQLERRM);
+      v_resp = pxp.f_agrega_clave(v_resp,'codigo_error',SQLSTATE);
+      v_resp = pxp.f_agrega_clave(v_resp,'procedimientos',v_nombre_funcion);
+      raise exception '%',v_resp;
 END;
 $body$
 LANGUAGE 'plpgsql'

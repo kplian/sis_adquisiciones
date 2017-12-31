@@ -82,6 +82,8 @@ DECLARE
 BEGIN
   v_nombre_funcion ='adq.f_lista_funcionario_aprobador';
   
+ 
+  
   
   --obtenmso datos basicos de la solicitud
    select 
@@ -99,7 +101,7 @@ BEGIN
       so.id_funcionario,
       so.id_moneda;
       
-      
+     
   
   --obtener id_uo
   
@@ -149,6 +151,8 @@ BEGIN
           v_i = 1;
           v_id_func_list='0';
           
+        
+          
           --raise exception 'array %',va_id_uo;
           --buscamos el aprobador subiendo por el array     
           WHILE v_i <= v_tam LOOP
@@ -180,13 +184,20 @@ BEGIN
               IF v_id_func_list != '0' and v_id_func_list is not null  THEN
                   v_i = v_tam +1;                
               END IF;
-              v_i = v_i +1  ;                                  
+              v_i = v_i +1  ;  
+              
+                                      
                                                   
           END LOOP;
-   
+          
+          IF v_id_func_list is null THEN
+             raise exception 'No se encontro un funcionario aprobador  para la unidad solictante y el monto (% MB) ',v_reg_op.monto_pago_mb; 
+          END IF;
+          
+         
     
-             
-    
+            
+     
     
    
     IF not p_count then
