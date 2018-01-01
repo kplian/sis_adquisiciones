@@ -285,16 +285,16 @@ class ACTCotizacion extends ACTbase{
 
         }
 
-      function reporteOC($create_file=false){
-                $dataSource = new DataSource();
-				$idSolicitud = $this->objParam->getParametro('id_solicitud');
-				$id_proceso_wf= $this->objParam->getParametro('id_proceso_wf');				
-                $this->objParam->addParametroConsulta('ordenacion','id_cotizacion');
-                $this->objParam->addParametroConsulta('dir_ordenacion','ASC');
-                $this->objParam->addParametroConsulta('cantidad',1000);
-                $this->objParam->addParametroConsulta('puntero',0);
-                $this->objFunc = $this->create('MODCotizacion');
-                $resultOrdenCompra = $this->objFunc->reporteOrdenCompra();
+	function reporteOC($create_file=false){
+		$dataSource = new DataSource();
+		$idSolicitud = $this->objParam->getParametro('id_solicitud');
+		$id_proceso_wf= $this->objParam->getParametro('id_proceso_wf');				
+		$this->objParam->addParametroConsulta('ordenacion','id_cotizacion');
+		$this->objParam->addParametroConsulta('dir_ordenacion','ASC');
+		$this->objParam->addParametroConsulta('cantidad',1000);
+		$this->objParam->addParametroConsulta('puntero',0);
+		$this->objFunc = $this->create('MODCotizacion');
+		$resultOrdenCompra = $this->objFunc->reporteOrdenCompra();
 				
 				if($resultOrdenCompra->getTipo()=='EXITO'){
 				 	

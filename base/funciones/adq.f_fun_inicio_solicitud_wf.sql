@@ -35,6 +35,7 @@ DECLARE
     v_tope_compra_lista			varchar;
     v_adq_comprometer_presupuesto		varchar;
     v_adq_estado_reversion				varchar;
+    v_adq_estado_comprometido_sol	    varchar;
    
 	
     
@@ -43,6 +44,7 @@ BEGIN
 	 v_nombre_funcion = 'adq.f_fun_inicio_solicitud_wf';
      v_adq_comprometer_presupuesto = pxp.f_get_variable_global('adq_comprometer_presupuesto');
      v_adq_estado_reversion = pxp.f_get_variable_global('adq_estado_reversion');
+     v_adq_estado_comprometido_sol = pxp.f_get_variable_global('adq_estado_reversion');
   
      
            select
@@ -128,9 +130,11 @@ BEGIN
               raise exception 'Las compras por encima de % (moneda base) no pueden realizarse  por el sistema de adquisiciones',v_tope_compra;
             END IF;
             
-      
+           ----------------------------------------------------------------------
+           --  RAC, 09/01/2018 compromete presupeusto segun estado de configurado
+           ---------------------------------------------------------------------   
           -- comprometer presupuesto cuando el estado anterior es el vbpresupuestos)
-             IF v_estado_anterior =  'vbpresupuestos'  and v_registros.presu_comprometido = 'no' and v_adq_comprometer_presupuesto = 'si' THEN 
+             IF v_estado_anterior =  v_adq_estado_comprometido_sol  and v_registros.presu_comprometido = 'no' and v_adq_comprometer_presupuesto = 'si' THEN 
 
                -- como en presupeustos puede mover los montos validamos que nose pase del monto tope
                    select 

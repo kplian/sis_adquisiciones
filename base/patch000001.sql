@@ -788,9 +788,6 @@ ALTER TABLE adq.tcotizacion
   ALTER COLUMN lugar_entrega SET DEFAULT 'Oficinas Cochabamba'::character varying;
 
 
-
-
-
   
 /***********************************F-SCP-RAC-ADQ-0-27/07/2017****************************************/  
 
@@ -798,11 +795,29 @@ ALTER TABLE adq.tcotizacion
 /***********************************I-SCP-RAC-ADQ-0-28/07/2017****************************************/  
 
 
---------------- SQL ---------------
-
 ALTER TABLE adq.tsolicitud_det
   ALTER COLUMN id_auxiliar DROP NOT NULL;
 
 /***********************************F-SCP-RAC-ADQ-0-28/07/2017****************************************/  
 
+  
+ 
+/***********************************I-SCP-RAC-ADQ-0-09/01/2017****************************************/  
+ 
+ALTER TABLE adq.tsolicitud_det
+  ADD COLUMN saldo_pre_mt NUMERIC;
+
+COMMENT ON COLUMN adq.tsolicitud_det.saldo_pre_mt
+IS 'saldo de presupeusto despues de comprometer en moenda de la trasaccion'; 
+  
+
+ALTER TABLE adq.tsolicitud_det
+  ADD COLUMN saldo_pre_mb NUMERIC;
+
+COMMENT ON COLUMN adq.tsolicitud_det.saldo_pre_mb
+IS 'saldo presupeustario en moenda base despues de comprometer';
+  
+  
+/***********************************F-SCP-RAC-ADQ-0-09/01/2017****************************************/  
+ 
   

@@ -403,7 +403,7 @@ class MODSolicitud extends MODbase{
         return $this->respuesta;
     }
     
-    function reporteSolicitud(){
+	function reporteSolicitud(){
 		//Definicion de variables para ejecucion del procedimientp
 		$this->procedimiento='adq.f_solicitud_sel';
 		$this->transaccion='ADQ_SOLREP_SEL';
@@ -790,6 +790,22 @@ class MODSolicitud extends MODbase{
 		//Ejecuta la instruccion
 		$this->armarConsulta();
 		$this->ejecutarConsulta();
+		//Devuelve la respuesta
+		return $this->respuesta;
+	}
+	
+	
+	function RVerDispPre_v1(){
+		//Definicion de variables para ejecucion del procedimientp
+		$this->procedimiento='adq.f_solicitud_ime';
+		$this->transaccion='ADQ_REPVERDISP';
+		$this->tipo_procedimiento='IME';//tipo de transaccion
+		$this->setCount(false);
+		$this->setParametro('dato','dato','varchar');
+		//Ejecuta la instruccion
+		$this->armarConsulta();
+		$this->ejecutarConsulta();
+
 		//Devuelve la respuesta
 		return $this->respuesta;
 	}

@@ -966,4 +966,17 @@ VALUES
    
 /***********************************F-DAT-RAC-ADQ-0-19/10/2017*****************************************/
   
+  
+  
+  
+/***********************************I-DAT-RAC-ADQ-0-09/01/2018*****************************************/
+ 
+ INSERT INTO pxp.variable_global ("variable", "valor", "descripcion")
+VALUES 
+  (E'adq_estado_comprometido_sol', E'borrador', E'estao en el que se va compromter el presupuesto de la solicitud de compra');
+  
+
+/***********************************F-DAT-RAC-ADQ-0-09/01/2018*****************************************/
+   
+   
     

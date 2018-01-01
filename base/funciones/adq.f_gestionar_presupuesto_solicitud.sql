@@ -1,3 +1,5 @@
+--------------- SQL ---------------
+
 CREATE OR REPLACE FUNCTION adq.f_gestionar_presupuesto_solicitud (
   p_id_solicitud_compra integer,
   p_id_usuario integer,
@@ -7,19 +9,19 @@ CREATE OR REPLACE FUNCTION adq.f_gestionar_presupuesto_solicitud (
 RETURNS boolean AS
 $body$
 /**************************************************************************
- SISTEMA:   Sistema de Adquisiciones
- FUNadq.f_gestionar_presupuesto_solicitud(p_id_solicitud_compra integer, p_id_usuario integer, p_operacion varchar)CION:    adq.f_gestionar_presupuesto_solicitud
+ SISTEMA:		Sistema de Adquisiciones
+ FUNadq.f_gestionar_presupuesto_solicitud(p_id_solicitud_compra integer, p_id_usuario integer, p_operacion varchar)CION: 		adq.f_gestionar_presupuesto_solicitud
                 
  DESCRIPCION:   Esta funcion a partir del id SOlicitud de COmpra se encarga de gestion el presupuesto,
                 compromenter
                 revertir
                 adcionar comprometido (revertido ne negativo)
- AUTOR:     Rensi Arteaga Copari
- FECHA:         25-06-2013
- COMENTARIOS: 
+ AUTOR: 		Rensi Arteaga Copari
+ FECHA:	        25-06-2013
+ COMENTARIOS:	
  
- ISSUE            FECHA:          AUTOR       DESCRIPCION
- 0        12/10/2017      RAC     Se adciona verificacion pro tipo de centro de costo, segun configuración de control de partidas
+ ISSUE            FECHA:		      AUTOR       DESCRIPCION
+ 0				12/10/2017			RAC			Se adciona verificacion pro tipo de centro de costo, segun configuración de control de partidas
 ***************************************************************************/
 
 DECLARE
@@ -29,41 +31,41 @@ DECLARE
  
   va_id_presupuesto integer[];
   va_id_partida     integer[];
-  va_momento    INTEGER[];
+  va_momento		INTEGER[];
   va_monto          numeric[];
-  va_id_moneda      integer[];
+  va_id_moneda    	integer[];
   va_id_partida_ejecucion integer[];
   va_columna_relacion     varchar[];
   va_fk_llave             integer[];
-  v_i             integer;
-  v_cont          integer;
-  va_id_solicitud_det   integer[];
-  v_id_moneda_base      integer;
+  v_i   				  integer;
+  v_cont				  integer;
+  va_id_solicitud_det	  integer[];
+  v_id_moneda_base		  integer;
   va_resp_ges              numeric[];
   
   va_fecha                date[];
   
-  v_monto_a_revertir  numeric;
-  v_total_adjudicado    numeric;
-  v_aux         numeric;
-  v_comprometido        numeric;
+  v_monto_a_revertir 	numeric;
+  v_total_adjudicado  	numeric;
+  v_aux 				numeric;
+  v_comprometido  	    numeric;
   v_comprometido_ga     numeric;
-  v_ejecutado           numeric;
+  v_ejecutado     	    numeric;
   
-  v_men_presu     varchar;
+  v_men_presu			varchar;
   v_monto_a_revertir_mb  numeric;
   v_ano_1 integer;
   v_ano_2 integer;
-  v_reg_sol           record;
-  va_num_tramite        varchar[];
-  v_mensage_error       varchar;
-  v_sw_error          boolean;
-  v_resp_pre          varchar;  
- v_pre_verificar_categoria    varchar;
- v_pre_verificar_tipo_cc    varchar;
- v_control_partida        varchar;
- v_consulta           varchar;
- v_id_centro_costo        integer;
+  v_reg_sol						record;
+  va_num_tramite				varchar[];
+  v_mensage_error				varchar;
+  v_sw_error					boolean;
+  v_resp_pre 					varchar;  
+ v_pre_verificar_categoria 		varchar;
+ v_pre_verificar_tipo_cc 		varchar;
+ v_control_partida 				varchar;
+ v_consulta						varchar;
+ v_id_centro_costo				integer;
   
 
   
@@ -82,7 +84,7 @@ BEGIN
   
   
   
-      IF p_operacion = 'comprometer' THEN
+      IF p_operacion = 'comprometer_old' THEN
         
           --compromete al aprobar la solicitud  
            v_i = 0;
@@ -124,7 +126,7 @@ BEGIN
            
                     va_id_presupuesto[v_i] = v_registros.id_presupuesto;
                     va_id_partida[v_i]= v_registros.id_partida;
-                    va_momento[v_i] = 1; --el momento 1 es el comprometido
+                    va_momento[v_i]	= 1; --el momento 1 es el comprometido
                     va_monto[v_i]  = v_registros.precio_ga; --RAC Cambio por moneda de la solicitud , v_registros.precio_ga_mb;
                     va_id_moneda[v_i]  = v_registros.id_moneda;        --  RAC Cambio por moneda de la solicitud , v_id_moneda_base;
                   
@@ -158,7 +160,7 @@ BEGIN
               
                     --llamada a la funcion de compromiso
                     va_resp_ges =  pre.f_gestionar_presupuesto(p_id_usuario,
-                                           NULL, --tipo cambio
+                    										   NULL, --tipo cambio
                                                                va_id_presupuesto, 
                                                                va_id_partida, 
                                                                va_id_moneda, 
@@ -193,7 +195,106 @@ BEGIN
              END IF;
       
       
-      
+          ELSEIF p_operacion = 'comprometer' THEN
+          
+               -----------------------------------------------------------------------------------------------------------------------
+               -- RAC, 09/01/2018 llamada directa para comprometer y obtener el saldo por comprometer ya que quieren que se muetre en los reportes
+               -------------------------------------------------------------------------------------------------------------------------
+             
+               --compromete al aprobar la solicitud  
+               v_i = 0;
+               
+               -- verifica que solicitud
+           
+              FOR v_registros in ( 
+                                SELECT
+                                  sd.id_solicitud_det,
+                                  sd.id_centro_costo,
+                                  s.id_gestion,
+                                  s.id_solicitud,
+                                  sd.id_partida,
+                                  sd.precio_ga_mb,
+                                  p.id_presupuesto,
+                                  s.presu_comprometido,
+                                  s.id_moneda,
+                                  sd.precio_ga,
+                                  s.fecha_soli,
+                                  s.num_tramite as nro_tramite
+                                  
+                                  FROM  adq.tsolicitud s 
+                                  INNER JOIN adq.tsolicitud_det sd on s.id_solicitud = sd.id_solicitud
+                                  inner join pre.tpresupuesto   p  on p.id_centro_costo = sd.id_centro_costo and sd.estado_reg = 'activo'
+                                  WHERE  sd.id_solicitud = p_id_solicitud_compra
+                                         and sd.estado_reg = 'activo' 
+                                         and sd.cantidad > 0 ) LOOP
+                                         
+                                    
+                         IF(v_registros.presu_comprometido='si') THEN                     
+                            raise exception 'El presupuesto ya se encuentra comprometido';                     
+                         END IF;
+                         
+                         v_i = v_i +1;                
+                       
+                       
+                        -- la fecha de solictud es la fecha de compromiso 
+                        IF  now()  < v_registros.fecha_soli THEN
+                          va_fecha[v_i] = v_registros.fecha_soli::date;
+                        ELSE
+                           -- la fecha de reversion como maximo puede ser el 31 de diciembre   
+                           va_fecha[v_i] = now()::date;
+                           v_ano_1 =  EXTRACT(YEAR FROM  now()::date);
+                           v_ano_2 =  EXTRACT(YEAR FROM  v_registros.fecha_soli::date);
+                           
+                           IF  v_ano_1  >  v_ano_2 THEN
+                             va_fecha[v_i] = ('31-12-'|| v_ano_2::varchar)::date;
+                           END IF;
+                           
+                        END IF;
+
+                        va_resp_ges = pre.f_gestionar_presupuesto_individual(
+                                              p_id_usuario, 
+                                              NULL::NUMERIC, --tipo cambio
+                                              v_registros.id_presupuesto, 
+                                              v_registros.id_partida, 
+                                              v_registros.id_moneda, --  RAC Cambio por moneda de la solicitud , v_id_moneda_base;
+                                              v_registros.precio_ga::NUMERIC, --RAC Cambio por moneda de la solicitud , v_registros.precio_ga_mb;
+                                              va_fecha[v_i], 
+                                              'comprometido'::Varchar, --traducido a varchar
+                                              NULL::INTEGER, 
+                                              'id_solicitud_compra'::VARCHAR, 
+                                              v_registros.id_solicitud, 
+                                              v_reg_sol.num_tramite::VARCHAR 
+                                              );
+                                              
+                                              
+                          IF va_resp_ges[1] = 0 THEN
+                              IF va_resp_ges[4] is not null and  va_resp_ges[4] = 1  THEN
+                                  raise exception 'el presupuesto no alcanza por diferencia cambiaria, en moneda base tenemos:  % ',va_resp_ges[3];
+                              ELSE
+                                  IF v_id_moneda_base = v_registros.id_moneda THEN
+                                      raise exception 'solo se tiene disponible un monto en moneda base de:  % , # % ,necesario: %', va_resp_ges[3], v_reg_sol.num_tramite , v_registros.precio_ga;   
+                                  ELSE
+                                      raise exception 'solo se tiene disponible un monto de:  % , %', va_resp_ges[5], v_reg_sol.num_tramite;
+                                  END IF;
+                             END IF;
+                         END IF;                    
+                        
+                        
+                         update adq.tsolicitud_det  s set
+                             id_partida_ejecucion = va_resp_ges[2],
+                             saldo_pre_mt =     va_resp_ges[5],
+                             saldo_pre_mb =   va_resp_ges[3],
+                             fecha_mod = now(),
+                             id_usuario_mod = p_id_usuario,
+                             revertido_mb = 0,     -- inicializa el monto de reversion
+                             revertido_mo = 0     -- inicializa el monto de reversion  
+                         where s.id_solicitud_det =  va_id_solicitud_det[v_cont];
+                
+              
+               END LOOP;
+                 
+                 
+
         ELSEIF p_operacion = 'revertir' THEN
        
        --revierte al revveertir la probacion de la solicitud
@@ -250,7 +351,7 @@ BEGIN
                              
                               va_id_presupuesto[v_i] = v_registros.id_presupuesto;
                               va_id_partida[v_i]= v_registros.id_partida;
-                              va_momento[v_i] = 2; --el momento 2 con signo positivo es revertir
+                              va_momento[v_i]	= 2; --el momento 2 con signo positivo es revertir
                               va_monto[v_i]  = (v_monto_a_revertir)*-1;  -- considera la posibilidad de que a este item se le aya revertido algun monto
                               va_id_moneda[v_i]  = v_registros.id_moneda; -- RAC,  v_id_moneda_base;
                               va_id_partida_ejecucion[v_i]= v_registros.id_partida_ejecucion;
@@ -293,8 +394,8 @@ BEGIN
              --llamada a la funcion de para reversion
                IF v_i > 0 THEN 
                   va_resp_ges =  pre.f_gestionar_presupuesto(p_id_usuario,
-                                         NULL, --tipo cambio
-                                         va_id_presupuesto, 
+                    										 NULL, --tipo cambio
+                  											 va_id_presupuesto, 
                                                              va_id_partida, 
                                                              va_id_moneda, 
                                                              va_monto, 
@@ -382,7 +483,7 @@ BEGIN
                        
                                 va_id_presupuesto[v_i] = v_registros.id_presupuesto;
                                 va_id_partida[v_i]= v_registros.id_partida;
-                                va_momento[v_i] = 2; --el momento 2 con signo positivo es revertir
+                                va_momento[v_i]	= 2; --el momento 2 con signo positivo es revertir
                                 va_monto[v_i]  = (v_monto_a_revertir)*-1;
                                 va_id_moneda[v_i]  =  v_registros.id_moneda;
                                 va_id_partida_ejecucion[v_i]= v_registros.id_partida_ejecucion;
@@ -434,7 +535,7 @@ BEGIN
                      
                        --llamada a la funcion de para reversion
                         va_resp_ges =  pre.f_gestionar_presupuesto(p_id_usuario,
-                                               NULL, --tipo cambio
+                    										       NULL, --tipo cambio
                                                                    va_id_presupuesto, 
                                                                    va_id_partida, 
                                                                    va_id_moneda, 
@@ -463,7 +564,7 @@ BEGIN
           
           IF   v_pre_verificar_categoria = 'si' THEN
           
-                -- verifica  por categoria programatica     
+            		-- verifica  por categoria programatica     
                       FOR v_registros in (
                                          SELECT                                   
                                             p.id_categoria_prog ,
@@ -685,13 +786,13 @@ BEGIN
 
 
 EXCEPTION
-          
-  WHEN OTHERS THEN
-      v_resp='';
-      v_resp = pxp.f_agrega_clave(v_resp,'mensaje',SQLERRM);
-      v_resp = pxp.f_agrega_clave(v_resp,'codigo_error',SQLSTATE);
-      v_resp = pxp.f_agrega_clave(v_resp,'procedimientos',v_nombre_funcion);
-      raise exception '%',v_resp;
+					
+	WHEN OTHERS THEN
+			v_resp='';
+			v_resp = pxp.f_agrega_clave(v_resp,'mensaje',SQLERRM);
+			v_resp = pxp.f_agrega_clave(v_resp,'codigo_error',SQLSTATE);
+			v_resp = pxp.f_agrega_clave(v_resp,'procedimientos',v_nombre_funcion);
+			raise exception '%',v_resp;
 END;
 $body$
 LANGUAGE 'plpgsql'

@@ -61,6 +61,7 @@ DECLARE
     v_adq_revisar_montos_categoria		varchar;
     v_id_categoria_compra				integer;
     v_total_mb							numeric;
+    v_adq_estado_comprometido_sol		varchar;
     
     
    
@@ -82,6 +83,7 @@ p_hstore->'id_solicitud'
   v_nombre_funcion = 'adq.f_finalizar_reg_solicitud';
   v_adq_comprometer_presupuesto = pxp.f_get_variable_global('adq_comprometer_presupuesto');
   v_adq_revisar_montos_categoria = pxp.f_get_variable_global('adq_revisar_montos_categoria');
+  v_adq_estado_comprometido_sol = pxp.f_get_variable_global('adq_estado_comprometido_sol');
   
  
           
@@ -321,7 +323,7 @@ p_hstore->'id_solicitud'
             
            -- si ele estado es borrador verificamos que el presupuesto sea suficiente
             
-             IF v_codigo_estado =  'borrador' THEN             
+             IF v_codigo_estado =  'borrador'  and v_adq_comprometer_presupuesto = 'si'   THEN             
                   IF not adq.f_gestionar_presupuesto_solicitud(p_id_solicitud, p_id_usuario, 'verificar')  THEN                     
                        raise exception 'Error al verificar  el presupeusto';                     
                   END IF;
@@ -348,8 +350,13 @@ p_hstore->'id_solicitud'
                                                          v_titulo);
              
                                                          
-           --si el estado  anteriro es vbpresupuestos  entonces comprometemos                                            
-           IF v_codigo_estado =  'vbpresupuestos'  and presu_comprometido = 'no' and v_adq_comprometer_presupuesto = 'si' THEN 
+           --si el estado  anteriro es vbpresupuestos  entonces comprometemos
+           
+           
+           ----------------------------------------------------------------------
+           --  RAC, 09/01/2018 compromete presupeusto segun estado de configurado
+           ---------------------------------------------------------------------                                                 
+           IF v_codigo_estado =  v_adq_estado_comprometido_sol  and presu_comprometido = 'no' and v_adq_comprometer_presupuesto = 'si' THEN 
               
                   -- Comprometer Presupuesto                  
                   IF not adq.f_gestionar_presupuesto_solicitud(p_id_solicitud, p_id_usuario, 'comprometer')  THEN                     
