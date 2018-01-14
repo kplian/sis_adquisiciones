@@ -16,6 +16,9 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
 		Phx.vista.Solicitud.superclass.constructor.call(this,config);
 		this.init();		
 		this.addBotones(); 
+		//
+        
+	
         /*
 		this.addButton('btnReporte',{
             text :'',
@@ -58,14 +61,23 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
                 tooltip: 'Subir archivo con el detalle de gasto'
             }
         );
+        
+         this.addButton('chkpresupuesto',   {
+	     	    grupo:[0,1,2,3,4],               
+                text: 'Presup',
+                iconCls: 'blist',
+                tooltip: '<b>Revisar Presupuesto</b><p>Revisar estado de ejecución presupeustaria para este  tramite</p>',
+                handler:this.wndowsCheckPresupuesto,               
+                scope: this
+         });
 
-		this.addButton('reporte_veri',{
+		/*this.addButton('reporte_veri',{
 			text:'Reporte Verificacion',
 			iconCls: 'bdocuments',
 			disabled:false,
 			handler:this.reporte_veri,
 			tooltip: '<b>Reporte</b>'
-		});
+		});*/
 	    
 	},
 	
@@ -958,7 +970,7 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
             this.getBoton('btnObs').disable();
             this.getBoton('btnDetalleGasto').disable();
             this.getBoton('chkpresupuesto').disable();
-                    
+                 
         }
        return tb
     },    
@@ -1062,16 +1074,18 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
     },
 
 	//
-	reporte_veri : function() {
+	/*reporte_veri : function() {
 		var rec = this.getSelectedData();
-		var NumSelect=this.sm.getCount();
+		var reco =this.sm.getSelected();
+		var NumSelect=this.sm.getCount();		
 		if(NumSelect != 0)
 		{
 			Phx.CP.loadingShow();
 			Ext.Ajax.request({
 				url:'../../sis_adquisiciones/control/Solicitud/RVerDispPre',
 				params:{
-					'dato':'dato',	
+					'id_proceso_wf': reco.data.id_proceso_wf,	
+					'num_cotizacion': reco.data.num_cotizacion,
 				},
 				success:this.successExport,
 				failure: this.conexionFailure,
@@ -1083,7 +1097,7 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
 		{
 			Ext.MessageBox.alert('Alerta', 'Antes debe seleccionar un item.');
 		}
-	},
+	},*/
 	//
 
     wndowsCheckPresupuesto:function(){                   

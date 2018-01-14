@@ -24,6 +24,7 @@ Phx.vista.SolicitudVb = {
 	constructor: function(config) {
 	    
 	    this.maestro=config.maestro;
+		
 
         this.Atributos.splice(7,0, {
             config:{
@@ -112,8 +113,13 @@ Phx.vista.SolicitudVb = {
            this.addButton('obs_presu',{text:'Obs. Presupuestos', disabled:true, handler: this.initObs, tooltip: '<b>Observacioens del área de presupuesto</b>'});
            this.crearFormObs();
         }
-        
-		console.log('configuracion',config, this.nombreVista)
+		this.addButton('reporte_veri',{
+			text:'Reporte Verificacion',
+			iconCls: 'bdocuments',
+			disabled:true,
+			handler:this.reporte_veri,
+			tooltip: '<b>Reporte</b>'
+		});
 	},
 
 
@@ -176,6 +182,7 @@ Phx.vista.SolicitudVb = {
           }
           
       }   
+      this.getBoton('reporte_veri').enable();	
       return tb 
      }, 
      liberaMenu:function(){
@@ -196,6 +203,32 @@ Phx.vista.SolicitudVb = {
         }
         return tb
     },  
+    //
+    reporte_veri : function() {
+		var rec = this.getSelectedData();
+		var reco =this.sm.getSelected();
+		var NumSelect=this.sm.getCount();
+		
+		if(NumSelect != 0)
+		{
+			Phx.CP.loadingShow();
+			Ext.Ajax.request({
+				url:'../../sis_adquisiciones/control/Solicitud/RVerDispPre',
+				params:{
+					'id_proceso_wf': reco.data.id_proceso_wf
+				},
+				success:this.successExport,
+				failure: this.conexionFailure,
+				timeout:this.timeout,
+				scope:this
+			});		
+		}
+		else
+		{
+			Ext.MessageBox.alert('Alerta', 'Antes debe seleccionar un item.');
+		}
+	},
+    //
     
     checkPresupuesto:function(){
     	var d = this.getSelectedData();

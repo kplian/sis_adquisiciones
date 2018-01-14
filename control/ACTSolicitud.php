@@ -27,6 +27,7 @@ require_once(dirname(__FILE__).'/../reportes/RCertificadoPoaPDF.php');
 //Reportes para generar el qr y el memorandum de designacion CRP
 require_once(dirname(__FILE__).'/../reportes/RMemoDesigCR.php');
 require_once(dirname(__FILE__).'/../reportes/RGenerarQRCR.php');
+
 require_once(dirname(__FILE__).'/../reportes/RVerDispPre.php');
 
 
@@ -118,7 +119,6 @@ class ACTSolicitud extends ACTbase{
 			//trabajar en la modificacion compelta de solicitud ....
 		}
 		$this->res->imprimirRespuesta($this->res->generarJson());
-		var_dump($this->res->generarJson());
 	}
 						
 	function eliminarSolicitud(){
@@ -905,41 +905,44 @@ function groupArray($array,$groupkey,$groupkeyTwo,$id_moneda,$estado_sol, $onlyD
 		$this->res=$this->objFunc->validarNroPo($this->objParam);
 		$this->res->imprimirRespuesta($this->res->generarJson());
 	}
-
-
+	//
 	function datos(){
-		$this->objFunc=$this->create('MODSolicitud');		
-		$cbteHeader = $this->objFunc->RVerDispPre_v1($this->objParam);			
-		if($cbteHeader->getTipo() == 'EXITO'){										
-			return $cbteHeader;			
+		$dataSource = new DataSource();			
+		if($this->objParam->getParametro('id_proceso_wf')!=''){
+			$this->objParam->addFiltro("id_proceso_wf = ".$this->objParam->getParametro('id_proceso_wf'));	
+		}		
+		$this->objFunc = $this->create('MODSolicitud');	
+		$cbteHeader = $this->objFunc->listarVeriCabecera($this->objParam);
+
+		if($cbteHeader->getTipo() == 'EXITO'){							
+			$dataSource->putParameter('cabecera',$cbteHeader->getDatos());								
+			return $dataSource;
 		}
 		else{
 			$cbteHeader->imprimirRespuesta($cbteHeader->generarJson());
-			exit;
-		}	
+		}
 	}
-	
-	function RVerDispPre(){		
-		$nombreArchivo = uniqid(md5(session_id()).'Disponibilidad de Presupuesto').'.pdf';			
-		$dataSource = $this->datos();
-		$orientacion = 'P';		
+	//
+	function RVerDispPre(){	
+		$dataSource = $this->datos();		
+		$nombreArchivo = uniqid(md5(session_id()).'-xxx') . '.pdf'; 		
 		$tamano = 'LETTER';
-		$titulo = 'Consolidado';
+		$orientacion = 'p';
 		$this->objParam->addParametro('orientacion',$orientacion);
 		$this->objParam->addParametro('tamano',$tamano);		
-		$this->objParam->addParametro('titulo_archivo',$titulo);	
+		$this->objParam->addParametro('titulo_archivo',$titulo);        
 		$this->objParam->addParametro('nombre_archivo',$nombreArchivo);
-		$reporte = new RVerDispPre($this->objParam);  
-		$reporte->datosHeader($dataSource->getDatos(),$dataSource->extraData, '' , '');		
+		
+		$reporte = new RVerDispPre($this->objParam); 		
+		$reporte->datosHeader($dataSource);
 		$reporte->generarReporte();
 		$reporte->output($reporte->url_archivo,'F');
+		
 		$this->mensajeExito=new Mensaje();
-		$this->mensajeExito->setMensaje('EXITO','Reporte.php','Reporte generado','Se genera con exito el reporte: '.$nombreArchivo,'control');
+		$this->mensajeExito->setMensaje('EXITO','Reporte.php','Reporte generado','Se generó con éxito el reporte: '.$nombreArchivo,'control');
 		$this->mensajeExito->setArchivoGenerado($nombreArchivo);
-		$this->mensajeExito->imprimirRespuesta($this->mensajeExito->generarJson());	
-	}
-
-
+		$this->mensajeExito->imprimirRespuesta($this->mensajeExito->generarJson());
+	}	
 }
 
 ?>

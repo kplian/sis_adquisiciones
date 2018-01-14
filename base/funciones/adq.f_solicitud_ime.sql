@@ -36,7 +36,7 @@ DECLARE
 	v_mensaje_error         text;
 	v_id_solicitud			integer;
     v_codigo_tipo_pro   	varchar;
-    
+    v_consulta    		varchar;
     v_num_sol   varchar;
     v_id_periodo integer;
     v_num_tramite varchar;
@@ -1835,6 +1835,33 @@ BEGIN
             return v_resp;
 
 		end;
+        
+  /*********************************
+ 	#TRANSACCION:  'ADQ_VERDISPRE'
+ 	#DESCRIPCION:	OBTENEMOS EL ID_MONEDA Y MONEDA PARA CARGAR DIRECTAMENTE EN EL COMBOBOX
+ 	#AUTOR:		manuel guerra
+ 	#FECHA:		07-04-2017 15:12:51
+	***********************************/
+
+	elsif(p_transaccion='ADQ_VERDISPRE')then
+		begin
+			--Sentencia de la modificacion
+			SELECT tm.id_moneda, tm.moneda
+            INTO v_moneda
+            FROM param.tmoneda tm
+			WHERE tm.codigo = v_parametros.nombre_moneda;
+
+			--Definicion de la respuesta
+            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Datos de Moneda id_moneda, moneda');
+            v_resp = pxp.f_agrega_clave(v_resp,'id_moneda',v_moneda.id_moneda::varchar);
+            v_resp = pxp.f_agrega_clave(v_resp,'moneda',v_moneda.moneda::varchar);
+
+            --Devuelve la respuesta
+            return v_resp;
+
+		end;
+      
+             
   /*********************************
  	#TRANSACCION:  'ADQ_NUMPO_GET'
  	#DESCRIPCION:	VERIFICAMOS SI EL NRO. PO YA FUE REGISTRADO Y RETORNAMOS DESC. FUNCIONARIO

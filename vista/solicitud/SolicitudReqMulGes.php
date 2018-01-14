@@ -248,7 +248,7 @@ Phx.vista.SolicitudReqMulGes = {
        this.Cmp.precontrato.disable();
        this.Cmp.tipo_concepto.disable();
        this.Cmp.id_moneda.disable();
-
+		this.Cmp.id_proveedor.hide();
 
        Phx.vista.SolicitudReqMulGes.superclass.onButtonEdit.call(this);
        this.Cmp.id_funcionario.store.baseParams.fecha = this.cmpFechaSoli.getValue().dateFormat(this.cmpFechaSoli.format);

@@ -41,14 +41,13 @@ Phx.vista.SolicitudReq = {
             this.Atributos[this.getIndAtributo('id_depto')].form=true; 
             this.Atributos[this.getIndAtributo('id_funcionario')].form=true;  
             this.Atributos[this.getIndAtributo('id_categoria_compra')].form=true;
-            this.Atributos[this.getIndAtributo('id_proveedor')].form=true; 
+            this.Atributos[this.getIndAtributo('id_proveedor')].form=false; 
             this.Atributos[this.getIndAtributo('justificacion')].form=true; 
             this.Atributos[this.getIndAtributo('lugar_entrega')].form=true; 
             this.Atributos[this.getIndAtributo('fecha_inicio')].form=true; 
             this.Atributos[this.getIndAtributo('dias_plazo_entrega')].form=true;
             
              
-		
 		
     		Phx.vista.SolicitudReq.superclass.constructor.call(this,config);
     		this.addButton('fin_requerimiento',{ grupo:[0],text:'Siguiente', iconCls: 'badelante', disabled: true, handler: this.fin_requerimiento, tooltip: '<b>Finalizar</b>'});

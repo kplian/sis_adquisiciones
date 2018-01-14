@@ -92,21 +92,35 @@ class CustomReportOC extends MYPDF {
 	
 	public function Footer() {
 		$this->SetFontSize(5.5);
-		$this->setY(-10);
+		$this->setY(-35);
 		$ormargins = $this->getOriginalMargins();
 		$this->SetTextColor(0, 0, 0);
 		//set style for cell border
+		$this->SetFont('','B');
+		$this->Cell($ancho, 0, 'CONOCIMIENTO SOBRE LA RESPONSABILIDAD', 0, 0, 'C');
+		$this->Ln(2);
+		$this->SetFont('','');
+		$this->Cell($ancho, 0, 'Manifiesta que garantiza la equidad de oportunidades a su personal y que esto tiene todas las garantias y libertades para asociarse y constituirse en gremio, asi como, para realizar negociaciones colectivas', '', 1, 'L');
+		$this->Cell($ancho, 0, 'Conocimiento de la importancia de incorporar normativas y procedimientos que mojoren el relacionamiento con su personal y sus pùblicos de interés, declara que conoce, respeta y se adhiere voluntariamente', '', 1, 'L'); 
+		$this->Cell($ancho, 0, 'a los principios y reglas referentes a la responsabildiad social, tales como: la declaracion universal de derechos humanos, el convenio de las naciones unidad sobre los derechos de los niños y los convenios', '', 1, 'L');
+		$this->Cell($ancho, 0, 'de la organización internacional del trabajo (documentos que forman partes del plego de especificaciones).', '', 1, 'L');
+		$this->Cell($ancho, 0, 'Declara que su pesonal se encuetnra capacitado para realizar las actividades encomendadas, que se presenta de manera voluntaria y que recibe una remuneración justa a corde al tipo de tarea que realiza', '', 1, 'L');
+		$this->Cell($ancho, 0, 'y sin discriminación alguna de raza , color, sexo. Religión, opinion politica, ascendecia nacional, discapacidad u origen social.', '', 1, 'L');
+		
+		 
+
+		
 		$line_width = 0.85 / $this->getScaleFactor();
 		$this->SetLineStyle(array('width' => $line_width, 'cap' => 'butt', 'join' => 'miter', 'dash' => 0, 'color' => array(0, 0, 0)));
 		$ancho = round(($this->getPageWidth() - $ormargins['left'] - $ormargins['right']) / 3);
 		$this->Ln(2);
 		$cur_y = $this->GetY();
 		//$this->Cell($ancho, 0, 'Generado por XPHS', 'T', 0, 'L');
-		$this->Cell($ancho, 0, 'Usuario: '.$_SESSION['_LOGIN'], '', 1, 'L');
+		//$this->Cell($ancho, 0, 'Usuario: '.$_SESSION['_LOGIN'], '', 1, 'L');
 		$pagenumtxt = 'Página'.' '.$this->getAliasNumPage().' de '.$this->getAliasNbPages();
 		//$this->Cell($ancho, 0, '', '', 0, 'C');
 		$fecha_rep = date("d-m-Y H:i:s");
-		$this->Cell($ancho, 0, "Fecha impresión: ".$fecha_rep, '', 0, 'L');
+		//$this->Cell($ancho, 0, "Fecha impresión: ".$fecha_rep, '', 0, 'L');
 		$this->Ln($line_width);
 	}
 }
@@ -241,7 +255,7 @@ Class ROrdenCompra extends Report {
 		if($this->getDataSource()->getParameter('fecha_entrega')!=''){  
     		
             $pdf->SetFont('', 'B');
-            $pdf->Cell($width3, $height, 'Fecha de Entrega:', 0, 0, 'L', false, '', 0, false, 'T', 'C');
+            $pdf->Cell($width4+$width3+$width2+$width1, $height, 'Fecha de Entrega:', 0, 0, 'L', false, '', 0, false, 'T', 'C');
             $pdf->SetFont('', '');
             $pdf->SetFillColor(192,192,192, true);
             $pdf->Cell($width4+$width3+$width2+$width1, $height, $this->getDataSource()->getParameter('fecha_entrega'), $white, 0, 'L', true, '', 0, false, 'T', 'C');        
@@ -259,15 +273,7 @@ Class ROrdenCompra extends Report {
             $pdf->Cell(5, $height, '', 0, 0, 'L', false, '', 0, false, 'T', 'C');
             $pdf->Ln();
        }
-         
-		/*
-        $pdf->Cell($width3, $height, 'Tipo de Entrega:', 0, 0, 'L', false, '', 0, false, 'T', 'C');
-        $pdf->SetFont('', '');
-        $pdf->SetFillColor(192,192,192, true);
-        $pdf->Cell($width4+$width3+$width2, $height, $this->getDataSource()->getParameter('tipo_entrega'), $white, 0, 'L', true, '', 0, false, 'T', 'C');        
-        $pdf->Ln();
-        $pdf->SetFont('', 'B');
-        */
+         		
 		
 		$pdf->SetFont('', 'B');
         $pdf->Cell($width3, $height, 'Lugar de Entrega:', 0, 0, 'L', false, '', 0, false, 'T', 'C');
@@ -303,7 +309,7 @@ Class ROrdenCompra extends Report {
 			//$pdf->MultiCell(0, $height, 'La suma de dinero será cancelada de acuerdo a su oferta, el pedido deberá cumplir con todas las especificaciones solicitadas por ENDE TRANSIMISION S.A., asimismo, solicitamos nos remita la nota fiscal correspondiente o similar de su país de origen.', 0,'L', false ,1);
 		}
 		
-		$pdf->Ln($height);
+		//$pdf->Ln(0.05);
 		//$pdf->MultiCell(0, $height, 'Firma Proveedor o Sello ', 1,'R', false ,1);							
 		
 		if($tipo=='Bien')			
@@ -320,38 +326,43 @@ Class ROrdenCompra extends Report {
 			$pdf->Cell($width1, $height, 'Contacto:', 0, 0, 'L', false, '', 0, false, 'T', 'C');
 			$pdf->SetFont('', '');
 			$pdf->SetFillColor(192,192,192, true);
-			$pdf->Cell($width4+$width3+$width2, $height, $this->getDataSource()->getParameter('contacto'), $white, 1, 'L', true, '', 0, false, 'T', 'C');
+			$pdf->Cell($width4, $height, $this->getDataSource()->getParameter('contacto'), $white, 1, 'L', true, '', 0, false, 'T', 'C');
 		}
-		
-		/*if($this->getDataSource()->getParameter('celular_contacto')!=''){
-			$pdf->SetFontSize(7);
-			$pdf->SetFont('', 'B');
-			$pdf->Cell($width1, $height, 'Telefono:', 0, 0, 'L', false, '', 0, false, 'T', 'C');
-			$pdf->SetFont('', '');
-			$pdf->SetFillColor(192,192,192, true);
-			$pdf->Cell($width4+$width3+$width2, $height, $this->getDataSource()->getParameter('celular_contacto'), $white, 1, 'L', true, '', 0, false, 'T', 'C');
-		}*/
-		
+				
 		if($this->getDataSource()->getParameter('email_contacto')!=''){
 			$pdf->SetFontSize(7);
 			$pdf->SetFont('', 'B');
 			$pdf->Cell($width1, $height, 'Correo:', 0, 0, 'L', false, '', 0, false, 'T', 'C');
 			$pdf->SetFont('', '');
 			$pdf->SetFillColor(192,192,192, true);
-			$pdf->Cell($width4+$width3+$width2, $height, $this->getDataSource()->getParameter('email_contacto'), $white, 1, 'L', true, '', 0, false, 'T', 'C');
+			$pdf->Cell($width4, $height, $this->getDataSource()->getParameter('email_contacto'), $white, 1, 'L', true, '', 0, false, 'T', 'C');
 		}
 		
 		$pdf->Ln($height);
-		$pdf->MultiCell(0, $height, 'NOTA: La cuenta bancaria de todo proveedor debe estar registrada en SIGEP para compras nacionales', 0,'L', false ,1);
-		$pdf->Ln($height);
+		$pdf->MultiCell(100, $height-30, '1.- Esta orden debe ser confirmada con la Copia adjunta', 0,'L', true ,1);
+		$pdf->Ln(0.01);
+		$pdf->MultiCell(100, $height, '2.- No debe haber ninguna variacion en los Terminos, condiciones, embarque, precios, calidad, cantidad y especificaciones indicadas en este periodo.', 0,'L', true ,1);
+		$pdf->Ln(0.01);
+		$pdf->MultiCell(100, $height, '3.- El numero de pedido debe aparecer en toda factura, lista de empaque y correspondencia relativa a esta adquisición.', 0,'L', true ,1);
+		$pdf->Ln(0.01);
+		$pdf->MultiCell(100, $height, '4.- El  embalaje debera ser en cajones adecuados para exportacion y reforzados con cintas de seguridad. Las marcas de embarque, Numero de bultos, dimensiones, pesos Neto y Bruto en Libras y kilos, deberan pintarse en caractéres visibles en cada bulto usando tinta indeleble.', 0,'L', true ,1);
+		$pdf->Ln(0.01);
+		$pdf->MultiCell(100, $height, '5.- La lista de embarque debe mostrar claramente las marcas de embarque, numero de bultos, clases de bultos, contenido, dimensiones, peso neto y bruto de los bultos.', 0,'L', true ,1);
+		$pdf->Ln(0.01);
+		$pdf->MultiCell(100, $height, '6.-El comprador se reserva el derecha de cancelar el pedido si la mercaderia no es embarcada dentro del periodo indicado. ', 0,'L', true ,1);
+		$pdf->Ln(0.01);
+		$pdf->MultiCell(100, $height, 'Enviar las facturas en original y copia a ENDE Transmision S.A. NIT 1023097024', 0,'L', false ,1);
+		/*$pdf->Ln(0.05);
+		$pdf->MultiCell(100, $height, 'Sin otro particular y agradeciendo su gentil atención, saludo a usted', 0,'L', true ,1);
+		$pdf->Ln(0.05);
+		$pdf->MultiCell(100, $height, 'Atentamente.', 0,'L', false ,1);
+*/
 		if($this->getDataSource()->getParameter('codigo_proceso')!='PROCINPD'){
 			//$pdf->MultiCell(0, $height, 'Ante cualquier demora ENDE TRANSIMISION S.A. se reserva el derecho de retener el UNO PORCIENTO (1%) del monto total por día de retraso hasta un 20%.', 0,'L', false ,1);
 			$pdf->Ln($height);
 		}		
 		
-		$pdf->MultiCell(0, $height, 'Sin otro particular y agradeciendo su gentil atención, saludo a usted', 0,'L', false ,1);
-		$pdf->Ln($height);
-		$pdf->MultiCell(0, $height, 'Atentamente.', 0,'L', false ,1);
+		
 		
 		//$pdf->MultiCell(0, $height, 'El proveedor se compromete a entregar el suministro en el plazo de '.$this->getDataSource()->getParameter('dias_entrega').' dias calendarios que seran computables a partir de la fecha de elaboracion de la presente orden de '.$tipo.'. El incumplimiento se sancionara con una multa del 0,1% del monto de contrato por cada dia calendario de retraso, multa que no debe exceder del 2%.', 1,'L', false ,1);
 		$pdf->Output($fileName, 'F');

@@ -795,18 +795,26 @@ class MODSolicitud extends MODbase{
 	}
 	
 	
-	function RVerDispPre_v1(){
+	function listarVeriCabecera(){			
 		//Definicion de variables para ejecucion del procedimientp
-		$this->procedimiento='adq.f_solicitud_ime';
-		$this->transaccion='ADQ_REPVERDISP';
-		$this->tipo_procedimiento='IME';//tipo de transaccion
-		$this->setCount(false);
-		$this->setParametro('dato','dato','varchar');
+		$this->procedimiento='adq.f_solicitud_sel';
+		$this->transaccion='ADQ_REPVERDISP_SEL';
+		$this->tipo_procedimiento='SEL';
+		$this->setCount(false);		
+		//
+		$this->setParametro('id_proceso_wf','id_proceso_wf','int4');		
+		//Definicion de la lista del resultado del query
+		$this->captura('tipo','varchar');
+		$this->captura('num_tramite','varchar');
+		$this->captura('justificacion','varchar');	
+		$this->captura('descripcion','varchar');
+		$this->captura('codigo','varchar');
+		$this->captura('precio_total','numeric');		
 		//Ejecuta la instruccion
 		$this->armarConsulta();
-		$this->ejecutarConsulta();
-
+		$this->ejecutarConsulta();		
 		//Devuelve la respuesta
+
 		return $this->respuesta;
 	}
 

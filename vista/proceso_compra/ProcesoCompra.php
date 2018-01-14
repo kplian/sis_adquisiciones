@@ -284,7 +284,7 @@ Phx.vista.ProcesoCompra=Ext.extend(Phx.gridInterfaz,{
             config: {
                 name: 'id_solicitud',
                 hiddenName: 'id_solicitud',
-                fieldLabel: 'Solicutud de Compra',
+                fieldLabel: 'Solicitud de Compra',
                 typeAhead: false,
                 forceSelection: false,
                 allowBlank: false,

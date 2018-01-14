@@ -288,7 +288,9 @@ BEGIN
                              id_usuario_mod = p_id_usuario,
                              revertido_mb = 0,     -- inicializa el monto de reversion
                              revertido_mo = 0     -- inicializa el monto de reversion  
-                         where s.id_solicitud_det =  va_id_solicitud_det[v_cont];
+                         where s.id_solicitud_det =  v_registros.id_solicitud_det;
+                         
+                        
                 
               
                END LOOP;

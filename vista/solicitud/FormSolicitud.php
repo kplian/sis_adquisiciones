@@ -759,6 +759,7 @@ header("content-type: text/javascript; charset=UTF-8");
 					origen:'PROVEEDOR',
 					fieldLabel:'Proveedor Precotizacion',					
 					allowBlank:false,
+					
 					tinit:false,
 					width: '80%',
 					valueField: 'id_proveedor'

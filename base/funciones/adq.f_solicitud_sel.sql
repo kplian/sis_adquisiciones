@@ -663,6 +663,44 @@ BEGIN
         --Devuelve la respuesta
           return v_consulta;
         end;
+    
+    /*********************************
+ 	#TRANSACCION:  'ADQ_REPVERDISP_SEL'
+ 	#DESCRIPCION:	REPORTE VERIFICACION DISPONIBILIDAD PRESUPUESTARIA
+ 	#AUTOR:		manuel guerra
+ 	#FECHA:		07-04-2017 15:12:51
+	***********************************/
+
+	elsif(p_transaccion='ADQ_REPVERDISP_SEL')then
+		begin
+		
+			v_consulta:='select						
+                          sol.tipo::varchar,
+                          sol.num_tramite::varchar,
+                          sol.justificacion::varchar,
+                          tcc.descripcion::varchar,
+                          tcc.codigo::varchar,
+                          det.precio_total::numeric
+						from adq.tsolicitud sol
+                        inner join segu.tusuario usu1 on usu1.id_usuario = sol.id_usuario_reg
+                        inner join orga.vfuncionario fun on fun.id_funcionario = sol.id_funcionario
+                        inner join orga.tuo uo on uo.id_uo = sol.id_uo
+                        inner join param.tmoneda mon on mon.id_moneda = sol.id_moneda
+                        inner join param.tgestion ges on ges.id_gestion = sol.id_gestion
+                        inner join param.tdepto dep on dep.id_depto = sol.id_depto
+                        inner join wf.tproceso_macro pm on pm.id_proceso_macro = sol.id_proceso_macro
+                        inner join adq.tcategoria_compra cat on cat.id_categoria_compra = sol.id_categoria_compra
+                        left join orga.vfuncionario funrpc on funrpc.id_funcionario = sol.id_funcionario_rpc
+                        inner join orga.vfuncionario funa on funa.id_funcionario = sol.id_funcionario_aprobador
+                        left join segu.tusuario usu2 on usu2.id_usuario = sol.id_usuario_mod
+                        inner join wf.testado_wf ew on ew.id_estado_wf = sol.id_estado_wf
+                        join adq.tsolicitud_det det on det.id_solicitud=sol.id_solicitud
+                        join param.tcentro_costo cc on cc.id_centro_costo=det.id_centro_costo
+                        join param.ttipo_cc tcc on tcc.id_tipo_cc=cc.id_tipo_cc
+                        where sol.id_proceso_wf='||v_parametros.id_proceso_wf;
+            return v_consulta;
+		end;
+        
     /*********************************
  	#TRANSACCION:  'ADQ_RMEMOCOMDCR_SEL'
  	#DESCRIPCION:	Obtenemos datos para Reporte Memorandum RPC

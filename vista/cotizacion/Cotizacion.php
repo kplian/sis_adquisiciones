@@ -489,7 +489,7 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
 				allowBlank: true,
 				anchor: '80%',
 				gwidth: 100,
-				maxLength:100
+				maxLength:2000
 			},
 			type:'TextArea',
 			filters:{pfiltro:'cot.obs',type:'string'},
