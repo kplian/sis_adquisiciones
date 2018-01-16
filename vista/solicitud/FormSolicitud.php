@@ -526,6 +526,23 @@ header("content-type: text/javascript; charset=UTF-8");
 									id_grupo: 2,
 									items: [],
 								}]
+							},
+							{
+								bodyStyle: 'padding-right:2px;',
+								border: false,
+								autoHeight: true,
+								items: [{
+									xtype: 'fieldset',
+									frame: true,
+									layout: 'form',
+									title: 'Glosa',
+									width: '33%',
+									border: false,								
+									padding: '0 0 0 10',
+									bodyStyle: 'padding-left:2px;',
+									id_grupo: 3,
+									items: [],
+								}]
 							}
 						]
 					},
@@ -846,7 +863,6 @@ header("content-type: text/javascript; charset=UTF-8");
 				grid:false,
 				form:true
 			},
-
 			{
 				config:{
 					name: 'fecha_po',
@@ -860,6 +876,19 @@ header("content-type: text/javascript; charset=UTF-8");
 				type:'DateField',
 				id_grupo:2,
 				grid:false,
+				form:true
+			},
+			{
+				config:{
+					name: 'observacion',
+					fieldLabel: 'Observacion',
+					qtip:'Observacion',
+					allowBlank: false,
+					height:'200',
+					width:'200'			
+				},
+				type:'TextArea',
+				id_grupo: 3,
 				form:true
 			}
 		],

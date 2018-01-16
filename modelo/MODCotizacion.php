@@ -510,6 +510,7 @@ class MODCotizacion extends MODbase{
 		$this->captura('forma_pago','varchar');
 		$this->captura('objeto','varchar');
 		$this->captura('codigo_uo','varchar');
+		$this->captura('observacion','varchar');
 		
 		$this->armarConsulta();
 		$this->ejecutarConsulta();

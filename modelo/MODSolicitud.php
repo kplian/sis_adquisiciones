@@ -603,6 +603,7 @@ class MODSolicitud extends MODbase{
 
 			$this->setParametro('nro_po','nro_po','varchar');
 			$this->setParametro('fecha_po','fecha_po','date');
+			$this->setParametro('observacion','observacion','varchar');
 
 			//Ejecuta la instruccion
             $this->armarConsulta();
@@ -809,7 +810,8 @@ class MODSolicitud extends MODbase{
 		$this->captura('justificacion','varchar');	
 		$this->captura('descripcion','varchar');
 		$this->captura('codigo','varchar');
-		$this->captura('precio_total','numeric');		
+		$this->captura('precio_total','numeric');
+		$this->captura('observacion','varchar');		
 		//Ejecuta la instruccion
 		$this->armarConsulta();
 		$this->ejecutarConsulta();		

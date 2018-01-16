@@ -680,7 +680,8 @@ BEGIN
                           sol.justificacion::varchar,
                           tcc.descripcion::varchar,
                           tcc.codigo::varchar,
-                          det.precio_total::numeric
+                          det.precio_total::numeric,
+                          sol.observacion::varchar
 						from adq.tsolicitud sol
                         inner join segu.tusuario usu1 on usu1.id_usuario = sol.id_usuario_reg
                         inner join orga.vfuncionario fun on fun.id_funcionario = sol.id_funcionario

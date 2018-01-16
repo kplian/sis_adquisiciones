@@ -649,7 +649,7 @@ BEGIN
                   v_filtro = 'cot.id_proceso_wf='||v_parametros.id_proceso_wf||' and ';
             
             END IF;
-            
+      
 		v_consulta:='select  
         			cot.id_cotizacion,
         			pv.desc_proveedor,
@@ -684,7 +684,8 @@ BEGIN
                     tppc.codigo as codigo_proceso,
                     cot.forma_pago,
                     pc.objeto,
-                    uo.codigo as codigo_uo
+                    uo.codigo as codigo_uo,
+                    sol.observacion::varchar
               from adq.tcotizacion cot 
               inner join param.vproveedor pv on pv.id_proveedor=cot.id_proveedor
               left join segu.tpersona per on per.id_persona=pv.id_persona

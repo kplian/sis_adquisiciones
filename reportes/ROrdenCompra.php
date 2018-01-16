@@ -190,7 +190,7 @@ Class ROrdenCompra extends Report {
 			$pdf->Cell($width4+$width3+$width2, $height, $this->getDataSource()->getParameter('telefono1'), $white, 1, 'L', true, '', 0, false, 'T', 'C');
 		}*/
 		//$pdf->Ln();
-		
+		//var_dump($this->getDataSource()->getParameter('observacion'));
 		if($this->getDataSource()->getParameter('telefono2')!=''){
 			$pdf->SetFont('', 'B');
 			$pdf->Cell($width1, $height, 'Telf. 2:', 0, 0, 'L', false, '', 0, false, 'T', 'C');
@@ -246,8 +246,11 @@ Class ROrdenCompra extends Report {
 		if($tipo=='Bien')						
 		    $pdf->MultiCell(0, $height, 'De acuerdo a su cotización en la que detalla especificaciones, por medio de la presente confirmamos orden para la provisión de:', 0,'L', false ,1);
 		
+		
 		//escritura de los datalles de la cotizacion
 		$this->writeDetalles($this->getDataSource()->getParameter('detalleDataSource'), $pdf,$tipo, $this->getDataSource()->getParameter('codigo_moneda') );
+		
+		
 
 		$pdf->SetFontSize(9);
 		$pdf->Ln();
@@ -297,12 +300,12 @@ Class ROrdenCompra extends Report {
 			$pdf->SetFont('', '');
 			$pdf->SetFillColor(192,192,192, true);
 			$pdf->MultiCell(0, $height, $this->getDataSource()->getParameter('fecha_adju'), 0,'L', true ,1);
+			$pdf->Ln();
 		}	
-		
-		$pdf->Ln();
+	
 		$pdf->SetFont('','');
 		$pdf->setFontSize(7);								
-
+		$pdf->MultiCell(0, $height,$this->getDataSource()->getParameter('observacion'), 0,'L', true ,1);
 		if($this->getDataSource()->getParameter('codigo_proceso')!='PROCINPD'){
 			//$pdf->MultiCell(0, $height, 'La suma de dinero será cancelada de la forma establecida, debiendo ustedes emitir la factura respectiva a nombre de ENDE TRANSIMISION S.A., NIT 10230097024,  de no emitirse la misma, ENDE TRANSMISION S.A. se reserva del derecho de efectuar las retenciones impositivas respectivas.', 0,'L', false ,1);
 		}else{
@@ -404,7 +407,7 @@ Class ROrdenCompra extends Report {
 				);     
 					 
 		 $pdf-> MultiRow($RowArray,false,1); 
-		 
+
         foreach($dataSource->getDataset() as $row) {
 			            
 			 if($row['cantidad_adju']>0){
