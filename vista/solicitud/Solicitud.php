@@ -834,6 +834,17 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
 			id_grupo:1,
 			grid:true,
 			form:false
+		},
+		{
+			config:{
+				name: 'observacion',
+				fieldLabel: 'Observacion',				
+				allowBlank: true,
+				anchor: '80%',
+				maxLength:255
+			},
+			type:'TextArea',
+			form:true
 		}
 	],
 	

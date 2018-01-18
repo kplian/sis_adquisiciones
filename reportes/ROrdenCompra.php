@@ -92,11 +92,13 @@ class CustomReportOC extends MYPDF {
 	
 	public function Footer() {
 		$this->SetFontSize(5.5);
-		$this->setY(-35);
+		$this->setY(-30); //-80  30
 		$ormargins = $this->getOriginalMargins();
 		$this->SetTextColor(0, 0, 0);
 		//set style for cell border
 		$this->SetFont('','B');
+		
+		
 		$this->Cell($ancho, 0, 'CONOCIMIENTO SOBRE LA RESPONSABILIDAD', 0, 0, 'C');
 		$this->Ln(2);
 		$this->SetFont('','');
@@ -139,11 +141,12 @@ Class ROrdenCompra extends Report {
 		//set margins
 		$pdf->SetMargins(PDF_MARGIN_LEFT, 40, PDF_MARGIN_RIGHT);
 		$pdf->SetHeaderMargin(10);
-		$pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
+		
 		
 		//set auto page breaks
 		$pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
 		
+		$pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
 		//set image scale factor
 		$pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
 		
@@ -303,28 +306,14 @@ Class ROrdenCompra extends Report {
 			$pdf->Ln();
 		}	
 	
-		$pdf->SetFont('','');
-		$pdf->setFontSize(7);								
-		$pdf->MultiCell(0, $height,$this->getDataSource()->getParameter('observacion'), 0,'L', true ,1);
-		if($this->getDataSource()->getParameter('codigo_proceso')!='PROCINPD'){
-			//$pdf->MultiCell(0, $height, 'La suma de dinero será cancelada de la forma establecida, debiendo ustedes emitir la factura respectiva a nombre de ENDE TRANSIMISION S.A., NIT 10230097024,  de no emitirse la misma, ENDE TRANSMISION S.A. se reserva del derecho de efectuar las retenciones impositivas respectivas.', 0,'L', false ,1);
-		}else{
-			//$pdf->MultiCell(0, $height, 'La suma de dinero será cancelada de acuerdo a su oferta, el pedido deberá cumplir con todas las especificaciones solicitadas por ENDE TRANSIMISION S.A., asimismo, solicitamos nos remita la nota fiscal correspondiente o similar de su país de origen.', 0,'L', false ,1);
-		}
-		
-		//$pdf->Ln(0.05);
-		//$pdf->MultiCell(0, $height, 'Firma Proveedor o Sello ', 1,'R', false ,1);							
-		
-		if($tipo=='Bien')			
-			$mensaje = 'El ítem deberá ser entregado conforme a lo solicitado, estipuladas en la cotización y la presente Orden.';			
-		else
-			$mensaje = 'El servicio deberá ser entregado conforme a lo solicitado, estipuladas en la cotización y la presente Orden.';			
-				
-		$pdf->MultiCell(0, $height, $mensaje, 0,'L', false ,1);
+	
 		$pdf->Ln($height);
+
+
 		
 		if($this->getDataSource()->getParameter('contacto')!=''){
-			$pdf->SetFontSize(7);
+			$pdf->SetFontSize(5);
+			
 			$pdf->SetFont('', 'B');
 			$pdf->Cell($width1, $height, 'Contacto:', 0, 0, 'L', false, '', 0, false, 'T', 'C');
 			$pdf->SetFont('', '');
@@ -333,7 +322,7 @@ Class ROrdenCompra extends Report {
 		}
 				
 		if($this->getDataSource()->getParameter('email_contacto')!=''){
-			$pdf->SetFontSize(7);
+			$pdf->SetFontSize(5); //7
 			$pdf->SetFont('', 'B');
 			$pdf->Cell($width1, $height, 'Correo:', 0, 0, 'L', false, '', 0, false, 'T', 'C');
 			$pdf->SetFont('', '');
@@ -341,7 +330,38 @@ Class ROrdenCompra extends Report {
 			$pdf->Cell($width4, $height, $this->getDataSource()->getParameter('email_contacto'), $white, 1, 'L', true, '', 0, false, 'T', 'C');
 		}
 		
+		
+	
+		$pdf->SetFont('','');
+		$pdf->setFontSize(5);	//5 a 1		  3 		
+		$pdf->Ln($height);	
+		
+		
+		$pdf->MultiCell(0, $height, $this->getDataSource()->getParameter('obs'), 0,'L', false ,1);				
+		if($this->getDataSource()->getParameter('codigo_proceso')!='PROCINPD'){
+			//$pdf->MultiCell(0, $height, 'La suma de dinero será cancelada de la forma establecida, debiendo ustedes emitir la factura respectiva a nombre de ENDE TRANSIMISION S.A., NIT 10230097024,  de no emitirse la misma, ENDE TRANSMISION S.A. se reserva del derecho de efectuar las retenciones impositivas respectivas.', 0,'L', false ,1);
+		}else{
+			//$pdf->MultiCell(0, $height, 'La suma de dinero será cancelada de acuerdo a su oferta, el pedido deberá cumplir con todas las especificaciones solicitadas por ENDE TRANSIMISION S.A., asimismo, solicitamos nos remita la nota fiscal correspondiente o similar de su país de origen.', 0,'L', false ,1);
+		}
+		
+		//$pdf->Ln(0.05);
+		//$pdf->MultiCell(0, $height, 'Firma Proveedor o Sello ', 1,'R', false ,1);		
+							
+		$pdf->SetFont('',''); //agrega
+		$pdf->setFontSize(5);	//agrega
+		if($tipo=='Bien')		
+		
+            $mensaje = 'La adquisición o contratación debe ser entregada conforme lo establecido en el pliego de condiciones, oferta y orden de compra';	
+			//$mensaje = 'El ítem deberá ser entregado conforme a lo solicitado, estipuladas en la cotización y la presente Orden.';			
+		else
+			$mensaje = 'El servicio deberá ser entregado conforme a lo solicitado, estipuladas en la cotización y la presente Orden.';			
+				
+		$pdf->MultiCell(0, $height, $mensaje, 0,'L', true ,1);
+
+
+		
 		$pdf->Ln($height);
+		
 		$pdf->MultiCell(100, $height-30, '1.- Esta orden debe ser confirmada con la Copia adjunta', 0,'L', true ,1);
 		$pdf->Ln(0.01);
 		$pdf->MultiCell(100, $height, '2.- No debe haber ninguna variacion en los Terminos, condiciones, embarque, precios, calidad, cantidad y especificaciones indicadas en este periodo.', 0,'L', true ,1);
@@ -408,8 +428,7 @@ Class ROrdenCompra extends Report {
 					 
 		 $pdf-> MultiRow($RowArray,false,1); 
 
-        foreach($dataSource->getDataset() as $row) {
-			            
+		foreach($dataSource->getDataset() as $row) {
 			 if($row['cantidad_adju']>0){
 				 $RowArray = array(							
 							'cantidad'  => $row['cantidad_adju'],							
@@ -419,9 +438,9 @@ Class ROrdenCompra extends Report {
 						);
 				$totalOrdenCompra=$totalOrdenCompra + ($row['cantidad_adju']*$row['precio_unitario']);			 
 				$pdf-> MultiRow($RowArray,false,1) ; 
-			}
-						  
+			}						 
         }
+		
     	$height=5;		 								
     	$obj = new Numbers_Words_es_AR;
     	$numero=explode('.', number_format($totalOrdenCompra,2));

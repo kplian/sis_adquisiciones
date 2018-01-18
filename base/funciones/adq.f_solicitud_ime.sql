@@ -220,7 +220,7 @@ BEGIN
              update param.tinstitucion set email1 = v_parametros.correo_proveedor where id_institucion = v_reg_prov.id_institucion;
         
         END IF;
-        
+       
         
         --inserta solicitud
         insert into adq.tsolicitud(
@@ -261,7 +261,8 @@ BEGIN
             dias_plazo_entrega,
             precontrato,
             nro_po,
-            fecha_po
+            fecha_po,
+            observacion
           	) values(
 			'activo',
 			--v_parametros.id_solicitud_ext,
@@ -300,7 +301,8 @@ BEGIN
             v_parametros.dias_plazo_entrega,
             COALESCE(v_parametros.precontrato,'no'),
             trim(both ' ' from v_parametros.nro_po),
-            v_parametros.fecha_po
+            v_parametros.fecha_po,
+            v_parametros.observacion
 							
 			)RETURNING id_solicitud into v_id_solicitud;
         
@@ -426,7 +428,7 @@ BEGIN
 			id_usuario_mod = p_id_usuario,
             id_uo = v_id_uo,
             id_proceso_macro=id_proceso_macro,
-            id_proveedor=v_parametros.id_proveedor,
+            --id_proveedor=v_parametros.id_proveedor,
             id_usuario_ai= v_parametros._id_usuario_ai,
             usuario_ai = v_parametros._nombre_usuario_ai,
             tipo_concepto =  v_parametros.tipo_concepto,

@@ -98,7 +98,7 @@ class ACTCotizacion extends ACTbase{
                 $this->objParam->addParametroConsulta('puntero',0);
                 $this->objFunc = $this->create('MODCotizacion');
                 $resultOrdenCompra = $this->objFunc->reporteOrdenCompra();
-				
+			
 				if($resultOrdenCompra->getTipo()=='EXITO'){
 				 	
 					    $datosOrdenCompra = $resultOrdenCompra->getDatos();
@@ -339,6 +339,7 @@ class ACTCotizacion extends ACTbase{
 						$dataSource->putParameter('num_tramite', $datosOrdenCompra[0]['num_tramite']);
 						$dataSource->putParameter('codigo_uo', $datosOrdenCompra[0]['codigo_uo']);
 						$dataSource->putParameter('observacion', $datosOrdenCompra[0]['observacion']);
+						$dataSource->putParameter('obs', $datosOrdenCompra[0]['obs']);
 		
 		                //get detalle
 		                //Reset all extra params:

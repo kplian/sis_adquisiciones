@@ -526,23 +526,6 @@ header("content-type: text/javascript; charset=UTF-8");
 									id_grupo: 2,
 									items: [],
 								}]
-							},
-							{
-								bodyStyle: 'padding-right:2px;',
-								border: false,
-								autoHeight: true,
-								items: [{
-									xtype: 'fieldset',
-									frame: true,
-									layout: 'form',
-									title: 'Glosa',
-									width: '33%',
-									border: false,								
-									padding: '0 0 0 10',
-									bodyStyle: 'padding-left:2px;',
-									id_grupo: 3,
-									items: [],
-								}]
 							}
 						]
 					},
@@ -883,12 +866,12 @@ header("content-type: text/javascript; charset=UTF-8");
 					name: 'observacion',
 					fieldLabel: 'Observacion',
 					qtip:'Observacion',
-					allowBlank: false,
-					height:'200',
+					allowBlank: true,
+					height:'100',
 					width:'200'			
 				},
 				type:'TextArea',
-				id_grupo: 3,
+				id_grupo: 2,
 				form:true
 			}
 		],
@@ -1048,6 +1031,7 @@ header("content-type: text/javascript; charset=UTF-8");
 			}
 		},
 		onEdit:function(){
+			
 			this.cmpFechaSoli.disable();
 			this.cmpIdDepto.disable();
 			this.Cmp.id_categoria_compra.disable();

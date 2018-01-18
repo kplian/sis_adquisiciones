@@ -485,11 +485,11 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
 		{
 			config:{
 				name: 'obs',
-				fieldLabel: 'Obs',
+				fieldLabel: 'Glosa',
 				allowBlank: true,
 				anchor: '80%',
-				gwidth: 100,
-				maxLength:2000
+				height:'150',
+				gwidth: 100
 			},
 			type:'TextArea',
 			filters:{pfiltro:'cot.obs',type:'string'},

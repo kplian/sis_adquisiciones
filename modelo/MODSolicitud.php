@@ -148,10 +148,11 @@ class MODSolicitud extends MODbase{
 		$this->setParametro('precontrato','precontrato','varchar');
 		$this->setParametro('codigo_poa','codigo_poa','varchar');		
 		$this->setParametro('obs_poa','obs_poa','varchar');
-
-
+		
+      
 		$this->setParametro('nro_po','nro_po','varchar');
 		$this->setParametro('fecha_po','fecha_po','varchar');
+		
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();
