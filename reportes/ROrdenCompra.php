@@ -92,7 +92,7 @@ class CustomReportOC extends MYPDF {
 	
 	public function Footer() {
 		$this->SetFontSize(5.5);
-		$this->setY(-30); //-80  30
+		$this->setY(-24); //-80  30
 		$ormargins = $this->getOriginalMargins();
 		$this->SetTextColor(0, 0, 0);
 		//set style for cell border
@@ -256,7 +256,7 @@ Class ROrdenCompra extends Report {
 		
 
 		$pdf->SetFontSize(9);
-		$pdf->Ln();
+		//$pdf->Ln(2);
 		
 		if($this->getDataSource()->getParameter('fecha_entrega')!=''){  
     		
@@ -286,7 +286,7 @@ Class ROrdenCompra extends Report {
         $pdf->SetFont('', '');
         $pdf->SetFillColor(192,192,192, true);
 		$pdf->MultiCell(0, $height, $this->getDataSource()->getParameter('lugar_entrega'), 0,'L', true ,1);        
-        $pdf->Ln();
+       // $pdf->Ln();
 		
 		if($this->getDataSource()->getParameter('forma_pago')!=''){
 			$pdf->SetFont('', 'B');
@@ -309,8 +309,6 @@ Class ROrdenCompra extends Report {
 	
 		$pdf->Ln($height);
 
-
-		
 		if($this->getDataSource()->getParameter('contacto')!=''){
 			$pdf->SetFontSize(5);
 			
@@ -334,7 +332,7 @@ Class ROrdenCompra extends Report {
 	
 		$pdf->SetFont('','');
 		$pdf->setFontSize(5);	//5 a 1		  3 		
-		$pdf->Ln($height);	
+		//$pdf->Ln($height);	
 		
 		
 		$pdf->MultiCell(0, $height, $this->getDataSource()->getParameter('obs'), 0,'L', false ,1);				
@@ -346,17 +344,18 @@ Class ROrdenCompra extends Report {
 		
 		//$pdf->Ln(0.05);
 		//$pdf->MultiCell(0, $height, 'Firma Proveedor o Sello ', 1,'R', false ,1);		
-							
+					
 		$pdf->SetFont('',''); //agrega
 		$pdf->setFontSize(5);	//agrega
+		$pdf->Ln(2);
 		if($tipo=='Bien')		
-		
+		   
             $mensaje = 'La adquisición o contratación debe ser entregada conforme lo establecido en el pliego de condiciones, oferta y orden de compra';	
 			//$mensaje = 'El ítem deberá ser entregado conforme a lo solicitado, estipuladas en la cotización y la presente Orden.';			
 		else
 			$mensaje = 'El servicio deberá ser entregado conforme a lo solicitado, estipuladas en la cotización y la presente Orden.';			
 				
-		$pdf->MultiCell(0, $height, $mensaje, 0,'L', true ,1);
+		    $pdf->MultiCell(0, $height, $mensaje, 0,'L', true ,1);
 
 
 		
@@ -385,7 +384,8 @@ Class ROrdenCompra extends Report {
 			$pdf->Ln($height);
 		}		
 		
-		
+		$pdf->Ln(20);
+		$pdf->MultiCell(100, $height, 'FIRMA AUTORIZADA Y SELLO DEL PROVEEDOR', 0,'L', false ,1);
 		
 		//$pdf->MultiCell(0, $height, 'El proveedor se compromete a entregar el suministro en el plazo de '.$this->getDataSource()->getParameter('dias_entrega').' dias calendarios que seran computables a partir de la fecha de elaboracion de la presente orden de '.$tipo.'. El incumplimiento se sancionara con una multa del 0,1% del monto de contrato por cada dia calendario de retraso, multa que no debe exceder del 2%.', 1,'L', false ,1);
 		$pdf->Output($fileName, 'F');

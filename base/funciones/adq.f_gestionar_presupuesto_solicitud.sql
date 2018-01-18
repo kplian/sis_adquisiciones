@@ -297,7 +297,7 @@ BEGIN
                  
                  
 
-        ELSEIF p_operacion = 'revertir' THEN
+        ELSEIF p_operacion = 'revertir_old' THEN
        
        --revierte al revveertir la probacion de la solicitud
        
@@ -410,6 +410,105 @@ BEGIN
                                                              NULL,
                                                              p_conexion);
                END IF;
+               
+         ELSEIF p_operacion = 'revertir' THEN
+       
+       --revierte al revveertir la probacion de la solicitud
+       
+           v_i = 0;
+           v_men_presu = '';
+           FOR v_registros in ( 
+                            SELECT
+                              sd.id_solicitud_det,
+                              sd.id_centro_costo,
+                              s.id_gestion,
+                              s.id_solicitud,
+                              sd.id_partida,
+                              sd.precio_ga_mb,
+                              p.id_presupuesto,
+                              sd.id_partida_ejecucion,
+                              sd.revertido_mb,
+                              sd.revertido_mo,
+                              s.id_moneda,
+                              sd.precio_ga,
+                              s.fecha_soli,
+                              s.num_tramite as nro_tramite
+                            FROM  adq.tsolicitud s 
+                            INNER JOIN adq.tsolicitud_det sd on s.id_solicitud = sd.id_solicitud and sd.estado_reg = 'activo'
+                            inner join pre.tpresupuesto   p  on p.id_centro_costo = sd.id_centro_costo 
+                            WHERE  sd.id_solicitud = p_id_solicitud_compra
+                                     and sd.estado_reg = 'activo' 
+                                     and sd.cantidad > 0 ) LOOP
+                                     
+                     IF(v_registros.id_partida_ejecucion is not  NULL) THEN                     
+                       
+                           
+                           v_comprometido=0;
+                           v_ejecutado=0;
+                           
+                                
+                           
+                           SELECT 
+                                 COALESCE(ps_comprometido,0), 
+                                 COALESCE(ps_ejecutado,0)  
+                             into 
+                                 v_comprometido,
+                                 v_ejecutado
+                           FROM pre.f_verificar_com_eje_pag(v_registros.id_partida_ejecucion,v_registros.id_moneda);   --  RAC,  v_id_moneda_base);
+                           
+                           
+                           v_monto_a_revertir = COALESCE(v_comprometido,0) - COALESCE(v_ejecutado,0);  
+                           
+                           
+                          --armamos los array para enviar a presupuestos          
+                          IF v_monto_a_revertir != 0 THEN
+                           
+                              v_i = v_i +1;                
+                             
+                               -- la fecha de solictud es la fecha de compromiso 
+                              IF  now()  < v_registros.fecha_soli THEN
+                                va_fecha[v_i] = v_registros.fecha_soli::date;
+                              ELSE
+                                 -- la fecha de reversion como maximo puede ser el 31 de diciembre   
+                                 va_fecha[v_i] = now()::date;
+                                 v_ano_1 =  EXTRACT(YEAR FROM  now()::date);
+                                 v_ano_2 =  EXTRACT(YEAR FROM  v_registros.fecha_soli::date);
+                                 
+                                 IF  v_ano_1  >  v_ano_2 THEN
+                                   va_fecha[v_i] = ('31-12-'|| v_ano_2::varchar)::date;
+                                 END IF;
+                              END IF;
+                              
+                                  va_resp_ges = pre.f_gestionar_presupuesto_individual(
+                                              p_id_usuario, 
+                                              NULL::NUMERIC, --tipo cambio
+                                              v_registros.id_presupuesto, 
+                                              v_registros.id_partida, 
+                                              v_registros.id_moneda, --  RAC Cambio por moneda de la solicitud , v_id_moneda_base;
+                                              -1 * v_monto_a_revertir::NUMERIC, --RAC Cambio por moneda de la solicitud , v_registros.precio_ga_mb;
+                                              va_fecha[v_i], 
+                                              'comprometido'::Varchar, --traducido a varchar
+                                               v_registros.id_partida_ejecucion::INTEGER, 
+                                              'id_solicitud_compra'::VARCHAR, 
+                                               v_registros.id_solicitud, 
+                                               v_reg_sol.num_tramite::VARCHAR 
+                                              );
+                              
+                          END IF;
+                          
+                          
+                          v_men_presu = ' comprometido: '||COALESCE(v_comprometido,0)::varchar||'  ejecutado: '||COALESCE(v_ejecutado,0)::varchar||' \n'||v_men_presu;
+                          
+                     
+                   ELSE  
+                        raise notice 'El presupuesto del detalle con el identificador (%)  no se encuntra comprometido',v_registros.id_solicitud_det;
+                   END IF;
+                    
+             
+             END LOOP;
+             
+               --raise exception '%', v_men_presu;
+             
              
        ELSEIF p_operacion = 'revertir_sobrante' THEN
        
