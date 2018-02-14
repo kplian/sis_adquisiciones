@@ -463,7 +463,7 @@ Class ROrdenCompra extends Report {
 				$pdf-> MultiRow($RowArray,false,1) ; 
 			}						 
         }
-		
+		 
     	$height=5;		 								
     	$obj = new Numbers_Words_es_AR;
     	$numero=explode('.', number_format($totalOrdenCompra,2));
