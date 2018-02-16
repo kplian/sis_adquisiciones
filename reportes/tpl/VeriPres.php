@@ -42,15 +42,15 @@
 	
 	<tr style="text-align: center; vertical-align: middle;">
 		<td colspan="2"><strong><font size="8">DESCRIPCION</font></strong></td>
-		<td colspan="2"><strong><font size="8">GESTION 2017</font></strong></td>
-		<td colspan="2"><strong><font size="8">GESTION 2018</font></strong></td>
-		<td colspan="2"><strong><font size="8">GESTION 2019</font></strong></td>		
+		<td colspan="2"><strong><font size="8">GESTION <?php  echo $this->cabecera[0]['gestion']; ?></font></strong></td>
+		<td colspan="2"><strong><font size="8">GESTION <?php  echo $this->cabecera[0]['gestion']+1; ?></font></strong></td>
+		<td colspan="2"><strong><font size="8">GESTION <?php  echo $this->cabecera[0]['gestion']+2; ?></font></strong></td>		
 	</tr>
 	
 	<tr style="text-align: center; vertical-align: middle;">
 		<td colspan="2"><strong><font size="8">MONTO REQUERIDO</font></strong></td>
-		<td colspan="2"><strong><font size="8"></font></strong></td>
-		<td colspan="2"><strong><font size="8"></font></strong></td>
+		<td colspan="2"><strong><font size="8"><br/> <?php echo number_format($this->datos['v_precio_ga_mb'],2);?> </font></strong></td>
+		<td colspan="2"><strong><font size="8"><br/> <?php echo number_format($this->datos['v_precio_sg_mb'],2);?> </font></strong></td>		
 		<td colspan="2"><strong><font size="8"></font></strong></td>		
 	</tr>
 	
@@ -62,28 +62,27 @@
 	</tr>
 	<tr>
 		<td colspan="8">
-			<font size="6">   NOTA:<br />*Es responsabilidad del Area Solicitante, presupuestar en cada gestion, los montos programados para las geestiones posteriores al año en curso. (2017-2018). 
+			<font size="6">   NOTA:<br />*Es responsabilidad del Area Solicitante, presupuestar en cada gestion, los montos programados para las gestiones posteriores al año en curso. (2017-2018). 
 			</font> 
 		</td>			
 	</tr>
 	
 	<tr>
 		<td colspan="8" valign="center" style="background-color: #87B4F4; vertical-align: middle;"><font size="10"><strong>2) DETALLE FINANCIERO (Responsable de llenado: Finanzas)</strong></font></td>		
-	</tr>
-	
+	</tr>	
 	<tr style="text-align: center; vertical-align: middle;">
-		<td colspan="1"><strong><font size="8"><br/> PRESUPUESTO APROBADO <br />GESTION 2017(Bs)<br/></font></strong></td>	
-		<td colspan="1"><strong><font size="8"></font></strong></td>	
-		<td colspan="1"><strong><font size="8"><br/>PRESUPUESTO APROBADO <br />GESTION 2017(Bs)<br/></font></strong></td>	
-		<td colspan="1"><strong><font size="8"></font></strong></td>	
-		<td colspan="1"><strong><font size="8"><br/>PRESUPUESTO APROBADO <br />GESTION 2017(Bs)<br/></font></strong></td>	
-		<td colspan="1"><strong><font size="8"></font></strong></td>	
-		<td colspan="1"><strong><font size="8"><br/>PRESUPUESTO APROBADO <br />GESTION 2017(Bs)<br/></font></strong></td>	
-		<td colspan="1"><strong><font size="8"></font></strong></td>	
+		<td colspan="1"><strong><font size="8"><br/> PRESUPUESTO VIGENTE GESTION <?php  echo $this->cabecera[0]['gestion']; ?><br /> <br/></font></strong></td>	
+		<td colspan="1"><strong><font size="8"><br/><br/><br/> <?php echo number_format($this->datos['v_saldo_vigente_mb'],2);?> </font></strong></td>	
+		<td colspan="1"><strong><font size="8"><br/>PRESUPUESTO COMPROMETIDO GESTION <?php  echo $this->cabecera[0]['gestion']; ?><br /> <br/></font></strong></td>	
+		<td colspan="1"><strong><font size="8"><br/><br/><br/> <?php echo number_format($this->datos['v_saldo_comp_mb'],2);?></font></strong></td>	
+		<td colspan="1"><strong><font size="8"><br/>SOLICITADO CON CARGO AL PRESUPUESTO GESTION <?php  echo $this->cabecera[0]['gestion']; ?><br /> <br/></font></strong></td>	
+		<td colspan="1"><strong><font size="8"><br/><br/><br/> <?php echo number_format($this->datos['v_precio_ga_mb'],2);?></font></strong></td>	
+		<td colspan="1"><strong><font size="8"><br/>PRESUPUESTO DISPONIBLE IMPUTACION GESTION  <?php  echo $this->cabecera[0]['gestion']; ?><br /> <br/></font></strong></td>	
+		<td colspan="1"><strong><font size="8"><br/><br/><br/> <?php echo number_format($this->datos['v_total_disponble'],2);?></font></strong></td>	
 	</tr>
 	
 	<tr>
-		<td colspan="8" style="background-color: #87B4F4; vertical-align: middle;"><font size="10"><strong> 2.1 VERIFICACION PRESUPUESTARIA GESTION 2017</strong></font></td>		
+		<td colspan="8" style="background-color: #87B4F4; vertical-align: middle;"><font size="10"><strong> 2.1 VERIFICACION PRESUPUESTARIA GESTION <?php  echo $this->cabecera[0]['gestion']; ?></strong></font></td>		
 	</tr>
 	
 	<tr style="text-align: center; vertical-align: middle;">

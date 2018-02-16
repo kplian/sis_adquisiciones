@@ -681,7 +681,8 @@ BEGIN
                           tcc.descripcion::varchar,
                           tcc.codigo::varchar,
                           det.precio_total::numeric,
-                          sol.observacion::varchar
+                          sol.observacion::varchar,
+                          g.gestion::int
 						from adq.tsolicitud sol
                         inner join segu.tusuario usu1 on usu1.id_usuario = sol.id_usuario_reg
                         inner join orga.vfuncionario fun on fun.id_funcionario = sol.id_funcionario
@@ -698,6 +699,7 @@ BEGIN
                         join adq.tsolicitud_det det on det.id_solicitud=sol.id_solicitud
                         join param.tcentro_costo cc on cc.id_centro_costo=det.id_centro_costo
                         join param.ttipo_cc tcc on tcc.id_tipo_cc=cc.id_tipo_cc
+                        join param.tgestion g on g.id_gestion=sol.id_gestion
                         where sol.id_proceso_wf='||v_parametros.id_proceso_wf;
             return v_consulta;
 		end;

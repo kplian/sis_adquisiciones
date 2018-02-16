@@ -812,7 +812,26 @@ class MODSolicitud extends MODbase{
 		$this->captura('descripcion','varchar');
 		$this->captura('codigo','varchar');
 		$this->captura('precio_total','numeric');
-		$this->captura('observacion','varchar');		
+		$this->captura('observacion','varchar');
+		$this->captura('gestion','int4');		
+		//Ejecuta la instruccion
+		$this->armarConsulta();
+		$this->ejecutarConsulta();		
+		//Devuelve la respuesta
+
+		return $this->respuesta;
+	}
+//
+	function getCertSol(){			
+		//Definicion de variables para ejecucion del procedimientp
+		$this->procedimiento='adq.f_solicitud_ime';
+		$this->transaccion='ADQ_CERDATA_GET';
+		$this->tipo_procedimiento='IME';
+		$this->setCount(false);		
+		//
+		$this->setParametro('id_proceso_wf','id_proceso_wf','int4');		
+		//Definicion de la lista del resultado del query
+
 		//Ejecuta la instruccion
 		$this->armarConsulta();
 		$this->ejecutarConsulta();		

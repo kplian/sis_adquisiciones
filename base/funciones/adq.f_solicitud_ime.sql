@@ -114,6 +114,9 @@ DECLARE
        v_valid						varchar;
        v_funcionario				varchar = null;
        v_adq_requiere_rpc			varchar;
+       v_datos_ga_gs				record;
+       v_datos_saldos				record;
+       v_total_disponble			numeric;
 
 			    
 BEGIN
@@ -1904,6 +1907,75 @@ BEGIN
             return v_resp;
 
 		end;
+        
+   /*********************************
+ 	#TRANSACCION:  'ADQ_CERDATA_GET'
+ 	#DESCRIPCION:	Recuperamos lso datos para certificacion presupesutaria
+ 	#AUTOR:		FEA
+ 	#FECHA:		07-04-2017 15:12:51
+	***********************************/
+
+	elsif(p_transaccion='ADQ_CERDATA_GET')then
+
+		begin
+        
+            --recupera moneda de la solicitud
+           select 
+             sol.id_solicitud
+            into
+             v_id_solicitud
+           from adq.tsolicitud sol
+           where sol.id_proceso_wf = v_parametros.id_proceso_wf ;
+            
+            -- recupera monto solicitado gestoon actual y siguiente
+            select 
+               sum(sd.precio_ga_mb) as precio_ga_mb,
+               sum(sd.precio_sg_mb) as precio_sg_mb
+              into
+                v_datos_ga_gs  
+            from adq.tsolicitud_det sd
+            where sd.id_solicitud =v_id_solicitud and sd.estado_reg = 'activo';
+            
+            -- recupera total  vigente y comprometido previo
+            select 
+                codigo_techo,
+                sum(saldo_vigente_mb) as saldo_vigente_mb,
+                sum(saldo_comp_mb) as saldo_comp_mb
+              into
+                v_datos_saldos
+            from (
+                    select 
+                      DISTINCT
+                      tcc.codigo_techo,
+                      sd.saldo_vigente_mb,
+                      sd.saldo_comp_mb
+                    from adq.tsolicitud_det sd
+                    inner join param.tcentro_costo cc on cc.id_centro_costo = sd.id_centro_costo
+                    inner join param.vtipo_cc_techo tcc on tcc.id_tipo_cc = cc.id_tipo_cc
+                    where sd.id_solicitud = v_id_solicitud and sd.estado_reg = 'activo'
+                 ) saldos
+            
+            group by 
+            saldos.codigo_techo;
+            
+            --determina todal disopnible
+            
+            v_total_disponble = COALESCE(v_datos_saldos.saldo_vigente_mb,0)  - COALESCE(v_datos_saldos.saldo_comp_mb,0) - COALESCE(v_datos_ga_gs.precio_ga_mb, 0);			
+
+			--Definicion de la respuesta
+            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Datos de Nro. PO, descripcion funcionario');
+            v_resp = pxp.f_agrega_clave(v_resp,'v_id_funcionario',v_funcionario::varchar);
+            v_resp = pxp.f_agrega_clave(v_resp,'v_total_disponble',COALESCE(v_total_disponble,0)::varchar);
+            v_resp = pxp.f_agrega_clave(v_resp,'v_saldo_vigente_mb',COALESCE(v_datos_saldos.saldo_vigente_mb,0)::varchar);
+            v_resp = pxp.f_agrega_clave(v_resp,'v_saldo_comp_mb',COALESCE(v_datos_saldos.saldo_comp_mb,0)::varchar);
+            v_resp = pxp.f_agrega_clave(v_resp,'v_precio_ga_mb',COALESCE(v_datos_ga_gs.precio_ga_mb,0)::varchar);
+            v_resp = pxp.f_agrega_clave(v_resp,'v_precio_sg_mb',COALESCE(v_datos_ga_gs.precio_sg_mb,0)::varchar);
+
+
+            --Devuelve la respuesta
+            return v_resp;
+
+		end;      
         
   else
      

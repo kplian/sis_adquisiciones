@@ -340,7 +340,7 @@ Phx.vista.CotizacionDet=Ext.extend(Phx.gridInterfaz,{
 				allowBlank: true,
 				allowDecimals: true,
                 allowNegative:false,
-                decimalPrecision:2,
+                decimalPrecision:3,
 				anchor: '80%',
 				gwidth: 120,
 				maxLength:1245186
@@ -630,8 +630,7 @@ Phx.vista.CotizacionDet=Ext.extend(Phx.gridInterfaz,{
        
      },
      
-     obtenerVariableGlobal: function(param){
-				
+     obtenerVariableGlobal: function(param){				
 				//Verifica que la fecha y la moneda hayan sido elegidos
 				Phx.CP.loadingShow();
 				Ext.Ajax.request({

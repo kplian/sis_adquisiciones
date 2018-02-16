@@ -428,14 +428,13 @@ BEGIN
                      --raise exception 'LLega...  %, % , %, %', v_comprometido_ga, v_ejecutado, v_id_partida_ejecucion, v_id_moneda;
                     
                      --validamos que el total revertido no afecte la adjudicacion 
-                    IF  (((v_comprometido_ga + COALESCE(v_precio_sg,0)) - v_total_costo_mo)  >= (v_parametros.cantidad_adjudicada * v_precio_unitario_coti) ) OR v_adq_comprometer_presupuesto = 'no'  THEN
+                    IF  (( ( (v_comprometido_ga + COALESCE(v_precio_sg,0)) - v_total_costo_mo)*( 1 + v_adq_tolerancia_adjudicacion::numeric))  >= (v_parametros.cantidad_adjudicada * v_precio_unitario_coti) ) OR v_adq_comprometer_presupuesto = 'no'  THEN
                        
                        update adq.tcotizacion_det set
                        cantidad_adju = v_parametros.cantidad_adjudicada
                        where id_cotizacion_det = v_parametros.id_cotizacion_det;
                     
-                    ELSE
-                      
+                    ELSE                      
                        raise exception 'El presupeusto comprometido para esta gestión no permiten adjudicar a este precio, solo dispone de un total  de: %',((v_comprometido_ga+ COALESCE(v_precio_sg,0)) - v_total_costo_mo) ;
                     
                     END IF;

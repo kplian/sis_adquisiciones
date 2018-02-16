@@ -922,10 +922,29 @@ function groupArray($array,$groupkey,$groupkeyTwo,$id_moneda,$estado_sol, $onlyD
 			$cbteHeader->imprimirRespuesta($cbteHeader->generarJson());
 		}
 	}
+	
+	//
+	function datosCertSol(){			
+		$dataSource = new DataSource();			
+		if($this->objParam->getParametro('id_proceso_wf')!=''){
+			$this->objParam->addFiltro("id_proceso_wf = ".$this->objParam->getParametro('id_proceso_wf'));	
+		}		
+		$this->objFunc = $this->create('MODSolicitud');	
+		$cbteHeader = $this->objFunc->getCertSol($this->objParam);
+
+		if($cbteHeader->getTipo() == 'EXITO'){							
+			$dataSource->putParameter('datos',$cbteHeader->getDatos());								
+			return $dataSource;
+		}
+		else{
+			$cbteHeader->imprimirRespuesta($cbteHeader->generarJson());
+		}		
+	}
 	//
 	function RVerDispPre(){	
 		$dataSource = $this->datos();		
-		$nombreArchivo = uniqid(md5(session_id()).'-xxx') . '.pdf'; 		
+		$dataPresupuesto = $this->datosCertSol();
+		$nombreArchivo = uniqid(md5(session_id()).'-Presupuestaria') . '.pdf'; 		
 		$tamano = 'LETTER';
 		$orientacion = 'p';
 		$this->objParam->addParametro('orientacion',$orientacion);
@@ -934,7 +953,7 @@ function groupArray($array,$groupkey,$groupkeyTwo,$id_moneda,$estado_sol, $onlyD
 		$this->objParam->addParametro('nombre_archivo',$nombreArchivo);
 		
 		$reporte = new RVerDispPre($this->objParam); 		
-		$reporte->datosHeader($dataSource);
+		$reporte->datosHeader($dataSource, $dataPresupuesto);
 		$reporte->generarReporte();
 		$reporte->output($reporte->url_archivo,'F');
 		
@@ -943,6 +962,6 @@ function groupArray($array,$groupkey,$groupkeyTwo,$id_moneda,$estado_sol, $onlyD
 		$this->mensajeExito->setArchivoGenerado($nombreArchivo);
 		$this->mensajeExito->imprimirRespuesta($this->mensajeExito->generarJson());
 	}	
+	
 }
-
 ?>

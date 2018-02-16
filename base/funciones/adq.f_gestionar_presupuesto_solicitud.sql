@@ -22,6 +22,7 @@ $body$
  
  ISSUE            FECHA:		      AUTOR       DESCRIPCION
  0				12/10/2017			RAC			Se adciona verificacion pro tipo de centro de costo, segun configuración de control de partidas
+ #101			13/02/2018			RAC			Se almacena presupeusto vigente y comprometido previo al compromiso final para reprotes de certificacion
 ***************************************************************************/
 
 DECLARE
@@ -66,6 +67,11 @@ DECLARE
  v_control_partida 				varchar;
  v_consulta						varchar;
  v_id_centro_costo				integer;
+ v_verif_pres_for				varchar[];
+ v_saldo_vigente		        numeric;
+ v_fecha_aux					date;
+ v_verif_pres_comp		        varchar[];
+ v_saldo_comp					numeric;
   
 
   
@@ -197,16 +203,124 @@ BEGIN
       
           ELSEIF p_operacion = 'comprometer' THEN
           
-               -----------------------------------------------------------------------------------------------------------------------
-               -- RAC, 09/01/2018 llamada directa para comprometer y obtener el saldo por comprometer ya que quieren que se muetre en los reportes
-               -------------------------------------------------------------------------------------------------------------------------
+              -----------------------------------------------------------------------------------------------------------------------
+              -- RAC, 09/01/2018 llamada directa para comprometer y obtener el saldo por comprometer ya que quieren que se muetre en los reportes
+              -------------------------------------------------------------------------------------------------------------------------
              
-               --compromete al aprobar la solicitud  
+              ---------------------------------------------------------
+              --  RECUPERAR PRESUPEUSTO VIGENTE y COMPROMETIDOS PREVIOS
+              ----------------------------------------------------------
+              --#101, 13/02/2018  
                v_i = 0;
                
+               FOR v_registros in ( 
+                                SELECT
+                                  sd.id_solicitud_det,
+                                  sd.id_centro_costo,
+                                  s.id_gestion,
+                                  s.id_solicitud,
+                                  sd.id_partida,
+                                  sd.precio_ga_mb,
+                                  p.id_presupuesto,
+                                  s.presu_comprometido,
+                                  s.id_moneda,
+                                  sd.precio_ga,
+                                  s.fecha_soli,
+                                  s.num_tramite as nro_tramite
+                                  
+                                  FROM  adq.tsolicitud s 
+                                  INNER JOIN adq.tsolicitud_det sd on s.id_solicitud = sd.id_solicitud
+                                  inner join pre.tpresupuesto   p  on p.id_centro_costo = sd.id_centro_costo and sd.estado_reg = 'activo'
+                                  WHERE  sd.id_solicitud = p_id_solicitud_compra
+                                         and sd.estado_reg = 'activo' 
+                                         and sd.cantidad > 0 ) LOOP
+                                         
+                                         
+                                         
+                              -- la fecha de solictud es la fecha de compromiso 
+                            IF  now()  < v_registros.fecha_soli THEN
+                              v_fecha_aux = v_registros.fecha_soli::date;
+                            ELSE
+                               -- la fecha de reversion como maximo puede ser el 31 de diciembre   
+                               v_fecha_aux = now()::date;
+                               v_ano_1 =  EXTRACT(YEAR FROM  now()::date);
+                               v_ano_2 =  EXTRACT(YEAR FROM  v_registros.fecha_soli::date);
+                               
+                               IF  v_ano_1  >  v_ano_2 THEN
+                                 v_fecha_aux = ('31-12-'|| v_ano_2::varchar)::date;
+                               END IF;
+                               
+                            END IF;                
+                                         
+                        --obtiene presupuesto vigente
+                        
+                        v_verif_pres_for  =  pre.f_verificar_presupuesto_individual(
+                                                                NULL,--p_nro_tramite, 
+                                                                NULL,--p_id_partida_ejecucion, 
+                                                                v_registros.id_presupuesto, 
+                                                                v_registros.id_partida, 
+                                                                0, 
+                                                                0, 
+                                                                'formulado');
+                                                                
+                                                                
+                         IF  v_id_moneda_base != v_registros.id_moneda THEN
+                            v_saldo_vigente  =   param.f_convertir_moneda (
+                                       v_id_moneda_base,
+                                       v_registros.id_moneda, 
+                                       v_verif_pres_for[2]::numeric, 
+                                       v_fecha_aux,
+                                       'O'::varchar,50);
+                        ELSE
+                         	 v_saldo_vigente = v_verif_pres_for[2]::numeric;
+                        END IF;  
+                        
+                                         
+                        
+                        --obtiene presupuesto  comprometido
+                         v_verif_pres_comp  =  pre.f_verificar_presupuesto_individual(
+                                                                NULL,--p_nro_tramite, 
+                                                                NULL,--p_id_partida_ejecucion, 
+                                                                v_registros.id_presupuesto, 
+                                                                v_registros.id_partida, 
+                                                                0, 
+                                                                0, 
+                                                                'comprometido'); 
+                        
+                        
+                       
+                        
+                        
+                        IF  v_id_moneda_base != v_registros.id_moneda THEN
+                            v_saldo_comp  =   param.f_convertir_moneda (
+                                       v_id_moneda_base, 
+                                       v_registros.id_moneda, 
+                                       v_verif_pres_comp[2]::numeric, 
+                                       v_fecha_aux,
+                                       'O'::varchar,50);
+                        ELSE
+                         	 v_saldo_comp = v_verif_pres_comp[2]::numeric;
+                        END IF;
+                        
+                       
+                                         
+                        --almacena datos recuperados                 
+                         update adq.tsolicitud_det  s set                             
+                             saldo_vigente =    v_saldo_vigente ,
+                             saldo_vigente_mb =   v_verif_pres_for[2]::numeric, 
+                             saldo_comp = v_saldo_comp,
+                             saldo_comp_mb    = v_verif_pres_comp [2]::numeric                       
+                         where s.id_solicitud_det =  v_registros.id_solicitud_det;
+                                         
+               
+               END LOOP;
+               
+               ------------------------------------
+               --  COMPROMETER PRESUPUESTOS
+               -----------------------------------               
                -- verifica que solicitud
-           
-              FOR v_registros in ( 
+               --compromete al aprobar la solicitud  
+               FOR v_registros in ( 
                                 SELECT
                                   sd.id_solicitud_det,
                                   sd.id_centro_costo,
@@ -250,6 +364,9 @@ BEGIN
                            END IF;
                            
                         END IF;
+                        
+                       
+                        
 
                         va_resp_ges = pre.f_gestionar_presupuesto_individual(
                                               p_id_usuario, 
