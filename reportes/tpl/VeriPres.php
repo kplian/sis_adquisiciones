@@ -49,8 +49,8 @@
 	
 	<tr style="text-align: center; vertical-align: middle;">
 		<td colspan="2"><strong><font size="8">MONTO REQUERIDO</font></strong></td>
-		<td colspan="2"><strong><font size="8"><br/> <?php echo number_format($this->datos['v_precio_ga_mb'],2);?> </font></strong></td>
-		<td colspan="2"><strong><font size="8"><br/> <?php echo number_format($this->datos['v_precio_sg_mb'],2);?> </font></strong></td>		
+		<td colspan="2"><strong><font size="8"><?php echo number_format($this->datos['v_precio_ga_mb'],2);?> </font></strong></td>
+		<td colspan="2"><strong><font size="8"><?php echo number_format($this->datos['v_precio_sg_mb'],2);?> </font></strong></td>		
 		<td colspan="2"><strong><font size="8"></font></strong></td>		
 	</tr>
 	
@@ -62,7 +62,7 @@
 	</tr>
 	<tr>
 		<td colspan="8">
-			<font size="6">   NOTA:<br />*Es responsabilidad del Area Solicitante, presupuestar en cada gestion, los montos programados para las gestiones posteriores al año en curso. (2017-2018). 
+			<font size="6">   NOTA:<br />*Es responsabilidad del Area Solicitante, presupuestar en cada gestion, los montos programados para las gestiones posteriores al año en curso. 
 			</font> 
 		</td>			
 	</tr>
