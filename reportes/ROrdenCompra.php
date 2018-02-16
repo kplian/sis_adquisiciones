@@ -102,16 +102,21 @@ class CustomReportOC extends MYPDF {
 		$this->Cell($ancho, 0, 'CONOCIMIENTO SOBRE LA RESPONSABILIDAD', 0, 0, 'C');
 		$this->Ln(2);
 		$this->SetFont('','');
-		$this->Cell($ancho, 0, 'Manifiesta que garantiza la equidad de oportunidades a su personal y que esto tiene todas las garantias y libertades para asociarse y constituirse en gremio, asi como, para realizar negociaciones colectivas', '', 1, 'L');
+		/*$this->Cell($ancho, 0, 'Manifiesta que garantiza la equidad de oportunidades a su personal y que esto tiene todas las garantias y libertades para asociarse y constituirse en gremio, asi como, para realizar negociaciones colectivas', '', 1, 'L');
 		$this->Cell($ancho, 0, 'Conocimiento de la importancia de incorporar normativas y procedimientos que mojoren el relacionamiento con su personal y sus pùblicos de interés, declara que conoce, respeta y se adhiere voluntariamente', '', 1, 'L'); 
 		$this->Cell($ancho, 0, 'a los principios y reglas referentes a la responsabildiad social, tales como: la declaracion universal de derechos humanos, el convenio de las naciones unidad sobre los derechos de los niños y los convenios', '', 1, 'L');
 		$this->Cell($ancho, 0, 'de la organización internacional del trabajo (documentos que forman partes del plego de especificaciones).', '', 1, 'L');
 		$this->Cell($ancho, 0, 'Declara que su pesonal se encuetnra capacitado para realizar las actividades encomendadas, que se presenta de manera voluntaria y que recibe una remuneración justa a corde al tipo de tarea que realiza', '', 1, 'L');
 		$this->Cell($ancho, 0, 'y sin discriminación alguna de raza , color, sexo. Religión, opinion politica, ascendecia nacional, discapacidad u origen social.', '', 1, 'L');
-		
-		 
+		*/
 
-		
+        $this->Cell($ancho, 0, 'Consiente de la importancia de incorporar normativas y procedimientos que mejoren el relacionamiento  con su personal y sus públicos de interés, declara que conoce, respeta y se adhiere voluntariamente a los', '', 1, 'L');
+        $this->Cell($ancho, 0, 'principios y reglas referentes a la responsabilidad social, tales como: la declaración Universal de Derechos Humanos, el convenio de las Naciones Unidas sobre los derechos de los niños y los convenios de la', '', 1, 'L'); 
+		$this->Cell($ancho, 0, 'organización internacional del trabajo (documentos que forman parte competente del pliego de especificaciones). Declara que su personal se encuentra capacitado para realizar las actividades encomendadas,', '', 1, 'L');
+		$this->Cell($ancho, 0, 'que se presenta de manera voluntaria a su puesto de trabajo y que recibe una remuneración justa acorde al tipo de tarea que realiza y sin discriminación alguna de raza, color, sexo, religión, opinión política,', '', 1, 'L');
+		$this->Cell($ancho, 0, 'ascendencia nacional, discapacidad u origen social. Manifiesta que garantiza la equidad de oportunidades a su personal y que éste tiene todas las garantías y libertades para asociarse y constituirse en gremio,', '', 1, 'L');
+		$this->Cell($ancho, 0, ', así como, para realizar negociaciones colectivas.', '', 1, 'L');
+								
 		$line_width = 0.85 / $this->getScaleFactor();
 		$this->SetLineStyle(array('width' => $line_width, 'cap' => 'butt', 'join' => 'miter', 'dash' => 0, 'color' => array(0, 0, 0)));
 		$ancho = round(($this->getPageWidth() - $ormargins['left'] - $ormargins['right']) / 3);
@@ -261,10 +266,12 @@ Class ROrdenCompra extends Report {
 		if($this->getDataSource()->getParameter('fecha_entrega')!=''){  
     		
             $pdf->SetFont('', 'B');
-            $pdf->Cell($width4+$width3+$width2+$width1, $height, 'Fecha de Entrega:', 0, 0, 'L', false, '', 0, false, 'T', 'C');
+			$pdf->Cell($width3, $height, 'Fecha de Entrega:', 0, 0, 'L', false, '', 0, false, 'T', 'C');
+            //$pdf->Cell($width4+$width3+$width2+$width1, $height, 'Fecha de Entrega:', 0, 0, 'L', false, '', 0, false, 'T', 'C');
             $pdf->SetFont('', '');
             $pdf->SetFillColor(192,192,192, true);
-            $pdf->Cell($width4+$width3+$width2+$width1, $height, $this->getDataSource()->getParameter('fecha_entrega'), $white, 0, 'L', true, '', 0, false, 'T', 'C');        
+            //$pdf->Cell($width4+$width3+$width2+$width1, $height, $this->getDataSource()->getParameter('fecha_entrega'), $white, 0, 'L', true, '', 0, false, 'T', 'C');       
+			$pdf->MultiCell(0, $height, $this->getDataSource()->getParameter('fecha_entrega'), 0,'L', true ,1);     
             $pdf->Cell(5, $height, '', 0, 0, 'L', false, '', 0, false, 'T', 'C');
             $pdf->Ln();
             $pdf->SetFont('', 'B');
@@ -384,6 +391,22 @@ Class ROrdenCompra extends Report {
 			$pdf->Ln($height);
 		}		
 		
+		
+	    $pdf->Ln(20);
+		$pdf->SetFontSize(5.5);
+		$pdf->MultiCell(200, $height, 'CONCILIACIÓN Y ARBITRAJE', 0,'L', false ,1);
+		
+		$pdf->SetFont('','');
+		$pdf->MultiCell(200, 0, 'Las partes del presente contrato se comprometen a someter a la jurisdicción arbitral del Centro de Conciliación y Arbitraje Institucional de la Cámara de Comercio de Cochabamba, ante cualquier controversia ', 0,'L', false ,1);
+		
+		$pdf->MultiCell(200, 0, 'que surja de la interpretación del presente contrato, de todos los documentos anexos que forman parte del mismo. Asimismo declaran que acataran el Acta de conciliación o el laudo arbitral, comprometiéndose', 0,'L', false ,1);
+		
+		$pdf->MultiCell(200, 0, 'a no presentar ninguna demanda de anulación. Cada parte elegirá un arbitro, el centro de conciliación y Arbitraje, elegirá el tercero. Las partes de común acuerdo, podrán elegir un solo arbitro.', 0,'L', false ,1);
+		$pdf->Ln(1.5);
+		$pdf->MultiCell(200, $height, 'EN CONFORMIDAD CON LOS TERMINOS DEL PRESENTE CONTRATO', 0,'L', false ,1);
+		
+		
+		
 		$pdf->Ln(20);
 		$pdf->MultiCell(100, $height, 'FIRMA AUTORIZADA Y SELLO DEL PROVEEDOR', 0,'L', false ,1);
 		
@@ -440,11 +463,11 @@ Class ROrdenCompra extends Report {
 				$pdf-> MultiRow($RowArray,false,1) ; 
 			}						 
         }
-		
+		 
     	$height=5;		 								
     	$obj = new Numbers_Words_es_AR;
     	$numero=explode('.', number_format($totalOrdenCompra,2));
-    	$pdf->Cell($width2+$width1+$width1/2+$width1/4, $height, 'SON: '. strtoupper(trim($obj->toWords(str_replace(',', '', $numero[0])))).' '.$numero[1].'/'.'100 '.strtoupper($this->getDataSource()->getParameter('moneda')).'S', 1, 0, 'L', false, '', 1, false, 'T', 'C');
+    	$pdf->Cell($width2+$width1+$width1/2+$width1/4, $height, 'SON: '. strtoupper(trim($obj->toWords(str_replace(',', '', $numero[0])))).' '.$numero[1].'/'.'100 '.strtoupper($this->getDataSource()->getParameter('moneda')).'', 1, 0, 'L', false, '', 1, false, 'T', 'C');
     	$pdf->Cell($width1, $height, number_format($totalOrdenCompra,2), 1, 0, 'R', false, '', 1, false, 'T', 'C');
     	$pdf->Ln();       									
     }     
