@@ -5,6 +5,12 @@
 *@author  (admin)
 *@date 19-02-2013 12:12:51
 *@description Archivo con la interfaz de usuario que permite la ejecucion de todas las funcionalidades del sistema
+ * 
+ * 
+****************************************************************************
+* ISSUE            FECHA:		      AUTOR       DESCRIPCION
+* #10  ETR      21/02/2018          RAC         se incrementa columna para comproemter al 87 %
+   
 */
 header("content-type: text/javascript; charset=UTF-8");
 ?>
@@ -570,6 +576,33 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
                 options: ['no_necesita','contrato_nuevo','contrato_adhesion','ampliacion_contrato'],
             },
             valorInicial: 'no_necesita',
+            grid:false,
+            form:true
+        },
+        
+         //#10 Adqusiciones, adiciona el campo para decidir si vamos al 87% 
+        {
+            config:{
+                name: 'comprometer_87',
+                fieldLabel: 'Comp 87%',
+                qtip: 'Si compromete al 87% , en caso contrario es el 100%  (87% es cuando estemos  seguros que la adjudicación se realizara a un proveedor que emite factura con crédito fiscal)',
+                allowBlank: false,
+                emptyText: 'Tipo...',
+                typeAhead: true,
+                triggerAction: 'all',
+                lazyRender: true,
+                mode: 'local',
+                gwidth: 100,
+                store: ['no','si']
+            },
+            type: 'ComboBox',
+            id_grupo: 2,
+            filters:{
+                type: 'list',
+                pfiltro:'sol.comprometer_87',
+                options: ['no','si'],
+            },
+            valorInicial: 'no',
             grid:false,
             form:true
         },

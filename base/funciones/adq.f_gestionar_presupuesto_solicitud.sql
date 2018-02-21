@@ -20,9 +20,10 @@ $body$
  FECHA:	        25-06-2013
  COMENTARIOS:	
  
- ISSUE            FECHA:		      AUTOR       DESCRIPCION
- 0				12/10/2017			RAC			Se adciona verificacion pro tipo de centro de costo, segun configuración de control de partidas
- #101			13/02/2018			RAC			Se almacena presupeusto vigente y comprometido previo al compromiso final para reprotes de certificacion
+ ISSUE     EMPRESA        FECHA:	      AUTOR       			DESCRIPCION
+ 0				        12/10/2017			RAC				Se adciona verificacion pro tipo de centro de costo, segun configuración de control de partidas
+ #101			        13/02/2018			RAC				Se almacena presupeusto vigente y comprometido previo al compromiso final para reprotes de certificacion
+ #10 ADQ    ETR         21/02/2018          RAC KPLIAN      se incrementa columna para comproemter al 87 %	
 ***************************************************************************/
 
 DECLARE
@@ -72,6 +73,8 @@ DECLARE
  v_fecha_aux					date;
  v_verif_pres_comp		        varchar[];
  v_saldo_comp					numeric;
+ v_monto_a_comprometer 			numeric; --10 ADQ ++
+ v_monto_a_comprometer_mb    	numeric; --10 ADQ ++
   
 
   
@@ -206,6 +209,8 @@ BEGIN
               -----------------------------------------------------------------------------------------------------------------------
               -- RAC, 09/01/2018 llamada directa para comprometer y obtener el saldo por comprometer ya que quieren que se muetre en los reportes
               -------------------------------------------------------------------------------------------------------------------------
+              
+              
              
               ---------------------------------------------------------
               --  RECUPERAR PRESUPEUSTO VIGENTE y COMPROMETIDOS PREVIOS
@@ -213,7 +218,7 @@ BEGIN
               --#101, 13/02/2018  
                v_i = 0;
                
-               FOR v_registros in ( 
+              FOR v_registros in ( 
                                 SELECT
                                   sd.id_solicitud_det,
                                   sd.id_centro_costo,
@@ -226,7 +231,8 @@ BEGIN
                                   s.id_moneda,
                                   sd.precio_ga,
                                   s.fecha_soli,
-                                  s.num_tramite as nro_tramite
+                                  s.num_tramite as nro_tramite,
+                                  s.comprometer_87
                                   
                                   FROM  adq.tsolicitud s 
                                   INNER JOIN adq.tsolicitud_det sd on s.id_solicitud = sd.id_solicitud
@@ -273,9 +279,9 @@ BEGIN
                                        'O'::varchar,50);
                         ELSE
                          	 v_saldo_vigente = v_verif_pres_for[2]::numeric;
-                        END IF;  
+                        END IF; 
                         
-                                         
+                                     
                         
                         --obtiene presupuesto  comprometido
                          v_verif_pres_comp  =  pre.f_verificar_presupuesto_individual(
@@ -333,7 +339,8 @@ BEGIN
                                   s.id_moneda,
                                   sd.precio_ga,
                                   s.fecha_soli,
-                                  s.num_tramite as nro_tramite
+                                  s.num_tramite as nro_tramite,
+                                  s.comprometer_87 -- #10 ADQ, adcionar el consideracion del 87% 
                                   
                                   FROM  adq.tsolicitud s 
                                   INNER JOIN adq.tsolicitud_det sd on s.id_solicitud = sd.id_solicitud
@@ -365,6 +372,16 @@ BEGIN
                            
                         END IF;
                         
+                        --#10 ADQ, comproemte al 87% de manera opcional segun configuracion de la solicitud
+                        v_monto_a_comprometer = 0;
+                        v_monto_a_comprometer_mb = 0;
+                        IF  v_registros.comprometer_87 = 'no' THEN
+                          v_monto_a_comprometer =  v_registros.precio_ga::NUMERIC;
+                          v_monto_a_comprometer_mb =  v_registros.precio_ga_mb::NUMERIC;
+                        ELSE
+                          v_monto_a_comprometer =  v_registros.precio_ga::NUMERIC * 0.87;
+                          v_monto_a_comprometer_mb =  v_registros.precio_ga_mb::NUMERIC * 0.87;
+                        END IF;
                        
                         
 
@@ -374,7 +391,7 @@ BEGIN
                                               v_registros.id_presupuesto, 
                                               v_registros.id_partida, 
                                               v_registros.id_moneda, --  RAC Cambio por moneda de la solicitud , v_id_moneda_base;
-                                              v_registros.precio_ga::NUMERIC, --RAC Cambio por moneda de la solicitud , v_registros.precio_ga_mb;
+                                              v_monto_a_comprometer::numeric ,--RAC Cambio por moneda de la solicitud , v_registros.precio_ga_mb;
                                               va_fecha[v_i], 
                                               'comprometido'::Varchar, --traducido a varchar
                                               NULL::INTEGER, 
@@ -402,9 +419,12 @@ BEGIN
                              saldo_pre_mt =     va_resp_ges[5],
                              saldo_pre_mb =   va_resp_ges[3],
                              fecha_mod = now(),
+                             fecha_comp = now(),
                              id_usuario_mod = p_id_usuario,
                              revertido_mb = 0,     -- inicializa el monto de reversion
-                             revertido_mo = 0     -- inicializa el monto de reversion  
+                             revertido_mo = 0 ,    -- inicializa el monto de reversion 
+                             monto_cmp = v_monto_a_comprometer,  --#10 ADQ ++
+                             monto_cmp_mb = v_monto_a_comprometer_mb  --#10 ADQ ++ 
                          where s.id_solicitud_det =  v_registros.id_solicitud_det;
                          
                         

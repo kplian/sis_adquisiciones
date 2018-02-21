@@ -819,5 +819,129 @@ IS 'saldo presupeustario en moenda base despues de comprometer';
   
   
 /***********************************F-SCP-RAC-ADQ-0-09/01/2017****************************************/  
+
+
+/***********************************I-SCP-RAC-ADQ-0-13/02/2018****************************************/  
+
+
+--------------- SQL ---------------
+
+ALTER TABLE adq.tsolicitud_det
+  ADD COLUMN saldo_vigente NUMERIC DEFAULT 0 NOT NULL;
+
+COMMENT ON COLUMN adq.tsolicitud_det.saldo_vigente
+IS 'saldo vigente de presupuesto';
+
+
+--------------- SQL ---------------
+
+ALTER TABLE adq.tsolicitud_det
+  ADD COLUMN saldo_vigente_mb NUMERIC DEFAULT 0 NOT NULL;
+
+COMMENT ON COLUMN adq.tsolicitud_det.saldo_vigente_mb
+IS 'saldo vigente de presupeusto en moneda base';
+
+--------------- SQL ---------------
+
+ALTER TABLE adq.tsolicitud_det
+  ADD COLUMN saldo_vigente_rep NUMERIC DEFAULT 0 NOT NULL;
+
+COMMENT ON COLUMN adq.tsolicitud_det.saldo_vigente_rep
+IS 'saldo vigente en moneda de trasaccion para reportes (es volatil dependiendo del momento de generacion del reporte)';
+
+
+--------------- SQL ---------------
+
+ALTER TABLE adq.tsolicitud_det
+  ADD COLUMN saldo_vigente_rep_mb NUMERIC DEFAULT 0 NOT NULL;
+
+COMMENT ON COLUMN adq.tsolicitud_det.saldo_vigente_rep_mb
+IS 'saldo vigente en moneda de trasaccion para reportes (es volatil dependiendo del momento de generacion del reporte) en moneda base';
+
+
+--------------- SQL ---------------
+
+ALTER TABLE adq.tsolicitud_det
+  ADD COLUMN saldo_comp NUMERIC DEFAULT 0 NOT NULL;
+
+COMMENT ON COLUMN adq.tsolicitud_det.saldo_comp
+IS 'saldo presupeusto comprometido en moenda de trasaccion, vigente - disopnible = comproemtido';
+
+
+
+--------------- SQL ---------------
+
+ALTER TABLE adq.tsolicitud_det
+  ADD COLUMN saldo_comp_mb NUMERIC DEFAULT 0 NOT NULL;
+
+COMMENT ON COLUMN adq.tsolicitud_det.saldo_comp_mb
+IS 'saldo presupeusto comprometido en moenda de trasaccion, vigente - disopnible = comproemtido en moenda base';
+
+
+--------------- SQL ---------------
+
+ALTER TABLE adq.tsolicitud_det
+  ADD COLUMN saldo_comp_rep NUMERIC DEFAULT 0 NOT NULL;
+
+COMMENT ON COLUMN adq.tsolicitud_det.saldo_comp_rep
+IS 'saldo presupeusto comprometido en moenda de trasaccion, vigente - disopnible = comproemtido . para reportes antes de ser aprobado  y comprometido el monto solicitado';
+
+
+ --------------- SQL ---------------
+
+ALTER TABLE adq.tsolicitud_det
+  ADD COLUMN saldo_comp_rep_mb NUMERIC DEFAULT 0 NOT NULL;
+
+COMMENT ON COLUMN adq.tsolicitud_det.saldo_comp_rep_mb
+IS 'aldo presupeusto comprometido en moenda de trasaccion, vigente - disopnible = comproemtido . para reportes antes de ser aprobado  y comprometido el monto solicitado, en moneda base';
+  
+
+ALTER TABLE adq.tsolicitud_det
+  ADD COLUMN fecha_comp TIMESTAMP WITHOUT TIME ZONE DEFAULT now() NOT NULL;
+  
+  
+ 
+/***********************************F-SCP-RAC-ADQ-0-13/02/2018****************************************/  
+  
+  
+  
+  
+    
+  
+/***********************************I-SCP-RAC-ADQ-0-21/02/2018****************************************/  
+ 
+-- #10  ETR      21/02/2018          RAC         se incrementa columna para comproemter al 87 %
+  
+  --------------- SQL ---------------
+
+ALTER TABLE adq.tsolicitud
+  ADD COLUMN comprometer_87 VARCHAR(4) DEFAULT 'no' NOT NULL;
+
+COMMENT ON COLUMN adq.tsolicitud.comprometer_87
+IS 'no compromete el 100 %, si comproemte solo el 87';
+  
+ 
+ALTER TABLE adq.tsolicitud_det
+  ADD COLUMN monto_cmp NUMERIC;
+  
+ --------------- SQL ---------------
+ALTER TABLE adq.tsolicitud_det
+  ADD COLUMN monto_cmp NUMERIC DEFAULT 0 NOT NULL;
+
+COMMENT ON COLUMN adq.tsolicitud_det.monto_cmp
+IS 'monto comprometido en moenda original'; 
+ 
+
+ALTER TABLE adq.tsolicitud_det
+  ADD COLUMN monto_cmp_mb NUMERIC DEFAULT 0 NOT NULL;
+
+COMMENT ON COLUMN adq.tsolicitud_det.monto_cmp_mb
+IS 'monto comprometido en moenda base';
+
+
+
+   
+/***********************************F-SCP-RAC-ADQ-0-21/02/2018****************************************/  
  
   
+ 

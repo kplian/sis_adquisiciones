@@ -88,11 +88,11 @@ class MODSolicitud extends MODbase{
 		$this->captura('codigo_poa','varchar');		
 		$this->captura('obs_poa','varchar');
 		$this->captura('contador_estados','bigint');
-
 		$this->captura('nro_po','varchar');
 		$this->captura('fecha_po','date');
-
 		$this->captura('importe_total','numeric');
+		$this->captura('comprometer_87','varchar');//#10 ++
+		
 		
 		
 		  
@@ -105,10 +105,13 @@ class MODSolicitud extends MODbase{
 		return $this->respuesta;
 	}
 	
-	
-	
-        
-        		
+	/*
+	 *     ***************************************************************************
+     *   ISSUE            FECHA:		      AUTOR       DESCRIPCION
+     *  #10  ETR      21/02/2018          RAC         se incrementa columna para comproemter al 87 %, comprometer_87
+   
+	 * 
+	 * */        		
 	function insertarSolicitud(){
 		//Definicion de variables para ejecucion del procedimiento
 		$this->procedimiento='adq.f_solicitud_ime';
@@ -147,11 +150,10 @@ class MODSolicitud extends MODbase{
 		$this->setParametro('dias_plazo_entrega','dias_plazo_entrega','integer');
 		$this->setParametro('precontrato','precontrato','varchar');
 		$this->setParametro('codigo_poa','codigo_poa','varchar');		
-		$this->setParametro('obs_poa','obs_poa','varchar');
-		
-      
+		$this->setParametro('obs_poa','obs_poa','varchar');      
 		$this->setParametro('nro_po','nro_po','varchar');
 		$this->setParametro('fecha_po','fecha_po','varchar');
+		$this->setParametro('comprometer_87','comprometer_87','varchar');//#10 ADQ
 		
 
 		//Ejecuta la instruccion
@@ -161,6 +163,14 @@ class MODSolicitud extends MODbase{
 		//Devuelve la respuesta
 		return $this->respuesta;
 	}
+
+/*
+	 * ***************************************************************************
+     *   ISSUE            FECHA:		      AUTOR       DESCRIPCION
+     *  #10  ETR      21/02/2018          RAC         se incrementa columna para comproemter al 87 %, comprometer_87
+   
+	 * 
+	 * */  
 
 	function modificarSolicitud(){
 		//Definicion de variables para ejecucion del procedimiento
@@ -200,9 +210,9 @@ class MODSolicitud extends MODbase{
 		$this->setParametro('fecha_inicio','fecha_inicio','date');
 		$this->setParametro('dias_plazo_entrega','dias_plazo_entrega','integer');
 		$this->setParametro('precontrato','precontrato','varchar');
-
 		$this->setParametro('nro_po','nro_po','varchar');
 		$this->setParametro('fecha_po','fecha_po','date');
+		$this->setParametro('comprometer_87','comprometer_87','varchar');//#10 ADQ
 
 		
 		//Ejecuta la instruccion
@@ -601,10 +611,10 @@ class MODSolicitud extends MODbase{
 			$this->setParametro('dias_plazo_entrega','dias_plazo_entrega','integer');
 			$this->setParametro('precontrato','precontrato','varchar');
 			$this->setParametro('correo_proveedor','correo_proveedor','varchar');
-
 			$this->setParametro('nro_po','nro_po','varchar');
 			$this->setParametro('fecha_po','fecha_po','date');
 			$this->setParametro('observacion','observacion','varchar');
+			$this->setParametro('comprometer_87','comprometer_87','varchar');//#10 ADQ
 
 			//Ejecuta la instruccion
             $this->armarConsulta();

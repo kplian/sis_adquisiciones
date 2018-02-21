@@ -16,10 +16,11 @@ $body$
  FECHA:	        19-02-2013 12:12:51
  COMENTARIOS:
 ***************************************************************************
-* ISSUE            FECHA:		      AUTOR       DESCRIPCION
-* 0, BOA	  	10/06/2013          RAC         Funcion que devuelve conjuntos de registros de las consultas relacionadas con la tabla 'adq.tsolicitud'
-* 0, ETR	    19/10/2017          RAC			no se muestra en visto bueno solicitud el estado desierto, ADQ_SOL_SEL
-*
+* ISSUE SIS       EMPRESA      FECHA:		      AUTOR       DESCRIPCION
+* 0,   				BOA	  		10/06/2013          RAC         Funcion que devuelve conjuntos de registros de las consultas relacionadas con la tabla 'adq.tsolicitud'
+* 0,  				ETR	        19/10/2017          RAC			no se muestra en visto bueno solicitud el estado desierto, ADQ_SOL_SEL 
+ #10 ADQ       		ETR         21/02/2018          RAC         se incrementa columna para comproemter al 87 %	
+ 
 ***************************************************************************/
 
 DECLARE
@@ -66,6 +67,13 @@ BEGIN
     #DESCRIPCION_TEC:	 TIENE QUE DEVOLVER LAS MISMAS COLUMNAS QUE ADQ_HISSOL_SEL
  	#AUTOR:		Rensi Arteaga Copari
  	#FECHA:		19-02-2013 12:12:51
+    
+    ***************************************************************************
+   * ISSUE               FECHA:		      AUTOR       DESCRIPCION
+   * #10 ADQ  ETR      21/02/2018          RAC         se incrementa columna para comproemter al 87 %
+    
+    
+    
     ***********************************/
 
 	if(p_transaccion='ADQ_SOL_SEL')then
@@ -165,70 +173,71 @@ BEGIN
 
     		--Sentencia de la consulta
 			v_consulta:='select
-						'||v_strg_sol||',
-						sol.estado_reg,
-						sol.id_solicitud_ext,
-						sol.presu_revertido,
-						sol.fecha_apro,
-						sol.estado,
-						sol.id_funcionario_aprobador,
-						sol.id_moneda,
-						sol.id_gestion,
-						sol.tipo,
-						sol.num_tramite,
-						sol.justificacion,
-						sol.id_depto,
-						sol.lugar_entrega,
-						sol.extendida,
-					    sol.posibles_proveedores,
-						sol.id_proceso_wf,
-						sol.comite_calificacion,
-						sol.id_categoria_compra,
-						sol.id_funcionario,
-						sol.id_estado_wf,
-						sol.fecha_soli,
-						sol.fecha_reg,
-						sol.id_usuario_reg,
-						sol.fecha_mod,
-						sol.id_usuario_mod,
-						usu1.cuenta as usr_reg,
-						usu2.cuenta as usr_mod,
-                        sol.id_uo,
-						fun.desc_funcionario1 as desc_funcionario,
-                        funa.desc_funcionario1 as desc_funcionario_apro,
-                        uo.codigo||''-''||uo.nombre_unidad as desc_uo,
-                        ges.gestion as desc_gestion,
-                        mon.codigo as desc_moneda,
-						dep.codigo as desc_depto,
-                        pm.nombre as desc_proceso_macro,
-                        cat.nombre as desc_categoria_compra,
-                        sol.id_proceso_macro,
-                        sol.numero,
-                        funrpc.desc_funcionario1 as desc_funcionario_rpc,
-                        '||v_strg_obs||',
-                        sol.instruc_rpc,
-                        pro.desc_proveedor,
-                        sol.id_proveedor,
-                        sol.id_funcionario_supervisor,
-                        funs.desc_funcionario1 as desc_funcionario_supervisor,
-                        sol.ai_habilitado,
-                        sol.id_cargo_rpc,
-                        sol.id_cargo_rpc_ai,
-                        sol.tipo_concepto,
-                        sol.revisado_asistente,
-                        sol.fecha_inicio,
-                        sol.dias_plazo_entrega,
-                        sol.obs_presupuestos,
-                        sol.precontrato,
-                        sol.update_enable,
-                        sol.codigo_poa,
-                        sol.obs_poa,
-                        (select count(*)
-                             from unnest(id_tipo_estado_wfs) elemento
-                             where elemento = ew.id_tipo_estado) as contador_estados,
-						            sol.nro_po,
-                        sol.fecha_po,
-                        sum(tsd.precio_total) as importe_total
+                              '||v_strg_sol||',
+                              sol.estado_reg,
+                              sol.id_solicitud_ext,
+                              sol.presu_revertido,
+                              sol.fecha_apro,
+                              sol.estado,
+                              sol.id_funcionario_aprobador,
+                              sol.id_moneda,
+                              sol.id_gestion,
+                              sol.tipo,
+                              sol.num_tramite,
+                              sol.justificacion,
+                              sol.id_depto,
+                              sol.lugar_entrega,
+                              sol.extendida,
+                              sol.posibles_proveedores,
+                              sol.id_proceso_wf,
+                              sol.comite_calificacion,
+                              sol.id_categoria_compra,
+                              sol.id_funcionario,
+                              sol.id_estado_wf,
+                              sol.fecha_soli,
+                              sol.fecha_reg,
+                              sol.id_usuario_reg,
+                              sol.fecha_mod,
+                              sol.id_usuario_mod,
+                              usu1.cuenta as usr_reg,
+                              usu2.cuenta as usr_mod,
+                              sol.id_uo,
+                              fun.desc_funcionario1 as desc_funcionario,
+                              funa.desc_funcionario1 as desc_funcionario_apro,
+                              uo.codigo||''-''||uo.nombre_unidad as desc_uo,
+                              ges.gestion as desc_gestion,
+                              mon.codigo as desc_moneda,
+                              dep.codigo as desc_depto,
+                              pm.nombre as desc_proceso_macro,
+                              cat.nombre as desc_categoria_compra,
+                              sol.id_proceso_macro,
+                              sol.numero,
+                              funrpc.desc_funcionario1 as desc_funcionario_rpc,
+                              '||v_strg_obs||',
+                              sol.instruc_rpc,
+                              pro.desc_proveedor,
+                              sol.id_proveedor,
+                              sol.id_funcionario_supervisor,
+                              funs.desc_funcionario1 as desc_funcionario_supervisor,
+                              sol.ai_habilitado,
+                              sol.id_cargo_rpc,
+                              sol.id_cargo_rpc_ai,
+                              sol.tipo_concepto,
+                              sol.revisado_asistente,
+                              sol.fecha_inicio,
+                              sol.dias_plazo_entrega,
+                              sol.obs_presupuestos,
+                              sol.precontrato,
+                              sol.update_enable,
+                              sol.codigo_poa,
+                              sol.obs_poa,
+                              (select count(*)
+                                   from unnest(id_tipo_estado_wfs) elemento
+                                   where elemento = ew.id_tipo_estado) as contador_estados,
+                                          sol.nro_po,
+                              sol.fecha_po,
+                              sum(tsd.precio_total) as importe_total,
+                              sol.comprometer_87
 						from adq.tsolicitud sol
 						inner join segu.tusuario usu1 on usu1.id_usuario = sol.id_usuario_reg
                         inner join wf.tproceso_wf pwf on pwf.id_proceso_wf = sol.id_proceso_wf
@@ -682,7 +691,8 @@ BEGIN
                           tcc.codigo::varchar,
                           det.precio_total::numeric,
                           sol.observacion::varchar,
-                          g.gestion::int
+                          g.gestion::int,
+                          sol.fecha_soli::date
 						from adq.tsolicitud sol
                         inner join segu.tusuario usu1 on usu1.id_usuario = sol.id_usuario_reg
                         inner join orga.vfuncionario fun on fun.id_funcionario = sol.id_funcionario

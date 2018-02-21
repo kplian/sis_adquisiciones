@@ -20,7 +20,14 @@ $body$
 
  DESCRIPCION:	
  AUTOR:			
- FECHA:		
+ FECHA:	
+ 
+ ***************************************************************************
+ ISSUE SIS       EMPRESA      FECHA:		      AUTOR       DESCRIPCION
+ #10 ADQ       ETR      21/02/2018          RAC         se incrementa columna para comproemter al 87 %	
+ 
+ 
+ 
 ***************************************************************************/
 
 DECLARE
@@ -117,6 +124,8 @@ DECLARE
        v_datos_ga_gs				record;
        v_datos_saldos				record;
        v_total_disponble			numeric;
+       v_comprometer_87             varchar; --#10ADQ ++
+       v_factor						numeric; --#10 ADQ ++
 
 			    
 BEGIN
@@ -129,10 +138,13 @@ BEGIN
  	#DESCRIPCION:	Insercion de la cabecera de las solicitudes de compra ....
  	#AUTOR:		RAC	
  	#FECHA:		19-02-2013 12:12:51
+    
+    ***************************************************************************
+   * ISSUE               FECHA:		      AUTOR       DESCRIPCION
+   * #10 ADQ  ETR      21/02/2018          RAC         se incrementa columna para comproemter al 87 %
+    
 	***********************************/
     
-    --raise exception 'LLEGA .... %', p_transaccion;
-
 	if (p_transaccion='ADQ_SOL_INS') then
 					
         begin
@@ -265,7 +277,8 @@ BEGIN
             precontrato,
             nro_po,
             fecha_po,
-            observacion
+            observacion,
+            comprometer_87 --#10 se adciona campo para indicar el tipo de compromiso al 87 %
           	) values(
 			'activo',
 			--v_parametros.id_solicitud_ext,
@@ -305,7 +318,8 @@ BEGIN
             COALESCE(v_parametros.precontrato,'no'),
             trim(both ' ' from v_parametros.nro_po),
             v_parametros.fecha_po,
-            v_parametros.observacion
+            v_parametros.observacion,
+            v_parametros.comprometer_87
 							
 			)RETURNING id_solicitud into v_id_solicitud;
         
@@ -368,7 +382,9 @@ BEGIN
  	#TRANSACCION:  'ADQ_SOL_MOD'
  	#DESCRIPCION:	Modificacion de registros
  	#AUTOR:		RAC	
- 	#FECHA:		19-02-2013 12:12:51
+ 	 **************************************************************************
+   * ISSUE               FECHA:		      AUTOR       DESCRIPCION
+   * #10 ADQ  ETR      21/02/2018          RAC         se incrementa columna para comproemter al 87 %
 	***********************************/
 
 	elsif(p_transaccion='ADQ_SOL_MOD')then
@@ -416,30 +432,31 @@ BEGIN
             
 			--Sentencia de la modificacion
 			update adq.tsolicitud set
-			id_funcionario_aprobador = va_id_funcionario_gerente[1],
-			id_moneda = v_parametros.id_moneda,
-			id_gestion = v_parametros.id_gestion,
-			tipo = v_parametros.tipo,
-			justificacion = v_parametros.justificacion,
-			id_depto = v_parametros.id_depto,
-			lugar_entrega = v_parametros.lugar_entrega,
-			--posibles_proveedores = v_parametros.posibles_proveedores,
-			--comite_calificacion = v_parametros.comite_calificacion,
-			id_funcionario = v_parametros.id_funcionario,
-			fecha_soli = v_parametros.fecha_soli,
-			fecha_mod = now(),
-			id_usuario_mod = p_id_usuario,
-            id_uo = v_id_uo,
-            id_proceso_macro=id_proceso_macro,
-            --id_proveedor=v_parametros.id_proveedor,
-            id_usuario_ai= v_parametros._id_usuario_ai,
-            usuario_ai = v_parametros._nombre_usuario_ai,
-            tipo_concepto =  v_parametros.tipo_concepto,
-            fecha_inicio = v_parametros.fecha_inicio,
-            dias_plazo_entrega = v_parametros.dias_plazo_entrega,
-            precontrato = COALESCE(v_parametros.precontrato,'no'),
-            nro_po = trim(both ' ' from v_parametros.nro_po),
-            fecha_po = v_parametros.fecha_po
+                id_funcionario_aprobador = va_id_funcionario_gerente[1],
+                id_moneda = v_parametros.id_moneda,
+                id_gestion = v_parametros.id_gestion,
+                tipo = v_parametros.tipo,
+                justificacion = v_parametros.justificacion,
+                id_depto = v_parametros.id_depto,
+                lugar_entrega = v_parametros.lugar_entrega,
+                --posibles_proveedores = v_parametros.posibles_proveedores,
+                --comite_calificacion = v_parametros.comite_calificacion,
+                id_funcionario = v_parametros.id_funcionario,
+                fecha_soli = v_parametros.fecha_soli,
+                fecha_mod = now(),
+                id_usuario_mod = p_id_usuario,
+                id_uo = v_id_uo,
+                id_proceso_macro=id_proceso_macro,
+                --id_proveedor=v_parametros.id_proveedor,
+                id_usuario_ai= v_parametros._id_usuario_ai,
+                usuario_ai = v_parametros._nombre_usuario_ai,
+                tipo_concepto =  v_parametros.tipo_concepto,
+                fecha_inicio = v_parametros.fecha_inicio,
+                dias_plazo_entrega = v_parametros.dias_plazo_entrega,
+                precontrato = COALESCE(v_parametros.precontrato,'no'),
+                nro_po = trim(both ' ' from v_parametros.nro_po),
+                fecha_po = v_parametros.fecha_po,
+                comprometer_87 = v_parametros.comprometer_87
 			where id_solicitud = v_parametros.id_solicitud;
                
 			--Definicion de la respuesta
@@ -1921,16 +1938,19 @@ BEGIN
         
             --recupera moneda de la solicitud
            select 
-             sol.id_solicitud
+             sol.id_solicitud,
+             sol.comprometer_87
             into
-             v_id_solicitud
+             v_id_solicitud,
+             v_comprometer_87
            from adq.tsolicitud sol
            where sol.id_proceso_wf = v_parametros.id_proceso_wf ;
             
-            -- recupera monto solicitado gestoon actual y siguiente
+            -- recupera monto solicitado gestoon actual y siguiente, fecha
             select 
                sum(sd.precio_ga_mb) as precio_ga_mb,
-               sum(sd.precio_sg_mb) as precio_sg_mb
+               sum(sd.precio_sg_mb) as precio_sg_mb,
+               max(sd.fecha_comp)::varchar as fecha_comp
               into
                 v_datos_ga_gs  
             from adq.tsolicitud_det sd
@@ -1958,6 +1978,13 @@ BEGIN
             group by 
             saldos.codigo_techo;
             
+            --#10 calculo de factor del comproemtido
+            IF v_comprometer_87 = 'si' THEN
+              v_factor = 0.87;
+            ELSE
+              v_factor = 1;
+            END IF;
+            
             --determina todal disopnible
             
             v_total_disponble = COALESCE(v_datos_saldos.saldo_vigente_mb,0)  - COALESCE(v_datos_saldos.saldo_comp_mb,0) - COALESCE(v_datos_ga_gs.precio_ga_mb, 0);			
@@ -1968,8 +1995,9 @@ BEGIN
             v_resp = pxp.f_agrega_clave(v_resp,'v_total_disponble',COALESCE(v_total_disponble,0)::varchar);
             v_resp = pxp.f_agrega_clave(v_resp,'v_saldo_vigente_mb',COALESCE(v_datos_saldos.saldo_vigente_mb,0)::varchar);
             v_resp = pxp.f_agrega_clave(v_resp,'v_saldo_comp_mb',COALESCE(v_datos_saldos.saldo_comp_mb,0)::varchar);
-            v_resp = pxp.f_agrega_clave(v_resp,'v_precio_ga_mb',COALESCE(v_datos_ga_gs.precio_ga_mb,0)::varchar);
-            v_resp = pxp.f_agrega_clave(v_resp,'v_precio_sg_mb',COALESCE(v_datos_ga_gs.precio_sg_mb,0)::varchar);
+            v_resp = pxp.f_agrega_clave(v_resp,'v_precio_ga_mb',COALESCE(v_datos_ga_gs.precio_ga_mb*v_factor,0)::varchar); --10 ADQ, segun la configuracion de comproemtido para la solcitidu
+            v_resp = pxp.f_agrega_clave(v_resp,'v_precio_sg_mb',COALESCE(v_datos_ga_gs.precio_sg_mb*v_factor,0)::varchar);  --10 ADQ, "
+            v_resp = pxp.f_agrega_clave(v_resp,'v_fecha_comp', COALESCE(v_datos_ga_gs.fecha_comp,'')::varchar); 
 
 
             --Devuelve la respuesta

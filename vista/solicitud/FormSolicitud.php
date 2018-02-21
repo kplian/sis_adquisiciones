@@ -805,6 +805,32 @@ header("content-type: text/javascript; charset=UTF-8");
 				id_grupo: 1,
 				form:true
 			},
+			    //#10 Adqusiciones, adiciona el campo para decidir si vamos al 87% 
+	        {
+	            config:{
+	                name: 'comprometer_87',
+	                fieldLabel: 'Comp 87%',
+	                qtip: 'Si compromete al 87% , en caso contrario es el 100%  (87% es cuando estemos  seguros que la adjudicación se realizara a un proveedor que emite factura con crédito fiscal)',
+	                allowBlank: false,
+	                emptyText: 'Tipo...',
+	                typeAhead: true,
+	                triggerAction: 'all',
+	                lazyRender: true,
+	                mode: 'local',
+	                gwidth: 100,
+	                store: ['no','si']
+	            },
+	            type: 'ComboBox',
+	            id_grupo: 2,
+	            filters:{
+	                type: 'list',
+	                pfiltro:'sol.comprometer_87',
+	                options: ['no','si'],
+	            },
+	            valorInicial: 'no',
+	            grid:false,
+	            form:true
+	        },
 			{
 				config:{
 					name: 'precontrato',
