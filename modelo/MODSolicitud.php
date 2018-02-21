@@ -813,7 +813,8 @@ class MODSolicitud extends MODbase{
 		$this->captura('codigo','varchar');
 		$this->captura('precio_total','numeric');
 		$this->captura('observacion','varchar');
-		$this->captura('gestion','int4');		
+		$this->captura('gestion','int4');
+		$this->captura('fecha_soli','date');		
 		//Ejecuta la instruccion
 		$this->armarConsulta();
 		$this->ejecutarConsulta();		

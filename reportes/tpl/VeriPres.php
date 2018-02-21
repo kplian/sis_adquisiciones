@@ -25,7 +25,7 @@
 		<td colspan="1" ><font size="8"><strong><br />DESCRIPCION INVITACION <BR/>SOL. PEDIDO</strong></font></td>
 		<td colspan="3"><font size="8"><br />&nbsp;<?php  echo $this->cabecera[0]['justificacion']; ?></font></td>
 		<td colspan="1" ><strong><font size="8"> COSTO ESTIMADO (BS).<BR/> SOL. PEDIDO <br /> (LIBERADA)</strong></font></td>
-		<td colspan="1" ><font size="8"><br /> <?php  echo $this->cabecera[0]['precio_total']; ?></font></td>
+		<td colspan="1" ><font size="8"><br /><?php echo number_format(($this->datos['v_precio_sg_mb']+$this->datos['v_precio_ga_mb']),2);?></font></td>
 	</tr>
 		
 	<tr style="text-align: center; vertical-align: top;">
@@ -87,114 +87,27 @@
 	
 	<tr style="text-align: center; vertical-align: middle;">
 		<td colspan="2"><strong><font size="8"><br/>DISPONIBILIDAD<br/>PRESUPUESTARIA<br/>EN ORDEN/ELEMENTO PEP<br/></font></strong></td>
-		<td colspan="2"><strong><font size="8"><br/>SI**</font></strong></td>
-		<td colspan="1"><strong><font size="8"></font><br/></strong></td>
-		<td colspan="2"><strong><font size="8"><br/>NO***</font></strong></td>	
-		<td colspan="1"><strong><font size="8"></font></strong></td>		
-	</tr>
-	<tr>
-		<td colspan="8"><font size="6">NOTA:<br />**Verificando la disponibilida presupuestaria, el RESPONSABLE DEL DEPARTAMENTO DE FINANZAfirma y se concluye el llenado del inciso 2 del Formulario
-			<br />***Al no existir disponibilidad presupuestaria en la partida, el responsable del Proyecto debe completar en el inciso 2.3 indicando la modificacion presupuestaria a realizarse (movimiento entre partidas), 
-			que debera incluir la firma del RESPONSABLE DEL DEPARTAMENTO DE FINANZAS
-			</font>
-		</td>			
-	</tr>
-	
-	
-	<tr style="text-align: center; vertical-align: middle;">
-		<td colspan="2"><strong><font size="8">VERIFICACION DEPARTAMENTO DE FINANZAS<br />(SELLO/NOMBRE)</font></strong></td>	
-		<td colspan="2"><strong><font size="8"></font></strong></td>	
-		<td colspan="1"><strong><font size="8"><br />FIRMA</font></strong></td>	
-		<td colspan="1"><strong><font size="8"></font></strong></td>	
-		<td colspan="1"><strong><font size="8"><br />FECHA</font></strong></td>	
-		<td colspan="1"><strong><font size="8"></font></strong></td>		
-	</tr>
-	
-	<tr>
-		<td colspan="8" style="background-color: #87B4F4; vertical-align: middle;"><h5>2.3 MODIFICACION PRESUPUESTARIA (Responsable de llenado : Responsable de Proyecto y Finanzas)</h5></td>		
-	</tr>
-	
-	
-	<tr style="text-align: center; vertical-align: middle;">
-		<td colspan="2"><strong><font size="8">PARTIDA ORIGEN <br />(INCLUIR FILAS DE SER NECESARIO)</font></strong></td>
-		<td colspan="2"><strong><font size="8"><br />PARTIDA DESTINO</font></strong></td>
 		<td rowspan="2" colspan="1">
-			<font size="8">&nbsp;</font>
-			<font size="8"><br /><br /><strong> MONTO</strong></font>
+			<strong><font size="8"><br/>SI</font>
+				<font size="7">
+					<br/><?php if(number_format($this->datos['v_total_disponble'],2)>0){  echo 'FECHA IMPRESION'; }?>		
+					<br/> <?php if(number_format($this->datos['v_total_disponble'],2)>0){  echo date("d-m-Y H:m", strtotime($this->datos['v_fecha_comp'])); }?>					
+				</font>
+			</strong>
+		</td>
+		<td colspan="1"><strong><font size="18"><br/><?php if(number_format($this->datos['v_total_disponble'],2)>0){  echo 'X'; }?></font><br/></strong></td>
 		
-		</td>
-		<td rowspan="2" colspan="3">
-			<font size="8">&nbsp;</font>
-			<font size="8"><br /><br /><strong>JUSTIFICACION</strong></font>
-		</td>
-	</tr>
-	<tr style="text-align: center; vertical-align: middle;">
-		<td colspan="2">
-			<font size="8"><strong>IMPUTACION <br/> (CECO/ ORDEN / PEP)</strong></font>
-		</td>
-		<td colspan="2">
-			<font size="8"><strong>IMPUTACION <br/>(CECO/ ORDEN / PEP)</strong></font>
-		</td>
-	</tr>
-	
-	
-	<tr style="text-align: center; vertical-align: middle;">
-		<td colspan="2">
-			<font size="8"><br /></font>
-		</td>
-		<td colspan="2">
-			<font size="8"><br /></font>
-		</td>
-		<td colspan="1">
-			<font size="8"><br /></font>
-		</td>
-		<td colspan="3">
-			<font size="8"><br /></font>
-		</td>
-	</tr>
-	
-	<tr style="text-align: center; vertical-align: middle;">
-		<td colspan="2">
-			<h6>RESPONSABLE DE AUTORIZAR MODIFICACION<BR/>PRESUPUESTARIA (GERENTE DE AREA)</h6>
-		</td>
-		<td colspan="2">
-			<h5><br /></h5>
-		</td>
-		<td colspan="1">
-			<font size="8"><br /><strong>FIRMA</strong></font>
-		</td>
-		<td colspan="1">
-			<h5></h5>
-		</td>
-		<td colspan="1">
-			<font size="8"><br /><strong>FECHA</strong></font>
-		</td>
-		<td colspan="1">
-			<h5><br /></h5>
-		</td>
-	</tr>
-	
-	<tr style="text-align: center; vertical-align: middle;">
-		<td colspan="2">
-			<h6>RESPONSABLE DE DEPARTAMENTO DE FINANZAS</h6>
-		</td>
-		<td colspan="2">
-			<h5><br /></h5>
-		</td>
-		<td colspan="1">
-			<font size="8"><br /><strong>FIRMA</strong></font>
-		</td>
-		<td colspan="1">
-			<h5></h5>
-		</td>
-		<td colspan="1">
-			<font size="8"><br /><strong> FECHA</strong></font>
-		</td>
-		<td colspan="1">
-			<h5></h5>
-		</td>
-	</tr>
 		
-	
+		<td rowspan="2" colspan="1">
+			<strong><font size="8"><br/>NO</font>
+				<font size="7">
+					<br/><?php if(number_format($this->datos['v_total_disponble'],2)<0){  echo 'FECHA IMPRESION'; }?>	
+					<br/> <?php if(number_format($this->datos['v_total_disponble'],2)<0){  echo date("d-m-Y H:m", strtotime($this->datos['v_fecha_comp'])); }?>				
+				</font>
+			</strong>
+		</td>
+		<td colspan="1"><strong><font size="18"><br/><?php if(number_format($this->datos['v_total_disponble'],2)<0){  echo 'X'; }?></font><br/></strong></td>
+	</tr>
+
 </tbody>
 </table>

@@ -816,8 +816,17 @@ ALTER TABLE adq.tsolicitud_det
 
 COMMENT ON COLUMN adq.tsolicitud_det.saldo_pre_mb
 IS 'saldo presupeustario en moenda base despues de comprometer';
+
+
+--------------- SQL ---------------
+
+ALTER TABLE adq.tsolicitud_det
+  ADD COLUMN fecha_comp TIMESTAMP WITHOUT TIME ZONE DEFAULT now() NOT NULL;
   
   
 /***********************************F-SCP-RAC-ADQ-0-09/01/2017****************************************/  
  
+  
+  
+  
   
