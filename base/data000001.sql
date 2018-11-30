@@ -979,4 +979,7 @@ VALUES
 /***********************************F-DAT-RAC-ADQ-0-09/01/2018*****************************************/
    
    
-    
+/***********************************I-DAT-CAP-ADQ-0-13/08/2018*****************************************/
+INSERT INTO pxp.variable_global ( "variable", "valor", "descripcion")
+VALUES ( E'adq_adjudicar_con_presupuesto', E'si', E'no: para que NO verifique si existe monto disponible a momento de adjudicar un proveedor. si:valor por defecto para que SI verifique monto disponible a momento de adjudicar un proveedor');
+/***********************************F-DAT-CAP-ADQ-0-13/08/2018*****************************************/

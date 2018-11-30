@@ -338,7 +338,7 @@ Class ROrdenCompra extends Report {
 		
 	
 		$pdf->SetFont('','');
-		$pdf->setFontSize(5);	//5 a 1		  3 		
+		$pdf->setFontSize(8);	//5 a 1		  3 /////EGS///		
 		//$pdf->Ln($height);	
 		
 		
@@ -379,8 +379,13 @@ Class ROrdenCompra extends Report {
 		$pdf->MultiCell(100, $height, '5.- La lista de embarque debe mostrar claramente las marcas de embarque, numero de bultos, clases de bultos, contenido, dimensiones, peso neto y bruto de los bultos.', 0,'L', true ,1);
 		$pdf->Ln(0.01);
 		$pdf->MultiCell(100, $height, '6.-El comprador se reserva el derecha de cancelar el pedido si la mercaderia no es embarcada dentro del periodo indicado. ', 0,'L', true ,1);
+        
+        $pdf->SetFont('',''); //agrega
+		$pdf->setFontSize(8);	//agrega
 		$pdf->Ln(0.01);
-		$pdf->MultiCell(100, $height, 'Enviar las facturas en original y copia a ENDE Transmision S.A. NIT 1023097024', 0,'L', false ,1);
+		$pdf->MultiCell(150, $height, 'Enviar las facturas en original y copia a ENDE Transmision S.A. NIT 1023097024', 0,'L', false ,1);
+        $pdf->SetFont('',''); //agrega
+		$pdf->setFontSize(5);	//agrega
 		/*$pdf->Ln(0.05);
 		$pdf->MultiCell(100, $height, 'Sin otro particular y agradeciendo su gentil atención, saludo a usted', 0,'L', true ,1);
 		$pdf->Ln(0.05);

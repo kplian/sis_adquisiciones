@@ -5,7 +5,12 @@
 *@author  (admin)
 *@date 19-02-2013 12:12:51
 *@description Clase que envia los parametros requeridos a la Base de datos para la ejecucion de las funciones, y que recibe la respuesta del resultado de la ejecucion de las mismas
-*/
+		* ISSUE            FECHA:		      AUTOR       DESCRIPCION
+* 
+  		#11 			19/09/2018			EGS			se habilito el campo observacion
+ * 
+ * */
+
 
 class MODSolicitud extends MODbase{
 	
@@ -92,7 +97,7 @@ class MODSolicitud extends MODbase{
 		$this->captura('fecha_po','date');
 		$this->captura('importe_total','numeric');
 		$this->captura('comprometer_87','varchar');//#10 ++
-		
+		$this->captura('observacion','text');// #11 			19/09/2018			EGS	
 		
 		
 		  
@@ -154,6 +159,7 @@ class MODSolicitud extends MODbase{
 		$this->setParametro('nro_po','nro_po','varchar');
 		$this->setParametro('fecha_po','fecha_po','varchar');
 		$this->setParametro('comprometer_87','comprometer_87','varchar');//#10 ADQ
+		$this->setParametro('observacion','observacion','text');//#11 			19/09/2018			EGS	
 		
 
 		//Ejecuta la instruccion
@@ -213,6 +219,8 @@ class MODSolicitud extends MODbase{
 		$this->setParametro('nro_po','nro_po','varchar');
 		$this->setParametro('fecha_po','fecha_po','date');
 		$this->setParametro('comprometer_87','comprometer_87','varchar');//#10 ADQ
+		$this->setParametro('observacion','observacion','text');//#11 			19/09/2018			EGS	
+		
 
 		
 		//Ejecuta la instruccion
@@ -824,7 +832,7 @@ class MODSolicitud extends MODbase{
 		$this->captura('precio_total','numeric');
 		$this->captura('observacion','varchar');
 		$this->captura('gestion','int4');
-		$this->captura('fecha_soli','date');		
+		$this->captura('fecha_soli','date');
 		//Ejecuta la instruccion
 		$this->armarConsulta();
 		$this->ejecutarConsulta();		
@@ -840,7 +848,8 @@ class MODSolicitud extends MODbase{
 		$this->tipo_procedimiento='IME';
 		$this->setCount(false);		
 		//
-		$this->setParametro('id_proceso_wf','id_proceso_wf','int4');		
+		$this->setParametro('id_proceso_wf','id_proceso_wf','int4');					
+			
 		//Definicion de la lista del resultado del query
 
 		//Ejecuta la instruccion

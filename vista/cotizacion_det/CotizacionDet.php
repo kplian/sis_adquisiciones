@@ -260,7 +260,7 @@ Phx.vista.CotizacionDet=Ext.extend(Phx.gridInterfaz,{
         {
             config:{
                 name: 'descripcion_sol',
-                fieldLabel: 'Descripción',
+                fieldLabel: 'Descripcións',
                 allowBlank: true,
                 anchor: '80%',
                 gwidth: 200,
@@ -273,7 +273,7 @@ Phx.vista.CotizacionDet=Ext.extend(Phx.gridInterfaz,{
                                                 }
                                             
                                         },
-                maxLength:500
+                maxLength:700
             },
             type:'TextArea',
             filters:{pfiltro:'sold.descripcion',type:'string'},
@@ -340,7 +340,7 @@ Phx.vista.CotizacionDet=Ext.extend(Phx.gridInterfaz,{
 				allowBlank: true,
 				allowDecimals: true,
                 allowNegative:false,
-                decimalPrecision:3,
+                decimalPrecision:4,
 				anchor: '80%',
 				gwidth: 120,
 				maxLength:1245186

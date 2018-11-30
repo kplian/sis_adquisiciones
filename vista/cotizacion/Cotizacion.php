@@ -5,6 +5,9 @@
 *@author  Gonzalo Sarmiento Sejas
 *@date 21-03-2013 14:48:35
 *@description Archivo con la interfaz de usuario que permite la ejecucion de todas las funcionalidades del sistema
+ *  * * ISSUE            FECHA:		      AUTOR       DESCRIPCION
+ *   	#1 			19/09/2018			EGS			se mejoro el combo de proveedor
+ * *    #2 			21/09/2018			EGS			se mejoro el combo de tipo de entregas
 */
 header("content-type: text/javascript; charset=UTF-8");
 ?>
@@ -192,7 +195,9 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
             bottom_filter: true,
             grid:true,
             form:false
-        },		
+        },
+        
+         ///#1 			19/09/2018			EGS			
 		{
 			config:{
 				name: 'id_proveedor',
@@ -209,11 +214,16 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
 	    						direction: 'ASC'
 	    					},
 	    					totalProperty: 'total',
-	    					fields: ['id_proveedor','codigo','desc_proveedor'],
+	    					fields: ['id_proveedor','codigo','desc_proveedor','nit'],
 	    					// turn on remote sorting
 	    					remoteSort: true,
-	    					baseParams:{par_filtro:'codigo#desc_proveedor'}
+	    					baseParams:{par_filtro:'codigo#desc_proveedor#nit'}
 	    				}),
+	    		tpl:'<tpl for=".">\
+		                       <div class="x-combo-list-item"><p><b>Codigo: </b>{codigo}</p>\
+		                      <p><b>Proveedor: </b>{desc_proveedor}</p>\
+		                      <p><b>Nit:</b>{nit}</p> \
+		                     </div></tpl>',		
         	    valueField: 'id_proveedor',
         	    displayField: 'desc_proveedor',
         	    gdisplayField: 'desc_proveedor',
@@ -222,11 +232,12 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
         	    //queryDelay:1000,
         	    pageSize:10,
 				forceSelection: true,
-				typeAhead: true,
+				typeAhead: false,
 				allowBlank: false,
 				anchor: '80%',
 				gwidth: 180,
 				mode: 'remote',
+				minChars:1,
 				renderer: function(value,p,record){
                         if(record.data.estado=='anulado'){
                              return String.format('<b><font color="red">{0}</font></b>', record.data['desc_proveedor']);
@@ -246,6 +257,7 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
 			grid:true,
 			form:true
 		},
+		 ///#1 			19/09/2018			EGS	
         {
             config:{
                 name: 'numero',
@@ -412,7 +424,7 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
 			form:true
 		},
 		
-		
+		/*
 		{
 			config:{
 				name: 'tipo_entrega',
@@ -427,7 +439,35 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
 			id_grupo:1,
 			grid:true,
 			form:true
+		},*/
+		
+			 //#2 			21/09/2018			EGS
+		{
+			config: {
+				name: 'tipo_entrega',
+				fieldLabel: 'Tipo Entrega',
+				anchor: '95%',
+				tinit: false,
+				allowBlank: false,
+				origen: 'CATALOGO',
+				gdisplayField: 'tipo_entrega',
+				hiddenName: 'tipo_entrega',
+				gwidth: 55,
+				baseParams:{
+					cod_subsistema:'ADQ',
+					catalogo_tipo:'ttipo_entrega'
+				},
+				valueField: 'codigo',
+				hidden: false
+			},
+			
+			type: 'ComboRec',
+			filters:{pfiltro:'cot.tipo_entrega',type:'string'},
+			id_grupo: 0,
+			grid: true,
+			form: true
 		},
+		 //#2 			21/09/2018			EGS
         {
             config:{
                 name: 'tiempo_entrega',
@@ -703,7 +743,52 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
 			id_grupo:1,
 			grid:true,
 			form:false
-		}
+		},
+		{
+			config:{
+				name: 'cecos',
+				fieldLabel: 'Cecos',
+				allowBlank: true,
+				anchor: '80%',
+				gwidth: 100,
+				maxLength:450
+			},
+			type:'TextArea',
+			//filters:{pfiltro:'cot.forma_pago',type:'string'},
+			id_grupo:1,
+			grid:true,
+			form:true
+		},
+		{
+			config:{
+				name: 'total',
+				fieldLabel: 'Cant Total',
+				allowBlank: true,
+				anchor: '80%',
+				height:'150',
+				gwidth: 100
+			},
+			type:'NumberField',
+			//filters:{pfiltro:'cot.obs',type:'string'},
+			id_grupo:1,
+			grid:true,
+			form:true
+		},
+		{
+			config:{
+				name: 'nro_cuenta',
+				fieldLabel: 'Cuentas',
+				allowBlank: true,
+				anchor: '80%',
+				height:'150',
+				gwidth: 100
+			},
+			type:'NumberField',
+			//filters:{pfiltro:'cot.obs',type:'string'},
+			id_grupo:1,
+			grid:true,
+			form:true
+		},
 	],
 	
 	title:'Cotizaciones',
@@ -745,7 +830,8 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
 		'funcionario_contacto',
         'telefono_contacto',
         'correo_contacto', 'correo_oc',
-        'prellenar_oferta', 'forma_pago', 'requiere_contrato','total_adjudicado','total_cotizado','total_adjudicado_mb','tiene_form500'
+        'prellenar_oferta', 'forma_pago', 'requiere_contrato','total_adjudicado','total_cotizado','total_adjudicado_mb','tiene_form500','total','cecos'
+        ,'nro_cuenta'
 		
 	],
     rowExpander: new Ext.ux.grid.RowExpander({

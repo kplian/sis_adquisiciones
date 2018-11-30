@@ -253,13 +253,13 @@ BEGIN
                         inner join orga.vfuncionario funa on funa.id_funcionario = sol.id_funcionario_aprobador
                         left join orga.vfuncionario funs on funs.id_funcionario = sol.id_funcionario_supervisor
 
-						left join segu.tusuario usu2 on usu2.id_usuario = sol.id_usuario_mod
+						            left join segu.tusuario usu2 on usu2.id_usuario = sol.id_usuario_mod
                         left join param.vproveedor pro on pro.id_proveedor = sol.id_proveedor
                         
-                        left join adq.tsolicitud_det tsd on tsd.id_solicitud = sol.id_solicitud
+                        left join adq.tsolicitud_det tsd on tsd.id_solicitud = sol.id_solicitud and tsd.estado_reg = ''activo''
                         
                         '||v_inner||'
-                        where  tsd.estado_reg = ''activo'' and '||v_filtro;
+                        where  sol.estado_reg = ''activo'' and '||v_filtro;
 
 			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;
@@ -683,17 +683,17 @@ BEGIN
 	elsif(p_transaccion='ADQ_REPVERDISP_SEL')then
 		begin
 		
-			v_consulta:='select						
-                          sol.tipo::varchar,
-                          sol.num_tramite::varchar,
-                          sol.justificacion::varchar,
-                          tcc.descripcion::varchar,
-                          tcc.codigo::varchar,
-                          det.precio_total::numeric,
-                          sol.observacion::varchar,
-                          g.gestion::int,
-                          sol.fecha_soli::date
-						from adq.tsolicitud sol
+			v_consulta:='select	                      				
+                        sol.tipo::varchar,
+                        sol.num_tramite::varchar,
+                        sol.justificacion::varchar,
+                        tcc.descripcion::varchar,
+                        tcc.codigo::varchar,
+                        det.precio_total::numeric,
+                        sol.observacion::varchar,
+                        g.gestion::int,
+                        sol.fecha_soli::date                        
+                        from adq.tsolicitud sol
                         inner join segu.tusuario usu1 on usu1.id_usuario = sol.id_usuario_reg
                         inner join orga.vfuncionario fun on fun.id_funcionario = sol.id_funcionario
                         inner join orga.tuo uo on uo.id_uo = sol.id_uo
@@ -711,6 +711,7 @@ BEGIN
                         join param.ttipo_cc tcc on tcc.id_tipo_cc=cc.id_tipo_cc
                         join param.tgestion g on g.id_gestion=sol.id_gestion
                         where sol.id_proceso_wf='||v_parametros.id_proceso_wf;
+                                                
             return v_consulta;
 		end;
         

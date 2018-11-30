@@ -10,6 +10,7 @@
 ****************************************************************************
 * ISSUE            FECHA:		      AUTOR       DESCRIPCION
 * #10  ETR      21/02/2018          RAC         se incrementa columna para comproemter al 87 %
+ * #11 			19/09/2018			EGS			se habilito el campo observacion
    
 */
 header("content-type: text/javascript; charset=UTF-8");
@@ -587,6 +588,7 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
                 fieldLabel: 'Comp 87%',
                 qtip: 'Si compromete al 87% , en caso contrario es el 100%  (87% es cuando estemos  seguros que la adjudicación se realizara a un proveedor que emite factura con crédito fiscal)',
                 allowBlank: false,
+                disabled: true,/////////EGS///////30/07/2018
                 emptyText: 'Tipo...',
                 typeAhead: true,
                 triggerAction: 'all',
@@ -917,6 +919,7 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
 		{name:'usr_reg', type: 'string'},
 		{name:'usr_mod', type: 'string'},
 		{name:'id_uo', type: 'string'},
+		{name:'observacion', type: 'string'}, //#11 			19/09/2018			EGS	
 		'desc_funcionario',
 		'desc_funcionario_apro',
 		'desc_funcionario_supervisor','id_funcionario_supervisor',
@@ -943,7 +946,8 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
 		'update_enable','codigo_poa','obs_poa','contador_estados',
         'nro_po',
         {name:'fecha_po', type: 'date',dateFormat:'Y-m-d'},
-        {name:'importe_total', type: 'numeric'}
+        {name:'importe_total', type: 'numeric'},
+        {name:'comprometer_87', type: 'string'} ////////EGS/////30/07/2018
 	],
 	
 	arrayDefaultColumHidden:['id_fecha_reg','id_fecha_mod',

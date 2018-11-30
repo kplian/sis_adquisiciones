@@ -1,3 +1,13 @@
+--------------- SQL ---------------
+
+CREATE OR REPLACE FUNCTION adq.f_cotizacion_sel (
+  p_administrador integer,
+  p_id_usuario integer,
+  p_tabla varchar,
+  p_transaccion varchar
+)
+RETURNS varchar AS
+$body$
 /**************************************************************************
  SISTEMA:		Adquisiciones
  FUNCION: 		adq.f_cotizacion_sel
@@ -28,6 +38,7 @@ DECLARE
     v_strg_cot			varchar;
 	v_filtro varchar;
     
+    item		record;
     		    
 BEGIN
 
@@ -176,7 +187,409 @@ BEGIN
 
 		end;
         
+	/*********************************    
+ 	#TRANSACCION:  'ADQ_DFOR_CO_SEL'
+ 	#DESCRIPCION:  Insertar alarma segun orden de compra
+ 	#AUTOR:	        Juan
+ 	#FECHA:		    18-06-2018 14:48:35
+	***********************************/
+
+	elsif(p_transaccion='ADQ_DFOR_CO_SEL')then
+
+		begin
+        
+            --RAISE NOTICE 'ERROR2 jj tr %',v_consulta;
+            --RAISE EXCEPTION 'ERROR jj tr %',v_consulta;
+        
+              FOR item IN(select
+                               (select ff.id_funcionario from 
+                               orga.vfuncionario f1 
+                               join orga.tfuncionario ff on ff.id_funcionario=f1.id_funcionario
+                               join orga.tuo_funcionario uf1 on uf1.id_funcionario=ff.id_funcionario
+                               join orga.tuo uo1 on uo1.id_uo=uf1.id_uo
+                               left join segu.tusuario usu on usu.id_persona=ff.id_persona
+                               where uo1.id_uo=(SELECT * FROM orga.f_get_uo_departamento(uo.id_uo,f.id_funcionario,null))::INTEGER and usu.estado_reg='activo' and ff.estado_reg='activo')::INTEGER  id_funcionario_departamento,
+                               
+                               (select usu.id_usuario from 
+                               orga.vfuncionario f1 
+                               join orga.tfuncionario ff on ff.id_funcionario=f1.id_funcionario
+                               join orga.tuo_funcionario uf1 on uf1.id_funcionario=ff.id_funcionario
+                               join orga.tuo uo1 on uo1.id_uo=uf1.id_uo
+                               left join segu.tusuario usu on usu.id_persona=ff.id_persona
+                               where uo1.id_uo=(SELECT * FROM orga.f_get_uo_departamento(uo.id_uo,f.id_funcionario,null))::INTEGER and usu.estado_reg='activo' and ff.estado_reg='activo')::INTEGER as id_usuario_departamento,
+                             
+                              (select ff.email_empresa from 
+                               orga.vfuncionario f1 
+                               join orga.tfuncionario ff on ff.id_funcionario=f1.id_funcionario
+                               join orga.tuo_funcionario uf1 on uf1.id_funcionario=ff.id_funcionario
+                               join orga.tuo uo1 on uo1.id_uo=uf1.id_uo
+                               where uo1.id_uo=(SELECT * FROM orga.f_get_uo_departamento(uo.id_uo,f.id_funcionario,null))::INTEGER and  ff.estado_reg='activo')::VARCHAR as correo_departamento,
+                               
+                               (select ff.id_funcionario from segu.tusuario usu 
+                               join orga.tfuncionario ff on ff.id_persona=usu.id_persona
+                               where usu.id_usuario = cot.id_usuario_reg and usu.estado_reg='activo' and ff.estado_reg='activo')::INTEGER as id_funcionario_gestor,
+                               
+                               (select usu.id_usuario from segu.tusuario usu 
+                               join orga.tfuncionario ff on ff.id_persona=usu.id_persona
+                               where usu.id_usuario = cot.id_usuario_reg and usu.estado_reg='activo' and ff.estado_reg='activo')::INTEGER as id_usuario_gestor,
+                               
+                               (SELECT ff.email_empresa from segu.tusuario uu 
+                               join orga.tfuncionario ff on ff.id_persona=uu.id_persona
+                               where uu.id_usuario=cot.id_usuario_reg and uu.estado_reg='activo' and ff.estado_reg='activo')::VARCHAR as correo_gestor,
+                               
+                               (SELECT ff.id_funcionario from segu.tusuario uu 
+                               join orga.tfuncionario ff on ff.id_persona=uu.id_persona
+                               where ff.email_empresa like '%'||cot.correo_contacto||'%' and uu.estado_reg='activo' and ff.estado_reg='activo')::INTEGER as id_funcionario_solicitante,
+                               
+                               (SELECT uu.id_usuario from segu.tusuario uu 
+                               join orga.tfuncionario ff on ff.id_persona=uu.id_persona
+                               where ff.email_empresa like '%'||cot.correo_contacto||'%' and uu.estado_reg='activo' and ff.estado_reg='activo')::INTEGER as id_usuario_solicitante,
+                               cot.correo_contacto::VARCHAR as correo_solicitante,
+                               pro.desc_proveedor::VARCHAR as desc_proveedor,
+                               (((EXTRACT(YEAR FROM cot.fecha_entrega))||'-'||(EXTRACT(MONTH FROM cot.fecha_entrega))||'-'||(EXTRACT(DAY FROM cot.fecha_entrega)))::TIMESTAMP -  ((EXTRACT(YEAR FROM now()))||'-'||(EXTRACT(MONTH FROM now()))||'-'||(EXTRACT(DAY FROM now())))::TIMESTAMP)::VARCHAR as dias_faltantes,
+                               cot.num_tramite::VARCHAR AS num_tramite,
+                               cot.fecha_entrega::VARCHAR as fecha_entrega,
+                               sol.justificacion
+                               from adq.tcotizacion cot
+                               inner join adq.tproceso_compra proc on proc.id_proceso_compra = cot.id_proceso_compra
+                               inner join adq.tsolicitud sol on sol.id_solicitud = proc.id_solicitud
+                               inner join segu.tusuario usu1 on usu1.id_usuario = cot.id_usuario_reg
+                               inner join param.tmoneda mon on mon.id_moneda = cot.id_moneda
+                               inner join param.vproveedor pro on pro.id_proveedor = cot.id_proveedor
+                               --left join segu.tusuario usu2 on usu2.id_usuario = cot.id_usuario_reg
+                               --left join orga.vfuncionario_persona fp on fp.id_persona=pro.id_persona
+                               join orga.vfuncionario f on f.id_funcionario=sol.id_funcionario
+                               join orga.tuo_funcionario uf on uf.id_funcionario=f.id_funcionario
+                               join orga.tuo uo on uo.id_uo=uf.id_uo
+                               WHERE 
+                               usu1.estado_reg='activo' and f.estado_reg='activo' and
+                               (
+                               (((EXTRACT(YEAR FROM cot.fecha_entrega))||'-'||(EXTRACT(MONTH FROM cot.fecha_entrega))||'-'||(EXTRACT(DAY FROM cot.fecha_entrega)))::TIMESTAMP -  ((EXTRACT(YEAR FROM now()))||'-'||(EXTRACT(MONTH FROM now()))||'-'||(EXTRACT(DAY FROM now())))::TIMESTAMP) = '15 days'
+                               OR (((EXTRACT(YEAR FROM cot.fecha_entrega))||'-'||(EXTRACT(MONTH FROM cot.fecha_entrega))||'-'||(EXTRACT(DAY FROM cot.fecha_entrega)))::TIMESTAMP -  ((EXTRACT(YEAR FROM now()))||'-'||(EXTRACT(MONTH FROM now()))||'-'||(EXTRACT(DAY FROM now())))::TIMESTAMP) = '10 days'
+                               OR (((EXTRACT(YEAR FROM cot.fecha_entrega))||'-'||(EXTRACT(MONTH FROM cot.fecha_entrega))||'-'||(EXTRACT(DAY FROM cot.fecha_entrega)))::TIMESTAMP -  ((EXTRACT(YEAR FROM now()))||'-'||(EXTRACT(MONTH FROM now()))||'-'||(EXTRACT(DAY FROM now())))::TIMESTAMP) = '5 days'
+                               OR (((EXTRACT(YEAR FROM cot.fecha_entrega))||'-'||(EXTRACT(MONTH FROM cot.fecha_entrega))||'-'||(EXTRACT(DAY FROM cot.fecha_entrega)))::TIMESTAMP -  ((EXTRACT(YEAR FROM now()))||'-'||(EXTRACT(MONTH FROM now()))||'-'||(EXTRACT(DAY FROM now())))::TIMESTAMP) = '0 days'
+                               )) LOOP
+                
+                                   /*insert into param.talarma(
+                                      acceso_directo,
+                                      id_funcionario,
+                                      fecha,
+                                      estado_reg,
+                                      descripcion,
+                                      id_usuario_reg,
+                                      fecha_reg,
+                                      id_usuario_mod,
+                                      fecha_mod,
+                                      tipo,
+                                      obs,
+                                      clase,
+                                      titulo,
+                                      parametros,
+                                      id_usuario,
+                                      titulo_correo,
+                                      correos,
+                                      documentos,
+                                      id_proceso_wf,
+                                      id_estado_wf,
+                                      id_plantilla_correo,
+                                      estado_envio
+                                      ) values(
+                                      '',--acceso_directo
+                                      591,--par_id_funcionario 591 juan
+                                      now(),--par_fecha
+                                      'activo',
+                                      regexp_replace(item.dias_faltantes,'days','Dias','g') ||' para fin de servicio de '||item.desc_proveedor,--par_descripcion
+                                      1,--par_id_usuario admin
+                                      now(),
+                                      null,
+                                      null,
+                                      'notificacion',--par_tipo
+                                      ''::varchar, --par_obs
+                                      '',--par_clase
+                                      'Fin servicio',--par_titulo
+                                      '',--par_parametros
+                                      407,--par_id_usuario_alarma 407 juan
+                                      'Dias restantes_',--par_titulo_correo
+                                      'juan.jimenez@endetransmision.bo',--par_correos
+                                      '',--par_documentos
+                                      NULL,--p_id_proceso_wf
+                                      NULL,--p_id_estado_wf
+                                      NULL,--p_id_plantilla_correo
+                                      'si'::character varying --v_estado_envio
+                                      
+                                    ); */           
+                      
+                                   -- Jefe de departamento
+                                   insert into param.talarma(
+                                      acceso_directo,
+                                      id_funcionario,
+                                      fecha,
+                                      estado_reg,
+                                      descripcion,
+                                      id_usuario_reg,
+                                      fecha_reg,
+                                      id_usuario_mod,
+                                      fecha_mod,
+                                      tipo,
+                                      obs,
+                                      clase,
+                                      titulo,
+                                      parametros,
+                                      id_usuario,
+                                      titulo_correo,
+                                      correos,
+                                      documentos,
+                                      id_proceso_wf,
+                                      id_estado_wf,
+                                      id_plantilla_correo,
+                                      estado_envio
+                                      ) values(
+                                      '',--acceso_directo
+                                      item.id_funcionario_departamento::INTEGER,--par_id_funcionario 591 juan
+                                      now(),--par_fecha
+                                      'activo',
+                                      '<font color="99CC00" size="5"><font size="4">'||regexp_replace(regexp_replace(item.dias_faltantes,'00:00:00','0','g'),'days','','g')||' Dias para fin servicio </font> </font><br><br><b></b>Tramite:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <b>'||item.num_tramite||'</b><br> Proveedor : <b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'||item.desc_proveedor||'</b><br>Fecha de entrega  : <b>&nbsp;&nbsp;'||item.fecha_entrega||'</b>',--par_descripcion
+                                      1,--par_id_usuario admin
+                                      now(),
+                                      null,
+                                      null,
+                                      'notificacion',--par_tipo
+                                      ''::varchar, --par_obs
+                                      '',--par_clase
+                                      item.justificacion,--par_titulo
+                                      '',--par_parametros
+                                      item.id_usuario_departamento::INTEGER,--par_id_usuario_alarma 407 juan
+                                      item.justificacion,--par_titulo correo
+                                      item.correo_departamento::VARCHAR,--par_correos
+                                      '',--par_documentos
+                                      NULL,--p_id_proceso_wf
+                                      NULL,--p_id_estado_wf
+                                      NULL,--p_id_plantilla_correo
+                                      'si'::character varying --v_estado_envio
+                                    );    
+                                    
+                      
+                                   -- Gestor
+                                   insert into param.talarma(
+                                      acceso_directo,
+                                      id_funcionario,
+                                      fecha,
+                                      estado_reg,
+                                      descripcion,
+                                      id_usuario_reg,
+                                      fecha_reg,
+                                      id_usuario_mod,
+                                      fecha_mod,
+                                      tipo,
+                                      obs,
+                                      clase,
+                                      titulo,
+                                      parametros,
+                                      id_usuario,
+                                      titulo_correo,
+                                      correos,
+                                      documentos,
+                                      id_proceso_wf,
+                                      id_estado_wf,
+                                      id_plantilla_correo,
+                                      estado_envio
+                                      ) values(
+                                      '',--acceso_directo
+                                      item.id_funcionario_gestor::INTEGER,--par_id_funcionario 591 juan
+                                      now(),--par_fecha
+                                      'activo',
+                                      '<font color="99CC00" size="5"><font size="4">'||regexp_replace(regexp_replace(item.dias_faltantes,'00:00:00','0','g'),'days','','g')||' Dias para fin servicio </font> </font><br><br><b></b>Tramite:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <b>'||item.num_tramite||'</b><br> Proveedor : <b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'||item.desc_proveedor||'</b><br>Fecha de entrega  : <b>&nbsp;&nbsp;'||item.fecha_entrega||'</b>',--par_descripcion
+                                      1,--par_id_usuario admin
+                                      now(),
+                                      null,
+                                      null,
+                                      'notificacion',--par_tipo
+                                      ''::varchar, --par_obs
+                                      '',--par_clase
+                                      item.justificacion,--par_titulo
+                                      '',--par_parametros
+                                      item.id_usuario_gestor::INTEGER,--par_id_usuario_alarma 407 juan
+                                      item.justificacion,--par_titulo correo
+                                      item.correo_gestor::VARCHAR,--par_correos
+                                      '',--par_documentos
+                                      NULL,--p_id_proceso_wf
+                                      NULL,--p_id_estado_wf
+                                      NULL,--p_id_plantilla_correo
+                                      'si'::character varying --v_estado_envio
+                                    );    
+                                    
+                      
+                                   -- solicitante
+                                   insert into param.talarma(
+                                      acceso_directo,
+                                      id_funcionario,
+                                      fecha,
+                                      estado_reg,
+                                      descripcion,
+                                      id_usuario_reg,
+                                      fecha_reg,
+                                      id_usuario_mod,
+                                      fecha_mod,
+                                      tipo,
+                                      obs,
+                                      clase,
+                                      titulo,
+                                      parametros,
+                                      id_usuario,
+                                      titulo_correo,
+                                      correos,
+                                      documentos,
+                                      id_proceso_wf,
+                                      id_estado_wf,
+                                      id_plantilla_correo,
+                                      estado_envio
+                                      ) values(
+                                      '',--acceso_directo
+                                      item.id_funcionario_solicitante::INTEGER,--par_id_funcionario 591 juan
+                                      now(),--par_fecha
+                                      'activo',
+                                      '<font color="99CC00" size="5"><font size="4">'||regexp_replace(regexp_replace(item.dias_faltantes,'00:00:00','0','g'),'days','','g')||' Dias para fin servicio </font> </font><br><br><b></b>Tramite:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <b>'||item.num_tramite||'</b><br> Proveedor : <b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'||item.desc_proveedor||'</b><br>Fecha de entrega  : <b>&nbsp;&nbsp;'||item.fecha_entrega||'</b>',--par_descripcion
+                                      1,--par_id_usuario admin
+                                      now(),
+                                      null,
+                                      null,
+                                      'notificacion',--par_tipo
+                                      ''::varchar, --par_obs
+                                      '',--par_clase
+                                      item.justificacion,--par_titulo
+                                      '',--par_parametros
+                                      item.id_usuario_solicitante::INTEGER,--par_id_usuario_alarma 407 juan
+                                      item.justificacion,--par_titulo correo
+                                      item.correo_solicitante::VARCHAR,--par_correos
+                                      '',--par_documentos
+                                      NULL,--p_id_proceso_wf
+                                      NULL,--p_id_estado_wf
+                                      NULL,--p_id_plantilla_correo
+                                      'si'::character varying --v_estado_envio
+                                    );  
+                                    
+                                           
+                                    
+           	   END LOOP; 
+               
+
+           
+            --Definicion de la respuesta
             
+            v_consulta:='select
+                               (select ff.id_funcionario from 
+                               orga.vfuncionario f1 
+                               join orga.tfuncionario ff on ff.id_funcionario=f1.id_funcionario
+                               join orga.tuo_funcionario uf1 on uf1.id_funcionario=ff.id_funcionario
+                               join orga.tuo uo1 on uo1.id_uo=uf1.id_uo
+                               left join segu.tusuario usu on usu.id_persona=ff.id_persona
+                               where uo1.id_uo=(SELECT * FROM orga.f_get_uo_departamento(uo.id_uo,f.id_funcionario,null))::INTEGER and usu.estado_reg=''activo'' and ff.estado_reg=''activo'')::INTEGER  id_funcionario_departamento,
+                               
+                               (select usu.id_usuario from 
+                               orga.vfuncionario f1 
+                               join orga.tfuncionario ff on ff.id_funcionario=f1.id_funcionario
+                               join orga.tuo_funcionario uf1 on uf1.id_funcionario=ff.id_funcionario
+                               join orga.tuo uo1 on uo1.id_uo=uf1.id_uo
+                               left join segu.tusuario usu on usu.id_persona=ff.id_persona
+                               where uo1.id_uo=(SELECT * FROM orga.f_get_uo_departamento(uo.id_uo,f.id_funcionario,null))::INTEGER and usu.estado_reg=''activo'' and ff.estado_reg=''activo'')::INTEGER as id_usuario_departamento,
+                             
+                              (select ff.email_empresa from 
+                               orga.vfuncionario f1 
+                               join orga.tfuncionario ff on ff.id_funcionario=f1.id_funcionario
+                               join orga.tuo_funcionario uf1 on uf1.id_funcionario=ff.id_funcionario
+                               join orga.tuo uo1 on uo1.id_uo=uf1.id_uo
+                               where uo1.id_uo=(SELECT * FROM orga.f_get_uo_departamento(uo.id_uo,f.id_funcionario,null))::INTEGER  and ff.estado_reg=''activo'')::VARCHAR as coreo_departamento,
+                               
+                               (select ff.id_funcionario from segu.tusuario usu 
+                               join orga.tfuncionario ff on ff.id_persona=usu.id_persona
+                               where usu.id_usuario = cot.id_usuario_reg and usu.estado_reg=''activo'' and ff.estado_reg=''activo'')::INTEGER as id_funcionario_gestor,
+                               
+                               (select usu.id_usuario from segu.tusuario usu 
+                               join orga.tfuncionario ff on ff.id_persona=usu.id_persona
+                               where usu.id_usuario = cot.id_usuario_reg and usu.estado_reg=''activo'' and ff.estado_reg=''activo'')::INTEGER as id_usuario_gestor,
+                               
+                               (SELECT ff.email_empresa from segu.tusuario uu 
+                               join orga.tfuncionario ff on ff.id_persona=uu.id_persona
+                               where uu.id_usuario=cot.id_usuario_reg and uu.estado_reg=''activo'' and ff.estado_reg=''activo'')::VARCHAR as correo_gestor,
+                               	
+                               (SELECT ff.id_funcionario from segu.tusuario uu 
+                               join orga.tfuncionario ff on ff.id_persona=uu.id_persona
+                               where ff.email_empresa like ''%''||cot.correo_contacto||''%'' and uu.estado_reg=''activo'' and ff.estado_reg=''activo'')::INTEGER as id_funcionario_solicitante,
+                               
+                               (SELECT uu.id_usuario from segu.tusuario uu 
+                               join orga.tfuncionario ff on ff.id_persona=uu.id_persona
+                               where ff.email_empresa like ''%''||cot.correo_contacto||''%'' and uu.estado_reg=''activo'' and ff.estado_reg=''activo'')::INTEGER as id_usuario_solicitante,
+                               cot.correo_contacto::VARCHAR as correo_solicitante,
+                               pro.desc_proveedor::VARCHAR,
+                               (((EXTRACT(YEAR FROM cot.fecha_entrega))||''-''||(EXTRACT(MONTH FROM cot.fecha_entrega))||''-''||(EXTRACT(DAY FROM cot.fecha_entrega)))::TIMESTAMP -  ((EXTRACT(YEAR FROM now()))||''-''||(EXTRACT(MONTH FROM now()))||''-''||(EXTRACT(DAY FROM now())))::TIMESTAMP)::VARCHAR as dias_faltantes
+                               from adq.tcotizacion cot
+                               inner join adq.tproceso_compra proc on proc.id_proceso_compra = cot.id_proceso_compra
+                               inner join adq.tsolicitud sol on sol.id_solicitud = proc.id_solicitud
+                               inner join segu.tusuario usu1 on usu1.id_usuario = cot.id_usuario_reg
+                               inner join param.tmoneda mon on mon.id_moneda = cot.id_moneda
+                               inner join param.vproveedor pro on pro.id_proveedor = cot.id_proveedor
+                               --left join segu.tusuario usu2 on usu2.id_usuario = cot.id_usuario_reg
+                               --left join orga.vfuncionario_persona fp on fp.id_persona=pro.id_persona
+                               join orga.vfuncionario f on f.id_funcionario=sol.id_funcionario
+                               join orga.tuo_funcionario uf on uf.id_funcionario=f.id_funcionario
+                               join orga.tuo uo on uo.id_uo=uf.id_uo
+                               WHERE 
+                               usu1.estado_reg=''activo'' and f.estado_reg=''activo'' and
+                               (
+                               (((EXTRACT(YEAR FROM cot.fecha_entrega))||''-''||(EXTRACT(MONTH FROM cot.fecha_entrega))||''-''||(EXTRACT(DAY FROM cot.fecha_entrega)))::TIMESTAMP -  ((EXTRACT(YEAR FROM now()))||''-''||(EXTRACT(MONTH FROM now()))||''-''||(EXTRACT(DAY FROM now())))::TIMESTAMP) = ''15 days''
+                               OR (((EXTRACT(YEAR FROM cot.fecha_entrega))||''-''||(EXTRACT(MONTH FROM cot.fecha_entrega))||''-''||(EXTRACT(DAY FROM cot.fecha_entrega)))::TIMESTAMP -  ((EXTRACT(YEAR FROM now()))||''-''||(EXTRACT(MONTH FROM now()))||''-''||(EXTRACT(DAY FROM now())))::TIMESTAMP) = ''10 days''
+                               OR (((EXTRACT(YEAR FROM cot.fecha_entrega))||''-''||(EXTRACT(MONTH FROM cot.fecha_entrega))||''-''||(EXTRACT(DAY FROM cot.fecha_entrega)))::TIMESTAMP -  ((EXTRACT(YEAR FROM now()))||''-''||(EXTRACT(MONTH FROM now()))||''-''||(EXTRACT(DAY FROM now())))::TIMESTAMP) = ''5 days''
+                               OR (((EXTRACT(YEAR FROM cot.fecha_entrega))||''-''||(EXTRACT(MONTH FROM cot.fecha_entrega))||''-''||(EXTRACT(DAY FROM cot.fecha_entrega)))::TIMESTAMP -  ((EXTRACT(YEAR FROM now()))||''-''||(EXTRACT(MONTH FROM now()))||''-''||(EXTRACT(DAY FROM now())))::TIMESTAMP) = ''0 days''
+                               )  ';
+            
+			--v_consulta:=v_consulta||v_parametros.filtro;
+			--v_consulta:=v_consulta||' order by cot.correo_contacto asc limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
+--raise notice 'err %',v_consulta;
+--raise EXCEPTION 'err %',v_consulta;
+            
+
+            return v_consulta;
+
+
+	 end;
+     
+    /*********************************    
+ 	#TRANSACCION:  'ADQ_DFOR_CO_CONT'
+ 	#DESCRIPCION:	Conteo de registros de la consulta de cotizaciones 
+ 	#AUTOR:	 	Gonzalo Sarmiento Sejas
+ 	#FECHA:		21-03-2013 14:48:35
+	***********************************/
+
+	elsif(p_transaccion='ADQ_DFOR_CO_CONT')then
+
+		begin
+        
+			--Sentencia de la consulta de conteo de registros
+			v_consulta:='  
+                     select count(cot.id_cotizacion)
+                          from adq.tcotizacion cot
+                           inner join adq.tproceso_compra proc on proc.id_proceso_compra = cot.id_proceso_compra
+                           inner join adq.tsolicitud sol on sol.id_solicitud = proc.id_solicitud
+                           inner join segu.tusuario usu1 on usu1.id_usuario = cot.id_usuario_reg
+                           inner join param.tmoneda mon on mon.id_moneda = cot.id_moneda
+                           inner join param.vproveedor pro on pro.id_proveedor = cot.id_proveedor
+
+                           join orga.vfuncionario f on f.id_funcionario=sol.id_funcionario
+                           join orga.tuo_funcionario uf on uf.id_funcionario=f.id_funcionario
+                           join orga.tuo uo on uo.id_uo=uf.id_uo
+                           WHERE (((EXTRACT(YEAR FROM cot.fecha_entrega))||''-''||(EXTRACT(MONTH FROM cot.fecha_entrega))||''-''||(EXTRACT(DAY FROM cot.fecha_entrega)))::TIMESTAMP -  ((EXTRACT(YEAR FROM now()))||''-''||(EXTRACT(MONTH FROM now()))||''-''||(EXTRACT(DAY FROM now())))::TIMESTAMP) = ''15 days''
+                               OR (((EXTRACT(YEAR FROM cot.fecha_entrega))||''-''||(EXTRACT(MONTH FROM cot.fecha_entrega))||''-''||(EXTRACT(DAY FROM cot.fecha_entrega)))::TIMESTAMP -  ((EXTRACT(YEAR FROM now()))||''-''||(EXTRACT(MONTH FROM now()))||''-''||(EXTRACT(DAY FROM now())))::TIMESTAMP) = ''10 days''
+                               OR (((EXTRACT(YEAR FROM cot.fecha_entrega))||''-''||(EXTRACT(MONTH FROM cot.fecha_entrega))||''-''||(EXTRACT(DAY FROM cot.fecha_entrega)))::TIMESTAMP -  ((EXTRACT(YEAR FROM now()))||''-''||(EXTRACT(MONTH FROM now()))||''-''||(EXTRACT(DAY FROM now())))::TIMESTAMP) = ''5 days''
+                               OR (((EXTRACT(YEAR FROM cot.fecha_entrega))||''-''||(EXTRACT(MONTH FROM cot.fecha_entrega))||''-''||(EXTRACT(DAY FROM cot.fecha_entrega)))::TIMESTAMP -  ((EXTRACT(YEAR FROM now()))||''-''||(EXTRACT(MONTH FROM now()))||''-''||(EXTRACT(DAY FROM now())))::TIMESTAMP) = ''0 days''  ';
+            
+			
+			--Definicion de la respuesta		    
+			--v_consulta:=v_consulta||v_parametros.filtro;
+
+			--Devuelve la respuesta
+			return v_consulta;
+
+		end;        
     /*********************************    
  	#TRANSACCION:  'ADQ_COTPROC_SEL'
  	#DESCRIPCION:	Consulta de datos
@@ -722,3 +1135,9 @@ EXCEPTION
       v_resp = pxp.f_agrega_clave(v_resp,'procedimientos',v_nombre_funcion);
       raise exception '%',v_resp;
 END;
+$body$
+LANGUAGE 'plpgsql'
+VOLATILE
+CALLED ON NULL INPUT
+SECURITY INVOKER
+COST 100;

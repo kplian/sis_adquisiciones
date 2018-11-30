@@ -561,8 +561,9 @@ header("content-type: text/javascript; charset=UTF-8");
 			],
 			'Servicio':[
 				['servicio','Servicios'],
-				['consultoria_personal','Consultoria de Personas'],
-				['consultoria_empresa','Consultoria de Empresas'],
+                //20180319 - calvarez - quitar en desarrollo tb por que usuarios VIP estan usando sin saber y no existe flujo que cubra estas 2 opciones
+				//['consultoria_personal','Consultoria de Personas'],
+				//['consultoria_empresa','Consultoria de Empresas'],
 				//['alquiler_inmueble','Alquiler Inmuebles']
 			]
 		},
@@ -813,6 +814,7 @@ header("content-type: text/javascript; charset=UTF-8");
 	                qtip: 'Si compromete al 87% , en caso contrario es el 100%  (87% es cuando estemos  seguros que la adjudicación se realizara a un proveedor que emite factura con crédito fiscal)',
 	                allowBlank: false,
 	                emptyText: 'Tipo...',
+	                disabled: true, //RAC 27/02/"018 se bloquea esta opcion, todoas las solitudes se han al NETO"
 	                typeAhead: true,
 	                triggerAction: 'all',
 	                lazyRender: true,
@@ -837,6 +839,7 @@ header("content-type: text/javascript; charset=UTF-8");
 					fieldLabel: 'Tipo de Contrato',
 					qtip: 'Si tine un contrato de adhesion',
 					allowBlank: false,
+					 disabled: true,   ///////////EGS///////////30/07/2018
 					emptyText: 'Tipo...',
 					typeAhead: true,
 					triggerAction: 'all',

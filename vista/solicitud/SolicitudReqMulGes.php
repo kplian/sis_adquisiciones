@@ -5,6 +5,8 @@
 *@author  (rarteaga)
 *@date 20-09-2011 10:22:05
 *@Interface para el inicio de solicitudes de compra
+ * *  * ISSUE            FECHA:		      AUTOR       DESCRIPCION
+ *   	#1 			20/09/2018			EGS			se modifico un atributo del formulario del proveedor
 */
 header("content-type: text/javascript; charset=UTF-8");
 ?>
@@ -276,7 +278,8 @@ Phx.vista.SolicitudReqMulGes = {
     },
     
     iniciarEventos:function(){
-        
+        	this.Cmp.id_proveedor.allowBlank=true;//#1 			20/09/2018			EGS	
+        	
 	        this.cmpFechaSoli = this.getComponente('fecha_soli');
 	        this.cmpIdDepto = this.getComponente('id_depto');
 	        this.cmpIdGestion = this.getComponente('id_gestion');

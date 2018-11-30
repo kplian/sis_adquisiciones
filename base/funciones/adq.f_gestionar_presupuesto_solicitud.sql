@@ -24,6 +24,7 @@ $body$
  0				        12/10/2017			RAC				Se adciona verificacion pro tipo de centro de costo, segun configuración de control de partidas
  #101			        13/02/2018			RAC				Se almacena presupeusto vigente y comprometido previo al compromiso final para reprotes de certificacion
  #10 ADQ    ETR         21/02/2018          RAC KPLIAN      se incrementa columna para comproemter al 87 %	
+ #11 ADQ    ETR         27/02/2018          RAC KPLIAN      Solucioar BUG al revertir presupeusto desde el proceso de adquisiciones 
 ***************************************************************************/
 
 DECLARE
@@ -46,7 +47,7 @@ DECLARE
   va_resp_ges              numeric[];
   
   va_fecha                date[];
-  
+  v_fecha                 date;
   v_monto_a_revertir 	numeric;
   v_total_adjudicado  	numeric;
   v_aux 				numeric;
@@ -75,7 +76,7 @@ DECLARE
  v_saldo_comp					numeric;
  v_monto_a_comprometer 			numeric; --10 ADQ ++
  v_monto_a_comprometer_mb    	numeric; --10 ADQ ++
-  
+ v_desc_pre						varchar;  
 
   
 BEGIN
@@ -91,7 +92,10 @@ BEGIN
   from adq.tsolicitud s
   where s.id_solicitud = p_id_solicitud_compra;
   
-  
+ -- raise exception '%',p_operacion;
+ 
+
+ 
   
       IF p_operacion = 'comprometer_old' THEN
         
@@ -402,13 +406,27 @@ BEGIN
                                               
                                               
                           IF va_resp_ges[1] = 0 THEN
+                              --recuperar descripcion del presupuesto
+                              select 
+                                 pre.descripcion
+                                into
+                                 v_desc_pre
+                              from  pre.tpresupuesto pre
+                              where pre.id_presupuesto =  v_registros.id_presupuesto;
+                              
+                          
                               IF va_resp_ges[4] is not null and  va_resp_ges[4] = 1  THEN
-                                  raise exception 'el presupuesto no alcanza por diferencia cambiaria, en moneda base tenemos:  % ',va_resp_ges[3];
+                                  raise exception '(%) el presupuesto no alcanza por diferencia cambiaria, en moneda base tenemos:  % ',v_desc_pre, va_resp_ges[3];
                               ELSE
                                   IF v_id_moneda_base = v_registros.id_moneda THEN
-                                      raise exception 'solo se tiene disponible un monto en moneda base de:  % , # % ,necesario: %', va_resp_ges[3], v_reg_sol.num_tramite , v_registros.precio_ga;   
-                                  ELSE
-                                      raise exception 'solo se tiene disponible un monto de:  % , %', va_resp_ges[5], v_reg_sol.num_tramite;
+                                      raise exception '(%) solo se tiene disponible un monto en moneda base de:  % , # % ,necesario: %', v_desc_pre, va_resp_ges[3], v_reg_sol.num_tramite , v_registros.precio_ga;   
+                                   ELSE
+                                      IF  va_resp_ges[5] is null  THEN
+                                        raise exception 'BOB (%) solo se tiene disponible un monto en moneda base de:  % , # % ,necesario: %, le falta %',v_desc_pre,  round(va_resp_ges[3],2), v_reg_sol.num_tramite , round(v_monto_a_comprometer_mb,2), round( v_monto_a_comprometer_mb - va_resp_ges[3],2);   
+                                      ELSE
+                                       raise exception '(%) solo se tiene disponible un monto de:  % , %',v_desc_pre, va_resp_ges[5], v_reg_sol.num_tramite;
+                                      END IF;
+                                     
                                   END IF;
                              END IF;
                          END IF;                    
@@ -431,6 +449,11 @@ BEGIN
                 
               
                END LOOP;
+               
+                IF  p_id_usuario = 429  and p_operacion  != 'verificar' THEN
+                        raise exception 'llega  % ', p_operacion;
+                END IF;
+               
                  
                  
 
@@ -647,7 +670,7 @@ BEGIN
                --raise exception '%', v_men_presu;
              
              
-       ELSEIF p_operacion = 'revertir_sobrante' THEN
+       ELSEIF p_operacion = 'revertir_sobrante_old' THEN
        
        -- revierte el sobrante no adjudicado en el proceso
                
@@ -787,6 +810,197 @@ BEGIN
                                                                    NULL,
                                                                    p_conexion);
                       END IF;
+                      
+                      
+      ------------------------------------------
+      --   #11 ADQ  revertir presupeusto   --OJO ANALIZAR SI ES NECESARIO CONSIDERAR EL TECHO PRESUPUESTARIO 
+      ------------------------------------------                
+                      
+       ELSEIF p_operacion = 'revertir_sobrante' THEN
+       
+          -- revierte el sobrante no adjudicado en el proceso
+       
+       
+          v_pre_verificar_categoria = pxp.f_get_variable_global('pre_verificar_categoria');     
+          v_pre_verificar_tipo_cc = pxp.f_get_variable_global('pre_verificar_tipo_cc');
+          v_control_partida = 'si'; --por defeto controlamos los monstos por partidas        
+          
+          
+          IF v_pre_verificar_tipo_cc = 'si' and v_pre_verificar_categoria = 'no' THEN
+          
+                
+                 FOR v_registros in (  SELECT                                   
+                                          tcc.id_tipo_cc_techo, 
+                                          s.id_gestion,
+                                          s.id_solicitud,
+                                          s.fecha_soli,     
+                                          sum (cd.cantidad_adju* cd.precio_unitario) as total_adjudicado,                                                                   
+                                          s.id_moneda,                                                                            
+                                          tcc.codigo_techo,
+                                          sd.id_partida,
+                                          par.nombre_partida,
+                                         pxp.aggarray(p.id_centro_costo) AS id_centro_costos,
+                                        pxp.aggarray(sd.id_solicitud_det) AS id_solicitud_dets  ,
+                                        pxp.aggarray(sd.id_partida_ejecucion) AS id_partida_ejecucions 
+                                        FROM  adq.tsolicitud s 
+                                        INNER JOIN adq.tsolicitud_det sd on s.id_solicitud = sd.id_solicitud
+                                        inner join pre.tpartida par on par.id_partida = sd.id_partida
+                                       
+                                        JOIN param.tcentro_costo p ON p.id_centro_costo = sd.id_centro_costo and sd.estado_reg = 'activo'
+                                        JOIN param.vtipo_cc_techo tcc ON tcc.id_tipo_cc = p.id_tipo_cc
+                                        inner join adq.tcotizacion_det cd on cd.id_solicitud_det = sd.id_solicitud_det
+                                        WHERE  sd.id_solicitud = p_id_solicitud_compra
+                                               and sd.estado_reg = 'activo' 
+                                               and sd.cantidad > 0
+                                               and cd.estado_reg = 'activo'
+                                                                              
+                                        group by 
+                                                                              
+                                       tcc.id_tipo_cc_techo, 
+                                       tcc.control_partida,
+                                       s.id_gestion,
+                                       s.id_solicitud,
+                                       s.fecha_soli,
+                                       sd.id_partida,                             
+                                       s.id_moneda,
+                                       par.nombre_partida,
+                                       tcc.codigo_techo
+                                       
+                                        ) LOOP
+                                       
+                                  
+                                   -----------------------------------------------------
+                                   --  OJO ANALIZAR si es necesario revertir el IVA ?????
+                                   --------------------------------------------------------
+                                  --calculamos el total adudicado
+                                   v_total_adjudicado = v_registros.total_adjudicado ;  --  suma la adjdicaciones en diferentes solicitudes  (puede no tener ningna adjudicacion)
+                                  
+                                  
+                                   --#11 tenemso dos posibilidades,  
+                                   --a) controlar solo por el id_partida _ejecucion que compmeio el item -> solo revierte lo comprometido en este sistema
+                                   --b) controlar por el otal disponible , hay que agruapr por partida, tipo_CC id_categoria, partida,...segun el sistema este configurado
+                                        -->  revertiria lo comprometido por otros sitemas  (AJSUTES desde sis_presupeustos)sobre el msimo nro de tramite 
+                                        
+                                    
+                                   v_comprometido_ga=0;
+                                   v_ejecutado=0;
+                                   
+                                   SELECT 
+                                         COALESCE(ps_comprometido,0), 
+                                         COALESCE(ps_ejecutado,0)  
+                                     into 
+                                         v_comprometido_ga,
+                                         v_ejecutado
+                                   FROM pre.f_verificar_com_eje_pag(v_registros.id_partida_ejecucions[1], v_registros.id_moneda); --, NULL, 'partida_ejecucion');  --#11 controla por el partida ejecucion del comprometido
+                                   
+                                   --raise exception '-- %, %',v_registros.id_partida_ejecucions[1],v_registros.id_moneda;
+                                   
+                                   
+                                   v_monto_a_revertir =  v_comprometido_ga - COALESCE(v_total_adjudicado,0);
+                                   
+                                   
+                                   --raise exception '%-- %, %',v_monto_a_revertir,  v_comprometido_ga, COALESCE(v_total_adjudicado,0);
+                                   
+                                   
+                                   
+                                   
+                                   --solo se revierte si el monto es mayor a cero
+                                   IF v_monto_a_revertir > 0 THEN 
+                                   
+                                          
+                                         -- la fecha de solictud es la fecha de compromiso 
+                                        IF  now()  < v_registros.fecha_soli THEN
+                                          v_fecha = v_registros.fecha_soli::date;
+                                        ELSE
+                                           -- la fecha de reversion como maximo puede ser el 31 de diciembre   
+                                           v_fecha = now()::date;
+                                           v_ano_1 =  EXTRACT(YEAR FROM  now()::date);
+                                           v_ano_2 =  EXTRACT(YEAR FROM  v_registros.fecha_soli::date);
+                                           
+                                           IF  v_ano_1  >  v_ano_2 THEN
+                                             v_fecha = ('31-12-'|| v_ano_2::varchar)::date;
+                                           END IF;
+                                        END IF;
+                                        
+                                      
+                                       -- actualizamos  el total revertido
+                                       
+                                       v_monto_a_revertir_mb= param.f_convertir_moneda(
+                                                v_registros.id_moneda, 
+                                                NULL,   --por defecto moenda base
+                                                v_monto_a_revertir, 
+                                                v_registros.fecha_soli, 
+                                                'O',-- tipo oficial, venta, compra 
+                                                NULL);
+                                         -- raise exception 'id %, %  ', v_monto_a_revertir_mb  , (v_monto_a_revertir)*-1;     
+                                              
+                                                
+                                         --raise exception 'id %, %  :  %  , %, %, % , %',v_registros.id_centro_costos[1], v_monto_a_revertir_mb  , (v_monto_a_revertir)*-1,  -6746.780, v_registros.id_solicitud, v_reg_sol.num_tramite, v_fecha;     
+                                                
+                                         va_resp_ges = pre.f_gestionar_presupuesto_individual(
+                                                    p_id_usuario, 
+                                                    NULL::NUMERIC, --tipo cambio
+                                                    v_registros.id_centro_costos[1], 
+                                                    v_registros.id_partida, 
+                                                    v_registros.id_moneda, --  RAC Cambio por moneda de la solicitud , v_id_moneda_base;
+                                                    (v_monto_a_revertir)*-1::numeric ,--RAC Cambio por moneda de la solicitud , v_registros.precio_ga_mb;
+                                                    v_fecha, 
+                                                    'comprometido'::Varchar, --traducido a varchar
+                                                    NULL::INTEGER, 
+                                                    'id_solicitud_compra'::VARCHAR, 
+                                                    v_registros.id_solicitud, 
+                                                    v_reg_sol.num_tramite  --v_reg_sol.num_tramite::VARCHAR 
+                                                 ); 
+                                                 
+                                                 
+                                             IF va_resp_ges[1] = 0 THEN
+                                                  IF va_resp_ges[4] is not null and  va_resp_ges[4] = 1  THEN
+                                                      raise exception 'el presupuesto no alcanza por diferencia cambiaria, en moneda base tenemos:  % ',va_resp_ges[3];
+                                                  ELSE
+                                                      IF v_id_moneda_base = v_registros.id_moneda THEN
+                                                          raise exception 'solo se tiene disponible un monto en moneda base de:  % , # % ,necesario: %', va_resp_ges[3], v_reg_sol.num_tramite , v_registros.precio_ga;   
+                                                      ELSE
+                                                          raise exception 'solo se tiene disponible un monto de:  % , %', va_resp_ges[5], v_reg_sol.num_tramite;
+                                                      END IF;
+                                                 END IF;
+                                             END IF;        
+                                                 
+                                                 
+                                           --raise exception 'resp  %', va_resp_ges;     
+                                                 
+                                              SELECT 
+                                         COALESCE(ps_comprometido,0), 
+                                         COALESCE(ps_ejecutado,0)  
+                                     into 
+                                         v_comprometido_ga,
+                                         v_ejecutado
+                                   FROM pre.f_verificar_com_eje_pag(v_registros.id_partida_ejecucions[1], v_registros.id_moneda); --, NULL, 'partida_ejecucion');  --#11 controla por el partida ejecucion del comprometido
+                                   
+                                   
+                                   
+                                   --raise exception 'FINAL %,%',v_comprometido_ga, v_ejecutado;             
+                                                
+                                      
+                                       UPDATE adq.tsolicitud_det sd set
+                                         revertido_mb = revertido_mb + v_monto_a_revertir_mb,
+                                         revertido_mo = revertido_mo + v_monto_a_revertir
+                                       WHERE  sd.id_solicitud_det =ANY(v_registros.id_solicitud_dets);
+                                       
+                                   END IF; 
+                           END LOOP;
+          
+          
+          
+          ELSEIF v_pre_verificar_categoria = 'si' THEN
+            raise exception 'combinacion no implementada';
+          ELSE
+            raise exception 'combinacion no implementada';
+          END IF;
+          
+           
+       
+               
+               
        
        ELSIF p_operacion = 'verificar' THEN
         
@@ -815,7 +1029,8 @@ BEGIN
                                             par.codigo,
                                             par.nombre_partida,
                                             p.codigo_cc,
-                                           pxp.aggarray(p.id_centro_costo) AS id_centro_costos 
+                                           pxp.aggarray(p.id_centro_costo) AS id_centro_costos
+                                          
                                           FROM  adq.tsolicitud s 
                                           INNER JOIN adq.tsolicitud_det sd on s.id_solicitud = sd.id_solicitud
                                           inner join pre.tpartida par on par.id_partida = sd.id_partida
@@ -842,7 +1057,17 @@ BEGIN
                                                 v_id_centro_costo
                                           from  adq.tsolicitud_det sd
                                           where  sd.id_solicitud = p_id_solicitud_compra
-                                          limit 1 offset 0;   
+                                          limit 1 offset 0; 
+                                          
+                                          
+                                           IF  p_id_usuario = 429  and p_operacion  != 'verificar' THEN
+                                                  raise exception 'llega  % ', p_operacion;
+                                          END IF;
+                
+                                          
+                                          
+                                          
+                                       
                                             
                                           v_resp_pre = pre.f_verificar_presupuesto_partida ( v_registros.id_centro_costos[1],
                                                                     v_registros.id_partida,
@@ -859,7 +1084,10 @@ BEGIN
                          
                          
                          END LOOP;
-          
+                         
+                         
+                         
+                        
                      
           
           
@@ -916,7 +1144,22 @@ BEGIN
                                        tcc.codigo_techo) 
                             LOOP
                                           
+                                        /*
+                                         IF  p_id_usuario = 429   THEN
+                                         
+                                            select 
+                                             tcc.codigo
+                                            into
+                                             v_desc_pre
+                                            from param.ttipo_cc tcc
+                                            where tcc.id_tipo_cc = v_registros.id_tipo_cc_techo;
                                             
+                                             IF v_desc_pre = 'P145' THEN
+                                                raise exception 'xx ... %, % ,% ,%', v_registros.id_centro_costos[1], v_registros.id_par, v_registros.id_moneda, v_registros.precio_ga;
+                                             END  IF;
+                                           
+                                         END IF;*/
+                                                          
                                           v_resp_pre = pre.f_verificar_presupuesto_partida ( v_registros.id_centro_costos[1],
                                                                     v_registros.id_par,
                                                                     v_registros.id_moneda,
@@ -932,6 +1175,12 @@ BEGIN
                          
                          
                          END LOOP;
+                         
+                         /*
+                          IF  p_id_usuario = 429  and v_sw_error THEN
+                              raise exception 'xx ... %', v_mensage_error;
+                           END IF;
+                             */ 
                     
                    
               
@@ -1016,6 +1265,10 @@ BEGIN
        
           raise exception 'Oepracion no implementada';
        
+       END IF;
+       
+       IF  p_id_usuario = 429  and p_operacion! = 'verificar' THEN
+          raise exception 'llega al final % ', p_operacion;
        END IF;
    
 

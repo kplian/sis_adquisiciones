@@ -72,12 +72,9 @@ class MODCotizacion extends MODbase{
 		$this->captura('tiene_form500','varchar');
 		$this->captura('correo_oc','varchar');
 		
-		
-		
-		 
-		
-		
-				
+		$this->captura('cecos','varchar');
+		$this->captura('total','numeric');
+		$this->captura('nro_cuenta','varchar');
 		
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -672,8 +669,54 @@ class MODCotizacion extends MODbase{
 		//Devuelve la respuesta
 		return $this->respuesta;
 	}
-    
-	
+	function InsertarDiasFaltantesOrdenCompra(){
+		//Definicion de variables para ejecucion del procedimiento
+		
+		
+		$this->procedimiento='adq.f_cotizacion_sel';
+		$this->transaccion='ADQ_DFOR_CO_SEL';
+		$this->tipo_procedimiento='SEL';
+		$this->setCount(false);  
+		
+
+		$this->tipo_conexion='seguridad';
+		
+		$this->arreglo=array("id_usuario" =>1,
+							 "tipo"=>'TODOS'
+							 );
+		
+
+						 
+		$this->setParametro('id_usuario','id_usuario','int4');						 
+			
+        $this->captura('id_funcionario_departamento','int4');
+		$this->captura('id_usuario_departamento','int4');
+		$this->captura('coreo_departamento','varchar');
+		
+        $this->captura('id_funcionario_gestor','int4');
+		$this->captura('id_usuario_gestor','int4');
+		$this->captura('correo_gestor','varchar');	
+		
+        $this->captura('id_funcionario_solicitante','int4');
+		$this->captura('id_usuario_solicitante','int4');
+		$this->captura('correo_solicitante','varchar');
+		
+		$this->captura('desc_proveedor','varchar');		
+		$this->captura('dias_faltantes','varchar');	
+	    //Ejecuta la instruccion
+		$this->armarConsulta();
+		
+
+		$this->ejecutarConsulta();
+		
+
+		/*echo ("entro al cron modelo juan ".$this->consulta.' fin juan');
+		exit;*/
+		
+		
+		//Devuelve la respuesta
+		return $this->respuesta;
+	}	
 
 			
 }

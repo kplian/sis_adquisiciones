@@ -942,9 +942,9 @@ function groupArray($array,$groupkey,$groupkeyTwo,$id_moneda,$estado_sol, $onlyD
 	}
 	//
 	function RVerDispPre(){	
-		$dataSource = $this->datos();	
-		//var_dump($dataSource);	
+		$dataSource = $this->datos();				
 		$dataPresupuesto = $this->datosCertSol();
+		//var_dump($dataSource);
 		//var_dump($dataPresupuesto);	
 		$nombreArchivo = uniqid(md5(session_id()).'-Presupuestaria') . '.pdf'; 		
 		$tamano = 'LETTER';
