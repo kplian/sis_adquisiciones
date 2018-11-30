@@ -376,7 +376,7 @@ p_hstore->'id_solicitud'
             IF v_adq_revisar_montos_categoria = 'si' THEN   
                 --la validacion se hace en moenda base
                  select
-                    sum(sd.precio_ga_mb + sd.precio_sg_mb )
+                    sum(COALESCE(sd.precio_ga_mb,0) +  COALESCE(sd.precio_sg_mb,0) )
                   into
                     v_total_mb
                  from adq.tsolicitud_det sd   

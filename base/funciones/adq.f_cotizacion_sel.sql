@@ -117,7 +117,23 @@ BEGIN
                         d.total_cotizado,
                         d.total_adjudicado_mb,
                         cot.tiene_form500,
-                        cot.correo_oc
+                        cot.correo_oc,
+                        (SELECT ARRAY_TO_STRING(ARRAY_AGG(DISTINCT(cc.codigo_cc)), ''<br>'')
+                        from adq.tcotizacion_det ctd						
+				        inner join adq.tsolicitud_det sold on sold.id_solicitud_det=  ctd.id_solicitud_det
+				        inner join param.tconcepto_ingas cig on cig.id_concepto_ingas = sold.id_concepto_ingas
+						inner join param.vcentro_costo cc on cc.id_centro_costo = sold.id_centro_costo
+                        WHERE cot.id_cotizacion=ctd.id_cotizacion)::VARCHAR AS cecos,                                                                       
+                        (SELECT sum(ctdet.cantidad_adju) 
+                        FROM adq.tcotizacion_det ctdet                                                                             
+                        WHERE ctdet.id_cotizacion=cot.id_cotizacion
+                        group by cot.id_cotizacion)as total,                        
+                        (SELECT ARRAY_TO_STRING(ARRAY_AGG(DISTINCT(cta.nro_cuenta)), ''<br>'')
+                        from adq.tcotizacion_det ctd						
+                        inner join adq.tsolicitud_det sold on sold.id_solicitud_det=  ctd.id_solicitud_det
+                        left join conta.tcuenta cta on cta.id_cuenta = sold.id_cuenta                          
+                        WHERE cot.id_cotizacion=ctd.id_cotizacion)::VARCHAR AS nro_cuenta
+                        
 						from adq.tcotizacion cot
                         inner join adq.tproceso_compra proc on proc.id_proceso_compra = cot.id_proceso_compra
                         inner join adq.tsolicitud sol on sol.id_solicitud = proc.id_solicitud
@@ -270,7 +286,8 @@ BEGIN
                                OR (((EXTRACT(YEAR FROM cot.fecha_entrega))||'-'||(EXTRACT(MONTH FROM cot.fecha_entrega))||'-'||(EXTRACT(DAY FROM cot.fecha_entrega)))::TIMESTAMP -  ((EXTRACT(YEAR FROM now()))||'-'||(EXTRACT(MONTH FROM now()))||'-'||(EXTRACT(DAY FROM now())))::TIMESTAMP) = '0 days'
                                )) LOOP
                 
-                                   /*insert into param.talarma(
+                                   /*
+                                   insert into param.talarma(
                                       acceso_directo,
                                       id_funcionario,
                                       fecha,
@@ -298,7 +315,8 @@ BEGIN
                                       591,--par_id_funcionario 591 juan
                                       now(),--par_fecha
                                       'activo',
-                                      regexp_replace(item.dias_faltantes,'days','Dias','g') ||' para fin de servicio de '||item.desc_proveedor,--par_descripcion
+                                      --'<font color="99CC00" size="5"><font size="4">Solicitud de Compra</font> </font><br><br><b>&nbsp;</b>Tramite:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; &nbsp;&nbsp; <b>ADQ-001129-2018</b><br><b>&nbsp;</b>Usuario :<b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RAMIRO PACO ESCOBAR </b>en estado<b>&nbsp; Evaluación de propuestas (Comité)<br></b>&nbsp;<b>Responsable:&nbsp;&nbsp; &nbsp;&nbsp; </b><b>RAMIRO PACO ESCOBAR&nbsp; <br>&nbsp;</b>Estado Actual<b>: &nbsp; &nbsp;&nbsp; VoBo Control Proceso II</b><br><br><br>&nbsp;ADQ-CENTRAL-SOLC-5/149-2018 Obs:Favor revisar -  <br>',
+                                      '<font color="99CC00" size="5"><font size="4">'||regexp_replace(regexp_replace(item.dias_faltantes,'00:00:00','0','g'),'days','','g')||' Dias para fin servicio </font> </font><br><br><b></b>Tramite:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <b>'||item.num_tramite||'</b><br> Proveedor : <b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'||item.desc_proveedor||'</b><br>Fecha de entrega  : <b>&nbsp;&nbsp;'||item.fecha_entrega||'</b>',--par_descripcion
                                       1,--par_id_usuario admin
                                       now(),
                                       null,
@@ -306,18 +324,19 @@ BEGIN
                                       'notificacion',--par_tipo
                                       ''::varchar, --par_obs
                                       '',--par_clase
-                                      'Fin servicio',--par_titulo
+                                      item.justificacion,--par_titulo
                                       '',--par_parametros
                                       407,--par_id_usuario_alarma 407 juan
-                                      'Dias restantes_',--par_titulo_correo
-                                      'juan.jimenez@endetransmision.bo',--par_correos
+                                      item.justificacion,--par_titulo_correo
+                                      '',--par_correos
                                       '',--par_documentos
                                       NULL,--p_id_proceso_wf
                                       NULL,--p_id_estado_wf
                                       NULL,--p_id_plantilla_correo
                                       'si'::character varying --v_estado_envio
-                                      
-                                    ); */           
+                                    ); 
+                                    
+                                    */           
                       
                                    -- Jefe de departamento
                                    insert into param.talarma(

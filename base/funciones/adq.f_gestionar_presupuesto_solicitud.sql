@@ -451,7 +451,7 @@ BEGIN
                END LOOP;
                
                 IF  p_id_usuario = 429  and p_operacion  != 'verificar' THEN
-                        raise exception 'llega  % ', p_operacion;
+                      --  raise exception 'llega  % ', p_operacion;
                 END IF;
                
                  
@@ -1061,7 +1061,7 @@ BEGIN
                                           
                                           
                                            IF  p_id_usuario = 429  and p_operacion  != 'verificar' THEN
-                                                  raise exception 'llega  % ', p_operacion;
+                                                --  raise exception 'llega  % ', p_operacion;
                                           END IF;
                 
                                           
@@ -1267,8 +1267,8 @@ BEGIN
        
        END IF;
        
-       IF  p_id_usuario = 429  and p_operacion! = 'verificar' THEN
-          raise exception 'llega al final % ', p_operacion;
+       IF  p_id_usuario = 429  and p_operacion != 'verificar' THEN
+          --raise exception 'llega al final % ', p_operacion;
        END IF;
    
 

@@ -123,6 +123,7 @@ DECLARE
        v_adq_requiere_rpc			varchar;
        v_datos_ga_gs				record;
        v_datos_saldos				record;
+       v_datos				        record;
        v_total_disponble			numeric;
        v_comprometer_87             varchar; --#10ADQ ++
        v_factor						numeric; --#10 ADQ ++
@@ -456,7 +457,8 @@ BEGIN
                 precontrato = COALESCE(v_parametros.precontrato,'no'),
                 nro_po = trim(both ' ' from v_parametros.nro_po),
                 fecha_po = v_parametros.fecha_po,
-                comprometer_87 = v_parametros.comprometer_87
+                comprometer_87 = v_parametros.comprometer_87,
+                observacion = v_parametros.observacion -- #11 ADQ       ETR    	  	19/09/2018
 			where id_solicitud = v_parametros.id_solicitud;
                
 			--Definicion de la respuesta
@@ -1936,6 +1938,29 @@ BEGIN
 
 		begin
         
+        	-- recupera descripcion y el techo
+            select 
+                codigo_techo,
+                descripcion_techo
+              into
+                v_datos
+            from (
+                    select 
+                      DISTINCT
+                      tcc.codigo_techo,
+                      tcc.descripcion_techo
+                    from adq.tsolicitud_det sd
+                    inner join param.tcentro_costo cc on cc.id_centro_costo = sd.id_centro_costo
+                    inner join param.vtipo_cc_techo tcc on tcc.id_tipo_cc = cc.id_tipo_cc
+                    inner join adq.tsolicitud s on s.id_solicitud=sd.id_solicitud
+                    where s.id_proceso_wf= v_parametros.id_proceso_wf and sd.estado_reg = 'activo'
+                 ) saldo
+            
+            group by 
+            saldo.codigo_techo,
+            saldo.descripcion_techo;
+        	
+        
             --recupera moneda de la solicitud
            select 
              sol.id_solicitud,
@@ -1966,7 +1991,7 @@ BEGIN
             from (
                     select 
                       DISTINCT
-                      tcc.codigo_techo,
+                      tcc.codigo_techo,                     
                       sd.saldo_vigente_mb,
                       sd.saldo_comp_mb
                     from adq.tsolicitud_det sd
@@ -1986,7 +2011,7 @@ BEGIN
             END IF;
             
             --determina todal disopnible
-            
+           
             v_total_disponble = COALESCE(v_datos_saldos.saldo_vigente_mb,0)  - COALESCE(v_datos_saldos.saldo_comp_mb,0) - COALESCE(v_datos_ga_gs.precio_ga_mb, 0);			
 
 			--Definicion de la respuesta
@@ -1998,9 +2023,10 @@ BEGIN
             v_resp = pxp.f_agrega_clave(v_resp,'v_precio_ga_mb',COALESCE(v_datos_ga_gs.precio_ga_mb*v_factor,0)::varchar); --10 ADQ, segun la configuracion de comproemtido para la solcitidu
             v_resp = pxp.f_agrega_clave(v_resp,'v_precio_sg_mb',COALESCE(v_datos_ga_gs.precio_sg_mb*v_factor,0)::varchar);  --10 ADQ, "
             v_resp = pxp.f_agrega_clave(v_resp,'v_fecha_comp', COALESCE(v_datos_ga_gs.fecha_comp,'')::varchar); 
+            v_resp = pxp.f_agrega_clave(v_resp,'v_cod_techo', COALESCE(v_datos.codigo_techo,'')::varchar);                                    
+            v_resp = pxp.f_agrega_clave(v_resp,'v_descripcion_techo', COALESCE(v_datos.descripcion_techo,'')::varchar);
 
-
-            --Devuelve la respuesta
+			--Devuelve la respuesta
             return v_resp;
 
 		end;      

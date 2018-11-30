@@ -75,7 +75,7 @@ DECLARE
      
      v_adq_tolerancia_adjudicacion    varchar;
      v_adq_comprometer_presupuesto    varchar;
-     
+     v_adq_adjudicar_con_presupuesto varchar;
      
      
      
@@ -343,6 +343,7 @@ BEGIN
             
             v_adq_tolerancia_adjudicacion  = pxp.f_get_variable_global('adq_tolerancia_adjudicacion');
             v_adq_comprometer_presupuesto = pxp.f_get_variable_global('adq_comprometer_presupuesto');
+            v_adq_adjudicar_con_presupuesto = pxp.f_get_variable_global('adq_adjudicar_con_presupuesto');
             
             select
                sd.id_solicitud_det, 
@@ -426,9 +427,11 @@ BEGIN
                      
                      
                      --raise exception 'LLega...  %, % , %, %', v_comprometido_ga, v_ejecutado, v_id_partida_ejecucion, v_id_moneda;
+                     --raise exception 'LLega...  %, % , %, %',v_comprometido_ga, (v_comprometido_ga + COALESCE(v_precio_sg,0)) - v_total_costo_mo, ( 1 + v_adq_tolerancia_adjudicacion::numeric),( v_parametros.cantidad_adjudicada * v_precio_unitario_coti) ;
+                    
                     
                      --validamos que el total revertido no afecte la adjudicacion 
-                    IF  (( ( (v_comprometido_ga + COALESCE(v_precio_sg,0)) - v_total_costo_mo)*( 1 + v_adq_tolerancia_adjudicacion::numeric))  >= (v_parametros.cantidad_adjudicada * v_precio_unitario_coti) ) OR v_adq_comprometer_presupuesto = 'no'  THEN
+                    IF  ((( ( v_comprometido_ga + COALESCE(v_precio_sg,0) - v_total_costo_mo)*( 1 + v_adq_tolerancia_adjudicacion::numeric))  >= (v_parametros.cantidad_adjudicada * v_precio_unitario_coti) ) OR v_adq_comprometer_presupuesto = 'no') or v_adq_adjudicar_con_presupuesto = 'no' THEN
                        
                        update adq.tcotizacion_det set
                        cantidad_adju = v_parametros.cantidad_adjudicada

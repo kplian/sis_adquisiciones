@@ -81,7 +81,9 @@ BEGIN
 			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;
 			v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
-
+             
+            RAISE notice '%',v_consulta;
+            
 			--Devuelve la respuesta
 			return v_consulta;
 						
@@ -105,7 +107,7 @@ BEGIN
 				        inner join adq.tsolicitud_det sold on sold.id_solicitud_det=  ctd.id_solicitud_det
 				        inner join param.tconcepto_ingas cig on cig.id_concepto_ingas = sold.id_concepto_ingas
 						inner join param.vcentro_costo cc on cc.id_centro_costo = sold.id_centro_costo
-                        where ';
+                        where ctd.id_cotizacion='||v_parametros.id_cotizacion||' and ';
 			
 			--Definicion de la respuesta		    
 			v_consulta:=v_consulta||v_parametros.filtro;
@@ -151,7 +153,7 @@ BEGIN
                                          lower(trim(sold.descripcion))
                                     ORDER BY descripcion_sol asc';
 
-            raise notice '%',v_consulta;
+            --raise exception '%',v_consulta;
 			--Devuelve la respuesta
 			return v_consulta;
 						
