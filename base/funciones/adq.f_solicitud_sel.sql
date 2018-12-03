@@ -20,7 +20,7 @@ $body$
 * 0,   				BOA	  		10/06/2013          RAC         Funcion que devuelve conjuntos de registros de las consultas relacionadas con la tabla 'adq.tsolicitud'
 * 0,  				ETR	        19/10/2017          RAC			no se muestra en visto bueno solicitud el estado desierto, ADQ_SOL_SEL 
  #10 ADQ       		ETR         21/02/2018          RAC         se incrementa columna para comproemter al 87 %	
- 
+ #11 ADQ       		ETR         19/09/2018          EGS         se aumento columna para observacion  
 ***************************************************************************/
 
 DECLARE
@@ -53,6 +53,7 @@ DECLARE
     v_valor				varchar;
     v_nro_memo			varchar;
     v_correlativo		varchar;
+    v_id_funcionarios_asistidos INTEGER[];
 
 BEGIN
 
@@ -71,6 +72,7 @@ BEGIN
     ***************************************************************************
    * ISSUE               FECHA:		      AUTOR       DESCRIPCION
    * #10 ADQ  ETR      21/02/2018          RAC         se incrementa columna para comproemter al 87 %
+   		#11 ADQ       		ETR         19/09/2018          EGS         se aumento columna para observacion 
     
     
     
@@ -79,6 +81,10 @@ BEGIN
 	if(p_transaccion='ADQ_SOL_SEL')then
 
     	begin
+          --CHROS 12/11/2018 - PARA MOSTRAR LAS SOLICITUDES DE TODOS LOS FUNCIONARIOS A LOS QUE SE ASISTE (DE LOS ASISTENTES CONFIGURADOS)
+          select array(select * FROM orga.f_get_funcionarios_x_usuario_asistente(now()::date, p_id_usuario) AS (id_funcionario INTEGER))
+          into v_id_funcionarios_asistidos;
+          
           --si es administrador
             v_filtro='';
             if (v_parametros.id_funcionario_usu is null) then
@@ -86,20 +92,13 @@ BEGIN
             end if;
 
             IF  pxp.f_existe_parametro(p_tabla,'historico') THEN
-
-             v_historico =  v_parametros.historico;
-
+              v_historico =  v_parametros.historico;
             ELSE
-
-            v_historico = 'no';
-
+              v_historico = 'no';
             END IF;
 
             IF p_administrador !=1  and lower(v_parametros.tipo_interfaz) = 'solicitudreq' THEN
-
-              v_filtro = '(ew.id_funcionario='||v_parametros.id_funcionario_usu::varchar||'  or sol.id_usuario_reg='||p_id_usuario||' or sol.id_funcionario = '||v_parametros.id_funcionario_usu::varchar||') and ';
-
-
+              v_filtro = '(ew.id_funcionario='||v_parametros.id_funcionario_usu::varchar||'  or sol.id_usuario_reg='||p_id_usuario||' or sol.id_funcionario = '||v_parametros.id_funcionario_usu::varchar||' or sol.id_funcionario in (' || array_to_string(v_id_funcionarios_asistidos, ',') || ')) and ';
             END IF;
 
           IF  lower(v_parametros.tipo_interfaz) in ('solicitudvb','solicitudvbwzd','solicitudvbpoa','solicitudvbpresupuestos') THEN
@@ -169,9 +168,9 @@ BEGIN
              END IF;
 
 
+ 		-- se habilito la columna observacion #11  9/09/2018 EGS  
 
-
-    		--Sentencia de la consulta
+      --Sentencia de la consulta
 			v_consulta:='select
                               '||v_strg_sol||',
                               sol.estado_reg,
@@ -237,7 +236,8 @@ BEGIN
                                           sol.nro_po,
                               sol.fecha_po,
                               sum(tsd.precio_total) as importe_total,
-                              sol.comprometer_87
+                              sol.comprometer_87,
+                              sol.observacion
 						from adq.tsolicitud sol
 						inner join segu.tusuario usu1 on usu1.id_usuario = sol.id_usuario_reg
                         inner join wf.tproceso_wf pwf on pwf.id_proceso_wf = sol.id_proceso_wf
@@ -263,6 +263,8 @@ BEGIN
 
 			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;
+            raise notice '%',v_consulta;
+
 			v_consulta:=v_consulta||' group by sol.id_solicitud, usu1.cuenta, usu2.cuenta, 
              fun.desc_funcionario1, funa.desc_funcionario1, uo.codigo, uo.nombre_unidad,
              ges.gestion, mon.codigo, dep.codigo, pm.nombre, cat.nombre, funrpc.desc_funcionario1,
@@ -287,6 +289,9 @@ BEGIN
 
 		begin
             v_filtro='';
+          --CHROS 12/11/2018 - PARA MOSTRAR LAS SOLICITUDES DE TODOS LOS FUNCIONARIOS A LOS QUE SE ASISTE (DE LOS ASISTENTES CONFIGURADOS)
+          select array(select * FROM orga.f_get_funcionarios_x_usuario_asistente(now()::date, p_id_usuario) AS (id_funcionario INTEGER))
+          into v_id_funcionarios_asistidos;
 
             IF  pxp.f_existe_parametro(p_tabla,'historico') THEN
 
@@ -303,10 +308,7 @@ BEGIN
             end if;
 
             IF p_administrador !=1  and lower(v_parametros.tipo_interfaz) = 'solicitudreq' THEN
-
-              v_filtro = '(ew.id_funcionario='||v_parametros.id_funcionario_usu::varchar||'  or sol.id_usuario_reg='||p_id_usuario||' ) and ';
-
-
+              v_filtro = '(ew.id_funcionario='||v_parametros.id_funcionario_usu::varchar||'  or sol.id_usuario_reg='||p_id_usuario||' or sol.id_funcionario = '||v_parametros.id_funcionario_usu::varchar||' or sol.id_funcionario in (' || array_to_string(v_id_funcionarios_asistidos, ',') || ')) and ';
             END IF;
 
             IF  lower(v_parametros.tipo_interfaz) in ('solicitudvb','solicitudvbwzd','solicitudvbpoa','solicitudvbpresupuestos') THEN

@@ -27,7 +27,8 @@ $body$
  DESCRIPCIÓN:
  AUTOR:       
  FECHA:      
-
+ ISSUE SIS       EMPRESA      FECHA:		      AUTOR       DESCRIPCION
+ #1              ETR    	  	19/09/2018         EGS         se modifico para los aprobadores de los encargados  
 ***************************************************************************/
 
 -------------------------
@@ -78,6 +79,17 @@ DECLARE
     v_id_subsistema		integer;   
     v_tam				integer;
     v_id_func_list		varchar;
+    
+    
+    v_bandera_GG                    varchar;  --#1
+    v_bandera_GAF                   varchar; --#1
+    v_record_gg                     varchar[]; --#1
+    v_record_gaf                    varchar[]; --#1
+    v_fecha                        	date; --#1
+    v_record_id_funcionario_gg      varchar; --#1
+    v_record_id_funcionario_gaf     varchar; --#1
+    v_integer_gg                    integer; --#1
+    v_integer_gaf                   integer; --#1
 
 BEGIN
   v_nombre_funcion ='adq.f_lista_funcionario_aprobador';
@@ -195,7 +207,64 @@ BEGIN
           END IF;
           
          
-    
+    	     ----#1              ETR    	  	19/09/2018         EGS  
+          	v_id_func_list = split_part(v_id_func_list, ',', 1);
+          	
+            
+            v_bandera_GG	= pxp.f_get_variable_global('orga_codigo_gerencia_general');
+            v_bandera_GAF	= pxp.f_get_variable_global('orga_codigo_gerencia_financiera');    
+            
+            v_fecha = now();
+            v_record_gg = orga.f_obtener_gerente_x_codigo_uo(v_bandera_GG,v_fecha);
+            v_record_id_funcionario_gg	= v_record_gg[1];
+            v_integer_gg = v_record_id_funcionario_gg::integer;
+            
+            v_record_gaf = orga.f_obtener_gerente_x_codigo_uo(v_bandera_GAF,v_fecha);
+            v_record_id_funcionario_gaf	= v_record_gaf[1];
+           -- v_integer_gaf = v_record_id_funcionario_gaf::integer;
+
+         if( (v_reg_op.id_funcionario = v_id_func_list::integer)AND(v_reg_op.id_funcionario !=  v_integer_gg ))then
+             v_i = 2;
+             
+             WHILE v_i <= v_tam LOOP
+               
+               select 
+                     pxp.list(id_funcionario::varchar)
+                   into 
+                      v_id_func_list    
+              from 
+                            
+                param.f_obtener_listado_aprobadores(va_id_uo[v_i], 
+                                                    null,--  p_id_ep
+                                                    null,--p_id_centro_costo, 
+                                                    v_id_subsistema, 
+                                                    v_reg_op.fecha_soli,  
+                                                    v_reg_op.monto_pago_mb,  
+                                                    p_id_usuario, 
+                                                    null--p_id_proceso_macro
+                                                    ) as 
+                                                    ( id_aprobador integer,
+                                                      id_funcionario integer,
+                                                      fecha_ini date,
+                                                      fecha_fin date,
+                                                      desc_funcionario text,
+                                                      monto_min numeric,
+                                                      monto_max numeric,
+                                                      prioridad integer);
+                                                    
+                IF v_id_func_list != '0' and v_id_func_list is not null  THEN
+                    v_i = v_tam +1;                
+                END IF;
+                v_i = v_i +1  ;  
+                                          
+          END LOOP;
+          elseif(v_reg_op.id_funcionario =  v_integer_gg)then
+          		v_id_func_list = v_record_id_funcionario_gaf;
+         
+         end if;
+    		
+         ----#1              ETR    	  	19/09/2018         EGS  
+          -- RAISE exception 'hola %',v_id_func_list ;
             
      
     

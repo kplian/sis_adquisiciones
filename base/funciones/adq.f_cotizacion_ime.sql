@@ -135,6 +135,7 @@ DECLARE
       v_registros_cotizacion 			record;
       v_tiene_form500					varchar;
       v_adq_comprometer_presupuesto		varchar;
+      v_adq_adjudicar_con_presupuesto varchar;
      
 			    
 BEGIN
@@ -349,7 +350,7 @@ BEGIN
             v_sw2 = FALSE;
             v_id_moneda_base =  param.f_get_moneda_base();
             v_adq_comprometer_presupuesto = pxp.f_get_variable_global('adq_comprometer_presupuesto');
-               
+            v_adq_adjudicar_con_presupuesto = pxp.f_get_variable_global('adq_adjudicar_con_presupuesto');
            --si ya tien item adjudicados no se los toca
            
             FOR v_registros in (
@@ -376,8 +377,6 @@ BEGIN
                                  inner join adq.tsolicitud s on s.id_solicitud = sd.id_solicitud
                                  where  cd.id_cotizacion = v_parametros.id_cotizacion and cd.estado_reg = 'activo') LOOP
                                  
-            
-               
                v_total_adj = adq.f_calcular_total_adj_cot_det(v_registros.id_cotizacion_det);
                -- RAC  29/01/2014, se aumenta el parametro tipo de moneda MO o MB
                v_total_costo_mo= adq.f_calcular_total_costo_mb_adj_cot_det(v_registros.id_cotizacion_det, 'MO');
@@ -389,13 +388,9 @@ BEGIN
                       IF v_registros.precio_unitario_sol >= v_registros.precio_unitario_coti THEN
                 
                           IF  (v_registros.cantidad - v_total_adj) <  v_registros.cantidad_coti THEN
-                          
                               v_cantidad_adjudicada = v_registros.cantidad - v_total_adj;
-                           
                           ELSE    
                               v_cantidad_adjudicada =v_registros.cantidad_coti;
-                         
-                         
                           END IF;
                           
                             IF  v_cantidad_adjudicada > 0 THEN
@@ -413,30 +408,21 @@ BEGIN
                                 
                                  --validamos que el total revertido no afecte la adjudicacion            
                                  --en caso contrario no se adjudicada nada
-                                IF  (((v_comprometido_ga + COALESCE(v_registros.precio_sg,0)) - v_total_costo_mo)  >= (v_cantidad_adjudicada * v_registros.precio_unitario_coti) ) OR v_adq_comprometer_presupuesto = 'no'  THEN
-                                     
+                                IF  (((v_comprometido_ga + COALESCE(v_registros.precio_sg,0) - v_total_costo_mo)  >= (v_cantidad_adjudicada * v_registros.precio_unitario_coti) ) OR v_adq_comprometer_presupuesto = 'no') or v_adq_adjudicar_con_presupuesto = 'no' THEN
                                      update adq.tcotizacion_det set
                                      cantidad_adju = v_cantidad_adjudicada
                                      where id_cotizacion_det = v_registros.id_cotizacion_det;
-                               
-                                    v_sw  = TRUE;
+                                     v_sw  = TRUE;
                                 ELSE
-                                    v_sw2 = TRUE;
+                                     v_sw2 = TRUE;
                                 END IF;
-                                
                           END IF;
-                      
                       END IF;     
-                
-                
                 END   IF;
              END LOOP;
-        
-             
+
              IF not v_sw  THEN
-             
                 IF  v_sw2 THEN
-                
                    raise exception 'No puede adjudicarse nada (Verifique el presupuesto comprometido y revertido)';
                 ELSE
                   raise exception 'No puede adjudicarse nada';
@@ -449,7 +435,6 @@ BEGIN
               
             --Devuelve la respuesta
             return v_resp;
-
 		end;
         
      
