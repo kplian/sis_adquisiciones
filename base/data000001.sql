@@ -983,3 +983,19 @@ VALUES
 INSERT INTO pxp.variable_global ( "variable", "valor", "descripcion")
 VALUES ( E'adq_adjudicar_con_presupuesto', E'si', E'no: para que NO verifique si existe monto disponible a momento de adjudicar un proveedor. si:valor por defecto para que SI verifique monto disponible a momento de adjudicar un proveedor');
 /***********************************F-DAT-CAP-ADQ-0-13/08/2018*****************************************/
+
+
+
+/***********************************I-DAT-EGS-ADQ-0-30/11/2018*****************************************/
+
+select param.f_import_tcatalogo_tipo ('insert','ttipo_entrega','ADQ','tproceso_compra');
+select param.f_import_tcatalogo ('insert','ADQ','CIP','CIP','ttipo_entrega');
+select param.f_import_tcatalogo ('insert','ADQ','CIF','CIF','ttipo_entrega');
+select param.f_import_tcatalogo ('insert','ADQ','DAP','DAP','ttipo_entrega');
+select param.f_import_tcatalogo ('insert','ADQ','DDP','DDP','ttipo_entrega');
+select param.f_import_tcatalogo ('insert','ADQ','DDU','DDU','ttipo_entrega');
+select param.f_import_tcatalogo ('insert','ADQ','EXW','EXW','ttipo_entrega');
+select param.f_import_tcatalogo ('insert','ADQ','FACTURADO','FACTURADO','ttipo_entrega');
+select param.f_import_tcatalogo ('insert','ADQ','RETENCION IMPOSITIVA','RETENCION IMPOSITIVA','ttipo_entrega');
+/***********************************F-DAT-EGS-ADQ-0-30/11/2018*****************************************/
+
