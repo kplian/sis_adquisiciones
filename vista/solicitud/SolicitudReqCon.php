@@ -1,12 +1,12 @@
 <?php
 /**
 *@package pXP
-*@file SolicitudReqCon.php
+*@file gen-SolicitudReq.php
 *@author  (rarteaga)
 *@date 20-09-2011 10:22:05
-*@description Archivo con la interfaz de usuario que 
-*permite la consolicdacion de presolicitudes en una unica solicitud
-*
+*@Interface para el inicio de solicitudes de compra
+	ISSUE				FECHA					AUTHOR					DESCRIPCION
+ * 	#1					11/12/2018				EGS						se modifico para que solo se inserte o modifique la cabecera de una solicitud 
 */
 header("content-type: text/javascript; charset=UTF-8");
 ?>
@@ -14,13 +14,48 @@ header("content-type: text/javascript; charset=UTF-8");
 Phx.vista.SolicitudReqCon = {
 	require:'../../../sis_adquisiciones/vista/solicitud/Solicitud.php',
 	requireclase:'Phx.vista.Solicitud',
-	title:'SolicitudReq',
-	nombreVista: 'solicitudReq',
-	defRegion:'west',
+	title:'Solicitud',
+	nombreVista: 'solicitudReqCon',
+	//layoutType: 'wizard',
+	
+	gruposBarraTareas:[{name:'borrador',title:'<H1 align="center"><i class="fa fa-thumbs-o-down"></i> Borradores</h1>',grupo:0,height:0},
+                       {name:'proceso',title:'<H1 align="center"><i class="fa fa-eye"></i> Iniciados</h1>',grupo:1,height:0},
+                       {name:'finalizados',title:'<H1 align="center"><i class="fa fa-thumbs-o-up"></i> Finalizados</h1>',grupo:2,height:0}],
+	
+	actualizarSegunTab: function(name, indice){
+    	if(this.finCons){
+    		 this.store.baseParams.pes_estado = name;
+    	     this.load({params:{start:0, limit:this.tam_pag}});
+    	   }
+    },
+	beditGroups: [0],
+    bdelGroups:  [0],
+    bactGroups:  [0,1,2],
+    btestGroups: [0],
+    bexcelGroups: [0,1,2],
+    
 	constructor: function(config) {
-            Phx.vista.SolicitudReqCon.superclass.constructor.call(this,config);
-            this.addButton('fin_requerimiento',{text:'Finalizar',iconCls: 'badelante',disabled:true,handler:this.fin_requerimiento,tooltip: '<b>Finalizar</b>'});
+		
+		    this.Atributos[this.getIndAtributo('tipo')].form=true; 
+            this.Atributos[this.getIndAtributo('tipo_concepto')].form=true; 
+            this.Atributos[this.getIndAtributo('id_moneda')].form=true;
+            this.Atributos[this.getIndAtributo('fecha_soli')].form=true; 
+            this.Atributos[this.getIndAtributo('id_depto')].form=true; 
+            this.Atributos[this.getIndAtributo('id_funcionario')].form=true;  
+            this.Atributos[this.getIndAtributo('id_categoria_compra')].form=true;
+            this.Atributos[this.getIndAtributo('id_proveedor')].form=false; 
+            this.Atributos[this.getIndAtributo('justificacion')].form=true; 
+            this.Atributos[this.getIndAtributo('lugar_entrega')].form=true; 
+            this.Atributos[this.getIndAtributo('fecha_inicio')].form=true; 
+            this.Atributos[this.getIndAtributo('dias_plazo_entrega')].form=true;
             
+             
+		
+    		Phx.vista.SolicitudReqCon.superclass.constructor.call(this,config);
+    		this.addButton('fin_requerimiento',{ grupo:[0],text:'Siguiente', iconCls: 'badelante', disabled: true, handler: this.fin_requerimiento, tooltip: '<b>Finalizar</b>'});
+            this.addButton('btnSolpre',{ grupo:[0,],text:'Sol Pre.',iconCls: 'bemail', disabled: true, handler: this.onSolModPresupuesto, tooltip: '<b>Solicitar Presuuesto</b><p>Emite un correo para solicitar traspaso presupuestario</p>'});
+       
+        
             this.iniciarEventos();
             
             //agrega ventana para selecion de RPC
@@ -107,104 +142,181 @@ Phx.vista.SolicitudReqCon = {
             }]
         });
             
-        
-        
-        this.store.baseParams={tipo_interfaz:this.nombreVista};
-        
-        this.load({params:{start:0, limit:this.tam_pag}});
-        
-        
+		
+		
+		this.store.baseParams={tipo_interfaz:this.nombreVista};
+		if(config.filtro_directo){
+           this.store.baseParams.filtro_valor = config.filtro_directo.valor;
+           this.store.baseParams.filtro_campo = config.filtro_directo.campo;
+        }
+		//primera carga
+		this.store.baseParams.pes_estado = 'borrador';
+    	this.load({params:{start:0, limit:this.tam_pag}});
+		
+		this.finCons = true;
+		
+	},
+    
+    
+         
+    onButtonNew:function(){
+	       //abrir formulario de solicitud
+	       var me = this;
+		   me.objSolForm = Phx.CP.loadWindows('../../../sis_adquisiciones/vista/presolicitud/FormSolicitud.php',
+	                                'Formulario de Solicitud de Compra',
+	                                {
+	                                    modal:true,
+	                                    width:'90%',
+	                                    height:'90%'
+	                                }, {data:{objPadre: me}
+	                                }, 
+	                                this.idContenedor,
+	                                'FormSolicitud',
+	                                {
+	                                    config:[{
+	                                              event:'successsave',
+	                                              delegate: this.onSaveForm,
+	                                              
+	                                            }],
+	                                    
+	                                    scope:this
+	                                 });    
+	    
+		
+           
+    },
+    
+    onSaveForm: function(form,  objRes){
+    	var me = this;
+    	
+    	//muestra la ventana de documentos para este proceso wf
+	    Phx.CP.loadWindows('../../../sis_workflow/vista/documento_wf/DocumentoWf.php',
+                    'Chequear documento del WF',
+                    {
+                        width:'90%',
+                        height:500
+                    },
+                    {
+				    	id_solicitud: objRes.ROOT.datos.id_solicitud,
+				    	id_proceso_wf: objRes.ROOT.datos.id_proceso_wf,
+				    	num_tramite: objRes.ROOT.datos.num_tramite,
+				    	estao: objRes.ROOT.datos.estado,
+				    	nombreVista: 'Formulario de solicitud de compra',
+				    	tipo: 'solcom'  //para crear un boton de guardar directamente en la ventana de documentos
+				    	
+				    },
+                    this.idContenedor,
+                    'DocumentoWf',
+                    {
+                        config:[{
+                                  event:'finalizarsol',
+                                  delegate: this.onCloseDocuments,
+                                  
+                                }],
+                        
+                        scope:this
+                     }
+        )
+    	
+    	form.panel.destroy()
+        me.reload();
+    	
+    },
+    
+    onCloseDocuments: function(paneldoc, data, directo){
+    	var newrec = this.store.getById(data.id_solicitud);
+    	if(newrec){
+	    	this.sm.selectRecords([newrec]);
+	    	if(directo === true){
+	    		 this.fin_requerimiento(paneldoc);
+	    	}
+	    	else{
+		    	if(confirm("¿Desea mandar la solictud para aprobación?")){
+		    		this.fin_requerimiento(paneldoc);
+		    	}	
+	    	}
+	    		
+    	}
+    	
+		    	
+    },
+    onButtonEdit:function(){
+
+       this.cmpFechaSoli.disable();
+       this.cmpIdDepto.disable();   
+       this.Cmp.id_funcionario.disable();     
+       this.Cmp.id_categoria_compra.disable();
+       this.Cmp.precontrato.disable();
+       this.Cmp.tipo_concepto.disable();
+       this.Cmp.id_moneda.disable();
+
+
+       Phx.vista.SolicitudReqCon.superclass.onButtonEdit.call(this);
+       this.Cmp.id_funcionario.store.baseParams.fecha = this.cmpFechaSoli.getValue().dateFormat(this.cmpFechaSoli.format);
+       //this.Cmp.fecha_soli.fireEvent('change');  
+
+        //nos permite habilitar para la categoria de compra internacional el campo nro_po, fecha_po
+       if(this.Cmp.id_categoria_compra.getValue()==4){
+           this.mostrarComponente(this.Cmp.nro_po);
+           this.mostrarComponente(this.Cmp.fecha_po);
+       }else{
+           this.ocultarComponente(this.Cmp.nro_po);
+           this.ocultarComponente(this.Cmp.fecha_po);
+       }
+
+
+       if(this.Cmp.tipo.getValue() == 'Bien' ||  this.Cmp.tipo.getValue() == 'Bien - Servicio'){
+            	this.ocultarComponente(this.Cmp.fecha_inicio);
+            	this.Cmp.dias_plazo_entrega.allowBlank = false;
+        }
+        else{
+        	this.mostrarComponente(this.Cmp.fecha_inicio);
+        	this.Cmp.dias_plazo_entrega.allowBlank = true;
+        }
+        this.mostrarComponente(this.Cmp.dias_plazo_entrega);
     },
     
     iniciarEventos:function(){
         
-        this.cmpFechaSoli = this.getComponente('fecha_soli');
-        this.cmpIdDepto = this.getComponente('id_depto');
-        this.cmpIdGestion = this.getComponente('id_gestion');
-        this.cmpIdUo = this.getComponente('id_uo');
-        this.cmpIdFuncionarioAprobador = this.getComponente('id_funcionario_aprobador');
-        
-        //inicio de eventos 
-        this.cmpFechaSoli.on('change',function(f){
-            
-             this.obtenerGestion(this.cmpFechaSoli);
-             this.cmpIdUo.reset();
-             this.cmpIdFuncionarioAprobador.reset();
-             this.cmpIdUo.enable();
-             this.Cmp.id_funcionario.enable();             
-             this.Cmp.id_funcionario.store.baseParams.fecha = this.cmpFechaSoli.getValue().dateFormat(this.cmpFechaSoli.format);
+	        this.cmpFechaSoli = this.getComponente('fecha_soli');
+	        this.cmpIdDepto = this.getComponente('id_depto');
+	        this.cmpIdGestion = this.getComponente('id_gestion');
+     
+	        //inicio de eventos 
+	        this.cmpFechaSoli.on('change',function(f){
+	        	
+	             this.obtenerGestion(this.cmpFechaSoli);
+	             this.Cmp.id_funcionario.enable();             
+	             this.Cmp.id_funcionario.store.baseParams.fecha = this.cmpFechaSoli.getValue().dateFormat(this.cmpFechaSoli.format);
+	             
+	             },this);
              
-             },this);
-        
-        this.Cmp.id_funcionario.on('select',function(rec){ 
-            
-            //Aprobador  
-            this.cmpIdFuncionarioAprobador.store.baseParams.id_funcionario_dependiente=this.Cmp.id_funcionario.getValue();
-            this.cmpIdFuncionarioAprobador.store.baseParams.fecha = this.cmpFechaSoli.getValue().dateFormat(this.cmpFechaSoli.format);
-            this.cmpIdFuncionarioAprobador.modificado=true;
-            //Unidad
-            this.Cmp.id_uo.store.baseParams.id_funcionario_uo_presupuesta=this.Cmp.id_funcionario.getValue();
-            this.Cmp.id_uo.store.baseParams.fecha = this.cmpFechaSoli.getValue().dateFormat(this.cmpFechaSoli.format);
-            this.Cmp.id_uo.store.load({params:{start:0,limit:this.tam_pag}, 
-               callback : function (r) {                        
-                    if (r.length > 0 ) {                        
-                        this.Cmp.id_uo.setValue(r[0].data.id_uo);
-                    }     
-                                    
-                }, scope : this
-            });
-            
-            this.cmpIdUo.enable();
-            this.cmpIdFuncionarioAprobador.reset();
-            this.cmpIdFuncionarioAprobador.enable();
-            
+           this.Cmp.tipo_concepto.on('select',function(cmp,rec){
+           	
+           	   //identificamos si es un bien o un servicio
+           	   if(this.isInArray(rec.json, this.arrayStore['Bien'])){
+           	   	  this.Cmp.tipo.setValue('Bien');
+           	   }
+           	   else{
+           	   	  this.Cmp.tipo.setValue('Servicio');
+           	   }
+           	   
+           	   if(this.Cmp.tipo.getValue() == 'Bien'){
+                	this.Cmp.lugar_entrega.setValue('Almacenes de Oficina Cochabamba');
+                	this.ocultarComponente(this.Cmp.fecha_inicio);
+                	this.Cmp.dias_plazo_entrega.allowBlank = false;
+                	
+                }
+                else{
+                	this.Cmp.lugar_entrega.setValue('');
+                	this.mostrarComponente(this.Cmp.fecha_inicio);
+                	this.Cmp.dias_plazo_entrega.allowBlank = true;
+                }
+                this.mostrarComponente(this.Cmp.dias_plazo_entrega);
+                
+           	
            },this);
       
-    },
-         
-    onButtonNew:function(){
-       Phx.vista.SolicitudReqCon.superclass.onButtonNew.call(this); 
-       
-       this.cmpIdDepto.enable(); 
-         
-       this.Cmp.id_categoria_compra.enable();
-       this.cmpIdFuncionarioAprobador.disable();
-       this.cmpIdUo.disable();
-       this.Cmp.id_funcionario.disable();
-       this.Cmp.fecha_soli.setValue(new Date());
-       this.Cmp.fecha_soli.fireEvent('change');
-       
-       
-       this.Cmp.id_categoria_compra.store.load({params:{start:0,limit:this.tam_pag}, 
-           callback : function (r) {
-                if (r.length > 0 ) {                        
-                    this.Cmp.id_categoria_compra.setValue(r[0].data.id_categoria_compra);
-                }    
-                                
-            }, scope : this
-        });
-        
-        this.Cmp.id_funcionario.store.load({params:{start:0,limit:this.tam_pag}, 
-           callback : function (r) {
-                if (r.length == 1 ) {                       
-                    this.Cmp.id_funcionario.setValue(r[0].data.id_funcionario);
-                    this.Cmp.id_funcionario.fireEvent('select', r[0]);
-                }    
-                                
-            }, scope : this
-        });
-        
-           
-    },
-    onButtonEdit:function(){
-       this.cmpFechaSoli.disable();
-       this.cmpIdDepto.disable();        
-       this.Cmp.id_categoria_compra.disable();
-       this.cmpIdFuncionarioAprobador.disable();       
-       this.cmpIdUo.disable();
-       Phx.vista.SolicitudReqCon.superclass.onButtonEdit.call(this);
-       this.Cmp.id_funcionario.store.baseParams.fecha = this.cmpFechaSoli.getValue().dateFormat(this.cmpFechaSoli.format);
-       //this.Cmp.fecha_soli.fireEvent('change');    
     },
     
     onFinalizarSol:function(){
@@ -215,15 +327,16 @@ Phx.vista.SolicitudReqCon = {
                    Ext.Ajax.request({
                     // form:this.form.getForm().getEl(),
                     url:'../../sis_adquisiciones/control/Solicitud/finalizarSolicitud',
-                    params:{id_solicitud:d.id_solicitud,operacion:'finalizar',id_funcionario_rpc:this.cmbRPC.getValue()},
-                    success:this.successFinSol,
+                    params: { id_solicitud: d.id_solicitud, operacion:'finalizar', id_estado_wf: d.id_estado_wf, id_funcionario_rpc: this.cmbRPC.getValue() },
+                    success: this.successFinSol,
                     failure: this.conexionFailure,
-                    timeout:this.timeout,
-                    scope:this
+                    timeout: this.timeout,
+                    scope: this
                 }); 
             } 
      },
-        successFinSol:function(resp){
+    
+    successFinSol:function(resp){
             
             Phx.CP.loadingHide();
             var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
@@ -241,7 +354,7 @@ Phx.vista.SolicitudReqCon = {
         },
     
     
-    fin_requerimiento:function()
+       fin_requerimiento:function(paneldoc)
         {                   
             var d= this.sm.getSelected().data;
            
@@ -254,11 +367,12 @@ Phx.vista.SolicitudReqCon = {
             Ext.Ajax.request({
                 // form:this.form.getForm().getEl(),
                 url:'../../sis_adquisiciones/control/Solicitud/finalizarSolicitud',
-                params:{id_solicitud:d.id_solicitud,operacion:'verificar'},
-                success:this.successSinc,
+                params: { id_solicitud: d.id_solicitud, operacion:'verificar', id_estado_wf: d.id_estado_wf },
+                argument: { paneldoc: paneldoc},
+                success: this.successSinc,
                 failure: this.conexionFailure,
-                timeout:this.timeout,
-                scope:this
+                timeout: this.timeout,
+                scope: this
             });     
         },
        successSinc:function(resp){
@@ -276,7 +390,10 @@ Phx.vista.SolicitudReqCon = {
                  this.cmbRPC.modificado=true;
                  this.wRPC.show();
                 */
-               
+              
+                 if(resp.argument.paneldoc.panel){
+                 	resp.argument.paneldoc.panel.destroy();
+                 }
                  this.reload();
             }else{
                 
@@ -315,39 +432,48 @@ Phx.vista.SolicitudReqCon = {
     },
     
   
-    
-     preparaMenu:function(n){
+   preparaMenu:function(n){
       var data = this.getSelectedData();
       var tb =this.tbar;
       Phx.vista.SolicitudReqCon.superclass.preparaMenu.call(this,n);  
+      //habilitar reporte de colicitud de comrpa y preorden de compra
+      this.menuAdq.enable();    
+      if(data['estado']==  'borrador' || data['estado']==  'Borrador'){
+         this.getBoton('fin_requerimiento').enable();
+         
+       }
+       else{
+           this.getBoton('fin_requerimiento').disable();
+           this.getBoton('edit').disable();
+           //this.getBoton('new').disable();
+           this.getBoton('del').disable();
+          // this.getBoton('save').disable();
+        
           
-          if(data['estado']==  'borrador' || data['estado']==  'Borrador'){
-             this.getBoton('fin_requerimiento').enable();
-             
-           }
-          else{
-               this.getBoton('fin_requerimiento').disable();
-               this.getBoton('edit').disable();
-               //this.getBoton('new').disable();
-               this.getBoton('del').disable();
-              // this.getBoton('save').disable();
-            
-              
-              
-          }
+          
+        }
+        
+        if(data.estado =='borrador' || data.estado =='pendiente' ||data.estado =='vbgerencia'){ 
+          this.getBoton('btnSolpre').enable(); 
+        }
+        else{
+           this.getBoton('btnSolpre').disable();     
+        }
+          
+          
         return tb 
      }, 
      liberaMenu:function(){
         var tb = Phx.vista.SolicitudReqCon.superclass.liberaMenu.call(this);
         if(tb){
             this.getBoton('fin_requerimiento').disable();
-           
+            this.getBoton('btnSolpre').disable(); 
+            this.menuAdq.disable();
         }
         
        return tb
     },    
-          
-   
+       
     xeast:{
           url:'../../../sis_adquisiciones/vista/presolicitud/PresolicitudCon.php',
           title:'Estados', 

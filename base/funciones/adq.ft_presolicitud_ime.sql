@@ -17,10 +17,9 @@ $body$
  COMENTARIOS:	
 ***************************************************************************
  HISTORIAL DE MODIFICACIONES:
-
- DESCRIPCION:	
- AUTOR:			
- FECHA:		
+ISSUE		FECHA:	         AUTOR:				 DESCRIPCION:	
+#1			11/12/2018		 EGS				 Se modifico las funciones para que cuando consolide inserte con las validaciones en la funcion de insertar detalle de la solicitud ime
+												 y al eliminar pase a estado inactivo
 ***************************************************************************/
 
 DECLARE
@@ -33,17 +32,27 @@ DECLARE
 	v_mensaje_error         text;
 	v_id_presolicitud	    integer;
     v_registros    		    record;
-    v_estado  varchar;
-    v_consulta  varchar;
-    v_id_partida integer; 
-    v_id_cuenta integer; 
-    v_id_auxiliar   integer;
-    v_id_solicitud_det integer;
-    v_aux varchar;
-    v_registros_pre record;
+    v_estado  				varchar;
+    v_consulta  			varchar;
+    v_id_partida 			integer; 
+    v_id_cuenta 			integer; 
+    v_id_auxiliar   		integer;
+    v_id_solicitud_det 		integer;
+    v_aux 					varchar;
+    v_registros_pre 		record;
 
-    v_id_gestion integer;
-    v_count_det  integer;
+    v_id_gestion 			integer;
+    v_count_det  			integer;
+    v_record_solicitud_det	record;
+    v_existe_detalle		boolean;
+    
+    v_codigo_trans				varchar;
+    v_tabla						varchar;
+    v_precio_total			numeric;
+    v_precio_ga				numeric;
+    v_cantidad				integer;
+    v_record_cig			record;
+    v_record_solicitud	record;
 
 			    
 BEGIN
@@ -149,10 +158,23 @@ BEGIN
 	elsif(p_transaccion='ADQ_PRES_ELI')then
 
 		begin
+        	--verificando si tiene detalles la presolicitud
+            IF (Select
+            	count(pred.id_presolicitud_det)
+            from adq.tpresolicitud_det pred
+            where pred.id_presolicitud = v_parametros.id_presolicitud)<> 0 THEN
+             Raise Exception 'La presolicitud  no puede ser eliminada revise que no tenga detalle';
+            END IF; 
+            
+            UPDATE adq.tpresolicitud
+            Set estado_reg = 'inactivo',
+            	id_usuario_mod = p_id_usuario
+            where id_presolicitud = v_parametros.id_presolicitud;
+            /*
 			--Sentencia de la eliminacion
 			delete from adq.tpresolicitud
-            where id_presolicitud=v_parametros.id_presolicitud;
-               
+            where id_presolicitud = v_parametros.id_presolicitud;
+               */
             --Definicion de la respuesta
             v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Presolicitud eliminado(a)'); 
             v_resp = pxp.f_agrega_clave(v_resp,'id_presolicitud',v_parametros.id_presolicitud::varchar);
@@ -380,17 +402,18 @@ BEGIN
            select
             s.estado,
             s.id_depto,
-            s.id_gestion
+            s.id_gestion,
+            s.tipo
             into 
-            v_registros 
+            v_record_solicitud 
             from adq.tsolicitud s
             where s.id_solicitud = v_parametros.id_solicitud;
             
 
-            v_id_gestion = v_registros.id_gestion;
+            v_id_gestion = v_record_solicitud.id_gestion;
 
             
-            IF v_registros.estado != 'borrador' THEN
+            IF v_record_solicitud.estado != 'borrador' THEN
             
                raise exception 'La solictud de compra bede estar en estado borrador para consolidar, actualice su interface de solicitudes';
             
@@ -414,7 +437,7 @@ BEGIN
             
             END IF;
             
-            IF v_registros_pre.id_depto != v_registros.id_depto   THEN
+            IF v_registros_pre.id_depto != v_record_solicitud.id_depto   THEN
             
              
                raise exception 'Solo puede consolidar presolicitudes del mismo departamento que la solicitud';
@@ -430,13 +453,14 @@ BEGIN
            v_aux = 0;
         END IF;
         
-        
+           v_existe_detalle = false;
            v_consulta = 'select
              pd.id_presolicitud_det,
              pd.id_centro_costo,
              pd.id_concepto_ingas,
              pd.descripcion,
              pd.cantidad,
+             pd.precio,
              pd.estado    
             from adq.tpresolicitud_det pd
             where pd.id_presolicitud = '||v_parametros.id_presolicitud||'
@@ -444,12 +468,22 @@ BEGIN
                    pd.id_presolicitud_det in ('||v_aux||')';
         
            --raise exception '%',v_consulta;
-        
+        	
            FOR  v_registros in  execute(v_consulta) LOOP
-           
-              
+           		  --recuperamos el tipo de la solicitud
+           		  Select
+                       congas.tipo
+                  INTO
+                       v_record_cig
+                  From param.tconcepto_ingas congas
+                  Where congas.id_concepto_ingas = v_registros.id_concepto_ingas ;
                   
+                  --si los tipos son diferentes no deberia insertar
+                  IF  UPPER(v_record_solicitud.tipo) <> UPPER(v_record_cig.tipo)  THEN
+                         	raise exception 'El tipo de la Solicitud (%) es diferente al tipo del detalle de la Presolicitud(%)',v_record_solicitud.tipo,v_record_cig.tipo;
+                  END IF; 			
            
+           			
                   SELECT 
                     ps_id_partida ,
                     ps_id_cuenta,
@@ -460,74 +494,149 @@ BEGIN
                     v_id_auxiliar
 
                 FROM conta.f_get_config_relacion_contable('CUECOMP', v_id_gestion, v_registros.id_concepto_ingas, v_registros.id_centro_costo);
-
+				-- #1	1/12/2018		 EGS	
+              	-- Inserta el detalle a la solicitud  
+                FOR v_record_solicitud_det IN(
+                	Select
+                    sold.id_solicitud_det,
+                    sold.id_centro_costo,
+                    sold.id_concepto_ingas,
+                    sold.precio_unitario,
+                    sold.cantidad,
+                    sold.precio_unitario
+               	    from adq.tsolicitud_det sold
+                    where sold.estado_reg = 'activo' AND sold.id_solicitud = v_parametros.id_solicitud
+				  ) LOOP   
+                  	          
+        			
+                      ---si es de igual centro de costo,precio y concepto de gasto a un detalle de la solicitud se actualiza sumando solo las cantidades
+                      IF v_record_solicitud_det.id_centro_costo = v_registros.id_centro_costo  and 
+                         v_record_solicitud_det.id_concepto_ingas = v_registros.id_concepto_ingas  and
+                         v_record_solicitud_det.precio_unitario = v_registros.precio	 THEN
+                         
+                        
+                          
+                         v_cantidad =  v_record_solicitud_det.cantidad + v_registros.cantidad;
+                         v_precio_total = (v_record_solicitud_det.cantidad + v_registros.cantidad)*v_record_solicitud_det.precio_unitario;
+                         v_precio_ga = (v_record_solicitud_det.cantidad + v_registros.cantidad)*v_record_solicitud_det.precio_unitario;
+                         
+                         v_codigo_trans ='ADQ_SOLD_MOD';
+           				 v_tabla = pxp.f_crear_parametro(ARRAY[	
+                         				'id_solicitud_det',
+                                    	'id_centro_costo',
+                                        'descripcion',
+                                        'precio_unitario',
+                                        'id_solicitud',
+                                        'id_orden_trabajo',
+                                        'precio_sg',
+                                        'precio_ga',
+                                        'id_concepto_ingas',
+                                        'precio_total',
+                                        'cantidad_sol',
+                                        'estado_reg'
+                           			
+                                                ],
+                                        ARRAY[	
+                                        v_record_solicitud_det.id_solicitud_det::varchar,--'id_solicitud_det'
+                                        v_registros.id_centro_costo::varchar,--'id_centro_costo'
+                                        ''::varchar,--'descripcion'
+                                        v_registros.precio::varchar,--'precio_unitario'
+                                        v_parametros.id_solicitud::varchar,--'id_solicitud'
+                                        ''::varchar,--'id_orden_trabajo'
+                                        0::varchar,--'precio_sg'
+                                        v_precio_ga::varchar,--'precio_ga'
+                                        v_registros.id_concepto_ingas::varchar,--'id_concepto_ingas'
+                                        v_precio_total::varchar,--'precio_total'
+                                        v_cantidad::varchar,--'cantidad'
+                                        ''::varchar--'estado_reg'
+                                            ],
+                                        ARRAY[   
+                                        	'int4',--'id_solicitud_det'      
+                                            'int4',--'id_centro_costo'
+                                            'text',--'descripcion'
+                                            'numeric',--'precio_unitario'
+                                            'int4',--'id_solicitud'
+                                            'int4',--'id_orden_trabajo'
+                                            'numeric',--'precio_sg'
+                                            'numeric',--'precio_ga'
+                                            'int4',--'id_concepto_ingas'
+                                            'numeric',--'precio_total'
+                                            'int4',--'cantidad'
+                                            'varchar'--'estado_reg'
+                                           ]
+                           						 );
+                      
+            			v_resp= adq.f_solicitud_det_ime(p_administrador,p_id_usuario,v_tabla,v_codigo_trans);
+                        v_existe_detalle = TRUE;
+                      END IF;	
+               
+             	
+            
                 
-        
            
-             
-                 --Sentencia de la insercion
-                  insert into adq.tsolicitud_det(
-                  id_centro_costo,
-                  descripcion,
-                  precio_unitario,
-                  id_solicitud,
-                  id_partida,
-                  id_orden_trabajo,
-      			
-                  id_concepto_ingas,
-                  id_cuenta,
-                  precio_total,
-                  cantidad,
-                  id_auxiliar,
-                  estado_reg,
-                  precio_ga,
-                  precio_sg,
-                  id_usuario_reg,
-                  fecha_reg,
-                  fecha_mod,
-                  id_usuario_mod,
-                  precio_ga_mb,
-                  precio_sg_mb,
-                  precio_unitario_mb
-                  
-                  
-                  ) values(
-                  v_registros.id_centro_costo,
-                  v_registros.descripcion,
-                  0,
-                  v_parametros.id_solicitud,
-                  v_id_partida,
-                  NULL,
-      			
-                  v_registros.id_concepto_ingas,
-                  v_id_cuenta,
-                  0,
-                  v_registros.cantidad,
-                  v_id_auxiliar,
-                  'activo',
-                  0,
-                  0,
-                  p_id_usuario,
-                  now(),
-                  null,
-                  null,
-                  0,
-                  0,
-                  0
-      							
-                  )RETURNING id_solicitud_det into v_id_solicitud_det;
+                   
+           		END LOOP;
                 
-           
-                update  adq.tpresolicitud_det  set
-                  estado = 'consolidado',
-                  id_solicitud_det = v_id_solicitud_det,
-                  id_usuario_mod = p_id_usuario,
-                  fecha_mod = now()
-                where id_presolicitud_det = v_registros.id_presolicitud_det;
-           
-           
+                -- raise EXCEPTION 'hola %',v_existe_detalle;
+                IF (v_existe_detalle = false) then
+                         v_precio_total=v_registros.precio * v_registros.cantidad;
+                         v_precio_ga = v_registros.precio * v_registros.cantidad;
+                     	 v_codigo_trans ='ADQ_SOLD_INS';
+           				 v_tabla = pxp.f_crear_parametro(ARRAY[	
+                         				
+                                    	'id_centro_costo',
+                                        'descripcion',
+                                        'precio_unitario',
+                                        'id_solicitud',
+                                        'id_orden_trabajo',
+                                        'precio_sg',
+                                        'precio_ga',
+                                        'id_concepto_ingas',
+                                        'precio_total',
+                                        'cantidad_sol'
+                                                ],
+                                        ARRAY[	
+                                        
+                                        v_registros.id_centro_costo::varchar,--'id_centro_costo'
+                                        v_registros.descripcion::varchar,--'descripcion'
+                                        v_registros.precio::varchar,--'precio_unitario'
+                                        v_parametros.id_solicitud::varchar,--'id_solicitud'
+                                        ''::varchar,--'id_orden_trabajo'
+                                        0::varchar,--'precio_sg'
+                                        v_precio_ga::varchar,--'precio_ga'
+                                        v_registros.id_concepto_ingas::varchar,--'concepto_ingas'
+                                        v_precio_total::varchar,--'precio_total'
+                                        v_registros.cantidad::varchar--'cantidad'
+                                       
+                                            ],
+                                        ARRAY[   
+                                        	      
+                                            'int4',--'id_centro_costo'
+                                            'text',--'descripcion'
+                                            'numeric',--'precio_unitario'
+                                            'int4',--'id_solicitud'
+                                            'int4',--'id_orden_trabajo'
+                                            'numeric',--'precio_sg'
+                                            'numeric',--'precio_ga'
+                                            'int4',--'id_concepto_ingas'
+                                            'numeric',--'precio_total'
+                                            'int4'--'cantidad'
+                                            
+                                           ]
+                           						 );
+                      
+            			v_resp= adq.f_solicitud_det_ime(p_administrador,p_id_usuario,v_tabla,v_codigo_trans);
+					-- #1	1/12/2018		 EGS
+                  END IF;    
+                	 update  adq.tpresolicitud_det  set
+                      estado = 'consolidado',
+                      id_solicitud_det = v_id_solicitud_det,
+                      id_usuario_mod = p_id_usuario,
+                      fecha_mod = now()
+                    where id_presolicitud_det = v_registros.id_presolicitud_det;
+           	
            END LOOP;
-           
+           	
             update  adq.tpresolicitud p set
                   estado = 'asignado',
                   id_usuario_mod = p_id_usuario,

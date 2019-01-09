@@ -17,10 +17,8 @@ $body$
  COMENTARIOS:	
 ***************************************************************************
  HISTORIAL DE MODIFICACIONES:
-
- DESCRIPCION:	
- AUTOR:			
- FECHA:		
+ISSUE		FECHA:	         AUTOR:				 DESCRIPCION:	
+#1			11/12/2018		 EGS				 Se modifico el sel para que solo muestre registros activos 
 ***************************************************************************/
 
 DECLARE
@@ -132,7 +130,7 @@ BEGIN
                                inner join orga.tuo uo on uo.id_uo = pres.id_uo 
                                inner join param.tdepto d on d.id_depto= pres.id_depto
                                left join segu.tusuario usu2 on usu2.id_usuario = pres.id_usuario_mod
-				        where  '||v_filtro||' and ';
+				        where pres.estado_reg = ''activo'' and '||v_filtro||' and ';
 			
 			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;
