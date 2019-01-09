@@ -5,7 +5,9 @@
 *@author  (admin)
 *@date 10-05-2013 05:04:17
 *@description Clase que envia los parametros requeridos a la Base de datos para la ejecucion de las funciones, y que recibe la respuesta del resultado de la ejecucion de las mismas
-*/
+	ISSUE				FECHA					AUTHOR					DESCRIPCION
+ * 	#1					11/12/2018				EGS						Se aumento el campo de precio
+ */
 
 class MODPresolicitudDet extends MODbase{
 	
@@ -37,6 +39,8 @@ class MODPresolicitudDet extends MODbase{
 		$this->captura('usr_mod','varchar');
 		$this->captura('codigo_cc','text');
 		$this->captura('desc_ingas','varchar');
+		$this->captura('precio','numeric');//#1		11/12/2018	EGS	
+		
 		
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -61,6 +65,7 @@ class MODPresolicitudDet extends MODbase{
 		$this->setParametro('estado','estado','varchar');
 		$this->setParametro('id_solicitud_det','id_solicitud_det','int4');
 		$this->setParametro('id_presolicitud','id_presolicitud','int4');
+		$this->setParametro('precio','precio','numeric'); //#1		11/12/2018	EGS	
 	
 
 		//Ejecuta la instruccion
@@ -87,6 +92,7 @@ class MODPresolicitudDet extends MODbase{
 		$this->setParametro('estado','estado','varchar');
 		$this->setParametro('id_solicitud_det','id_solicitud_det','int4');
 		$this->setParametro('id_presolicitud','id_presolicitud','int4');
+		$this->setParametro('precio','precio','numeric');//#1		11/12/2018	EGS	
 	
 
 		//Ejecuta la instruccion

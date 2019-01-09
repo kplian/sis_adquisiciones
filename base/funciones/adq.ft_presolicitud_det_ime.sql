@@ -17,10 +17,8 @@ $body$
  COMENTARIOS:	
 ***************************************************************************
  HISTORIAL DE MODIFICACIONES:
-
- DESCRIPCION:	
- AUTOR:			
- FECHA:		
+  ISSUE			 FECHA:	  	 	AUTOR:				DESCRIPCION:
+ #1				10/12/2018		EGS					Se aumento el campo de precio	
 ***************************************************************************/
 
 DECLARE
@@ -48,7 +46,7 @@ BEGIN
 	if(p_transaccion='ADQ_PRED_INS')then
 					
         begin
-        
+        	
            IF v_parametros.cantidad_sol <=0 THEN
            
              raise exception 'La cantidad debe ser mayor a cero';
@@ -59,6 +57,7 @@ BEGIN
         	insert into adq.tpresolicitud_det(
 			descripcion,
 			cantidad,
+            precio,	--#1 10/12/2018	EGS
 			id_centro_costo,
 			estado_reg,
 			estado,
@@ -71,6 +70,7 @@ BEGIN
           	) values(
 			v_parametros.descripcion,
 			v_parametros.cantidad_sol,
+            v_parametros.precio, --#1 10/12/2018	EGS
 			v_parametros.id_centro_costo,
 			'activo',
 			'pendiente',
@@ -110,7 +110,8 @@ BEGIN
 			id_presolicitud = v_parametros.id_presolicitud,
 			id_concepto_ingas = v_parametros.id_concepto_ingas,
 			id_usuario_mod = p_id_usuario,
-			fecha_mod = now()
+			fecha_mod = now(),
+            precio = v_parametros.precio --#1 10/12/2018	EGS
 			where id_presolicitud_det=v_parametros.id_presolicitud_det;
                
 			--Definicion de la respuesta

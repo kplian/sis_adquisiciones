@@ -17,10 +17,10 @@ $body$
  COMENTARIOS:	
 ***************************************************************************
  HISTORIAL DE MODIFICACIONES:
-
- DESCRIPCION:	
- AUTOR:			
- FECHA:		
+  ISSUE			 FECHA:	  	 	AUTOR:				DESCRIPCION:
+ #1				10/12/2018		EGS					Se aumento el campo de precio	
+			
+		
 ***************************************************************************/
 
 DECLARE
@@ -47,7 +47,7 @@ BEGIN
      				
     	begin
         
-       
+       			
     		--Sentencia de la consulta
 			v_consulta:='select pred.id_presolicitud_det,
                                  pred.descripcion,
@@ -65,7 +65,8 @@ BEGIN
                                  usu1.cuenta as usr_reg,
                                  usu2.cuenta as usr_mod,
                                  cc.codigo_cc,
-                                 cig.desc_ingas
+                                 cig.desc_ingas,
+                                 pred.precio 	--#1 10/12/2018	EGS	
                           from adq.tpresolicitud_det pred
                                inner join segu.tusuario usu1 on usu1.id_usuario = pred.id_usuario_reg
                                inner join param.tconcepto_ingas cig on cig.id_concepto_ingas = pred.id_concepto_ingas

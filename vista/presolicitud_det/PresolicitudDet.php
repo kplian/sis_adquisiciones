@@ -5,6 +5,8 @@
 *@author  (admin)
 *@date 10-05-2013 05:04:17
 *@description Archivo con la interfaz de usuario que permite la ejecucion de todas las funcionalidades del sistema
+	ISSUE				FECHA					AUTHOR					DESCRIPCION
+ * 	#1					11/12/2018				EGS						Se aumento el campo de precio
 */
 
 header("content-type: text/javascript; charset=UTF-8");
@@ -148,6 +150,23 @@ Phx.vista.PresolicitudDet=Ext.extend(Phx.gridInterfaz,{
             grid:true,
             form:true
         },
+        //#1	11/12/2018	EGS	
+        {
+            config:{
+                name: 'precio',
+                fieldLabel: 'Precio',
+                allowBlank: false,
+                anchor: '80%',
+                gwidth: 100,
+                maxLength:1245186
+            },
+            type:'NumberField',
+            filters:{pfiltro:'pred.precio',type:'numeric'},
+            id_grupo:1,
+            grid:true,
+            form:true
+        },
+         //#1	11/12/2018	EGS	
 		{
 			config:{
 				name: 'estado_reg',
@@ -247,7 +266,9 @@ Phx.vista.PresolicitudDet=Ext.extend(Phx.gridInterfaz,{
 		{name:'id_usuario_mod', type: 'numeric'},
 		{name:'fecha_mod', type: 'date',dateFormat:'Y-m-d H:i:s.u'},
 		{name:'usr_reg', type: 'string'},
-		{name:'usr_mod', type: 'string'},'codigo_cc','desc_ingas'
+		{name:'usr_mod', type: 'string'},'codigo_cc','desc_ingas',
+		{name:'precio', type: 'numeric'}, //#1	11/12/2018	EGS	
+
 		
 	],
 	sortInfo:{
