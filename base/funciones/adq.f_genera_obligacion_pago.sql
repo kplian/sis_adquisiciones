@@ -1,6 +1,6 @@
 --------------- SQL ---------------
 
-CREATE OR REPLACE FUNCTION adq.f_genera_obligacion_pago (   
+CREATE OR REPLACE FUNCTION adq.f_genera_obligacion_pago (
   p_id_usuario integer,
   p_id_usuario_ai integer,
   p_usuario_ai varchar,
@@ -18,9 +18,16 @@ Autor: RAC
 Fecha: 26/02/2015
 Descripción: Generar Obligaciones de pago
 
- 
+ HISTORIAL DE MODIFICACIONES:
 
-*/
+
+       
+ ISSUE            FECHA:              AUTOR                 DESCRIPCION
+ 
+ #0 BOA          26/02/2015        RAC            creación
+ #3 ETR          15/01/2019        RAC            adiciona  validacion para fecha en cambio de gestion 
+
+***************************************************************************/
 
 DECLARE
 
@@ -34,6 +41,9 @@ DECLARE
     v_id_contrato					integer;
     v_num_contrato					varchar;
     v_adq_comprometer_presupuesto	varchar;
+    v_gestion_fecha			     	integer;  -- #3
+    v_gestion_aux				    integer;  -- #3
+    v_fecha_obligacion              date;     -- #3
 
 	
 
@@ -72,7 +82,8 @@ BEGIN
               c.requiere_contrato,
               sol.justificacion,
               sol.id_funcionario_aprobador,
-              sol.codigo_poa
+              sol.codigo_poa,
+              sol.id_gestion
             into
              v_registros_cotizacion
             from adq.tcotizacion c
@@ -114,9 +125,31 @@ BEGIN
             END IF;
             
             
-            --  RAC  02/08/2017
-            --  marca la bolgacigacion como comproemtido en funcion a varaible global de adquisiciones
-            v_adq_comprometer_presupuesto = pxp.f_get_variable_global('adq_comprometer_presupuesto');
+             --  RAC  02/08/2017
+             --  marca la bolgacigacion como comproemtido en funcion a varaible global de adquisiciones
+             v_adq_comprometer_presupuesto = pxp.f_get_variable_global('adq_comprometer_presupuesto');
+            
+            
+             --#3 forzamos que la fecha se quede en los limites de la gestion
+             v_fecha_obligacion = now(); 
+             v_gestion_fecha =  date_part('year', v_fecha_obligacion);
+              
+              select 
+                g.gestion
+               into
+                v_gestion_aux
+              from param.tgestion g
+              where g.id_gestion = v_registros_cotizacion.id_gestion;
+              
+              
+              if v_gestion_fecha < v_gestion_aux then
+                 -- forzamos  1ro de enero
+                 v_fecha_obligacion = (v_gestion_aux||'-01-01')::date;   
+              elseif v_gestion_fecha > v_gestion_aux then
+                -- forzamos 31 de diciembre
+                v_fecha_obligacion = (v_gestion_aux||'-12-31')::date;
+              end if;
+            
             
           
             INSERT INTO 
@@ -153,7 +186,7 @@ BEGIN
               v_id_subsistema,
               v_registros_cotizacion.id_moneda,
               'adquisiciones',
-              now(),
+              v_fecha_obligacion,
               pxp.f_iif(v_num_contrato is NULL, v_registros_cotizacion.numero_oc, v_num_contrato),
               v_registros_cotizacion.tipo_cambio_conv,
               v_registros_cotizacion.num_tramite,
