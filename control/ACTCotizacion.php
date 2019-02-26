@@ -337,6 +337,7 @@ class ACTCotizacion extends ACTbase{
 		                $dataSource->putParameter('moneda', $datosOrdenCompra[0]['moneda']);
 		                $dataSource->putParameter('codigo_moneda', $datosOrdenCompra[0]['codigo_moneda']);
 						$dataSource->putParameter('num_tramite', $datosOrdenCompra[0]['num_tramite']);
+						$dataSource->putParameter('id_categoria_compra', $datosOrdenCompra[0]['id_categoria_compra']);
 						$dataSource->putParameter('codigo_uo', $datosOrdenCompra[0]['codigo_uo']);
 						$dataSource->putParameter('observacion', $datosOrdenCompra[0]['observacion']);
 						$dataSource->putParameter('obs', $datosOrdenCompra[0]['obs']);

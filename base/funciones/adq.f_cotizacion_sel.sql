@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION adq.f_cotizacion_sel (
   p_administrador integer,
   p_id_usuario integer,
@@ -1073,11 +1071,11 @@ BEGIN
             END IF;
       
 		v_consulta:='select  
-        			cot.id_cotizacion,
-        			pv.desc_proveedor,
+        			      cot.id_cotizacion,
+        			      pv.desc_proveedor,
                     per.id_persona,
-					per.direccion as dir_persona,
-			        per.telefono1 as telf1_persona,
+                    per.direccion as dir_persona,
+                    per.telefono1 as telf1_persona,
                     per.telefono2 as telf2_persona,
                     per.celular1 as cel_persona,
                     per.correo as correo_persona,
@@ -1100,9 +1098,10 @@ BEGIN
                     mon.codigo as codigo_moneda,
                     cot.tiempo_entrega,
                     sol.num_tramite,
+                    sol.id_categoria_compra,
                     cot.funcionario_contacto,
-               cot.telefono_contacto,
-               cot.correo_contacto,
+                    cot.telefono_contacto,
+                    cot.correo_contacto,
                     tppc.codigo as codigo_proceso,
                     cot.forma_pago,
                     pc.objeto,
@@ -1114,12 +1113,12 @@ BEGIN
               left join segu.tpersona per on per.id_persona=pv.id_persona
               left join param.tinstitucion ins on ins.id_institucion= pv.id_institucion
               inner join adq.tproceso_compra pc on pc.id_proceso_compra=cot.id_proceso_compra
-        inner join adq.tsolicitud sol on sol.id_solicitud=pc.id_solicitud
-        inner join param.tmoneda mon on mon.id_moneda=cot.id_moneda
+              inner join adq.tsolicitud sol on sol.id_solicitud=pc.id_solicitud
+              inner join param.tmoneda mon on mon.id_moneda=cot.id_moneda
               inner join orga.tfuncionario fun on fun.id_funcionario=sol.id_funcionario
-          inner join segu.vpersona persol on persol.id_persona=fun.id_persona
+              inner join segu.vpersona persol on persol.id_persona=fun.id_persona
               inner join wf.tproceso_wf pcwf on pcwf.id_proceso_wf=pc.id_proceso_wf
-          inner join wf.ttipo_proceso tppc on tppc.id_tipo_proceso=pcwf.id_tipo_proceso
+              inner join wf.ttipo_proceso tppc on tppc.id_tipo_proceso=pcwf.id_tipo_proceso
               inner join orga.tuo uo on uo.id_uo=sol.id_uo
               where '||v_filtro;
           

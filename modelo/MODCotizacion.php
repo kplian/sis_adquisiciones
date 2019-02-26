@@ -500,6 +500,7 @@ class MODCotizacion extends MODbase{
 		$this->captura('codigo_moneda','varchar');
 		$this->captura('tiempo_entrega','varchar');
 		$this->captura('num_tramite','varchar');
+		$this->captura('id_categoria_compra','int4');
 		$this->captura('nombre_completo1','varchar');
 		$this->captura('celular1','varchar');
 		$this->captura('email_empresa','varchar');

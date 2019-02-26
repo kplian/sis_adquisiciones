@@ -247,13 +247,17 @@ Class ROrdenCompra extends Report {
 		
 		$pdf->SetFontSize(10);
 		$tipo=$this->getDataSource()->getParameter('tipo');
+        $id_categoria_compra=$this->getDataSource()->getParameter('id_categoria_compra');
 		
 		if($tipo=='Bien - Servicio')
 		  $tipo='Compra - Servicio'; 
 		
-		if($tipo=='Bien')						
-		    $pdf->MultiCell(0, $height, 'De acuerdo a su cotización en la que detalla especificaciones, por medio de la presente confirmamos orden para la provisión de:', 0,'L', false ,1);
-		
+		if($tipo=='Bien'){
+		    if($id_categoria_compra==2 || $id_categoria_compra==4)
+                $pdf->MultiCell(0, $height, 'De acuerdo a la propuesta económica presentada por su empresa, se detalla:', 0,'L', false ,1);
+            else
+                $pdf->MultiCell(0, $height, 'De acuerdo a su cotización en la que detalla especificaciones, por medio de la presente confirmamos orden para la provisión de:', 0,'L', false ,1);
+		}
 		
 		//escritura de los datalles de la cotizacion
 		$this->writeDetalles($this->getDataSource()->getParameter('detalleDataSource'), $pdf,$tipo, $this->getDataSource()->getParameter('codigo_moneda') );
