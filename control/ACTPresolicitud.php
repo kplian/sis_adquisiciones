@@ -5,6 +5,8 @@
 *@author  (admin)
 *@date 10-05-2013 05:03:41
 *@description Clase que recibe los parametros enviados por la vista para mandar a la capa de Modelo
+	ISSUE		FECHA			ATHOR			DESCRIPCION
+ * 	#4 endeETR	19/02/2019		EGS				Se aumento filtro para tipo de estado en la presolicitud
 */
 
 require_once(dirname(__FILE__).'/../../pxp/pxpReport/ReportWriter.php');
@@ -18,8 +20,15 @@ class ACTPresolicitud extends ACTbase{
 
 		$this->objParam->defecto('dir_ordenacion','asc');
 		
-		$this->objParam->addParametro('id_funcionario_usu',$_SESSION["ss_id_funcionario"]); 
+		$this->objParam->addParametro('id_funcionario_usu',$_SESSION["ss_id_funcionario"]);
         
+        if($this->objParam->getParametro('estado')!=''){//#4
+        	if ($this->objParam->getParametro('estado')=='aprobado') {
+				$this->objParam->addFiltro("pres.estado in (''".$this->objParam->getParametro('estado')."'',''asignado'')");					
+			} else {
+				$this->objParam->addFiltro("pres.estado = ''".$this->objParam->getParametro('estado')."''");				
+			}			
+        }
 		if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
 			$this->objReporte = new Reporte($this->objParam,$this);
 			$this->res = $this->objReporte->generarReporteListado('MODPresolicitud','listarPresolicitud');
@@ -159,6 +168,22 @@ class ACTPresolicitud extends ACTbase{
 				 else
 				 	return array();
 				}
+	function desconsolidarSolicitud(){
+        $this->objFunc=$this->create('MODPresolicitud');    
+        $this->res=$this->objFunc->desconsolidarSolicitud($this->objParam);
+        $this->res->imprimirRespuesta($this->res->generarJson());
+    }
+	function siguienteEstado(){
+        $this->objFunc=$this->create('MODPresolicitud');  
+        $this->res=$this->objFunc->siguienteEstado($this->objParam);
+        $this->res->imprimirRespuesta($this->res->generarJson());
+    }
+
+    function anteriorEstado(){
+        $this->objFunc=$this->create('MODPresolicitud');  
+        $this->res=$this->objFunc->anteriorEstado($this->objParam);
+        $this->res->imprimirRespuesta($this->res->generarJson());
+    }
 }
 
 ?>

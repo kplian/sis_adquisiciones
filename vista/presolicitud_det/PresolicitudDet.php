@@ -243,7 +243,7 @@ Phx.vista.PresolicitudDet=Ext.extend(Phx.gridInterfaz,{
 			id_grupo:1,
 			grid:true,
 			form:false
-		}
+		},
 	],
 	
 	title:'Presolicitud Detalle',
@@ -268,6 +268,7 @@ Phx.vista.PresolicitudDet=Ext.extend(Phx.gridInterfaz,{
 		{name:'usr_reg', type: 'string'},
 		{name:'usr_mod', type: 'string'},'codigo_cc','desc_ingas',
 		{name:'precio', type: 'numeric'}, //#1	11/12/2018	EGS	
+		{name:'id_solicitud', type: 'numeric'},
 
 		
 	],

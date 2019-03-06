@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION adq.f_solicitud_ime (
   p_administrador integer,
   p_id_usuario integer,
@@ -9,47 +7,47 @@ CREATE OR REPLACE FUNCTION adq.f_solicitud_ime (
 RETURNS varchar AS
 $body$
 /**************************************************************************
- SISTEMA:		Adquisiciones
- FUNCION: 		adq.f_solicitud_ime
+ SISTEMA:        Adquisiciones
+ FUNCION:         adq.f_solicitud_ime
  DESCRIPCION:   Funcion que gestiona las operaciones basicas (inserciones, modificaciones, eliminaciones de la tabla 'adq.tsolicitud'
- AUTOR: 		 (RAC)
- FECHA:	        19-02-2013 12:12:51
- COMENTARIOS:	
+ AUTOR:          (RAC)
+ FECHA:            19-02-2013 12:12:51
+ COMENTARIOS:    
 ***************************************************************************
  HISTORIAL DE MODIFICACIONES:
 
- DESCRIPCION:	
- AUTOR:			
- FECHA:	
+ DESCRIPCION:    
+ AUTOR:            
+ FECHA:    
  
  ***************************************************************************
- ISSUE SIS       EMPRESA      FECHA:		      AUTOR       DESCRIPCION
- #10 ADQ       ETR      21/02/2018          RAC         se incrementa columna para comproemter al 87 %	
- 
+ ISSUE SIS       EMPRESA        FECHA:              AUTOR       DESCRIPCION
+ #10 ADQ         ETR            21/02/2018          RAC         se incrementa columna para comproemter al 87 %    
+ #4              EndeEtr        21/02/2018          EGS         validacion cuandal anular la solicitud se elimine primero detalle que fue consolidado por una presolicitud  
  
  
 ***************************************************************************/
 
 DECLARE
 
-	v_nro_requerimiento    	integer;
-	v_parametros           	record;
-    v_registros 	        record;
-    v_registros_sol	        record;
+    v_nro_requerimiento        integer;
+    v_parametros               record;
+    v_registros             record;
+    v_registros_sol            record;
     v_registros_proc        record;
-	v_id_requerimiento     	integer;
-	v_resp		            varchar;
-	v_nombre_funcion        text;
-	v_mensaje_error         text;
-	v_id_solicitud			integer;
-    v_codigo_tipo_pro   	varchar;
-    v_consulta    		varchar;
+    v_id_requerimiento         integer;
+    v_resp                    varchar;
+    v_nombre_funcion        text;
+    v_mensaje_error         text;
+    v_id_solicitud            integer;
+    v_codigo_tipo_pro       varchar;
+    v_consulta            varchar;
     v_num_sol   varchar;
     v_id_periodo integer;
     v_num_tramite varchar;
     v_id_proceso_wf integer;
     v_id_estado_wf integer;
-    v_id_proceso_macro	integer;
+    v_id_proceso_macro    integer;
     v_codigo_estado varchar;
      v_codigo_estado_siguiente varchar;
     v_codigo_tipo_proceso varchar;
@@ -90,64 +88,67 @@ DECLARE
       v_uo_sol varchar;
       v_obs text;
       
-      v_numero_sol					varchar;
-      v_id_subsistema 				integer;
-      v_id_uo  						integer;
-      v_cont  						integer;
-      v_mensaje_resp  				varchar;
+      v_numero_sol                    varchar;
+      v_id_subsistema                 integer;
+      v_id_uo                          integer;
+      v_cont                          integer;
+      v_mensaje_resp                  varchar;
       
 
-       v_acceso_directo  			varchar;
-       v_clase   					varchar;
-       v_parametros_ad   			varchar;
-       v_tipo_noti  				varchar;
-       v_titulo   					varchar;
-       v_estado_actual   			varchar;
-       v_id_categoria_compra   		integer;
-       v_resp_doc					boolean;
-       v_revisado 					varchar;
-       va_id_funcionario_gerente  	INTEGER[];
-       v_tope_compra 				numeric;
-       v_prioridad_depto			integer;
-       v_reg_prov					record;
-       v_tope_compra_lista			varchar;
-       v_res_validacion				text;
-       v_valid_campos				boolean;
-       v_documentos					record;
+       v_acceso_directo              varchar;
+       v_clase                       varchar;
+       v_parametros_ad               varchar;
+       v_tipo_noti                  varchar;
+       v_titulo                       varchar;
+       v_estado_actual               varchar;
+       v_id_categoria_compra           integer;
+       v_resp_doc                    boolean;
+       v_revisado                     varchar;
+       va_id_funcionario_gerente      INTEGER[];
+       v_tope_compra                 numeric;
+       v_prioridad_depto            integer;
+       v_reg_prov                    record;
+       v_tope_compra_lista            varchar;
+       v_res_validacion                text;
+       v_valid_campos                boolean;
+       v_documentos                    record;
 
        --VARIABLES PARA MONEDA Y PO VALIDO
-       v_moneda						record;
-       v_contador					integer = 0;
-       v_valid						varchar;
-       v_funcionario				varchar = null;
-       v_adq_requiere_rpc			varchar;
-       v_datos_ga_gs				record;
-       v_datos_saldos				record;
-       v_datos				        record;
-       v_total_disponble			numeric;
+       v_moneda                        record;
+       v_contador                    integer = 0;
+       v_valid                        varchar;
+       v_funcionario                varchar = null;
+       v_adq_requiere_rpc            varchar;
+       v_datos_ga_gs                record;
+       v_datos_saldos                record;
+       v_datos                        record;
+       v_total_disponble            numeric;
        v_comprometer_87             varchar; --#10ADQ ++
-       v_factor						numeric; --#10 ADQ ++
+       v_factor                        numeric; --#10 ADQ ++
+       
+       v_detalle                    record;
+       v_id_solicitud_det           integer;
 
-			    
+                
 BEGIN
 
     v_nombre_funcion = 'adq.f_solicitud_ime';
     v_parametros = pxp.f_get_record(p_tabla);
 
-	/*********************************    
- 	#TRANSACCION:  'ADQ_SOL_INS'
- 	#DESCRIPCION:	Insercion de la cabecera de las solicitudes de compra ....
- 	#AUTOR:		RAC	
- 	#FECHA:		19-02-2013 12:12:51
+    /*********************************    
+     #TRANSACCION:  'ADQ_SOL_INS'
+     #DESCRIPCION:    Insercion de la cabecera de las solicitudes de compra ....
+     #AUTOR:        RAC    
+     #FECHA:        19-02-2013 12:12:51
     
     ***************************************************************************
-   * ISSUE               FECHA:		      AUTOR       DESCRIPCION
+   * ISSUE               FECHA:              AUTOR       DESCRIPCION
    * #10 ADQ  ETR      21/02/2018          RAC         se incrementa columna para comproemter al 87 %
     
-	***********************************/
+    ***********************************/
     
-	if (p_transaccion='ADQ_SOL_INS') then
-					
+    if (p_transaccion='ADQ_SOL_INS') then
+                    
         begin
         -- determina la fecha del periodo
         
@@ -179,9 +180,9 @@ BEGIN
             into v_codigo_tipo_proceso, v_id_proceso_macro
         from  adq.tcategoria_compra cc
         inner join wf.tproceso_macro pm
-        	on pm.id_proceso_macro =  cc.id_proceso_macro
+            on pm.id_proceso_macro =  cc.id_proceso_macro
         inner join wf.ttipo_proceso tp
-        	on tp.id_proceso_macro = pm.id_proceso_macro
+            on tp.id_proceso_macro = pm.id_proceso_macro
         where   cc.id_categoria_compra = v_parametros.id_categoria_compra
                 and tp.estado_reg = 'activo' and tp.inicio = 'si';
             
@@ -240,32 +241,32 @@ BEGIN
         
         --inserta solicitud
         insert into adq.tsolicitud(
-			estado_reg,
-			--id_solicitud_ext,
-			--presu_revertido,
-			--fecha_apro,
-			--estado,
-			id_funcionario_aprobador,
-			id_moneda,
-			id_gestion,
-			tipo,
-			--num_tramite,
-			justificacion,
-			id_depto,
-			lugar_entrega,
-			extendida,
-			numero,
-			--posibles_proveedores,
-			--id_proceso_wf,
-			--comite_calificacion,
-			id_categoria_compra,
-			id_funcionario,
-			--id_estado_wf,
-			fecha_soli,
-			fecha_reg,
-			id_usuario_reg,
-			fecha_mod,
-			id_usuario_mod,
+            estado_reg,
+            --id_solicitud_ext,
+            --presu_revertido,
+            --fecha_apro,
+            --estado,
+            id_funcionario_aprobador,
+            id_moneda,
+            id_gestion,
+            tipo,
+            --num_tramite,
+            justificacion,
+            id_depto,
+            lugar_entrega,
+            extendida,
+            numero,
+            --posibles_proveedores,
+            --id_proceso_wf,
+            --comite_calificacion,
+            id_categoria_compra,
+            id_funcionario,
+            --id_estado_wf,
+            fecha_soli,
+            fecha_reg,
+            id_usuario_reg,
+            fecha_mod,
+            id_usuario_mod,
             id_uo,
             id_proceso_macro,
             id_proveedor,
@@ -280,33 +281,33 @@ BEGIN
             fecha_po,
             observacion,
             comprometer_87 --#10 se adciona campo para indicar el tipo de compromiso al 87 %
-          	) values(
-			'activo',
-			--v_parametros.id_solicitud_ext,
-			--v_parametros.presu_revertido,
-			--v_parametros.fecha_apro,
-			--v_codigo_estado,
-			va_id_funcionario_gerente[1],   --v_parametros.id_funcionario_aprobador,
-			v_parametros.id_moneda,
-			v_parametros.id_gestion,
-			v_parametros.tipo,
-			--v_num_tramite,
-			v_parametros.justificacion,
-			v_parametros.id_depto,
-			v_parametros.lugar_entrega,
-			'no',
-			v_num_sol,--v_parametros.numero,
-			--v_parametros.posibles_proveedores,
-			--v_id_proceso_wf,
-			--v_parametros.comite_calificacion,
-			v_parametros.id_categoria_compra,
-			v_parametros.id_funcionario,
-			--v_id_estado_wf,
-			v_parametros.fecha_soli,
-			now(),
-			p_id_usuario,
-			null,
-			null,
+              ) values(
+            'activo',
+            --v_parametros.id_solicitud_ext,
+            --v_parametros.presu_revertido,
+            --v_parametros.fecha_apro,
+            --v_codigo_estado,
+            va_id_funcionario_gerente[1],   --v_parametros.id_funcionario_aprobador,
+            v_parametros.id_moneda,
+            v_parametros.id_gestion,
+            v_parametros.tipo,
+            --v_num_tramite,
+            v_parametros.justificacion,
+            v_parametros.id_depto,
+            v_parametros.lugar_entrega,
+            'no',
+            v_num_sol,--v_parametros.numero,
+            --v_parametros.posibles_proveedores,
+            --v_id_proceso_wf,
+            --v_parametros.comite_calificacion,
+            v_parametros.id_categoria_compra,
+            v_parametros.id_funcionario,
+            --v_id_estado_wf,
+            v_parametros.fecha_soli,
+            now(),
+            p_id_usuario,
+            null,
+            null,
             v_id_uo,
             v_id_proceso_macro,
             v_parametros.id_proveedor,
@@ -321,8 +322,8 @@ BEGIN
             v_parametros.fecha_po,
             v_parametros.observacion,
             v_parametros.comprometer_87
-							
-			)RETURNING id_solicitud into v_id_solicitud;
+                            
+            )RETURNING id_solicitud into v_id_solicitud;
         
         
         
@@ -366,9 +367,9 @@ BEGIN
            -- verificar documentos
            v_resp_doc = wf.f_verifica_documento(p_id_usuario, v_id_estado_wf); 
         
-        	
-		   --Definicion de la respuesta
-		   v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Solicitud de Compras almacenado(a) con exito (id_solicitud'||v_id_solicitud||')'); 
+            
+           --Definicion de la respuesta
+           v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Solicitud de Compras almacenado(a) con exito (id_solicitud'||v_id_solicitud||')'); 
            v_resp = pxp.f_agrega_clave(v_resp,'id_solicitud',v_id_solicitud::varchar);
            v_resp = pxp.f_agrega_clave(v_resp,'id_proceso_wf',v_id_proceso_wf::varchar);
            v_resp = pxp.f_agrega_clave(v_resp,'num_tramite',v_num_tramite::varchar);
@@ -377,20 +378,20 @@ BEGIN
             --Devuelve la respuesta
             return v_resp;
 
-		end;
+        end;
 
-	/*********************************    
- 	#TRANSACCION:  'ADQ_SOL_MOD'
- 	#DESCRIPCION:	Modificacion de registros
- 	#AUTOR:		RAC	
- 	 **************************************************************************
-   * ISSUE               FECHA:		      AUTOR       DESCRIPCION
+    /*********************************    
+     #TRANSACCION:  'ADQ_SOL_MOD'
+     #DESCRIPCION:    Modificacion de registros
+     #AUTOR:        RAC    
+      **************************************************************************
+   * ISSUE               FECHA:              AUTOR       DESCRIPCION
    * #10 ADQ  ETR      21/02/2018          RAC         se incrementa columna para comproemter al 87 %
-	***********************************/
+    ***********************************/
 
-	elsif(p_transaccion='ADQ_SOL_MOD')then
+    elsif(p_transaccion='ADQ_SOL_MOD')then
 
-		begin
+        begin
         
             select
              s.estado,
@@ -431,8 +432,8 @@ BEGIN
                 END IF;  
             END IF;
             
-			--Sentencia de la modificacion
-			update adq.tsolicitud set
+            --Sentencia de la modificacion
+            update adq.tsolicitud set
                 id_funcionario_aprobador = va_id_funcionario_gerente[1],
                 id_moneda = v_parametros.id_moneda,
                 id_gestion = v_parametros.id_gestion,
@@ -458,10 +459,10 @@ BEGIN
                 nro_po = trim(both ' ' from v_parametros.nro_po),
                 fecha_po = v_parametros.fecha_po,
                 comprometer_87 = v_parametros.comprometer_87,
-                observacion = v_parametros.observacion -- #11 ADQ       ETR    	  	19/09/2018
-			where id_solicitud = v_parametros.id_solicitud;
+                observacion = v_parametros.observacion -- #11 ADQ       ETR              19/09/2018
+            where id_solicitud = v_parametros.id_solicitud;
                
-			--Definicion de la respuesta
+            --Definicion de la respuesta
             v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Solicitud de Compras modificado(a)'); 
             v_resp = pxp.f_agrega_clave(v_resp,'id_solicitud',v_parametros.id_solicitud::varchar);
             v_resp = pxp.f_agrega_clave(v_resp,'num_tramite',v_registros.num_tramite);
@@ -470,31 +471,30 @@ BEGIN
             --Devuelve la respuesta
             return v_resp;
             
-		end;
+        end;
 
-	/*********************************    
- 	#TRANSACCION:  'ADQ_SOL_ELI'
- 	#DESCRIPCION:	Eliminacion de registros
- 	#AUTOR:		RAC	
- 	#FECHA:		19-02-2013 12:12:51
-	***********************************/
+    /*********************************    
+     #TRANSACCION:  'ADQ_SOL_ELI'
+     #DESCRIPCION:    Eliminacion de registros
+     #AUTOR:        RAC    
+     #FECHA:        19-02-2013 12:12:51
+    ***********************************/
 
-	elsif(p_transaccion='ADQ_SOL_ELI')then
+    elsif(p_transaccion='ADQ_SOL_ELI')then
 
-		begin
-          
-          
+        begin
+                
           --obtenemos datos basicos
             select 
-            	s.id_estado_wf,
-            	s.id_proceso_wf,
-            	s.estado,
-            	s.id_depto,
+                s.id_estado_wf,
+                s.id_proceso_wf,
+                s.estado,
+                s.id_depto,
                 s.id_solicitud,
                 s.numero,
                 s.num_tramite
             into
-            	v_id_estado_wf,
+                v_id_estado_wf,
                 v_id_proceso_wf,
                 v_codigo_estado,
                 v_id_depto,
@@ -511,10 +511,31 @@ BEGIN
               
             
             END IF;
+            --#4
+            --si la solicitud tiene asociados detalles de presolicitud y esta va a ser anulada 
+            --recuperamos el detalle de la solicitud
+             FOR v_detalle IN (                                    
+                 SELECT
+                       sold.id_solicitud_det,
+                       coing.desc_ingas
+                  FROM adq.tsolicitud_det sold
+                  left join param.tconcepto_ingas coing on coing.id_concepto_ingas = sold.id_concepto_ingas
+                  WHERE sold.id_solicitud = v_parametros.id_solicitud)LOOP
+                        --verificamos si el detalle esta en una presolicitud
+                        Select
+                            presd.id_solicitud_det
+                            into
+                            v_id_solicitud_det  
+                        from adq.tpresolicitud_det presd
+                        where presd.id_solicitud_det = v_detalle.id_solicitud_det ;
+                        IF v_id_solicitud_det is not null THEN
+                            RAISE EXCEPTION 'El detalle % fue consolidada por una presolicitud .Por favor Eliminela del detalle para anular la Solicitud',v_detalle.desc_ingas;
+                        END IF;
+                         
+              END LOOP;  
         
         
-        
-			-- obtenemos el tipo del estado anulado
+            -- obtenemos el tipo del estado anulado
             
              select 
               te.id_tipo_estado
@@ -562,25 +583,25 @@ BEGIN
             --Devuelve la respuesta
             return v_resp;
 
-		end;
+        end;
      /*********************************    
- 	#TRANSACCION:  'ADQ_REVSOL_IME'
- 	#DESCRIPCION:	Marca la revision de las solicitudes de compra
- 	#AUTOR:		RAC	
- 	#FECHA:		23-09-2014 12:12:51
-	***********************************/
+     #TRANSACCION:  'ADQ_REVSOL_IME'
+     #DESCRIPCION:    Marca la revision de las solicitudes de compra
+     #AUTOR:        RAC    
+     #FECHA:        23-09-2014 12:12:51
+    ***********************************/
 
-	elsif(p_transaccion='ADQ_REVSOL_IME')then
+    elsif(p_transaccion='ADQ_REVSOL_IME')then
 
-		begin
+        begin
           
           
           --obtenemos datos basicos
             select 
-            	s.revisado_asistente,
+                s.revisado_asistente,
                 s.id_proceso_wf
             into
-            	v_registros
+                v_registros
             from adq.tsolicitud s 
             where s.id_solicitud = v_parametros.id_solicitud;
         
@@ -612,15 +633,15 @@ BEGIN
             --Devuelve la respuesta
             return v_resp;
 
-		end;   
+        end;   
      /*********************************    
- 	#TRANSACCION:  'ADQ_FINSOL_IME'
- 	#DESCRIPCION:	Finalizar solicitud de Compras
- 	#AUTOR:		RAC	
- 	#FECHA:		19-02-2013 12:12:51
-	***********************************/
+     #TRANSACCION:  'ADQ_FINSOL_IME'
+     #DESCRIPCION:    Finalizar solicitud de Compras
+     #AUTOR:        RAC    
+     #FECHA:        19-02-2013 12:12:51
+    ***********************************/
 
-	elseif(p_transaccion='ADQ_FINSOL_IME')then   
+    elseif(p_transaccion='ADQ_FINSOL_IME')then   
         begin
           
          
@@ -736,7 +757,7 @@ BEGIN
                    raise exception 'Las compras en las regionales no pueden estar por encima de % (moneda base)',v_tope_compra;
                   END IF;
                   
-                  			
+                              
                   
                    v_cont = 0;
                    v_mensaje_resp = '';
@@ -752,7 +773,7 @@ BEGIN
                     */
                      
                   
-                   	FOR v_registros in (
+                       FOR v_registros in (
                             SELECT 
                                   DISTINCT (id_funcionario),
                                   id_rpc,
@@ -877,13 +898,13 @@ BEGIN
         end;   
     
     /*********************************    
- 	#TRANSACCION:  'ADQ_SIGESOL_IME'
- 	#DESCRIPCION:	funcion que controla el cambio al Siguiente esado de la solicitud, integrado con el WF
- 	#AUTOR:		RAC	
- 	#FECHA:		19-02-2013 12:12:51
-	***********************************/
+     #TRANSACCION:  'ADQ_SIGESOL_IME'
+     #DESCRIPCION:    funcion que controla el cambio al Siguiente esado de la solicitud, integrado con el WF
+     #AUTOR:        RAC    
+     #FECHA:        19-02-2013 12:12:51
+    ***********************************/
 
-	elseif(p_transaccion='ADQ_SIGESOL_IME')then   
+    elseif(p_transaccion='ADQ_SIGESOL_IME')then   
         begin
         
         --obtenermos datos basicos
@@ -1160,13 +1181,13 @@ BEGIN
         end;
     
      /*********************************    
- 	#TRANSACCION:  'ADQ_SIGESOLWZD_IME'
- 	#DESCRIPCION:	cambia al siguiente estado de la solcitud con el wizard del WF
- 	#AUTOR:		RAC	
- 	#FECHA:		19-06-2015 12:12:51
-	***********************************/
+     #TRANSACCION:  'ADQ_SIGESOLWZD_IME'
+     #DESCRIPCION:    cambia al siguiente estado de la solcitud con el wizard del WF
+     #AUTOR:        RAC    
+     #FECHA:        19-06-2015 12:12:51
+    ***********************************/
 
-	elseif(p_transaccion='ADQ_SIGESOLWZD_IME')then   
+    elseif(p_transaccion='ADQ_SIGESOLWZD_IME')then   
         begin
         
          /*   PARAMETROS
@@ -1365,13 +1386,13 @@ BEGIN
     
     
      /*********************************    
- 	#TRANSACCION:  'ADQ_VERSIGPRO_IME'
- 	#DESCRIPCION:   Verifica los estodos siguientes de la solicitud
- 	#AUTOR:		RAC	
- 	#FECHA:		19-06-2015 12:12:51
-	***********************************/
+     #TRANSACCION:  'ADQ_VERSIGPRO_IME'
+     #DESCRIPCION:   Verifica los estodos siguientes de la solicitud
+     #AUTOR:        RAC    
+     #FECHA:        19-06-2015 12:12:51
+    ***********************************/
 
-	elseif(p_transaccion='ADQ_VERSIGPRO_IME')then   
+    elseif(p_transaccion='ADQ_VERSIGPRO_IME')then   
         begin
         
           --  obtenermos datos basicos
@@ -1397,13 +1418,13 @@ BEGIN
           v_res_validacion = wf.f_valida_cambio_estado(v_registros.id_estado_wf);
           
           IF  (v_res_validacion IS NOT NULL AND v_res_validacion != '') THEN
-          		v_resp = pxp.f_agrega_clave(v_resp,'otro_dato','si');
-          	  v_resp = pxp.f_agrega_clave(v_resp,'error_validacion_campos','si');
+                  v_resp = pxp.f_agrega_clave(v_resp,'otro_dato','si');
+                v_resp = pxp.f_agrega_clave(v_resp,'error_validacion_campos','si');
               v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Es necesario registrar los siguientes campos en el formulario: '|| v_res_validacion);
               return v_resp;
           ELSE
-          		v_resp = pxp.f_agrega_clave(v_resp,'otro_dato','si');
-          		v_resp = pxp.f_agrega_clave(v_resp,'error_validacion_campos','no');
+                  v_resp = pxp.f_agrega_clave(v_resp,'otro_dato','si');
+                  v_resp = pxp.f_agrega_clave(v_resp,'error_validacion_campos','no');
           END IF;
           
           --validacion de documentos
@@ -1411,7 +1432,7 @@ BEGIN
          
           
           for v_documentos in (
-          		select
+                  select
                     dwf.id_documento_wf,                    
                     dwf.id_tipo_documento,
                     wf.f_priorizar_documento(v_parametros.id_proceso_wf , p_id_usuario
@@ -1421,9 +1442,9 @@ BEGIN
                 where  pw.nro_tramite = COALESCE(v_registros.nro_tramite,'--')) loop
                 
                 if (v_documentos.priorizacion in (0,9)) then
-                	v_resp = pxp.f_agrega_clave(v_resp,'otro_dato','si');
-          	  		v_resp = pxp.f_agrega_clave(v_resp,'error_validacion_documentos','si');
-              		v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Es necesario subir algun(os) documento(s) antes de pasar al siguiente estado');
+                    v_resp = pxp.f_agrega_clave(v_resp,'otro_dato','si');
+                        v_resp = pxp.f_agrega_clave(v_resp,'error_validacion_documentos','si');
+                      v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Es necesario subir algun(os) documento(s) antes de pasar al siguiente estado');
                     return v_resp;
                 end if;
           
@@ -1545,14 +1566,14 @@ BEGIN
         end;
     
     /*********************************    
- 	#TRANSACCION:  'ADQ_ANTESOL_IME'
- 	#DESCRIPCION:	Trasaacion utilizada  pasar a  estados anterior es de la solicitud
+     #TRANSACCION:  'ADQ_ANTESOL_IME'
+     #DESCRIPCION:    Trasaacion utilizada  pasar a  estados anterior es de la solicitud
                     segun la operacion definida
- 	#AUTOR:		RAC	
- 	#FECHA:		19-02-2013 12:12:51
-	***********************************/
+     #AUTOR:        RAC    
+     #FECHA:        19-02-2013 12:12:51
+    ***********************************/
 
-	elseif(p_transaccion='ADQ_ANTESOL_IME')then   
+    elseif(p_transaccion='ADQ_ANTESOL_IME')then   
         begin
         
 
@@ -1560,7 +1581,7 @@ BEGIN
             sol.id_estado_wf,
             sol.presu_comprometido,
             pw.id_tipo_proceso,
-           	pw.id_proceso_wf,
+               pw.id_proceso_wf,
             sol.numero,
             sol.estado
            into
@@ -1748,7 +1769,7 @@ BEGIN
              
            ELSE
            
-           		raise exception 'Operacion no reconocida %',v_parametros.operacion;
+                   raise exception 'Operacion no reconocida %',v_parametros.operacion;
            
            END IF;
            
@@ -1787,70 +1808,70 @@ BEGIN
         end;
     
     /*********************************    
- 	#TRANSACCION:  'ADQ_MODOBS_MOD'
- 	#DESCRIPCION:	Modificar observacion de área de presupuestos
- 	#AUTOR:		RAC	
- 	#FECHA:		19-02-2013 12:12:51
-	***********************************/
+     #TRANSACCION:  'ADQ_MODOBS_MOD'
+     #DESCRIPCION:    Modificar observacion de área de presupuestos
+     #AUTOR:        RAC    
+     #FECHA:        19-02-2013 12:12:51
+    ***********************************/
 
-	elsif(p_transaccion='ADQ_MODOBS_MOD')then
+    elsif(p_transaccion='ADQ_MODOBS_MOD')then
 
-		begin
-			--Sentencia de la modificacion
-			update adq.tsolicitud set
-			obs_presupuestos = v_parametros.obs
-			where id_solicitud = v_parametros.id_solicitud;
+        begin
+            --Sentencia de la modificacion
+            update adq.tsolicitud set
+            obs_presupuestos = v_parametros.obs
+            where id_solicitud = v_parametros.id_solicitud;
                
-			--Definicion de la respuesta
+            --Definicion de la respuesta
             v_resp = pxp.f_agrega_clave(v_resp,'mensaje','obs de presupuestos modificada'); 
             v_resp = pxp.f_agrega_clave(v_resp,'id_solicitud',v_parametros.id_solicitud::varchar);
                
             --Devuelve la respuesta
             return v_resp;
             
-		end;
+        end;
     
     
     /*********************************    
- 	#TRANSACCION:  'ADQ_MODOBSPOA_MOD'
- 	#DESCRIPCION:	Modificar datos de POA
- 	#AUTOR:		RAC	
- 	#FECHA:		07-05-2015 12:12:51
-	***********************************/
+     #TRANSACCION:  'ADQ_MODOBSPOA_MOD'
+     #DESCRIPCION:    Modificar datos de POA
+     #AUTOR:        RAC    
+     #FECHA:        07-05-2015 12:12:51
+    ***********************************/
 
-	elsif(p_transaccion='ADQ_MODOBSPOA_MOD')then
+    elsif(p_transaccion='ADQ_MODOBSPOA_MOD')then
 
-		begin
-			--Sentencia de la modificacion
-			update adq.tsolicitud set
-			obs_poa = v_parametros.obs_poa,
+        begin
+            --Sentencia de la modificacion
+            update adq.tsolicitud set
+            obs_poa = v_parametros.obs_poa,
             codigo_poa = v_parametros.codigo_poa
-			where id_solicitud = v_parametros.id_solicitud;
+            where id_solicitud = v_parametros.id_solicitud;
                
-			--Definicion de la respuesta
+            --Definicion de la respuesta
             v_resp = pxp.f_agrega_clave(v_resp,'mensaje','datos POA modificados'); 
             v_resp = pxp.f_agrega_clave(v_resp,'id_solicitud',v_parametros.id_solicitud::varchar);
                
             --Devuelve la respuesta
             return v_resp;
             
-		end;
-	/*********************************
- 	#TRANSACCION:  'ADQ_MONEDA_GET'
- 	#DESCRIPCION:	OBTENEMOS EL ID_MONEDA Y MONEDA PARA CARGAR DIRECTAMENTE EN EL COMBOBOX
- 	#AUTOR:		FEA
- 	#FECHA:		07-04-2017 15:12:51
-	***********************************/
+        end;
+    /*********************************
+     #TRANSACCION:  'ADQ_MONEDA_GET'
+     #DESCRIPCION:    OBTENEMOS EL ID_MONEDA Y MONEDA PARA CARGAR DIRECTAMENTE EN EL COMBOBOX
+     #AUTOR:        FEA
+     #FECHA:        07-04-2017 15:12:51
+    ***********************************/
 
-	elsif(p_transaccion='ADQ_MONEDA_GET')then
-		begin
-			--Sentencia de la modificacion
-			SELECT tm.id_moneda, tm.moneda
+    elsif(p_transaccion='ADQ_MONEDA_GET')then
+        begin
+            --Sentencia de la modificacion
+            SELECT tm.id_moneda, tm.moneda
             INTO v_moneda
             FROM param.tmoneda tm
-			WHERE tm.codigo = v_parametros.nombre_moneda;
+            WHERE tm.codigo = v_parametros.nombre_moneda;
 
-			--Definicion de la respuesta
+            --Definicion de la respuesta
             v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Datos de Moneda id_moneda, moneda');
             v_resp = pxp.f_agrega_clave(v_resp,'id_moneda',v_moneda.id_moneda::varchar);
             v_resp = pxp.f_agrega_clave(v_resp,'moneda',v_moneda.moneda::varchar);
@@ -1858,24 +1879,24 @@ BEGIN
             --Devuelve la respuesta
             return v_resp;
 
-		end;
+        end;
         
   /*********************************
- 	#TRANSACCION:  'ADQ_VERDISPRE'
- 	#DESCRIPCION:	OBTENEMOS EL ID_MONEDA Y MONEDA PARA CARGAR DIRECTAMENTE EN EL COMBOBOX
- 	#AUTOR:		manuel guerra
- 	#FECHA:		07-04-2017 15:12:51
-	***********************************/
+     #TRANSACCION:  'ADQ_VERDISPRE'
+     #DESCRIPCION:    OBTENEMOS EL ID_MONEDA Y MONEDA PARA CARGAR DIRECTAMENTE EN EL COMBOBOX
+     #AUTOR:        manuel guerra
+     #FECHA:        07-04-2017 15:12:51
+    ***********************************/
 
-	elsif(p_transaccion='ADQ_VERDISPRE')then
-		begin
-			--Sentencia de la modificacion
-			SELECT tm.id_moneda, tm.moneda
+    elsif(p_transaccion='ADQ_VERDISPRE')then
+        begin
+            --Sentencia de la modificacion
+            SELECT tm.id_moneda, tm.moneda
             INTO v_moneda
             FROM param.tmoneda tm
-			WHERE tm.codigo = v_parametros.nombre_moneda;
+            WHERE tm.codigo = v_parametros.nombre_moneda;
 
-			--Definicion de la respuesta
+            --Definicion de la respuesta
             v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Datos de Moneda id_moneda, moneda');
             v_resp = pxp.f_agrega_clave(v_resp,'id_moneda',v_moneda.id_moneda::varchar);
             v_resp = pxp.f_agrega_clave(v_resp,'moneda',v_moneda.moneda::varchar);
@@ -1883,20 +1904,20 @@ BEGIN
             --Devuelve la respuesta
             return v_resp;
 
-		end;
+        end;
       
              
   /*********************************
- 	#TRANSACCION:  'ADQ_NUMPO_GET'
- 	#DESCRIPCION:	VERIFICAMOS SI EL NRO. PO YA FUE REGISTRADO Y RETORNAMOS DESC. FUNCIONARIO
- 	#AUTOR:		FEA
- 	#FECHA:		07-04-2017 15:12:51
-	***********************************/
+     #TRANSACCION:  'ADQ_NUMPO_GET'
+     #DESCRIPCION:    VERIFICAMOS SI EL NRO. PO YA FUE REGISTRADO Y RETORNAMOS DESC. FUNCIONARIO
+     #AUTOR:        FEA
+     #FECHA:        07-04-2017 15:12:51
+    ***********************************/
 
-	elsif(p_transaccion='ADQ_NUMPO_GET')then
+    elsif(p_transaccion='ADQ_NUMPO_GET')then
 
-		begin
-			--Sentencia de la modificacion
+        begin
+            --Sentencia de la modificacion
             IF(v_parametros.nro_po::varchar <> '')THEN
               SELECT count(ts.id_solicitud)
               INTO v_contador
@@ -1905,7 +1926,7 @@ BEGIN
             END IF;
 
             IF(v_contador>=1)THEN
-        		v_valid = 'true';
+                v_valid = 'true';
 
                 SELECT vf.desc_funcionario1
                 INTO v_funcionario
@@ -1913,10 +1934,10 @@ BEGIN
                 INNER JOIN orga.vfuncionario vf ON vf.id_funcionario = ts.id_funcionario
                 WHERE ts.nro_po = trim(both ' ' from v_parametros.nro_po);
             ELSE
-            	v_valid = 'false';
-			END IF;
+                v_valid = 'false';
+            END IF;
 
-			--Definicion de la respuesta
+            --Definicion de la respuesta
             v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Datos de Nro. PO, descripcion funcionario');
             v_resp = pxp.f_agrega_clave(v_resp,'v_id_funcionario',v_funcionario::varchar);
             v_resp = pxp.f_agrega_clave(v_resp,'v_valid',v_valid);
@@ -1925,20 +1946,20 @@ BEGIN
             --Devuelve la respuesta
             return v_resp;
 
-		end;
+        end;
         
    /*********************************
- 	#TRANSACCION:  'ADQ_CERDATA_GET'
- 	#DESCRIPCION:	Recuperamos lso datos para certificacion presupesutaria
- 	#AUTOR:		FEA
- 	#FECHA:		07-04-2017 15:12:51
-	***********************************/
+     #TRANSACCION:  'ADQ_CERDATA_GET'
+     #DESCRIPCION:    Recuperamos lso datos para certificacion presupesutaria
+     #AUTOR:        FEA
+     #FECHA:        07-04-2017 15:12:51
+    ***********************************/
 
-	elsif(p_transaccion='ADQ_CERDATA_GET')then
+    elsif(p_transaccion='ADQ_CERDATA_GET')then
 
-		begin
+        begin
         
-        	-- recupera descripcion y el techo
+            -- recupera descripcion y el techo
             select 
                 codigo_techo,
                 descripcion_techo
@@ -1959,7 +1980,7 @@ BEGIN
             group by 
             saldo.codigo_techo,
             saldo.descripcion_techo;
-        	
+            
         
             --recupera moneda de la solicitud
            select 
@@ -2012,9 +2033,9 @@ BEGIN
             
             --determina todal disopnible
            
-            v_total_disponble = COALESCE(v_datos_saldos.saldo_vigente_mb,0)  - COALESCE(v_datos_saldos.saldo_comp_mb,0) - COALESCE(v_datos_ga_gs.precio_ga_mb, 0);			
+            v_total_disponble = COALESCE(v_datos_saldos.saldo_vigente_mb,0)  - COALESCE(v_datos_saldos.saldo_comp_mb,0) - COALESCE(v_datos_ga_gs.precio_ga_mb, 0);            
 
-			--Definicion de la respuesta
+            --Definicion de la respuesta
             v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Datos de Nro. PO, descripcion funcionario');
             v_resp = pxp.f_agrega_clave(v_resp,'v_id_funcionario',v_funcionario::varchar);
             v_resp = pxp.f_agrega_clave(v_resp,'v_total_disponble',COALESCE(v_total_disponble,0)::varchar);
@@ -2026,26 +2047,26 @@ BEGIN
             v_resp = pxp.f_agrega_clave(v_resp,'v_cod_techo', COALESCE(v_datos.codigo_techo,'')::varchar);                                    
             v_resp = pxp.f_agrega_clave(v_resp,'v_descripcion_techo', COALESCE(v_datos.descripcion_techo,'')::varchar);
 
-			--Devuelve la respuesta
+            --Devuelve la respuesta
             return v_resp;
 
-		end;      
+        end;      
         
   else
      
-    	raise exception 'Transaccion inexistente: %',p_transaccion;
+        raise exception 'Transaccion inexistente: %',p_transaccion;
 
-	end if;
+    end if;
 
 EXCEPTION
-				
-	WHEN OTHERS THEN
-		v_resp='';
-		v_resp = pxp.f_agrega_clave(v_resp,'mensaje',SQLERRM);
-		v_resp = pxp.f_agrega_clave(v_resp,'codigo_error',SQLSTATE);
-		v_resp = pxp.f_agrega_clave(v_resp,'procedimientos',v_nombre_funcion);
-		raise exception '%',v_resp;
-				        
+                
+    WHEN OTHERS THEN
+        v_resp='';
+        v_resp = pxp.f_agrega_clave(v_resp,'mensaje',SQLERRM);
+        v_resp = pxp.f_agrega_clave(v_resp,'codigo_error',SQLSTATE);
+        v_resp = pxp.f_agrega_clave(v_resp,'procedimientos',v_nombre_funcion);
+        raise exception '%',v_resp;
+                        
 END;
 $body$
 LANGUAGE 'plpgsql'

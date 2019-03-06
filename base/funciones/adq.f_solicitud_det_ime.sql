@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION adq.f_solicitud_det_ime (
   p_administrador integer,
   p_id_usuario integer,
@@ -18,9 +16,9 @@ $body$
 ***************************************************************************
  HISTORIAL DE MODIFICACIONES:
 
- DESCRIPCION:
- AUTOR:
- FECHA:
+ ISSUE              FECHA:              AUTOR:              DESCRIPCION:
+   #4   endeEtr    08/02/2019           EGS                 Validacion cuando el detalle sea consolidado por una presolicitud no puede ser modificado y cuando la presolicitud este en estado finalizado no puede ser eliminado
+
 ***************************************************************************/
 
 DECLARE
@@ -31,19 +29,21 @@ DECLARE
 	v_resp		            varchar;
 	v_nombre_funcion        text;
 	v_mensaje_error         text;
-	v_id_solicitud_det	integer;
+	v_id_solicitud_det	    integer;
 
-    v_id_partida integer;
-    v_id_cuenta integer;
-    v_id_auxiliar integer;
-    v_id_moneda integer;
-    v_fecha_soli date;
-    v_monto_ga_mb numeric;
-    v_monto_sg_mb numeric;
-    v_precio_unitario_mb numeric;
-    v_id_gestion integer;
-    v_registros_cig record;
+    v_id_partida            integer;
+    v_id_cuenta             integer;
+    v_id_auxiliar           integer;
+    v_id_moneda             integer;
+    v_fecha_soli            date;
+    v_monto_ga_mb           numeric;
+    v_monto_sg_mb           numeric;
+    v_precio_unitario_mb    numeric;
+    v_id_gestion            integer;
+    v_registros_cig         record;
     v_id_orden_trabajo		integer;
+    v_record_presolicitud_det   record;
+    v_record_solicitud_det      record;
 
 
 BEGIN
@@ -393,9 +393,35 @@ BEGIN
 	elsif(p_transaccion='ADQ_SOLD_MOD')then
 
 		begin
-
+        -- #4
+            --validando si el detalle fue consolidada desde una presolicitud o se sumo un item 
+            SELECT
+                presd.id_presolicitud_det
+                into 
+                v_record_presolicitud_det
+            FROM adq.tpresolicitud_det presd
+            WHERE presd.id_solicitud_det = v_parametros.id_solicitud_det;
+            --recuperamos los datos de la solicitud
+            SELECT
+                sold.id_centro_costo,
+                sold.id_concepto_ingas,
+                sold.precio_unitario,
+                sold.cantidad
+                INTO
+                v_record_solicitud_det
+            From adq.tsolicitud_det sold
+            WHERE sold.id_solicitud_det = v_parametros.id_solicitud_det; 
+            
+            IF v_record_presolicitud_det.id_presolicitud_det is not null THEN                 
+                IF v_record_solicitud_det.id_centro_costo <> v_parametros.id_centro_costo or
+                v_record_solicitud_det.id_concepto_ingas<> v_parametros.id_concepto_ingas or
+                v_record_solicitud_det.precio_unitario<> v_parametros.precio_unitario or
+                v_record_solicitud_det.cantidad<> v_parametros.cantidad_sol  THEN
+                 RAISE EXCEPTION 'No puede editar este detalle solo la descripcion.Este detalle fue consolidada o tiene un item de una presolicitud.Eliminela o desconsolide la presolicitud';
+                END IF;
+            END IF;
+            --#4
             -- obtener parametros de solicitud
-
             select s.id_moneda, s.fecha_soli,s.id_gestion  into v_id_moneda, v_fecha_soli, v_id_gestion
             from adq.tsolicitud s
             where  s.id_solicitud = v_parametros.id_solicitud;
@@ -498,13 +524,28 @@ BEGIN
 	elsif(p_transaccion='ADQ_SOLD_ELI')then
 
 		begin
-			--Sentencia de la eliminacion
+            -- #4 validamos si el detalle de la solicitud fue consolidada por una presolicitud y si esta esta en finalizado
+            SELECT
+                presd.id_presolicitud_det,
+                pres.estado,
+                pres.nro_tramite
+                into 
+                v_record_presolicitud_det
+            FROM adq.tpresolicitud_det presd
+            left join adq.tpresolicitud pres on pres.id_presolicitud = presd.id_presolicitud
+            WHERE presd.id_solicitud_det = v_parametros.id_solicitud_det;
+            IF v_record_presolicitud_det.estado = 'finalizado' THEN
+                RAISE EXCEPTION 'No puede Eliminar El detalle de la solicitud la presolicitud % asociada a este detalle esta en estado de Finalizado',v_record_presolicitud_det.nro_tramite;
+            END IF;
+
+            --Sentencia de la eliminacion
 
             --delete from adq.tsolicitud_det
             --where id_solicitud_det=v_parametros.id_solicitud_det;
-
             update adq.tsolicitud_det set
-            estado_reg = 'inactivo'
+            estado_reg = 'inactivo',
+            id_usuario_mod = p_id_usuario,
+            fecha_mod = now()
             where id_solicitud_det=v_parametros.id_solicitud_det;
 
             --Definicion de la respuesta

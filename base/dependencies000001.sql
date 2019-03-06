@@ -4355,3 +4355,10 @@ select pxp.f_insert_testructura_gui ('SOLHIS.7.1.1', 'SOLHIS.7.1');
 select pxp.f_insert_testructura_gui ('SOLHIS.7.3.1', 'SOLHIS.7.3');  
     
 /***********************************F-DEP-CAP-ADQ-0-01/12/2018*****************************************/
+/***********************************I-DEP-EGS-ADQ-0-08/02/2019*****************************************/
+CREATE TRIGGER tr_delete_soldet_up_presoldet
+  AFTER UPDATE OF fecha_mod, estado_reg 
+  ON adq.tsolicitud_det FOR EACH ROW 
+  EXECUTE PROCEDURE adq.f_tr_delete_soldet_up_presoldet();
+/***********************************F-DEP-EGS-ADQ-0-08/02/2019*****************************************/
+

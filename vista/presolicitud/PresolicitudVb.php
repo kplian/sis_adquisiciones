@@ -17,7 +17,8 @@ Phx.vista.PresolicitudVb = {
 	
 	constructor: function(config) {
     	Phx.vista.PresolicitudVb.superclass.constructor.call(this,config);
-    	this.addButton('apr_requerimiento',{text:'Aprobar',iconCls: 'bok',disabled:true,handler:this.apr_requerimiento,tooltip: '<b>Aprobar </b><p>Aprobar el inicio de compra</p>'});
+        
+        this.addButton('sig_estado',{ text:'Aprobar', iconCls: 'bok', disabled: true, handler: this.sigEstado, tooltip: '<b>Pasar al Siguiente Estado</b>'});
         this.iniciarEventos();
         this.init();
         this.store.baseParams={tipo_interfaz:this.nombreVista};
@@ -25,45 +26,17 @@ Phx.vista.PresolicitudVb = {
 		
 		
 	},
-    apr_requerimiento:function()
-        {                   
-           var d= this.sm.getSelected().data;
-           Phx.CP.loadingShow();
-           Ext.Ajax.request({
-               
-                url:'../../sis_adquisiciones/control/Presolicitud/aprobarPresolicitud',
-                params:{id_presolicitud:d.id_presolicitud,operacion:'aprobado'},
-                success:this.successSinc,
-                failure: this.conexionFailure,
-                timeout:this.timeout,
-                scope:this
-            });     
-     },
-     successSinc:function(resp){
-            
-            Phx.CP.loadingHide();
-            var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
-            if(!reg.ROOT.error){
-               
-               this.reload();
-                
-            }else{
-                
-                alert('ocurrio un error durante el proceso')
-            }
-           
-            
-      },
     preparaMenu:function(n){
       var data = this.getSelectedData();
       var tb =this.tbar;
         Phx.vista.Presolicitud.superclass.preparaMenu.call(this,n);
+        this.getBoton('diagrama_gantt').enable();
         if(data.estado=='pendiente'){
-         this.getBoton('apr_requerimiento').enable();
-        
+         this.getBoton('sig_estado').enable();       
         }
         else{
-          this.getBoton('apr_requerimiento').disable();
+          this.getBoton('sig_estado').disable();
+
         }
         this.getBoton('ant_estado').enable();
         this.getBoton('btnReporte').enable();  
@@ -72,15 +45,13 @@ Phx.vista.PresolicitudVb = {
      liberaMenu:function(){
         var tb = Phx.vista.Presolicitud.superclass.liberaMenu.call(this);
         if(tb){
-           
-            this.getBoton('apr_requerimiento').disable();
+            this.getBoton('diagrama_gantt').disable();
+            this.getBoton('sig_estado').disable();
             this.getBoton('ant_estado').disable(); 
             this.getBoton('btnReporte').disable();            
         }
        return tb
     },
-    
-	
 	south:
           { 
           url:'../../../sis_adquisiciones/vista/presolicitud_det/PresolicitudReqDet.php',

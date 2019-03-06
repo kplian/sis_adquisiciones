@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION adq.ft_presolicitud_det_sel (
   p_administrador integer,
   p_id_usuario integer,
@@ -66,11 +64,15 @@ BEGIN
                                  usu2.cuenta as usr_mod,
                                  cc.codigo_cc,
                                  cig.desc_ingas,
-                                 pred.precio 	--#1 10/12/2018	EGS	
+                                 pred.precio,
+                                 sol.num_tramite, 	--#1 10/12/2018	EGS	
+                                 sol.id_solicitud
                           from adq.tpresolicitud_det pred
                                inner join segu.tusuario usu1 on usu1.id_usuario = pred.id_usuario_reg
                                inner join param.tconcepto_ingas cig on cig.id_concepto_ingas = pred.id_concepto_ingas
                                inner join param.vcentro_costo cc on cc.id_centro_costo = pred.id_centro_costo
+                               left join adq.tsolicitud_det sold on sold.id_solicitud_det = pred.id_solicitud_det
+                               left join adq.tsolicitud sol on sol.id_solicitud = sold.id_solicitud 
                                left join segu.tusuario usu2 on usu2.id_usuario = pred.id_usuario_mod
 				        where   ';
 			
