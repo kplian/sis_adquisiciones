@@ -5,7 +5,9 @@
 *@author  (fprudencio)
 *@date 20-09-2011 10:22:05
 *@description Archivo con la interfaz de usuario que permite la ejecucion de todas las funcionalidades del sistema
-*/
+ * ISSUE		FECHA				AUTHOR		DESCRIPCION
+ * #4   endeEtr	05/02/2019			EGS			inhabilita edicion y eliminacion en estado diferente a borrador
+ * */
 header("content-type: text/javascript; charset=UTF-8");
 ?>
 <script>
@@ -17,7 +19,7 @@ Phx.vista.PresolicitudReq = {
 	
 	constructor: function(config) {
     	Phx.vista.PresolicitudReq.superclass.constructor.call(this,config);
-    	this.addButton('fin_requerimiento',{text:'Finalizar',iconCls: 'badelante',disabled:true,handler:this.fin_requerimiento,tooltip: '<b>Finalizar</b>'});
+    	this.addButton('sig_estado',{ text:'Siguiente', iconCls: 'badelante', disabled: true, handler: this.sigEstado, tooltip: '<b>Pasar al Siguiente Estado</b>'});
         this.iniciarEventos();
         this.init();
         this.store.baseParams={tipo_interfaz:this.nombreVista};
@@ -99,37 +101,7 @@ Phx.vista.PresolicitudReq = {
         
            
     },
-    fin_requerimiento:function()
-        {                   
-            var d= this.sm.getSelected().data;
-           
-            Phx.CP.loadingShow();
-           
-            Ext.Ajax.request({
-                // form:this.form.getForm().getEl(),
-                url:'../../sis_adquisiciones/control/Presolicitud/finalizarPresolicitud',
-                params:{id_presolicitud:d.id_presolicitud,operacion:'verificar'},
-                success:this.successSinc,
-                failure: this.conexionFailure,
-                timeout:this.timeout,
-                scope:this
-            });     
-     },
-      successSinc:function(resp){
-            
-            Phx.CP.loadingHide();
-            var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
-            if(!reg.ROOT.error){
-               
-               this.reload();
-                
-            }else{
-                
-                alert('ocurrio un error durante el proceso')
-            }
-           
-            
-        },
+
     onButtonEdit:function(){
        this.cmpFechaSoli.disable();
        this.cmpIdFuncionarioSupervisor.disable();       
@@ -144,19 +116,25 @@ Phx.vista.PresolicitudReq = {
       var data = this.getSelectedData();
       var tb =this.tbar;
         Phx.vista.PresolicitudReq.superclass.preparaMenu.call(this,n);
+        this.getBoton('diagrama_gantt').enable();
         if(data.estado=='borrador'){
-         this.getBoton('fin_requerimiento').enable();
+         
+         this.getBoton('sig_estado').enable();
+         this.getBoton('ant_estado').disable();
          
         }
         else{
-          this.getBoton('fin_requerimiento').disable(); 
-          
-          if (data.estado=='pendiente'){
+          this.getBoton('sig_estado').disable();
+
+          if (data.estado !='borrador'){//#4
                this.getBoton('ant_estado').enable();
+               this.getBoton('edit').disable();//#4
+               this.getBoton('del').disable();//#4
+
               
           } 
           else{
-               this.getBoton('ant_estado').disable();
+               this.getBoton('ant_estado').enable();
               
           }
             
@@ -169,8 +147,9 @@ Phx.vista.PresolicitudReq = {
         var tb = Phx.vista.PresolicitudReq.superclass.liberaMenu.call(this);
         if(tb){
            
-            this.getBoton('fin_requerimiento').disable();
-            this.getBoton('btnReporte').disable();             
+            this.getBoton('btnReporte').disable();
+            this.getBoton('diagrama_gantt').disable();
+             
         }
        return tb
     },

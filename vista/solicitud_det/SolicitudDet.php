@@ -5,6 +5,8 @@
 *@author  (admin)
 *@date 05-03-2013 01:28:10
 *@description Archivo con la interfaz de usuario que permite la ejecucion de todas las funcionalidades del sistema
+* ISSUE            FECHA:		      AUTOR       DESCRIPCION
+* #4   endeEtr	05/02/2019			EGS			se recarga las presolicitudes cuando se elimina en la un detalle de solicitud asociado a una presolicitud  
 */
 
 header("content-type: text/javascript; charset=UTF-8");
@@ -474,7 +476,16 @@ Phx.vista.SolicitudDet=Ext.extend(Phx.gridInterfaz,{
     },
     
     bdel: true,
-	bsave: false
+	bsave: false,
+	//#4	
+	onButtonDel: function(){
+		Phx.vista.Solicitud.superclass.onButtonDel.call(this);
+		this.actualizarPresolicitud();
+	},
+	 actualizarPresolicitud:function(){
+     Phx.CP.getPagina(this.idContenedorPadre).actualizarPresolicitud();          
+    }//#4
+
 	}
 )
 </script>

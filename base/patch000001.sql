@@ -963,3 +963,14 @@ ALTER TABLE adq.tpresolicitud_det
   ADD COLUMN precio NUMERIC(18,2);
   
 /***********************************F-SCP-EGS-ADQ-1-24/12/2018****************************************/
+/***********************************I-SCP-EGS-ADQ-2-19/02/2019****************************************/
+ALTER TABLE adq.tpresolicitud
+  ADD COLUMN id_estado_wf INTEGER;
+
+ALTER TABLE adq.tpresolicitud
+  ADD COLUMN id_proceso_wf INTEGER;
+
+ALTER TABLE adq.tpresolicitud
+  ADD COLUMN nro_tramite VARCHAR(150);
+/***********************************F-SCP-EGS-ADQ-2-19/02/2019****************************************/
+

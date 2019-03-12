@@ -7,6 +7,7 @@
 *@Interface para el inicio de solicitudes de compra
 	ISSUE				FECHA					AUTHOR					DESCRIPCION
  * 	#1					11/12/2018				EGS						se modifico para que solo se inserte o modifique la cabecera de una solicitud 
+ * 	#4					20/02/2019				EGS						Se modifico el ancho de la vista presolicitudCon
 */
 header("content-type: text/javascript; charset=UTF-8");
 ?>
@@ -477,7 +478,7 @@ Phx.vista.SolicitudReqCon = {
     xeast:{
           url:'../../../sis_adquisiciones/vista/presolicitud/PresolicitudCon.php',
           title:'Estados', 
-          width:400,
+          width:'50%',//#4	 EGS
           cls:'PresolicitudCon'
           },
 	

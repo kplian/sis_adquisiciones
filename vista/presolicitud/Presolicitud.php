@@ -5,6 +5,8 @@
 *@author  (admin)
 *@date 10-05-2013 05:03:41
 *@description Archivo con la interfaz de usuario que permite la ejecucion de todas las funcionalidades del sistema
+ * 	ISSUE		FECHA:	         AUTOR:				 DESCRIPCION:	
+ * #4 endeETR  	19/02/2019       EGS                 se implemento el flujo WF en el proceso con sus funciones
 */
 
 header("content-type: text/javascript; charset=UTF-8");
@@ -27,8 +29,54 @@ Phx.vista.Presolicitud=Ext.extend(Phx.gridInterfaz,{
             tooltip : '<b>Reporte Presolicitud de Compra</b><br/><b>Reporte Presolicitud de Compra</b>'
   });
   
-		this.addButton('ant_estado',{argument: {estado: 'anterior'},text:'Anterior',iconCls: 'batras',disabled:true,handler:this.antEstado,tooltip: '<b>Pasar al Anterior Estado</b>'});
-  
+		this.addButton('ant_estado',{argument: {estado: 'anterior'},text:'Anterior',iconCls: 'batras',disabled:true,handler:this.anteriorEstado,tooltip: '<b>Pasar al Anterior Estado</b>'});
+		this.addBotonesGantt();// #4 EGS
+	},
+	addBotonesGantt: function() {// #4 EGS
+	        this.menuAdqGantt = new Ext.Toolbar.SplitButton({
+	            id: 'b-diagrama_gantt-' + this.idContenedor,
+	            text: 'Gantt',
+	            disabled: true,
+	            grupo:[0,1,2,3],
+	            iconCls : 'bgantt',
+	            handler:this.diagramGanttDinamico,
+	            scope: this,
+	            menu:{
+		            items: [{
+		                id:'b-gantti-' + this.idContenedor,
+		                text: 'Gantt Imagen',
+		                tooltip: '<b>Muestra un reporte gantt en formato de imagen</b>',
+		                handler:this.diagramGantt,
+		                scope: this
+		            }, {
+		                id:'b-ganttd-' + this.idContenedor,
+		                text: 'Gantt Dinámico',
+		                tooltip: '<b>Muestra el reporte gantt facil de entender</b>',
+		                handler:this.diagramGanttDinamico,
+		                scope: this
+		            }]
+	            }
+	        });
+			this.tbar.add(this.menuAdqGantt);
+   		},
+	diagramGantt: function (){	// #4 EGS		
+		var data=this.sm.getSelected().data.id_proceso_wf;
+
+		Phx.CP.loadingShow();
+		Ext.Ajax.request({
+			url:'../../sis_workflow/control/ProcesoWf/diagramaGanttTramite',
+			params:{'id_proceso_wf':data},
+			success: this.successExport,
+			failure: this.conexionFailure,
+			timeout: this.timeout,
+			scope: this
+		});			
+	},
+	
+	diagramGanttDinamico: function (){	// #4 EGS		
+		var data=this.sm.getSelected().data.id_proceso_wf;
+
+		window.open('../../../sis_workflow/reportes/gantt/gantt_dinamico.html?id_proceso_wf='+data)		
 	},
 	tam_pag:50,
 			
@@ -52,7 +100,40 @@ Phx.vista.Presolicitud=Ext.extend(Phx.gridInterfaz,{
             },
             type:'Field',
             form:true 
-        },
+        },		
+        {
+			config:{// #4 EGS
+					labelSeparator:'',
+					inputType:'hidden',
+					name: 'id_proceso_wf'
+			},
+			type:'Field',
+			form:true
+		},
+		{
+			config:{// #4 EGS
+					labelSeparator:'',
+					inputType:'hidden',
+					name: 'id_estado_wf'
+			},
+			type:'Field',
+			form:true
+		},
+		{
+			config:{// #4 EGS
+				name: 'nro_tramite',
+				fieldLabel: 'Nro. Tramite',
+				allowBlank: true,
+				anchor: '80%',
+				gwidth: 200,
+				maxLength:20
+			},
+			type:'TextField',
+			filters:{pfiltro:'fase.estado',type:'string'},
+			id_grupo:1,
+			grid:true,
+			form:false
+		},
         {
             config:{
                 name: 'estado',
@@ -335,26 +416,17 @@ Phx.vista.Presolicitud=Ext.extend(Phx.gridInterfaz,{
 		'desc_funcionario',
 		'desc_uo',
 		'desc_grupo','id_partidas',
-		'id_depto','desc_depto','id_gestion'
+		'id_depto','desc_depto','id_gestion',
+		
+						
+		{name:'id_proceso_wf', type: 'numeric'},// #4 EGS
+		{name:'id_estado_wf', type: 'numeric'},// #4 EGS
+		{name:'nro_tramite', type: 'string'},// #4 EGS
+
 		
 	],
-	antEstado:function(){
-	   var d= this.sm.getSelected().data;
-           
-            Phx.CP.loadingShow();
-           
-            Ext.Ajax.request({
-                // form:this.form.getForm().getEl(),
-                url:'../../sis_adquisiciones/control/Presolicitud/retrocederPresolicitud',
-                params:{id_presolicitud:d.id_presolicitud,estado:d.estado},
-                success:this.successSinc,
-                failure: this.conexionFailure,
-                timeout:this.timeout,
-                scope:this
-            });  
-	    
-	    
-	},
+
+
 	
 	onButtonPresolicitud:function(){
 	    var rec=this.sm.getSelected();
@@ -372,29 +444,147 @@ Phx.vista.Presolicitud=Ext.extend(Phx.gridInterfaz,{
                     scope:this
                 });  
 	},
-	
-	successSinc:function(resp){
-            
-            Phx.CP.loadingHide();
-            var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
-            if(!reg.ROOT.error){
-               
-               this.reload();
-                
-            }else{
-                
-                alert('ocurrio un error durante el proceso')
-            }
-           
-            
-        },
-	
+
 	sortInfo:{
 		field: 'id_presolicitud',
 		direction: 'ASC'
 	},
 	bdel:true,
-	bsave:false
+	bsave:false,
+	////funciones para estados wf 
+	   siguienteEstado: function(res){// #4 EGS
+	    	if (this.nombreVista =='PresolicitudCon') 
+			{
+				var opcion = confirm('Seguro que quiere Finalizar la Presolicitud.Los Items consolidados en el detalle no podran ser eliminados ni modificados en la solicitud');
+				if (opcion == true) {
+					this.sigEstado(res);
+				};
+			} 
+   		},
+	  sigEstado:function(){                   
+      var data = this.getSelectedData();
+      console.log('data',data)     
+      this.objWizard = Phx.CP.loadWindows('../../../sis_workflow/vista/estado_wf/FormEstadoWf.php',
+                                'Estado de Wf',
+                                {
+                                    modal:true,
+                                    width:700,
+                                    height:450
+                                }, {data:{
+                                	   id_presolicitud:data.id_presolicitud,
+                                       id_estado_wf:data.id_estado_wf,
+                                       id_proceso_wf:data.id_proceso_wf,
+                                    	
+                                    }}, this.idContenedor,'FormEstadoWf',
+                                {
+                                    config:[{
+                                              event:'beforesave',
+                                              delegate: this.onSaveWizard,
+                                              
+                                            }],
+                                    
+                                    scope:this
+                                 });        
+               
+     },
+      onSaveWizard:function(wizard,resp){// #4 EGS
+        //console.log(wizard);
+        //Phx.CP.loadingShow();
+        Ext.Ajax.request({
+            //url:'../../sis_workflow/control/ProcesoWf/siguienteEstadoProcesoWf',
+            url:'../../sis_adquisiciones/control/Presolicitud/siguienteEstado',
+            params:{
+                id_presolicitud:      wizard.data.id_presolicitud,
+                id_proceso_wf_act:  resp.id_proceso_wf_act,
+                id_estado_wf_act:   resp.id_estado_wf_act,
+                id_tipo_estado:     resp.id_tipo_estado,
+                id_funcionario_wf:  resp.id_funcionario_wf,
+                id_depto_wf:        resp.id_depto_wf,
+                obs:                resp.obs,
+                json_procesos:      Ext.util.JSON.encode(resp.procesos)
+                },
+            success:this.successWizard,
+            failure: this.conexionFailure,
+            argument:{wizard:wizard},
+            timeout:this.timeout,
+            scope:this
+        });
+         
+    },
+       successWizard:function(resp){// #4 EGS
+        Phx.CP.loadingHide();
+        resp.argument.wizard.panel.destroy()
+        this.reload();
+    },
+    anteriorEstado: function(res){// #4 EGS
+    	var data = this.getSelectedData();
+    	if (this.nombreVista =='PresolicitudCon' && data.estado == 'asignado') 
+		{
+			var opcion = confirm('Seguro que quiere volver atras.Si tiene Items consolidados en el detalle estos se desconsolidaran');
+			if (opcion == true) {
+				this.antEstado(res);
+			};
+		} else{
+				this.antEstado(res);
+    	}
+   },
+    antEstado: function(res){// #4 EGS
+		var data = this.getSelectedData();
+			//obsValorInicial;	
+		
+		Phx.CP.loadWindows('../../../sis_workflow/vista/estado_wf/AntFormEstadoWf.php',
+			'Estado de Wf',
+			{   modal: true,
+			    width: 450,
+			    height: 250
+			}, 
+			{    data: data, 
+				 estado_destino: res.argument.estado
+			    // obsValorInicial: obsValorInicial 
+			}, 
+			this.idContenedor,'AntFormEstadoWf',
+			{
+			    config:[{
+			              event:'beforesave',
+			              delegate: this.onAntEstado,
+			            }],
+			   scope:this
+			});
+		
+	}, 
+	onAntEstado: function(wizard,resp){// #4 EGS
+        Phx.CP.loadingShow();
+        var operacion = 'cambiar';
+
+        Ext.Ajax.request({
+              //url:'../../sis_workflow/control/ProcesoWf/anteriorEstadoProcesoWf',
+                url:'../../sis_adquisiciones/control/Presolicitud/anteriorEstado',
+            params:{
+            	id_presolicitud: wizard.data.id_presolicitud,
+                id_proceso_wf: resp.id_proceso_wf,
+                id_estado_wf:  resp.id_estado_wf,  
+                obs: resp.obs,
+                operacion: operacion
+             },
+            argument:{wizard:wizard},  
+            success: this.successAntEstado,
+            failure: this.conexionFailure,
+            timeout: this.timeout,
+            scope: this
+        });
+    }, 
+    
+       successAntEstado:function(resp){// #4 EGS
+        Phx.CP.loadingHide();
+        resp.argument.wizard.panel.destroy()
+       this.reload();
+       if (this.nombreVista =='PresolicitudCon') 
+		{
+       		Phx.CP.getPagina(this.idContenedorPadre).actualizarSolicitudDet(); 
+      	}
+    },  
+	
+	
    }
 )
 </script>

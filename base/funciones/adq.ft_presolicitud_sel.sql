@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION adq.ft_presolicitud_sel (
   p_administrador integer,
   p_id_usuario integer,
@@ -19,6 +17,8 @@ $body$
  HISTORIAL DE MODIFICACIONES:
 ISSUE		FECHA:	         AUTOR:				 DESCRIPCION:	
 #1			11/12/2018		 EGS				 Se modifico el sel para que solo muestre registros activos 
+#4	endeETR	19/02/2019		 EGS				 se elimino filtro para estados cuando la vista es de consolidacion,  
+                                                 se modifico la sentencia de sql del sel 
 ***************************************************************************/
 
 DECLARE
@@ -75,7 +75,6 @@ BEGIN
              
                END IF;
            
-               v_filtro = v_filtro ||' and (pres.estado = ''aprobado'' or pres.estado =''asignado'')';
            
            
            ELSE
@@ -94,7 +93,28 @@ BEGIN
            
                 
     		--Sentencia de la consulta
-			v_consulta:='select pres.id_presolicitud,
+			v_consulta:='
+                   with asignado (
+                                        id_presolicitud,
+                                        cantidad_asignado
+                                        )as(
+                                            Select
+                                                presold.id_presolicitud,
+                                                count(presold.id_solicitud_det)
+                                            from  adq.tpresolicitud_det presold
+                                            group by id_presolicitud
+                                                ),
+                 nro_item(
+                                id_presolicitud,
+                                nro_item
+                                )as(
+                                    Select
+                                        presold.id_presolicitud,
+                                        count(presold.id_presolicitud_det)
+                                    from  adq.tpresolicitud_det presold
+                                    group by id_presolicitud
+                                        )
+            select pres.id_presolicitud,
                                  pres.id_grupo,
                                  pres.id_funcionario_supervisor,
                                  pres.id_funcionario,
@@ -121,7 +141,11 @@ BEGIN
                                  where gp.id_grupo = gru.id_grupo  and gp.estado_reg=''activo'')::varchar  as id_partidas,
                                  pres.id_depto,
                                  d.codigo||'' ''||d.nombre as desc_depto,
-                                 pres.id_gestion
+                                 pres.id_gestion,                --#4 EGS
+                                 (asig.cantidad_asignado||'' de ''||nro.nro_item)::varchar  as asignado,     --#4 EGS
+                                  pres.id_proceso_wf,    --#4 EGS
+                                  pres.id_estado_wf,     --#4 EGS
+                                  pres.nro_tramite      --#4 EGS
                           from adq.tpresolicitud pres
                                inner join segu.tusuario usu1 on usu1.id_usuario = pres.id_usuario_reg
                                inner join adq.tgrupo gru on gru.id_grupo = pres.id_grupo
@@ -130,6 +154,8 @@ BEGIN
                                inner join orga.tuo uo on uo.id_uo = pres.id_uo 
                                inner join param.tdepto d on d.id_depto= pres.id_depto
                                left join segu.tusuario usu2 on usu2.id_usuario = pres.id_usuario_mod
+                               left join asignado asig on asig.id_presolicitud = pres.id_presolicitud
+                               left join nro_item nro   on nro.id_presolicitud = pres.id_presolicitud
 				        where pres.estado_reg = ''activo'' and '||v_filtro||' and ';
 			
 			--Definicion de la respuesta
@@ -180,9 +206,7 @@ BEGIN
                                               where gu.id_grupo = gru.id_grupo) ' ;
              
                END IF;
-           
-               v_filtro = v_filtro ||' and (pres.estado = ''aprobado'' or pres.estado =''asignado'')';
-           
+                     
            
            ELSE
            
