@@ -11,7 +11,8 @@
 * ISSUE            FECHA:		      AUTOR       DESCRIPCION
 * #10  ETR      21/02/2018          RAC         se incrementa columna para comproemter al 87 %
 * #11 			19/09/2018			EGS			se habilito el campo observacion
-* #4   endeEtr	05/02/2019			EGS			se recarga las presolicitudes cuando se elimina en la un detalle de solicitud asociado a una presolicitud  
+* #4   endeEtr	05/02/2019			EGS			se recarga las presolicitudes cuando se elimina en la un detalle de solicitud asociado a una presolicitud
+* #6 endeEtr	26/3/2019			EGS			Se habilita tipo llave en mano  
 */
 header("content-type: text/javascript; charset=UTF-8");
 ?>
@@ -295,6 +296,7 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
                         dato = (dato==''&&value=='vehiculo')?'Vehiculos':dato;
                         dato = (dato==''&&value=='inmueble')?'Inmuebles':dato;
                         dato = (dato==''&&value=='bien')?'Bienes':dato;
+                        dato = (dato==''&&value=='llaveMano')?'LLave en Mano':dato;//#6
                         return String.format('{0}', dato);
                     },
                 

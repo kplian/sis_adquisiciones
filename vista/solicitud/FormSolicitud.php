@@ -5,6 +5,9 @@
  *@author  Rensi Arteaga Copari
  *@date    30-01-2014
  *@description permites subir archivos a la tabla de documento_sol
+ * * ISSUE            FECHA:		      AUTOR       DESCRIPCION
+ *  #6 endeEtr		  26/3/2019				EGS			Se habilita tipo llave en mano  
+ * 
  */
 header("content-type: text/javascript; charset=UTF-8");
 ?>
@@ -36,7 +39,7 @@ header("content-type: text/javascript; charset=UTF-8");
 			this.iniciarEventosDetalle();
 			this.onNew();
 
-			this.Cmp.tipo_concepto.store.loadData(this.arrayStore['Bien'].concat(this.arrayStore['Servicio']));
+			this.Cmp.tipo_concepto.store.loadData(this.arrayStore['Bien'].concat(this.arrayStore['Servicio'],this.arrayStore['LlaveMano']));// #6
 
 		},
 		buildComponentesDetalle: function(){
@@ -565,6 +568,9 @@ header("content-type: text/javascript; charset=UTF-8");
 				//['consultoria_personal','Consultoria de Personas'],
 				//['consultoria_empresa','Consultoria de Empresas'],
 				//['alquiler_inmueble','Alquiler Inmuebles']
+			],
+			'LlaveMano':[ // #6
+				['llaveMano','Llave en Mano'] // #6
 			]
 		},
 		Atributos:[
@@ -931,8 +937,11 @@ header("content-type: text/javascript; charset=UTF-8");
 				if(this.isInArray(rec.json, this.arrayStore['Bien'])){
 					this.Cmp.tipo.setValue('Bien');
 				}
-				else{
+				if (this.isInArray(rec.json, this.arrayStore['Servicio'])){
 					this.Cmp.tipo.setValue('Servicio');
+				}
+				if (this.isInArray(rec.json, this.arrayStore['LlaveMano'])){// #6
+						this.Cmp.tipo.setValue('LlaveMano');
 				}
 
 				if(this.Cmp.tipo.getValue() == 'Bien'){
