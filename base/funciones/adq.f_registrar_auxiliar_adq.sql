@@ -18,10 +18,10 @@ $body$
 ***************************************************************************
  HISTORIA DE MODIFICACIONES:
 
- DESCRIPCIÓN:
- AUTOR:       
- FECHA:      
 
+        
+ ISSUES  AUTOR    FECHA        DESCRIPCIÓN
+ #7      JUAN     03/07/2019   Asignación de usuario en tesorería
 ***************************************************************************/
 
 -------------------------
@@ -38,7 +38,7 @@ DECLARE
     v_registros       record;
     v_id_usuario   integer;
     v_id_alarma    integer;
-    
+    v_id_funcionario integer;
 
 BEGIN
    v_nombre_funcion ='adq.f_registrar_auxiliar_adq';
@@ -88,7 +88,22 @@ BEGIN
 			id_usuario_auxiliar = v_id_usuario,
             id_usuario_mod = p_id_usuario
             where id_solicitud=p_id_solicitud;
-  
+            
+            
+
+            select --#7
+            f.id_funcionario --#7
+            into --#7
+             v_id_funcionario  --#7
+            from segu.tusuario u --#7
+            join segu.tpersona p on p.id_persona=u.id_persona --#7
+            join orga.tfuncionario f on f.id_persona=p.id_persona --#7
+            where u.id_usuario=v_id_usuario; --#7   
+            
+            update tes.tobligacion_pago --#7
+            set id_funcionario=v_id_funcionario --#7
+            where  num_tramite=v_registros.num_tramite; --#7
+
             v_resp = 'true';
      
    return v_resp;
