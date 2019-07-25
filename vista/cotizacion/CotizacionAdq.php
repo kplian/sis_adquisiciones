@@ -233,7 +233,6 @@ Phx.vista.CotizacionAdq = {
             this.ocultarComponente(this.Cmp.telefono_contacto);
             this.ocultarComponente(this.Cmp.funcionario_contacto);
             this.ocultarComponente(this.Cmp.lugar_entrega); 
-            this.ocultarComponente(this.Cmp.fecha_entrega); 
             this.ocultarComponente(this.Cmp.tiempo_entrega); 
             this.mostrarComponente(this.Cmp.prellenar_oferta); 
 
