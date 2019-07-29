@@ -325,7 +325,7 @@ BEGIN
             
             IF (p_hstore_cotizacion->'fecha_entrega')::date is not NULL  THEN
             
-              v_fecha_inicio_sol = (p_hstore_cotizacion->'lugar_entrega')::date;
+              v_fecha_inicio_sol = (p_hstore_cotizacion->'fecha_entrega')::date; --#9  JUAN  29/07/2019  Corrección de formato de fecha de variable lugar_entrega a fecha_entrega
             
             END IF;
             
