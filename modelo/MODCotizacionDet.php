@@ -5,6 +5,9 @@
 *@author  Gonzalo Sarmiento Sejas
 *@date 21-03-2013 21:44:43
 *@description Clase que envia los parametros requeridos a la Base de datos para la ejecucion de las funciones, y que recibe la respuesta del resultado de la ejecucion de las mismas
+		* ISSUE            FECHA:		      AUTOR        DESCRIPCION
+ * 		#10 			   28/08/2019		  EGS			e cambia cantidad integer a numerico
+
 */
 
 class MODCotizacionDet extends MODbase{
@@ -39,7 +42,7 @@ class MODCotizacionDet extends MODbase{
 		
 		
 		$this->captura('desc_centro_costo','text');
-        $this->captura('cantidad_sol','integer');
+        $this->captura('cantidad_sol','numeric');//#10
         $this->captura('precio_unitario_sol','numeric');
         $this->captura('descripcion_sol','text'); 
         $this->captura('precio_unitario_mb','numeric');
@@ -147,7 +150,7 @@ class MODCotizacionDet extends MODbase{
                 
         //Define los parametros para la funcion
         $this->setParametro('id_cotizacion_det','id_cotizacion_det','int4');
-        $this->setParametro('cantidad_adjudicada','cantidad_adjudicada','int4');
+        $this->setParametro('cantidad_adjudicada','cantidad_adjudicada','numeric');//#10
         
         //Ejecuta la instruccion
         $this->armarConsulta();
@@ -172,7 +175,7 @@ class MODCotizacionDet extends MODbase{
 		//Definicion de la lista del resultado del query
 		
 	
-		 $this->captura('cantidad_sol','BIGINT');
+		 $this->captura('cantidad_sol','numeric');//#10
 		 $this->captura('precio_unitario_sol','numeric');
 		 $this->captura('cantidad_coti','numeric');
 		 $this->captura('cantidad_adju','numeric');

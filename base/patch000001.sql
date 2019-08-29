@@ -974,3 +974,25 @@ ALTER TABLE adq.tpresolicitud
   ADD COLUMN nro_tramite VARCHAR(150);
 /***********************************F-SCP-EGS-ADQ-2-19/02/2019****************************************/
 
+/***********************************I-SCP-EGS-ADQ-3-28/08/2019****************************************/
+/**
+ * Como el patch es el que se ejecuta primero se eliminan algunas views que dependen del campo de cantidad
+ Y se las restaura en dependencias
+  */
+DROP VIEW   IF EXISTS adq.vproceso_compra_wf;
+DROP VIEW   IF EXISTS adq.vcotizacion;
+DROP VIEW  IF EXISTS adq.vsolicitud_compra;
+/*Este es un Triguer que se existe al instalar el sistema de proyectos si existe este se elimina si no no hace nada
+*/
+DROP TRIGGER IF EXISTS tr_ime_soldet
+ON adq.tsolicitud_det
+
+ALTER TABLE adq.tsolicitud_det
+  ALTER COLUMN cantidad TYPE NUMERIC(19,2);
+ALTER TABLE adq.tcotizacion_det
+  ALTER COLUMN cantidad_coti TYPE NUMERIC(19,2);
+ALTER TABLE adq.tcotizacion_det
+  ALTER COLUMN cantidad_adju TYPE NUMERIC(19,2);
+
+/***********************************F-SCP-EGS-ADQ-3-28/08/2019****************************************/
+

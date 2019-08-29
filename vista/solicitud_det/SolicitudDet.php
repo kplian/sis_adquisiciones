@@ -6,7 +6,8 @@
 *@date 05-03-2013 01:28:10
 *@description Archivo con la interfaz de usuario que permite la ejecucion de todas las funcionalidades del sistema
 * ISSUE            FECHA:		      AUTOR       DESCRIPCION
-* #4   endeEtr	05/02/2019			EGS			se recarga las presolicitudes cuando se elimina en la un detalle de solicitud asociado a una presolicitud  
+* #4   endeEtr	05/02/2019			EGS			se recarga las presolicitudes cuando se elimina en la un detalle de solicitud asociado a una presolicitud
+ * #10              28/08/2019          EGS         se habilito decimales en cantidad
 */
 
 header("content-type: text/javascript; charset=UTF-8");
@@ -171,7 +172,7 @@ Phx.vista.SolicitudDet=Ext.extend(Phx.gridInterfaz,{
                 name: 'cantidad',
                 fieldLabel: 'cantidad',
                 allowBlank: false,
-                allowDecimals: false,
+                allowDecimals: true,
                 width: 100,
                 gwidth: 100,
                 maxLength:10

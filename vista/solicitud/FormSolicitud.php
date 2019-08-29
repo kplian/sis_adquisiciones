@@ -5,9 +5,9 @@
  *@author  Rensi Arteaga Copari
  *@date    30-01-2014
  *@description permites subir archivos a la tabla de documento_sol
- * * ISSUE            FECHA:		      AUTOR       DESCRIPCION
- *  #6 endeEtr		  26/3/2019				EGS			Se habilita tipo llave en mano  
- * 
+ * * ISSUE            	FECHA:		      	AUTOR       	DESCRIPCION
+ *  #6 endeEtr		26/3/2019		        EGS		Se habilita tipo llave en mano
+ *  #10 endeEtr		28/08/2019	       	    EGS		Se  Habilita decimales en cantidad
  */
 header("content-type: text/javascript; charset=UTF-8");
 ?>
@@ -111,7 +111,7 @@ header("content-type: text/javascript; charset=UTF-8");
 					msgTarget: 'title',
 					fieldLabel: 'Cantidad',
 					allowBlank: false,
-					allowDecimals: false,
+					allowDecimals:true,//#10
 					maxLength:10
 				}),
 				'precio_unitario': new Ext.form.NumberField({

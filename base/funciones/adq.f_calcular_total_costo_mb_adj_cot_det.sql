@@ -22,13 +22,14 @@ $body$
    
    
    @TIPO  MO , MB ->   moneda origen o moneda base
-   
+    ISSUE      FECHA         AUTHOR         DESCRIPCION
+    #10         28/08/209   EGS             Se cambio cantidad_sol de integer a numeric
 ***************************************************************************/
 
 DECLARE
   registro record;
-  
-  v_cantidad_sol integer;
+
+  v_cantidad_sol numeric; --#10
   v_id_solicitud_det integer;
   
   v_total_adjudicado numeric;
