@@ -985,7 +985,7 @@ DROP VIEW  IF EXISTS adq.vsolicitud_compra;
 /*Este es un Triguer que se existe al instalar el sistema de proyectos si existe este se elimina si no no hace nada
 */
 DROP TRIGGER IF EXISTS tr_ime_soldet
-ON adq.tsolicitud_det
+ON adq.tsolicitud_det;
 
 ALTER TABLE adq.tsolicitud_det
   ALTER COLUMN cantidad TYPE NUMERIC(19,2);
