@@ -1012,4 +1012,6 @@ select wf.f_import_testructura_estado ('insert','pendiente','aprobado','PRESOL',
 select wf.f_import_testructura_estado ('insert','aprobado','asignado','PRESOL',1,'');
 select wf.f_import_testructura_estado ('insert','asignado','finalizado','PRESOL',1,'');
 /***********************************F-DAT-EGS-ADQ-1-19/02/2019*****************************************/
-
+/***********************************I-DAT-EGS-ADQ-2-13/09/2019*****************************************/
+select pxp.f_insert_tgui ('Proveedores', 'Proveedores de compra', 'ADQ.4', 'si', 2, 'sis_adquisiciones/vista/proveedor/ProveedorAdq.php', 2, '', 'ProveedorAdq', 'ADQ');
+/***********************************F-DAT-EGS-ADQ-2-13/09/2019*****************************************/

@@ -5,6 +5,8 @@
 *@author  (admin)
 *@date 05-03-2013 01:28:10
 *@description Clase que envia los parametros requeridos a la Base de datos para la ejecucion de las funciones, y que recibe la respuesta del resultado de la ejecucion de las mismas
+	ISSUE		FECHA		AUTHOR			DESCRIPCION
+	#10		28/08/2019	EGS			Modificacion de cantidad de integer a numerico
 */
 
 class MODSolicitudDet extends MODbase{
@@ -36,7 +38,7 @@ class MODSolicitudDet extends MODbase{
 		$this->captura('id_concepto_ingas','int4');
 		$this->captura('id_cuenta','int4');
 		$this->captura('precio_total','numeric');
-		$this->captura('cantidad','int4');
+		$this->captura('cantidad','numeric');//#10 EGS
 		$this->captura('id_auxiliar','int4');
 		$this->captura('precio_ga_mb','numeric');
 		$this->captura('estado_reg','varchar');
@@ -93,7 +95,7 @@ class MODSolicitudDet extends MODbase{
 		$this->setParametro('precio_ga','precio_ga','numeric');
 		$this->setParametro('id_concepto_ingas','id_concepto_ingas','int4');
 		$this->setParametro('precio_total','precio_total','numeric');
-		$this->setParametro('cantidad_sol','cantidad','int4');
+		$this->setParametro('cantidad_sol','cantidad','numeric');//#10 EGS
 		$this->setParametro('estado_reg','estado_reg','varchar');
 		
 
@@ -118,7 +120,7 @@ class MODSolicitudDet extends MODbase{
 		$this->setParametro('centro_costo','centro_costo','varchar');
 		$this->setParametro('orden_trabajo','orden_trabajo','varchar');
 		$this->setParametro('descripcion','descripcion','text');
-		$this->setParametro('cantidad_sol','cantidad_sol','int4');
+		$this->setParametro('cantidad_sol','cantidad_sol','numeric');//#10 EGS
 		$this->setParametro('precio_unitario','precio_unitario','numeric');
 		$this->setParametro('precio_total','precio_total','numeric');
 		$this->setParametro('precio_sg','precio_sg','numeric');
@@ -166,7 +168,7 @@ class MODSolicitudDet extends MODbase{
         $this->setParametro('precio_ga','precio_ga','numeric');
         $this->setParametro('id_concepto_ingas','id_concepto_ingas','int4');
         $this->setParametro('precio_total','precio_total','numeric');
-        $this->setParametro('cantidad_sol','cantidad','int4');
+        $this->setParametro('cantidad_sol','cantidad','numeric');//#10 EGS
         $this->setParametro('estado_reg','estado_reg','varchar');
         
 
@@ -226,7 +228,7 @@ class MODSolicitudDet extends MODbase{
 		$this->setParametro('id_proveedor','id_proveedor','int4');
 		$this->captura('desc_ingas','varchar');
 		$this->captura('desc_centro_costo','text');
-		$this->captura('cantidad_sol','int4');
+		$this->captura('cantidad_sol','numeric');//#10 EGS
 		$this->captura('precio_unitario_sol','numeric');
 		$this->captura('descripcion_sol','text');
 		$this->captura('precio_unitario_mb_sol','numeric');
@@ -261,7 +263,7 @@ class MODSolicitudDet extends MODbase{
 		$this->captura('id_concepto_ingas','int4');
 		$this->captura('id_cuenta','int4');
 		$this->captura('precio_total','numeric');
-		$this->captura('cantidad','int4');
+		$this->captura('cantidad','numeric');//#10 EGS
 		$this->captura('id_auxiliar','int4');
 		$this->captura('precio_ga_mb','numeric');
 		$this->captura('estado_reg','varchar');

@@ -413,27 +413,27 @@ Phx.vista.Solicitud=Ext.extend(Phx.gridInterfaz,{
    		    grid:true,
    			form:false
 		 },
-      	   {
-   			config:{
-       		    name:'id_uo',
-       		    hiddenName: 'id_uo',
-          		origen:'UO',
-   				fieldLabel:'UO',
-   				allowBlank:false,
-   				gdisplayField:'desc_uo',//mapea al store del grid
-   				disabled:true,
-   			    gwidth:200,
-   			    renderer:function (value, p, record){return String.format('{0}', record.data['desc_uo']);}
-       	     },
-   			type:'ComboRec',
-   			id_grupo:1,
-   			filters:{	
-		        pfiltro:'uo.codigo#uo.nombre_unidad',
-				type:'string'
-			},
-   		    grid:true,
-   			form:false
-   	      },
+           {
+            config:{
+                name:'id_uo',
+                hiddenName: 'id_uo',
+                origen:'UO',
+                fieldLabel:'UO',
+                allowBlank:false,
+                gdisplayField:'desc_uo',//mapea al store del grid
+                disabled:true,
+                gwidth:200,
+                renderer:function (value, p, record){return String.format('{0}', record.data['desc_uo']);}
+             },
+            type:'ComboRec',
+            id_grupo:1,
+            filters:{
+                pfiltro:'uo.codigo#uo.nombre_unidad',
+                type:'string'
+            },
+            grid:true,
+            form:false
+          },
         {
             config:{
                 name: 'obs',

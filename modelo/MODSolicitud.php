@@ -8,7 +8,7 @@
 		* ISSUE            FECHA:		      AUTOR       DESCRIPCION
 * 
   		#11 			19/09/2018			EGS			se habilito el campo observacion
- * 
+ * 		#10 			28/08/2019			EGS			se cambia cantidad integer a numerico
  * */
 
 
@@ -677,7 +677,7 @@ class MODSolicitud extends MODbase{
 				$this->setParametro('id_orden_trabajo', 'id_orden_trabajo', 'int4');
 				$this->setParametro('id_concepto_ingas', 'id_concepto_ingas', 'int4');
 				$this->setParametro('precio_total', 'precio_total', 'numeric');
-				$this->setParametro('cantidad_sol', 'cantidad_sol', 'int4');
+				$this->setParametro('cantidad_sol', 'cantidad_sol', 'numeric'); //#10
 				$this->setParametro('precio_ga', 'precio_ga', 'numeric');
 				$this->setParametro('precio_sg', 'precio_sg', 'numeric');
 				
