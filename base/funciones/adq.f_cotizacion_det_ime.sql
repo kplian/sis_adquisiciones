@@ -14,13 +14,13 @@ $body$
  DESCRIPCION:   Funcion que gestiona las operaciones basicas (inserciones, modificaciones, eliminaciones de la tabla 'adq.tcotizacion_det'
  AUTOR: 		Gonzalo Sarmiento Sejas
  FECHA:	        21-03-2013 21:44:43
- COMENTARIOS:	
+ COMENTARIOS:
 ***************************************************************************
  HISTORIAL DE MODIFICACIONES:
 
- DESCRIPCION:	
- AUTOR:			
- FECHA:		
+ DESCRIPCION:
+ AUTOR:
+ FECHA:
 ***************************************************************************/
 
 DECLARE
@@ -32,72 +32,72 @@ DECLARE
 	v_nombre_funcion        text;
 	v_mensaje_error         text;
 	v_id_cotizacion_det	integer;
-    
-    
-    v_cantidad_sol integer;
+
+
+    v_cantidad_sol numeric;
     v_precio_ga_mb_sol numeric;
     v_precio_unitario_sol numeric;
     v_precio_unitario_mb_sol numeric;
     v_id_moneda_sol integer;
-    
+
     v_precio_unitario_mb_coti numeric;
     v_tipo_cambio_conv numeric;
 	v_id_moneda_coti  integer;
-    v_total_adj integer;
-    
-     
+    v_total_adj numeric;
+
+
      v_id_solicitud_det integer;
-     v_cantidad_coti integer;
-     
-     v_cantidad_adju integer;
+     v_cantidad_coti numeric;
+
+     v_cantidad_adju numeric;
      v_revertido_mb numeric;
      v_total_costo_mb numeric;
      v_id_partida_ejecucion integer;
-     
+
      v_precio_sg_mb numeric;
      v_precio_ga_mb numeric;
      v_id_moneda_base integer;
-     
-     
+
+
      v_comprometido_ga numeric;
      v_ejecutado       numeric;
-     
-     
-    
-    
+
+
+
+
      v_precio_unitario_coti numeric;
      v_revertido_mo numeric;
      v_precio_sg numeric;
      v_precio_ga numeric;
      v_total_costo_mo numeric;
      v_id_moneda integer;
-     
-     
+
+
      v_adq_tolerancia_adjudicacion    varchar;
      v_adq_comprometer_presupuesto    varchar;
      v_adq_adjudicar_con_presupuesto varchar;
-     
-     
-     
-			    
+
+
+
+
 BEGIN
 
     v_nombre_funcion = 'adq.f_cotizacion_det_ime';
     v_parametros = pxp.f_get_record(p_tabla);
 
-	/*********************************    
+	/*********************************
  	#TRANSACCION:  'ADQ_CTD_INS'
  	#DESCRIPCION:	Insercion de registros
- 	#AUTOR:		Gonzalo Sarmiento Sejas	
+ 	#AUTOR:		Gonzalo Sarmiento Sejas
  	#FECHA:		21-03-2013 21:44:43
 	***********************************/
 
 	if(p_transaccion='ADQ_CTD_INS')then
-					
+
         begin
-        
+
            --recuperar datos de la solicitud
-            select 
+            select
             sd.cantidad,
             sd.precio_ga_mb,
             sd.precio_unitario,
@@ -112,36 +112,36 @@ BEGIN
            from adq.tsolicitud_det sd
            inner join adq.tsolicitud s on s.id_solicitud = sd.id_solicitud
            where  sd.id_solicitud_det = v_parametros.id_solicitud_det;
-           
-           
-           select 
+
+
+           select
           	 c.tipo_cambio_conv,
           	 c.id_moneda
            INTO
           	 v_tipo_cambio_conv,
-           	 v_id_moneda_coti            
+           	 v_id_moneda_coti
            from adq.tcotizacion c
-           where c.id_cotizacion = v_parametros.id_cotizacion; 
-         
-        
+           where c.id_cotizacion = v_parametros.id_cotizacion;
+
+
             --validar que la cantidad cotizada no sea mayor a la cantidad solicitada
-            
-            IF( v_parametros.cantidad_coti > v_cantidad_sol ) THEN 
-            
+
+            IF( v_parametros.cantidad_coti > v_cantidad_sol ) THEN
+
               raise exception 'No puede registrar una cantidad mayor que la solicitada';
-            
+
             END IF;
-            
-            
+
+
             --calcular el precio unitario en moneda base
-            
+
              v_precio_unitario_mb_coti= v_parametros.precio_unitario*v_tipo_cambio_conv;
-             
-         
-            
-               
-        
-        
+
+
+
+
+
+
         	--Sentencia de la insercion
         	insert into adq.tcotizacion_det(
 			estado_reg,
@@ -173,11 +173,11 @@ BEGIN
             v_precio_unitario_mb_coti,
             v_parametros._id_usuario_ai,
             v_parametros._nombre_usuario_ai
-							
+
 			)RETURNING id_cotizacion_det into v_id_cotizacion_det;
-			
+
 			--Definicion de la respuesta
-			v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Detalle cotizacion almacenado(a) con exito (id_cotizacion_det'||v_id_cotizacion_det||')'); 
+			v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Detalle cotizacion almacenado(a) con exito (id_cotizacion_det'||v_id_cotizacion_det||')');
             v_resp = pxp.f_agrega_clave(v_resp,'id_cotizacion_det',v_id_cotizacion_det::varchar);
 
             --Devuelve la respuesta
@@ -185,19 +185,19 @@ BEGIN
 
 		end;
 
-	/*********************************    
+	/*********************************
  	#TRANSACCION:  'ADQ_CTD_MOD'
  	#DESCRIPCION:	Modificacion de registros
- 	#AUTOR:		Gonzalo Sarmiento Sejas	
+ 	#AUTOR:		Gonzalo Sarmiento Sejas
  	#FECHA:		21-03-2013 21:44:43
 	***********************************/
 
 	elsif(p_transaccion='ADQ_CTD_MOD')then
 
 		begin
-        
+
             --recuperar datos de la solicitud
-            select 
+            select
             sd.cantidad,
             sd.precio_ga_mb,
             sd.precio_unitario,
@@ -212,40 +212,40 @@ BEGIN
            from adq.tsolicitud_det sd
            inner join adq.tsolicitud s on s.id_solicitud = sd.id_solicitud
            where  sd.id_solicitud_det = v_parametros.id_solicitud_det;
-           
-           
-           select 
+
+
+           select
           	 c.tipo_cambio_conv,
           	 c.id_moneda
            INTO
           	 v_tipo_cambio_conv,
-           	 v_id_moneda_coti            
+           	 v_id_moneda_coti
            from adq.tcotizacion c
-           where c.id_cotizacion = v_parametros.id_cotizacion; 
-         
-        
+           where c.id_cotizacion = v_parametros.id_cotizacion;
+
+
             --validar que la cantidad cotizada no sea mayor a la cantidad solicitada
-            
-            IF( v_parametros.cantidad_coti > v_cantidad_sol ) THEN 
-            
+
+            IF( v_parametros.cantidad_coti > v_cantidad_sol ) THEN
+
               raise exception 'No puede registrar una cantidad mayor que la solicitada';
-            
+
             END IF;
-            
+
              --validar numeros negativos
-            
-            IF( v_parametros.cantidad_coti < 0  or   v_parametros.precio_unitario < 0 ) THEN 
-            
+
+            IF( v_parametros.cantidad_coti < 0  or   v_parametros.precio_unitario < 0 ) THEN
+
               raise exception 'No se admiten numeros negativos';
-            
+
             END IF;
-            
-            
+
+
             --calcular el precio unitario en moneda base
-            
+
               v_precio_unitario_mb_coti= v_parametros.precio_unitario*v_tipo_cambio_conv;
-            
-        
+
+
 			--Sentencia de la modificacion
 			update adq.tcotizacion_det set
 			id_cotizacion = v_parametros.id_cotizacion,
@@ -260,25 +260,25 @@ BEGIN
             id_usuario_ai = v_parametros._id_usuario_ai,
             usuario_ai = v_parametros._nombre_usuario_ai
 			where id_cotizacion_det=v_parametros.id_cotizacion_det;
-			
-			
-			update adq.tsolicitud_det 
+
+
+			update adq.tsolicitud_det
 			set descripcion = v_parametros.descripcion_sol
             where id_solicitud_det = v_parametros.id_solicitud_det;
-              
+
 			--Definicion de la respuesta
-            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Detalle cotizacion modificado(a)'); 
+            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Detalle cotizacion modificado(a)');
             v_resp = pxp.f_agrega_clave(v_resp,'id_cotizacion_det',v_parametros.id_cotizacion_det::varchar);
-               
+
             --Devuelve la respuesta
             return v_resp;
-            
+
 		end;
 
-	/*********************************    
+	/*********************************
  	#TRANSACCION:  'ADQ_CTD_ELI'
  	#DESCRIPCION:	Eliminacion de registros
- 	#AUTOR:		Gonzalo Sarmiento Sejas	
+ 	#AUTOR:		Gonzalo Sarmiento Sejas
  	#FECHA:		21-03-2013 21:44:43
 	***********************************/
 
@@ -288,19 +288,19 @@ BEGIN
 			--Sentencia de la eliminacion
 			delete from adq.tcotizacion_det
             where id_cotizacion_det=v_parametros.id_cotizacion_det;
-               
+
             --Definicion de la respuesta
-            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Detalle cotizacion eliminado(a)'); 
+            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Detalle cotizacion eliminado(a)');
             v_resp = pxp.f_agrega_clave(v_resp,'id_cotizacion_det',v_parametros.id_cotizacion_det::varchar);
-              
+
             --Devuelve la respuesta
             return v_resp;
 
 		end;
-    
-    
-        
-    /*********************************    
+
+
+
+    /*********************************
  	#TRANSACCION:  'ADQ_TOTALADJ_IME'
  	#DESCRIPCION:	Recuperar Total adjudicado por item
  	#AUTOR:	    Rensi Arteaga Copari
@@ -310,22 +310,22 @@ BEGIN
 	elsif(p_transaccion='ADQ_TOTALADJ_IME')then
 
 		begin
-			
-			
+
+
            v_total_adj = adq.f_calcular_total_adj_cot_det(v_parametros.id_cotizacion_det);
-            
-            
+
+
             --Definicion de la respuesta
-            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Recupera Total Adjudicado'); 
+            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Recupera Total Adjudicado');
             v_resp = pxp.f_agrega_clave(v_resp,'total_adj',v_total_adj::varchar);
-              
+
             --Devuelve la respuesta
             return v_resp;
 
-		end;    
-   
+		end;
 
-    /*********************************    
+
+    /*********************************
  	#TRANSACCION:  'ADQ_ADJDET_IME'
  	#DESCRIPCION:	Adjudicada por detalle de la cotizacion
  	#AUTOR:	    Rensi Arteaga Copari
@@ -335,18 +335,18 @@ BEGIN
 	elsif(p_transaccion='ADQ_ADJDET_IME')then
 
 		begin
-        
+
             --recupera datos de la solicitud y la cotizacion
             v_revertido_mb=0;
             v_id_moneda_base =  param.f_get_moneda_base();
-            
-            
+
+
             v_adq_tolerancia_adjudicacion  = pxp.f_get_variable_global('adq_tolerancia_adjudicacion');
             v_adq_comprometer_presupuesto = pxp.f_get_variable_global('adq_comprometer_presupuesto');
             v_adq_adjudicar_con_presupuesto = pxp.f_get_variable_global('adq_adjudicar_con_presupuesto');
-            
+
             select
-               sd.id_solicitud_det, 
+               sd.id_solicitud_det,
                sd.cantidad,
                cd.cantidad_coti,
                cd.cantidad_adju,
@@ -362,7 +362,7 @@ BEGIN
                sd.precio_sg,
                sd.precio_ga,
                s.id_moneda
-            into 
+            into
                v_id_solicitud_det,
                v_cantidad_sol,
                v_cantidad_coti,
@@ -383,105 +383,105 @@ BEGIN
             inner join adq.tcotizacion_det cd on  cd.id_solicitud_det = sd.id_solicitud_det
             inner join adq.tsolicitud s on s.id_solicitud = sd.id_solicitud
             where cd.id_cotizacion_det = v_parametros.id_cotizacion_det;
-            
-             
-            
-            IF v_precio_unitario_coti > v_precio_unitario_sol*( 1 + v_adq_tolerancia_adjudicacion::numeric) THEN 
+
+
+
+            IF v_precio_unitario_coti > v_precio_unitario_sol*( 1 + v_adq_tolerancia_adjudicacion::numeric) THEN
               raise exception  'El precio referencial es menor que el precio cotizado ';
             END IF;
-            
-            
-           
+
+
+
 			--calcula el total adjudicado en otras cotizaciones
-			
+
              v_total_adj = adq.f_calcular_total_adj_cot_det(v_parametros.id_cotizacion_det);
              v_total_costo_mo= adq.f_calcular_total_costo_mb_adj_cot_det(v_parametros.id_cotizacion_det,'MO');
-             
-             
-            
-            
-            IF v_parametros.cantidad_adjudicada < 0 THEN            
+
+
+
+
+            IF v_parametros.cantidad_adjudicada < 0 THEN
               raise exception 'No se admiten adjudicaciones negativas';
             END IF;
-            
+
             --raise exception 'c% o %  sol %,  adj  %',v_cantidad_coti,v_parametros.cantidad_adjudicada,v_cantidad_sol,v_total_adj;
-           
+
             IF  (v_cantidad_sol - v_total_adj) >= v_parametros.cantidad_adjudicada THEN
-            
+
                  IF  v_cantidad_coti >= v_parametros.cantidad_adjudicada THEN
-            
-                      
+
+
                      --calcula el comprometido
                      v_comprometido_ga=0;
                      v_ejecutado=0;
-                                     
-                   
-                     
-                     SELECT 
-                           COALESCE(ps_comprometido,0), 
-                           COALESCE(ps_ejecutado,0)  
-                       into 
+
+
+
+                     SELECT
+                           COALESCE(ps_comprometido,0),
+                           COALESCE(ps_ejecutado,0)
+                       into
                            v_comprometido_ga,    --esta en moneda base
                            v_ejecutado
                      FROM pre.f_verificar_com_eje_pag(v_id_partida_ejecucion, v_id_moneda); --13/11/2017 cambia la funcion para control por nro de tramite
-                     
-                     
+
+
                      --raise exception 'LLega...  %, % , %, %', v_comprometido_ga, v_ejecutado, v_id_partida_ejecucion, v_id_moneda;
                      --raise exception 'LLega...  %, % , %, %',v_comprometido_ga, (v_comprometido_ga + COALESCE(v_precio_sg,0)) - v_total_costo_mo, ( 1 + v_adq_tolerancia_adjudicacion::numeric),( v_parametros.cantidad_adjudicada * v_precio_unitario_coti) ;
-                    
-                    
-                     --validamos que el total revertido no afecte la adjudicacion 
+
+
+                     --validamos que el total revertido no afecte la adjudicacion
                     IF  ((( ( v_comprometido_ga + COALESCE(v_precio_sg,0) - v_total_costo_mo)*( 1 + v_adq_tolerancia_adjudicacion::numeric))  >= (v_parametros.cantidad_adjudicada * v_precio_unitario_coti) ) OR v_adq_comprometer_presupuesto = 'no') or v_adq_adjudicar_con_presupuesto = 'no' THEN
-                       
+
                        update adq.tcotizacion_det set
                        cantidad_adju = v_parametros.cantidad_adjudicada
                        where id_cotizacion_det = v_parametros.id_cotizacion_det;
-                    
-                    ELSE                      
+
+                    ELSE
                        raise exception 'El presupeusto comprometido para esta gestión no permiten adjudicar a este precio, solo dispone de un total  de: %',((v_comprometido_ga+ COALESCE(v_precio_sg,0)) - v_total_costo_mo) ;
-                    
+
                     END IF;
-                 
+
                  ELSE
                   raise exception 'la cantidad adjudicada tiene que ser menor o igual cotizada';
-            
-                 
+
+
                  END IF;
             ELSE
-            
+
               raise exception 'la cantidad adjudicada tiene que ser menor o igual que la solicitada y que el total adjudicado';
-            
+
             END IF;
-           
-            
-            
-            
-            
+
+
+
+
+
             --Definicion de la respuesta
-            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Se adjudicaron los item indicados'); 
+            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Se adjudicaron los item indicados');
             v_resp = pxp.f_agrega_clave(v_resp,'id_cotizacion_det',v_parametros.id_cotizacion_det::varchar);
-              
+
             --Devuelve la respuesta
             return v_resp;
 
-		end;       
-        
-         
+		end;
+
+
 	else
-     
+
     	raise exception 'Transaccion inexistente: %',p_transaccion;
 
 	end if;
 
 EXCEPTION
-				
+
 	WHEN OTHERS THEN
 		v_resp='';
 		v_resp = pxp.f_agrega_clave(v_resp,'mensaje',SQLERRM);
 		v_resp = pxp.f_agrega_clave(v_resp,'codigo_error',SQLSTATE);
 		v_resp = pxp.f_agrega_clave(v_resp,'procedimientos',v_nombre_funcion);
 		raise exception '%',v_resp;
-				        
+
 END;
 $body$
 LANGUAGE 'plpgsql'
