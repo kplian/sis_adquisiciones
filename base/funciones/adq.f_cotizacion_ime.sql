@@ -21,6 +21,7 @@ $body$
  FECHA:
   ISSUE            FECHA:		      AUTOR       DESCRIPCION
  * #10              28/08/2019          EGS         se habilito decimales en cantidad
+   #17             21/01/2019           JUAN        Cambio de proveedor al editar en cotizaciones
 ***************************************************************************/
 
 DECLARE
@@ -136,7 +137,7 @@ DECLARE
       v_tiene_form500					varchar;
       v_adq_comprometer_presupuesto		varchar;
       v_adq_adjudicar_con_presupuesto varchar;
-
+      v_desc_proveedor                  varchar;--#17
 
 BEGIN
 
@@ -231,6 +232,24 @@ BEGIN
             correo_contacto = v_parametros.correo_contacto,
             forma_pago = v_parametros.forma_pago
 			where id_cotizacion=v_parametros.id_cotizacion;
+
+      SELECT --#17
+      p.desc_proveedor --#17
+      INTO
+      v_desc_proveedor--#17
+      FROM param.vproveedor p --#17
+      where p.id_proveedor=v_parametros.id_proveedor;--#17
+
+      select --#17
+      cot.id_proceso_wf--#17
+      into --#17
+      v_id_proceso_wf --#17
+      from adq.tcotizacion cot --#17
+      where cot.id_cotizacion=v_parametros.id_cotizacion;--#17
+
+      update wf.tproceso_wf --#17
+      set descripcion = 'Cotización del proveedor: '||v_desc_proveedor--#17
+      where id_proceso_wf=v_id_proceso_wf;--#17
 
 			--Definicion de la respuesta
             v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Cotizaciones modificado(a)');
