@@ -1,730 +1,992 @@
 <?php
 /**
 *@package pXP
-*@file gen-SistemaDist.php
-*@author  (rarteaga)
-*@date 20-09-2011 10:22:05
+*@file Cotizacion.php
+*@author  Gonzalo Sarmiento Sejas
+*@date 21-03-2013 14:48:35
 *@description Archivo con la interfaz de usuario que permite la ejecucion de todas las funcionalidades del sistema
+ *  * * ISSUE            FECHA:		      AUTOR       DESCRIPCION
+
+ #16               20/01/2020        RAC KPLIAN        Creacion, Mejor el rendimiento de la interface de Ordenes y Cotizaciones, issue #16
 */
+
 header("content-type: text/javascript; charset=UTF-8");
 ?>
 <script>
-Phx.vista.CotizacionOC = {
-    require:'../../../sis_adquisiciones/vista/cotizacion/Cotizacion.php',
-    requireclase:'Phx.vista.Cotizacion',
-    title:'Solicitud',
-    nombreVista: 'CotizacionAdq',
-    bnew: false,
-    
-    constructor: function(config) {
+Phx.vista.CotizacionOC=Ext.extend(Phx.gridInterfaz,{
+    tam_pag: 50,
+    constructor: function(config){
+	    this.maestro = config;
+		//llama al constructor de la clase padre
+    	Phx.vista.CotizacionOC.superclass.constructor.call(this,config);
+    	
+    	//RAC: Se agrega menú de reportes de adquisiciones
+        this.addBotones();
+    	this.addButton('btnChequeoDocumentosWf',
+            {
+                text: 'Docs',
+                iconCls: 'bchecklist',
+                disabled: true,
+                handler: this.loadCheckDocumentosSolWf,
+                tooltip: '<b>Documentos de la Solicitud</b><br/>Subir los documetos requeridos en la solicitud seleccionada.'
+            }
+        );
         
+        this.addButton('diagrama_gantt',{text:'Gantt',iconCls: 'bgantt',disabled:true,handler:this.diagramGantt,tooltip: '<b>Diagrama gantt de proceso macro</b>'});
         
-        
-         this.Atributos[this.getIndAtributo('tiene_form500')].grid=true; 
-         Phx.vista.CotizacionOC.superclass.constructor.call(this,config);
-         this.addButton('fin_registro',{text:'Fin Reg.',iconCls: 'badelante',disabled:true,handler:this.fin_registro,tooltip: '<b>Finalizar</b><p>Finalizar registro de cotización</p>'});
-         this.addButton('btnAdjudicar',{
-                    text :'Recomendar',
-                    iconCls : 'bchecklist',
-                    disabled: true,
-                    handler : this.onAdjudicarTodo,
-                    tooltip : '<b>Recomedar Todo</b><br/><b>Recomienda la adjudicación de todo lo disponible</b>'
-          });
-          
-         this.addButton('btnSolApro',{
-                         text:'Sol. Apro.',
-                         iconCls: 'bok',
-                         disabled:true,
-                         handler:this.onSolAprobacion,
-                         tooltip: '<b>Solictar Aprobación</b><p>Solictar Aprobación del RPC</p>'});
-           
-        
-        
-       this.addButton('btnHabPago',{text:'Habilitar Pago',iconCls: 'bcharge',disabled:false,handler:this.sigEstado,tooltip: '<b>Pasar al Siguiente Estado</b>'});
-       this.addButton('btnSendMail',{text:'Sol Cotizacion',iconCls: 'bemail',disabled:true,handler:this.onSendMail,tooltip: '<b>Solictar Cotizacion</b><p>Solicta la cotizacion por correo al proveedor</p>'});
-       this.addButton('btnSolCon',{text:'Hab. Contr.',iconCls: 'bemail',disabled:true,handler:this.onSolContrato,tooltip: '<b>Habilitar Contrato</b><p>si se tiene habilitado el  contrato en esta cotización, antes de armar el plan de pago pasara al área legal</p>'});
-       this.addButton('btnPreing',{
-                    text :'Preingreso',
-                    iconCls : 'bchecklist',
-                    disabled: true,
-                    handler : this.onPreing,
-                    tooltip : '<b>Preingreso</b><br/><b>Generación del Preingreso</b>'
-          });
-          
-          this.addButton('btnObs',{
-                    text :'Obs Wf',
-                    iconCls : 'bchecklist',
-                    disabled: true,
-                    handler : this.onOpenObs,
-                    tooltip : '<b>Observaciones</b><br/><b>Observaciones del WF</b>'
-          });
-		
-         this.addButton('btnForm500', {
-                text : 'Form500',
-                iconCls : 'bassign',
-                disabled : true,
-                handler : this.onBtnForm500,
-                tooltip : '<b>Cambia estado de Form500</b><br>(requiere, si, no), Cuando esta marcado como “REQUIERE” llegara todos los días un correo de recordatorio, hasta que se cambie a “SI”. “SI” significa que se hizo el formulario en SICOES'
-            });
-            
-            
         this.init();
-        this.iniciarEventos();
-        
-        //crea fomrlario para generar OC
-        this.crearFormularioFechaOC();
-        
-        //formulario de departamentos
-        
-        this.formDEPTO = new Ext.form.FormPanel({
-            baseCls: 'x-plain',
-            autoDestroy: true,
-            layout: 'form',
-            items: [
-                   {
-                    xtype: 'combo',
-                    name: 'id_depto_tes',
-                     hiddenName: 'id_depto_tes',
-                    fieldLabel: 'DEP TESORERIA',
-                    allowBlank: false,
-                    emptyText:'Elija un Depto',
-                    store:new Ext.data.JsonStore(
-                    {
-                        url: '../../sis_adquisiciones/control/Cotizacion/listarDeptoFiltradoCotizacion',
-                        id: 'id_depto',
-                        root: 'datos',
-                        sortInfo:{
-                            field: 'deppto.nombre',
-                            direction: 'ASC'
-                        },
-                        totalProperty: 'total',
-                        fields: ['id_depto','nombre'],
-                        // turn on remote sorting
-                        remoteSort: true,
-                        baseParams:{par_filtro:'deppto.nombre#deppto.codigo',estado:'activo',codigo_subsistema:'TES',tipo_filtro:'DEP_EP-DEP_EP'}
-                    }),
-                    valueField: 'id_depto',
-                    displayField: 'nombre',
-                    tpl:'<tpl for="."><div class="x-combo-list-item"><p>{nombre}</p></div></tpl>',
-                    hiddenName: 'id_depto_tes',
-                    forceSelection:true,
-                    typeAhead: true,
-                    triggerAction: 'all',
-                    lazyRender:true,
-                    mode:'remote',
-                    pageSize:10,
-                    queryDelay:1000,
-                    width:250,
-                    listWidth:'280',
-                    minChars:2
-                }
-                  ]
-        });
-        
-        this.cmpDeptoTes =this.formDEPTO.getForm().findField('id_depto_tes');
-        
-        this.wDEPTO= new Ext.Window({
-            title: 'Depto Tesoreria',
-            collapsible: true,
-            maximizable: true,
-             autoDestroy: true,
-            width: 400,
-            height: 200,
-            layout: 'fit',
-            plain: true,
-            bodyStyle: 'padding:5px;',
-            buttonAlign: 'center',
-            items: this.formDEPTO,
-            modal:true,
-             closeAction: 'hide',
-            buttons: [{
-                text: 'Guardar',
-                 handler:this.onSubmitHabPag,
-                scope:this
-                
-            },{
-                text: 'Cancelar',
-                handler:function(){this.wDEPTO.hide()},
-                scope:this
-            }]
-        }); 
-        
       
         this.store.baseParams={tipo_interfaz: this.nombreVista}; 
         this.load({params:{start:0, limit:this.tam_pag}});
-        
-        
-    },
-    
-    
-    crearFormularioFechaOC:function(){
-        
-            //formulario de adjudicacion parcil
-            this.formOC = new Ext.form.FormPanel({
-                baseCls: 'x-plain',
-                autoDestroy: true,
-                layout: 'form',
-                items: [
-                       { 
-                        xtype: 'datefield',   
-                        name: 'fecha_oc',
-                        fieldLabel: 'Fecha OC',
-                        allowBlank: false
-                       }
-                      ]
-            });
-            
-            
-            this.cmpFechaOC =this.formOC.getForm().findField('fecha_oc');
-             
-            this.wOC= new Ext.Window({
-                title: 'Generar OC',
-                collapsible: true,
-                maximizable: true,
-                 autoDestroy: true,
-                width: 350,
-                height: 170,
-                layout: 'fit',
-                plain: true,
-                bodyStyle: 'padding:5px;',
-                buttonAlign: 'center',
-                items: this.formOC,
-                modal:true,
-                 closeAction: 'hide',
-                buttons: [{
-                    text: 'Guardar',
-                     handler:this.onSubmitGenOC,
-                    scope:this
-                    
-                },{
-                    text: 'Cancelar',
-                    handler:function(){this.wOC.hide()},
-                    scope:this
-                }]
-            });  
-        
-    },
-    
-    EnableSelect:function(n){
-         Phx.vista.CotizacionOC.superclass.EnableSelect.call(this,n,{desc_moneda_sol:this.desc_moneda});
-    },
-    
-    
-    
-    onButtonEdit:function(){ 
-    	
-    	        
-            Phx.vista.CotizacionOC.superclass.onButtonEdit.call(this);
-            this.mostrarComponente(this.Cmp.correo_contacto);
-            this.mostrarComponente(this.Cmp.telefono_contacto);
-            this.mostrarComponente(this.Cmp.funcionario_contacto);
-            this.mostrarComponente(this.Cmp.lugar_entrega); 
-            this.mostrarComponente(this.Cmp.fecha_entrega); 
-            this.mostrarComponente(this.Cmp.tiempo_entrega); 
-            this.ocultarComponente(this.Cmp.prellenar_oferta); 
-            
-            
-     
-    },
-    
-    iniciarEventos:function(){
-          this.cmbMoneda= this.getComponente('id_moneda');
-          this.cmpFechaCoti =  this.getComponente('fecha_coti');
-          this.cmpTipoCambioConv =  this.getComponente('tipo_cambio_conv');
-          this.cmbMoneda.disable();
-          this.cmpTipoCambioConv.disable();
-          
-          this.cmpFechaCoti.on('blur',function(){
-               this.cmbMoneda.enable();
-               this.cmbMoneda.reset();
-               this.cmpTipoCambioConv.reset();
-               
-          },this);
-         
-          this.cmbMoneda.on('select',function(com,dat){
-              
-              if(dat.data.tipo_moneda=='base'){
-                 this.cmpTipoCambioConv.disable();
-                 this.cmpTipoCambioConv.setValue(1); 
-                  
-              }
-              else{
-                   this.cmpTipoCambioConv.enable()
-                 this.obtenerTipoCambio();  
-              }
-             
-              
-          },this);
-       
-    },
-    obtenerTipoCambio:function(){
-         
-         var fecha = this.cmpFechaCoti.getValue().dateFormat(this.cmpFechaCoti.format);
-         var id_moneda = this.cmbMoneda.getValue();
+	
+	},
+	
+	 diagramGantt:function(){           
+            var data=this.sm.getSelected().data.id_proceso_wf;
             Phx.CP.loadingShow();
             Ext.Ajax.request({
-                    // form:this.form.getForm().getEl(),
-                    url:'../../sis_parametros/control/TipoCambio/obtenerTipoCambio',
-                    params:{fecha:fecha,id_moneda:id_moneda},
-                    success:this.successTC,
-                    failure: this.conexionFailure,
-                    timeout:this.timeout,
-                    scope:this
-             });
-        }, 
-    successTC:function(resp){
-       Phx.CP.loadingHide();
-            var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
-            if(!reg.ROOT.error){
-                
-                this.cmpTipoCambioConv.setValue(reg.ROOT.datos.tipo_cambio);
-            }else{
-                
-                alert('ocurrio al obtener el tipo de Cambio')
-            } 
-    },
-    fin_registro:function()
-        {                   
-            var d= this.sm.getSelected().data;
-           
-            Phx.CP.loadingShow();
-            
-            Ext.Ajax.request({
-                // form:this.form.getForm().getEl(),
-                url:'../../sis_adquisiciones/control/Cotizacion/finalizarRegistro',
-                params:{id_cotizacion:d.id_cotizacion,operacion:'fin_registro'},
-                success:this.successSinc,
+                url:'../../sis_workflow/control/ProcesoWf/diagramaGanttTramite',
+                params:{'id_proceso_wf':data},
+                success:this.successExport,
                 failure: this.conexionFailure,
                 timeout:this.timeout,
                 scope:this
-            });     
-        },
-        
-        
-        onSolAprobacion:function(){
-            
-            this.cmpFechaOC.setValue(new Date());
-            //comentado temporalmente para regularizar
-            //this.cmpFechaOC.setReadOnly(true);
-            this.wOC.show(); 
-            
-        },
-        
-        
-        onSubmitGenOC:function()
-        {                   
-            var d= this.sm.getSelected().data;
-           
-            this.DataSelected = d
-            
-            Phx.CP.loadingShow();
-            
-            Ext.Ajax.request({
-                url:'../../sis_adquisiciones/control/Cotizacion/siguienteEstadoCotizacion',
-                params:{id_cotizacion:d.id_cotizacion,
-                        fecha_oc: this.cmpFechaOC.getValue().dateFormat('d/m/Y'),
-                        operacion:'verificar'},
-                
-                //params:{id_cotizacion:d.id_cotizacion,operacion:'sol_apro'},
-                success:this.successSinc,
-                failure: this.conexionFailure,
-                timeout:this.timeout,
-                scope:this
-            });     
-        },
-     
-        
-        onAdjudicarTodo:function(){
-            var data = this.getSelectedData();
-            Phx.CP.loadingShow();
-            Ext.Ajax.request({
-                // form:this.form.getForm().getEl(),
-                url:'../../sis_adquisiciones/control/Cotizacion/adjudicarTodo',
-                params:{id_cotizacion:data.id_cotizacion},
-                success:this.successSinc,
-                failure: this.conexionFailure,
-                timeout:this.timeout,
-                scope:this
-            });
-        },
-        
-       
-        successSinc:function(resp){
-            Phx.CP.loadingHide();
-           
-            var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
-            if(!reg.ROOT.error){
-                
-                        if (reg.ROOT.datos.operacion=='preguntar_todo'){
-                            
-                            if(reg.ROOT.datos.num_estados==1 && (reg.ROOT.datos.num_funcionarios==1 || reg.ROOT.datos.num_funcionarios==0)){
-                               //directamente mandamos los datos
-                               Phx.CP.loadingShow();
-                               var d= this.sm.getSelected().data;
-                               Ext.Ajax.request({
-                                // form:this.form.getForm().getEl(),
-                                url:'../../sis_adquisiciones/control/Cotizacion/siguienteEstadoCotizacion',
-                                params:{id_cotizacion:d.id_cotizacion,
-                                    operacion:'cambiar',
-                                    fecha_oc: this.cmpFechaOC.getValue().dateFormat('d/m/Y'),
-                                    id_tipo_estado:reg.ROOT.datos.id_tipo_estado,
-                                    id_funcionario:reg.ROOT.datos.id_funcionario_estado,
-                                    id_depto:reg.ROOT.datos.id_depto_estado,
-                                    id_solicitud:d.id_solicitud,
-                                    obs:'Se solicita  la revision de la Cotización de la solictud de compra '+ this.DataSelected.numero
-                                    },
-                                success:this.successSinc,
-                                failure: this.conexionFailure,
-                                timeout:this.timeout,
-                                scope:this
-                               }); 
-                           }
-                           else{
-                                 
-                               alert('Estado siguiente esta mal parametrizado, solo se admite un funcionario, un estado, sin instrucciones adicionales')
-                           }
-                     }
-                
-                    this.wDEPTO.hide();
-                    this.wOC.hide(),
-                    this.reload();
-                 }
-                 else{
-                    alert('ocurrio un error durante el proceso')
-                }
-        },
-        
-       
-
-        
-                                
-
-        onHabPag:function(){
-           
-            var data = this.getSelectedData();
-            this.cmpDeptoTes.reset();
-            this.cmpDeptoTes.store.baseParams.id_cotizacion = data.id_cotizacion;
-            this.cmpDeptoTes.modificado = true;
-            this.wDEPTO.show();
-            
-        },
-        
-        onSubmitHabPag:function(){
-            var data = this.getSelectedData();
-            Phx.CP.loadingShow();
-            Ext.Ajax.request({
-                url:'../../sis_adquisiciones/control/Cotizacion/habilitarPago',
-                params:{id_cotizacion:data.id_cotizacion,id_depto_tes: this.cmpDeptoTes.getValue()},
-                success:this.successSinc,
-                failure: this.conexionFailure,
-                timeout:this.timeout,
-                scope:this
-            });
-        },
-        
-        onPreing:function(){
-            var rec = this.sm.getSelected();
-            if(rec.data){
-            	Ext.Msg.confirm('Confirmación',
-				'¿Está seguro de generar el Preingreso?', 
-				function(btn) {
-					if (btn == "yes") {
-						Phx.CP.loadingShow();
-			            Ext.Ajax.request({
-			                url:'../../sis_adquisiciones/control/Cotizacion/generarPreingreso',
-			                params:{id_cotizacion:rec.data.id_cotizacion},
-			                success:this.successSinc,
-			                failure: this.conexionFailure,
-			                timeout:this.timeout,
-			                scope:this
-			            });
-					}
-				},this);
-  
-            } else{
-            	Ext.Msg.alert('Mensaje','Seleccione un registro y vuelva a intentarlo');
+            });         
+    },
+    
+    addBotones: function() {
+        this.menuAdq = new Ext.Toolbar.SplitButton({
+            id: 'btn-adqrep-' + this.idContenedor,
+            text: 'Rep.',
+            disabled: true,
+            iconCls : 'bpdf32',
+            scope: this,
+            menu: [{
+                id:'b-btnReporte-' + this.idContenedor,
+                text: 'Cotización',
+                tooltip: '<b>Reporte de  Cotización</b>',
+                handler: this.onButtonReporte,
+                scope: this
+            }, {
+                id:'b-btnRepOC-' + this.idContenedor,
+                text: 'Orden de Compra',
+                tooltip: '<b>Reporte de Orden de Compra</b>',
+                handler:this.onButtonRepOC,
+                scope: this
+            }, {
+                id:'b-btnRepCarta-' + this.idContenedor,
+                text: 'Carta de Adjudicación',
+                tooltip: '<b>Plantilla de la carta de adjudicación</b>',
+                handler:this.onButtonCartaAdj,
+                scope: this
             }
+        ]});
+        
+        //Adiciona el menú a la barra de herramientas
+        this.tbar.add(this.menuAdq);
+    },
+	
+			
+	Atributos:[
+		{
+			//configuracion del componente
+			config:{
+					labelSeparator:'',
+					inputType:'hidden',
+					name: 'id_cotizacion'
+			},
+			type:'Field',
+			form:true 
+		},
+        {
+            config:{
+                    labelSeparator:'',
+                    inputType:'hidden',
+                    name: 'id_proceso_compra'
+            },
+            type:'Field',
+            form:true 
+        },
+        {
+            config:{
+                name: 'require_contrato',
+                fieldLabel: 'Contrato',
+                allowBlank: true,
+                anchor: '80%',
+                gwidth: 70,
+                maxLength:200,
+                renderer: function(value,p,record){
+                         if(record.data.requiere_contrato=='si'){
+                             return String.format('<div title="Requiere elaboración de contrato"><b><font color="green"><i class="fa fa-file-o  fa-2x"></i> Si</font></b></div>', value);
+                         }
+                        else {
+                             return String.format('<div title="Solamente requiere orden de compra o servicio"><b><i class="fa fa-file  fa-2x"></i> No</b></div>', value);
+                        }
+                 }
+            },
+            type:'TextField',
+            filters:{pfiltro:'sol.num_tramite',type:'string'},
+            id_grupo:1,
+            grid:true,
+            form:false
+        },
+        {
+            config:{
+                name: 'num_tramite',
+                fieldLabel: 'N# Tramite',
+                allowBlank: true,
+                anchor: '80%',
+                gwidth: 150,
+                maxLength:200,
+                renderer: function(value,p,record){
+                        if(record.data.correo_oc=='bloqueado'){
+                             return String.format('<div title="Envio de correo con la orden de compra bloqueado"><b><font color="red">{0}</font></b>', value);
+                         }
+                        else if(record.data.correo_oc=='pendiente'){
+                             return String.format('<div title="Acuse de recibo de la OC en espera"><b><font color="orange">{0}</font></b></div>', value);
+                        }
+                        else if(record.data.correo_oc=='acuse'){
+                             return String.format('<div title="Acuse de OC recibido"><b><font color="green">{0}</font></b></div>', value);
+                        }
+                        else{
+                            return String.format('{0}', value);
+                        }}
+            },
+            type:'TextField',
+            filters:{pfiltro:'sol.num_tramite',type:'string'},
+            bottom_filter: true,
+            id_grupo:1,
+            grid:true,
+            form:false
+        },
+        {
+            config:{
+                name: 'estado',
+                fieldLabel: 'Estado',
+                allowBlank: true,
+                anchor: '80%',
+                gwidth: 110,
+                renderer: function(value,p,record){
+                         if(record.data.estado=='anulado'){
+                             return String.format('<b><font color="red">{0}</font></b>', value);
+                         }
+                        else if(record.data.estado=='adjudicado'){
+                             return String.format('<div title="Esta cotización tiene items adjudicados"><b><font color="green">{0}</font></b></div>', value);
+                        }
+                        else{
+                            return String.format('{0}', value);
+                        }},
+                maxLength:30
+            },
+            type:'TextField',
+            filters:{pfiltro:'cot.estado',
+                     options: ['borrador','cotizado','adjudicado','recomendado','contro_pendiente','contrato_eleborado','pago_habilitado','finalizada','anulada'],	
+	       		 	 type:'list'},
+            
+            id_grupo:1,
+            bottom_filter: true,
+            grid:true,
+            form:false
         },
         
-       preparaMenu:function(n){
+         ///#1 			19/09/2018			EGS			
+		{
+			config:{
+				name: 'id_proveedor',
+				fieldLabel: 'Proveedor',
+				allowBlank: false,
+				emptyText: 'Proveedor ...',
+				store: new Ext.data.JsonStore({
+
+	    					url: '../../sis_parametros/control/Proveedor/listarProveedorCombos',
+	    					id: 'id_proveedor',
+	    					root: 'datos',
+	    					sortInfo:{
+	    						field: 'desc_proveedor',
+	    						direction: 'ASC'
+	    					},
+	    					totalProperty: 'total',
+	    					fields: ['id_proveedor','codigo','desc_proveedor','nit'],
+	    					// turn on remote sorting
+	    					remoteSort: true,
+	    					baseParams:{par_filtro:'codigo#desc_proveedor#nit'}
+	    				}),
+	    		tpl:'<tpl for=".">\
+		                       <div class="x-combo-list-item"><p><b>Codigo: </b>{codigo}</p>\
+		                      <p><b>Proveedor: </b>{desc_proveedor}</p>\
+		                      <p><b>Nit:</b>{nit}</p> \
+		                     </div></tpl>',		
+        	    valueField: 'id_proveedor',
+        	    displayField: 'desc_proveedor',
+        	    gdisplayField: 'desc_proveedor',
+        	    hiddenName: 'id_proveedor',
+        	    triggerAction: 'all',
+        	    //queryDelay:1000,
+        	    pageSize:10,
+				forceSelection: true,
+				typeAhead: false,
+				allowBlank: false,
+				anchor: '80%',
+				gwidth: 180,
+				mode: 'remote',
+				minChars:1,
+				renderer: function(value,p,record){
+                        if(record.data.estado=='anulado'){
+                             return String.format('<b><font color="red">{0}</font></b>', record.data['desc_proveedor']);
+                         }
+                        else if(record.data.estado=='adjudicado'){
+                             return String.format('<div title="Esta cotización tiene items adjudicados"><b><font color="green">{0}</font></b></div>', record.data['desc_proveedor']);
+                        }
+                        else{
+                            return String.format('{0}', record.data['desc_proveedor']);
+                        }}
+			},
+	           			
+			type:'ComboBox',
+			filters:{pfiltro:'pro.desc_proveedor',type:'string'},
+			bottom_filter: true,
+			id_grupo:1,
+			grid:true,
+			form:false
+		},
+		 ///#1 			19/09/2018			EGS	
+        {
+            config:{
+                name: 'numero',
+                fieldLabel: 'Numero Sol',
+                allowBlank: true,
+                anchor: '80%',
+                gwidth: 140,
+                renderer: function(value,p,record){
+                        if(record.data.estado=='anulado'){
+                             return String.format('<b><font color="red">{0}</font></b>', value);
+                         }
+                        else if(record.data.estado=='adjudicado'){
+                             return String.format('<div title="Esta cotización tiene items adjudicados"><b><font color="green">{0}</font></b></div>', value);
+                        }
+                        else{
+                            return String.format('{0}', value);
+                        }},
+                maxLength:4
+            },
+            type:'Field',
+            filters:{pfiltro:'sol.numero',type:'string'},
+            id_grupo:1,
+            grid:true,
+            form:false
+        },
+        {
+            config:{
+                name: 'numero_oc',
+                fieldLabel: 'Numero O.C.',
+                allowBlank: true,
+                anchor: '80%',
+                gwidth: 140,
+                renderer: function(value,p,record){
+                        if(record.data.estado=='anulado'){
+                             return String.format('<b><font color="red">{0}</font></b>', value);
+                         }
+                        else if(record.data.estado=='adjudicado'){
+                             return String.format('<b><font color="green">{0}</font></b>', value);
+                         
+                        
+                        }
+                        else{
+                            return String.format('{0}', value);
+                        }},
+                maxLength:4
+            },
+            type:'Field',
+            filters:{pfiltro:'cot.numero_oc',type:'string'},
+            bottom_filter:true,
+            id_grupo:1,
+            grid:true,
+            form:false
+        },
+        {
+            config:{
+                name: 'fecha_coti',
+                fieldLabel: 'Fecha Cotiz.',
+                allowBlank: false,
+                anchor: '80%',
+                gwidth: 100,
+                        format: 'd/m/Y', 
+                        renderer:function (value,p,record){return value?value.dateFormat('d/m/Y'):''}
+            },
+            type:'DateField',
+            filters:{pfiltro:'cot.fecha_coti',type:'date'},
+            id_grupo:1,
+            grid:true,
+            form:true
+        },
+		{
+            config:{
+                name:'id_moneda',
+                origen:'MONEDA',
+                 allowBlank:false,
+                fieldLabel:'Moneda',
+                gdisplayField:'desc_moneda',//mapea al store del grid
+                gwidth:50,
+                 renderer:function (value, p, record){return String.format('{0}', record.data['desc_moneda']);}
+             },
+            type:'ComboRec',
+            id_grupo:1,
+            filters:{   
+                pfiltro:'mon.moneda#mon.codigo',
+                type:'string'
+            },
+            grid:true,
+            form:false
+          },
+          {
+            config:{
+                name: 'total_cotizado',
+                fieldLabel: 'Total Cotizado',
+                allowBlank: false,
+                anchor: '80%',
+                gwidth: 100
+            },
+            type:'NumberField',
+            filters:{pfiltro:'total_cotizado',type:'numeric'},
+            id_grupo:1,
+            grid:true,
+            form:false
+        },
+          {
+            config:{
+                name: 'total_adjudicado_mb',
+                fieldLabel: 'Total Adj (BS)',
+                allowBlank: false,
+                anchor: '80%',
+                gwidth: 100
+            },
+            type:'NumberField',
+            filters:{pfiltro:'total_adjudicado_mb',type:'numeric'},
+            id_grupo:1,
+            grid:true,
+            form:false
+        },
+        
+        
+        {
+            config:{
+                name: 'tipo_cambio_conv',
+                fieldLabel: 'Tipo de Cambio',
+                allowBlank: false,
+                anchor: '80%',
+                hidden: true,
+                gwidth: 100,
+				decimalPrecision : 10
+            },
+            type:'NumberField',
+            filters:{pfiltro:'cot.tipo_cambio_conv',type:'numeric'},
+            id_grupo:1,
+            grid:true,
+            form:false
+        },
+		{
+			config:{
+				name: 'lugar_entrega',
+				fieldLabel: 'Lugar Entrega',
+				allowBlank: true,
+				anchor: '80%',
+				hidden: true,
+				gwidth: 100,
+				maxLength:450
+			},
+			type:'TextArea',
+			filters:{pfiltro:'cot.lugar_entrega',type:'string'},
+			id_grupo:1,
+			grid:true,
+			form:false
+		},
+		{
+			config:{
+				name: 'forma_pago',
+				fieldLabel: 'Forma de pago',
+				allowBlank: true,
+				anchor: '80%',
+				gwidth: 100,
+				maxLength:450
+			},
+			type:'TextArea',
+			filters:{pfiltro:'cot.forma_pago',type:'string'},
+			id_grupo:1,
+			grid:true,
+			form:false
+		},
+		
+		 //#2 			21/09/2018			EGS
+		{
+			config: {
+				name: 'tipo_entrega',
+				fieldLabel: 'Tipo Entrega',
+				anchor: '95%',
+				tinit: false,
+				allowBlank: false,
+				origen: 'CATALOGO',
+				gdisplayField: 'tipo_entrega',
+				hiddenName: 'tipo_entrega',
+				gwidth: 55,
+				baseParams:{
+					cod_subsistema:'ADQ',
+					catalogo_tipo:'ttipo_entrega'
+				},
+				valueField: 'codigo',
+				hidden: false
+			},
+			
+			type: 'ComboRec',
+			filters:{pfiltro:'cot.tipo_entrega',type:'string'},
+			id_grupo: 0,
+			grid: true,
+			form: false
+		},
+		 //#2 	21/09/2018	EGS
+        {
+            config:{
+                name: 'tiempo_entrega',
+                qtip:'Dias en que se espera la entrega a partir del dia siguiente de la emision de la OC',
+                fieldLabel: 'Tiempo de entrega',
+                allowBlank: true,
+                anchor: '80%',
+                gwidth: 100,
+                maxLength:150
+            },
+            type:'TextField',
+            filters:{pfiltro:'cot.tiempo_entrega',type:'string'},
+            valorInicial:'5 días a partir del dia siguiente de emitida la presente orden',
+            id_grupo:1,
+            grid:true,
+            form:false
+        },
+		{
+			config:{
+				name: 'fecha_venc',
+				gtipo:'Fechas estimada de vencimiento',
+				fieldLabel: 'Fecha Venc',
+				qtip:'Fecha de vencimiento de la cotizacion',
+				allowBlank: true,
+				
+				anchor: '80%',
+				gwidth: 100,
+						format: 'd/m/Y', 
+						renderer:function (value,p,record){return value?value.dateFormat('d/m/Y'):''}
+			},
+			type:'DateField',
+			filters:{pfiltro:'cot.fecha_venc',type:'date'},
+			id_grupo:1,
+			grid:true,
+			form:false
+		},
+    
+        {
+            config:{
+                name: 'fecha_entrega',
+                fieldLabel: 'Fecha Entrega/Inicio',
+                qtip:'Fecha de entrar o inicio de servicio segun el proveedor',
+                allowBlank: true,
+                anchor: '80%',
+                gwidth: 100,
+                        format: 'd/m/Y', 
+                        renderer:function (value,p,record){return value?value.dateFormat('d/m/Y'):''}
+            },
+            type:'DateField',
+            filters:{pfiltro:'cot.fecha_entrega',type:'date'},
+            id_grupo:1,
+            grid:true,
+            form:false
+        },
+		{
+			config:{
+				name: 'obs',
+				fieldLabel: 'Glosa',
+				allowBlank: true,
+				anchor: '80%',
+				height:'150',
+				gwidth: 100
+			},
+			type:'TextArea',
+			filters:{pfiltro:'cot.obs',type:'string'},
+			id_grupo:1,
+			grid:true,
+			form:false
+		},
+		{
+			config:{
+				name: 'fecha_adju',
+				fieldLabel: 'Fecha Adju',
+				allowBlank: true,
+				anchor: '80%',
+				gwidth: 100,
+						format: 'd/m/Y', 
+						renderer:function (value,p,record){return value?value.dateFormat('d/m/Y'):''}
+			},
+			type:'DateField',
+			filters:{pfiltro:'cot.fecha_adju',type:'date'},
+			id_grupo:1,
+			grid:true,
+			form:false
+		},
+		{
+			config:{
+				name: 'nro_contrato',
+				fieldLabel: 'Nro Contrato',			
+				allowBlank: true,
+				anchor: '80%',
+				gwidth: 100,
+				maxLength:50
+			},
+			type:'TextField',
+			filters:{pfiltro:'cot.nro_contrato',type:'string'},
+			id_grupo:1,
+			grid:true,
+			form:false
+		},
+		{
+			config:{
+				name: 'tiene_form500',
+				fieldLabel: 'Form 500',
+				gwidth: 70,
+				maxLength:50,
+                renderer: function(value,p,record){
+                         if(record.data.tiene_form500 == 'requiere'){
+                             return String.format('<b><font color="red">{0}</font></b>', value);
+                         }
+                        else {
+                             return String.format('<b>{0}</b>', value);
+                        }
+                 }
+			},
+			type:'TextField',
+			filters:{pfiltro:'cot.tiene_form500',type:'list',options: ['si','no','requiere']},
+			id_grupo:1,
+			grid:false,
+			form:false
+		},
+		{
+			config:{
+				name: 'funcionario_contacto',
+				fieldLabel: 'Func Contacto',
+				qtip:'Funcionario de contacto para el proveedor',
+				allowBlank: true,
+				anchor: '100%',
+				gwidth: 300,
+				maxLength:50
+			},
+			type:'TextField',
+			filters:{pfiltro:'cot.funcionario_contacto',type:'string'},
+			id_grupo:1,
+			grid:true,
+			form:false
+		},
+		{
+			config:{
+				name: 'telefono_contacto',
+				fieldLabel: 'Telefono Contacto',
+				qtip:'Telefono de contacto para el proveedor',
+				allowBlank: true,
+				anchor: '100%',
+				gwidth: 300,
+				maxLength:50
+			},
+			type:'TextField',
+			filters:{pfiltro:'cot.telefono_contacto',type:'string'},
+			id_grupo:1,
+			grid:true,
+			form:false
+		},
+		{
+			config:{
+				name: 'correo_contacto',
+				fieldLabel: 'Correo de Contacto',
+				qtip:'Correo de contacto para el proveedor',
+				allowBlank: true,
+				anchor: '100%',
+				gwidth: 300,
+				maxLength:50
+			},
+			type:'TextField',
+			filters:{pfiltro:'cot.correo_contacto',type:'string'},
+			id_grupo:1,
+			grid:true,
+			form:false
+		},
+		{
+			config:{
+				name: 'prellenar_oferta',
+				fieldLabel: 'Prellenar Cotización',
+				qtip:'Copia los precios la cantidad y precio ofertado de la solicitud de compra',
+				allowBlank: true,
+				anchor: '40%',
+				gwidth: 50,
+				maxLength:2,
+				emptyText:'si/no...',       			
+       			typeAhead: true,
+       		    triggerAction: 'all',
+       		    lazyRender:true,
+       		    mode: 'local',
+       		    value:'no',
+       		    valueField: 'prellenar_oferta',       		    
+       		   // displayField: 'descestilo',
+       		    store: ['si','no']
+			},
+			type:  'ComboBox',
+			valorInicial: 'si',
+			id_grupo: 1,
+			filters: {	pfiltro:'cot.prellenar_oferta',
+	       		         type: 'list',
+	       				 options: ['si','no']
+	       		 	},
+			grid:true,
+			form:false
+		},
+		{
+			config:{
+				name: 'estado_reg',
+				fieldLabel: 'Estado Reg.',
+				allowBlank: true,
+				anchor: '80%',
+				gwidth: 100,
+				maxLength:10
+			},
+			type:'TextField',
+			filters:{pfiltro:'cot.estado_reg',type:'string'},
+			id_grupo:1,
+			grid:true,
+			form:false
+		},
+		{
+			config:{
+				name: 'fecha_reg',
+				fieldLabel: 'Fecha creación',
+				allowBlank: true,
+				anchor: '80%',
+				gwidth: 100,
+						format: 'd/m/Y', 
+						renderer:function (value,p,record){return value?value.dateFormat('d/m/Y H:i:s'):''}
+			},
+			type:'DateField',
+			filters:{pfiltro:'cot.fecha_reg',type:'date'},
+			id_grupo:1,
+			grid:true,
+			form:false
+		},
+		{
+			config:{
+				name: 'usr_reg',
+				fieldLabel: 'Creado por',
+				allowBlank: true,
+				anchor: '80%',
+				gwidth: 100,
+				maxLength:4
+			},
+			type:'NumberField',
+			filters:{pfiltro:'usu1.cuenta',type:'string'},
+			id_grupo:1,
+			grid:true,
+			form:false
+		},
+		{
+			config:{
+				name: 'fecha_mod',
+				fieldLabel: 'Fecha Modif.',
+				allowBlank: true,
+				anchor: '80%',
+				gwidth: 100,
+						format: 'd/m/Y', 
+						renderer:function (value,p,record){return value?value.dateFormat('d/m/Y H:i:s'):''}
+			},
+			type:'DateField',
+			filters:{pfiltro:'cot.fecha_mod',type:'date'},
+			id_grupo:1,
+			grid:true,
+			form:false
+		},
+		{
+			config:{
+				name: 'usr_mod',
+				hidden: true,
+				fieldLabel: 'Modificado por',
+				allowBlank: true,
+				anchor: '80%',
+				gwidth: 100,
+				maxLength:4
+			},
+			type:'NumberField',
+			filters:{pfiltro:'usu2.cuenta',type:'string'},
+			id_grupo:1,
+			grid:true,
+			form:false
+		},
+		{
+			config:{
+				name: 'cecos',
+				fieldLabel: 'Cecos',
+				allowBlank: true,
+				anchor: '80%',
+				gwidth: 100,
+				maxLength:450
+			},
+			type:'TextArea',
+			//filters:{pfiltro:'cot.forma_pago',type:'string'},
+			id_grupo:1,
+			grid:true,
+			form:false
+		},
+		{
+			config:{
+				name: 'total',
+				fieldLabel: 'Cant Total',
+				allowBlank: true,
+				anchor: '80%',
+				height:'150',
+				gwidth: 100
+			},
+			type:'NumberField',
+			//filters:{pfiltro:'cot.obs',type:'string'},
+			id_grupo:1,
+			grid:true,
+			form:false
+		},
+		{
+			config:{
+				name: 'nro_cuenta',
+				fieldLabel: 'Cuentas',
+				allowBlank: true,
+				anchor: '80%',
+				height:'150',
+				gwidth: 100
+			},
+			type:'NumberField',
+			//filters:{pfiltro:'cot.obs',type:'string'},
+			id_grupo:1,
+			grid:true,
+			form:false
+		},
+	],
+	
+	title:'Cotizaciones',
+	ActList:'../../sis_adquisiciones/control/Cotizacion/listarCotizacion',
+	id_store:'id_cotizacion',
+	fields: [
+		{name:'id_cotizacion', type: 'numeric'},
+		{name:'estado_reg', type: 'string'},
+		{name:'estado', type: 'string'},
+		{name:'lugar_entrega', type: 'string'},
+		{name:'tipo_entrega', type: 'string'},
+		{name:'fecha_coti', type: 'date',dateFormat:'Y-m-d'},
+		'numero_oc',
+		{name:'id_proveedor', type: 'numeric'},
+		{name:'desc_proveedor', type: 'string'},
+		{name:'porc_anticipo', type: 'numeric'},
+		{name:'precio_total', type: 'numeric'},
+		{name:'fecha_entrega', type: 'date',dateFormat:'Y-m-d'},
+		{name:'id_moneda', type: 'numeric'},
+		{name:'moneda', type: 'string'},
+		{name:'id_proceso_compra', type: 'numeric'},
+		{name:'id_solicitud', type: 'numeric'},
+		{name:'id_categoria_compra', type: 'numeric'},
+		{name:'fecha_venc', type: 'date',dateFormat:'Y-m-d'},
+		{name:'obs', type: 'string'},
+		{name:'fecha_adju', type: 'date',dateFormat:'Y-m-d'},
+		{name:'nro_contrato', type: 'string'},
+		{name:'porc_retgar', type: 'numeric'},
+		{name:'fecha_reg', type: 'date',dateFormat:'Y-m-d H:i:s.u'},
+		{name:'id_usuario_reg', type: 'numeric'},
+		{name:'fecha_mod', type: 'date',dateFormat:'Y-m-d H:i:s.u'},
+		{name:'id_usuario_mod', type: 'numeric'},
+		{name:'usr_reg', type: 'string'},
+		{name:'usr_mod', type: 'string'},'email','desc_moneda','tipo_cambio_conv','id_estado_wf','id_proceso_wf','numero',
+		'num_tramite',
+		{name:'id_obligacion_pago', type: 'numeric'},'tiempo_entrega',
+		'funcionario_contacto',
+        'telefono_contacto',
+        'correo_contacto', 'correo_oc',
+        'prellenar_oferta', 'forma_pago', 'requiere_contrato','total_adjudicado','total_cotizado','total_adjudicado_mb','tiene_form500','total','cecos'
+        ,'nro_cuenta'
+		
+	],
+    rowExpander: new Ext.ux.grid.RowExpander({
+	        tpl : new Ext.Template(
+	            '<br>',
+	            '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Solicitud de Compra:&nbsp;&nbsp;</b> {numero}</p>',
+	            '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Total Adudicado en Bs:&nbsp;&nbsp;</b> {total_adjudicado_mb}</p>',
+	            '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Funcionario de Contacto:&nbsp;&nbsp;</b> {funcionario_contacto}</p>',
+	            '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Usuario Registro:&nbsp;&nbsp;</b> {usr_reg}</p>',
+	            '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Notificación Orden de compra:&nbsp;&nbsp;</b> {correo_oc}</p>',
+	            '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Obs:&nbsp;&nbsp;</b> {obs}</p><br>'
+	        )
+    }),
+    arrayDefaultColumHidden:['id_fecha_reg','id_fecha_mod',
+'fecha_mod','usr_reg','usr_mod','numero',
+'total_adjudicado_mb','tipo_cambio_conv','lugar_entrega','forma_pago','tipo_entrega','tiempo_entrega',
+'fecha_venc','fecha_entrega','obs','fecha_adju', 'nro_contrato','funcionario_contacto',
+'telefono_contacto','correo_contacto','prellenar_oferta','estado_reg','fecha_reg','usr_reg','fecha_mod','usr_mod'],
+	sortInfo:{
+		field: 'id_cotizacion',
+		direction: 'ASC'
+	},
+	
+	onButtonCartaAdj: function(){
+                var rec=this.sm.getSelected();
+                Ext.Ajax.request({
+                    url:'../../sis_adquisiciones/control/Cotizacion/reporteCartaAdjudicacion',
+                    params: {'id_proceso_wf':rec.data.id_proceso_wf},
+                    success: this.successExport,
+                    failure: function() {
+                        alert("fail");
+                    },
+                    timeout: function() {
+                        alert("timeout");
+                    },
+                    scope:this
+                });
+        },
+	
+	onButtonRepOC: function(){
+		
+		        var rec=this.sm.getSelected();
+                if (rec.data.requiere_contrato == 'no'){
+	                 //si no tiene numero de orden compra generamos 
+	                if(!rec.data.numero_oc || rec.data.numero_oc == '' || rec.data.numero_oc == 'S/N'){
+		                Phx.CP.loadingShow();
+		                Ext.Ajax.request({
+		                    url:'../../sis_adquisiciones/control/Cotizacion/generarNumOC',
+		                    params:{'id_cotizacion':rec.data.id_cotizacion},
+		                    success: function(resp){
+		                    	Phx.CP.loadingHide();
+					            var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
+					            if(!reg.ROOT.error){
+					                 this.mostrarReporteOC(rec.data);
+					             }
+					             else{
+					                 alert('error al generar número de OC');
+		                         }
+		                    	
+		                    },
+		                    failure: function() {
+		                    	Phx.CP.loadingHide();
+		                        alert('error al generar número de OC');
+		                    },
+		                    timeout: function() {
+		                    	Phx.CP.loadingHide();
+		                        alert("timeout");
+		                    },
+		                    scope: this
+		                });	
+	                }
+	                else{
+	                	 this.mostrarReporteOC(rec.data);
+	                }
+	                	
+                }
+                else{
+                	alert('Esta cotizaicón no genera OC por que esta marcada para tener contrato');
+                	return;
+                }
+               
+                
+                
+                
+               
+        },
+      
+      mostrarReporteOC: function(data){
+  	        Ext.Ajax.request({
+                url: '../../sis_adquisiciones/control/Cotizacion/reporteOC',
+                params: { 'id_cotizacion': data.id_cotizacion, 'id_proveedor': data.id_proveedor },
+                success: this.successExport,
+                failure: function() {
+                	Phx.CP.loadingHide();
+                    alert("fail");
+                },
+                timeout: function() {
+                    alert("timeout");
+                },
+                scope:this
+            });
+      },
+      
+      onButtonReporte:function(){
+            var rec=this.sm.getSelected();
+            Ext.Ajax.request({
+                url:'../../sis_adquisiciones/control/Cotizacion/reporteCotizacion',
+                params:{'id_cotizacion':rec.data.id_cotizacion,'tipo':rec.data.estado},
+                success: this.successExport,
+                failure: function() {
+                    alert("fail");
+                },
+                timeout: function() {
+                    alert("timeout");
+                },
+                scope:this
+            });  
+	},
+    
+ 
+	
+	 loadCheckDocumentosSolWf:function() {
+            var rec=this.sm.getSelected();
+            rec.data.nombreVista = this.nombreVista;
+            rec.data.check_fisico = 'si';
+            Phx.CP.loadWindows('../../../sis_workflow/vista/documento_wf/DocumentoWf.php',
+                    'Documentos del Proceso',
+                    {
+                        width:'90%',
+                        height:500
+                    },
+                    rec.data,
+                   
+                    this.idContenedor,
+                    'DocumentoWf'
+        )
+    },
+    
+    successSimple:function(resp){
+            Phx.CP.loadingHide();
+            var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
+            if(!reg.ROOT.error){
+                 this.reload();
+             }
+             else{
+                alert('ocurrio un error durante el proceso')
+            }
+     },
+     
+      preparaMenu:function(n){
           var data = this.getSelectedData();
           var tb =this.tbar;
           Phx.vista.CotizacionOC.superclass.preparaMenu.call(this,n);
           this.menuAdq.enable();
           this.getBoton('btnReporte').enable();
-
-          //this.getBoton('btnReporte').enable(); 
-         
-              
-              if(data['estado'] == 'borrador'){
-                 this.getBoton('fin_registro').enable();
-                 this.getBoton('btnAdjudicar').disable();
-                
-                 
-                 this.getBoton('btnSolApro').disable();
-                 this.getBoton('ant_estado').disable();
-                 this.getBoton('btnRepOC').disable();
-                 
-                 if(data.email != '' &&data.email != undefined){ 
-                   this.getBoton('btnSendMail').enable(); 
-                 }
-               }
-              else{
-                   this.getBoton('ant_estado').enable();
-                   this.getBoton('btnSendMail').disable(); 
-                   
-                   if(data['estado']=='cotizado'){
-                     this.getBoton('btnAdjudicar').enable();
-                     this.getBoton('btnSolApro').enable();
-                     this.getBoton('btnRepOC').disable();   
-                   }
-                   else{
-                      this.getBoton('btnAdjudicar').disable();
-                      this.getBoton('btnSolApro').disable();
-                     
-                   }
-                   
-                   if(data['estado']=='adjudicado'|| data['estado']=='contrato_pendiente'|| data['estado']=='contrato_elaborado' || data['estado']=='pago_habilitado'|| data['estado']=='finalizada'){
-                     if(data['requiere_contrato']=='no'){
-                     	 this.getBoton('btnRepOC').enable();
-                     }
-                     
-                   }
-                   
-                   if(data['estado']=='adjudicado' || data['estado']=='cotizado'){
-                     this.getBoton('btnSolCon').enable();
-                   }
-                   else{
-                   	 this.getBoton('btnSolCon').disable();
-                   }
-                   
-                   
-                   this.getBoton('fin_registro').disable();
-                   this.getBoton('edit').disable();
-                   
-                 }
-               
-               if (data['estado']==  'borrador'||data['estado']=='cotizado'||data['estado']== 'adjudicado'){
-                   
-                    this.getBoton('del').enable();
-               }
-               else{
-                   
-                    this.getBoton('del').disable();
-               }
-               
-               if (data['estado']==  'anulado' || data['estado']=='finalizada'){
-                   this.getBoton('ant_estado').disable();
-                   this.getBoton('fin_registro').disable();
-               }
-               
-               if (data['estado']!='adjudicado'&&data['estado']!='contrato_elaborado'){
-                   this.getBoton('btnHabPago').disable();
-               }
-               else{
-                    if(data['estado']=='adjudicado'&&data['requiere_contrato']=='si'){
-                    	this.getBoton('btnHabPago').setIconClass('bdocuments');
-                    	this.getBoton('btnHabPago').setText( 'Solicitar Contrato' ); 
-                    	this.getBoton('btnHabPago').setTooltip('Solicita el contrato al área legal')
-                    }
-                    else{
-                    	this.getBoton('btnHabPago').setIconClass('bcharge');
-                    	this.getBoton('btnHabPago').setText( 'Habilitar Pago' );
-                    	this.getBoton('btnHabPago').setTooltip('Habilita la opción de registrar la obligación de pago' )
-                    }
-                    
-                    this.getBoton('btnHabPago').enable();  
-               }
-                 
-               if (data['estado']=='pago_habilitado' ){
-                   this.getBoton('ant_estado').disable();
-                   this.getBoton('btnPreing').enable();
-                   this.getBoton('btnSolCon').disable();
-                  
-              } 
-               
-              if(data['estado']=='contrato_pendiente' || data['estado']=='contrato_elaborado'){
-              	  this.getBoton('ant_estado').disable();
-              	  this.getBoton('btnSolCon').disable();
-              }
-               
-              if (data['estado']=='recomendado'){
-                   this.getBoton('btnRepOC').disable();
-                   this.getBoton('btnSolCon').disable();
-              }
-               
-            this.getBoton('btnForm500').enable();
-	        this.getBoton('btnObs').enable();    
-            this.getBoton('btnChequeoDocumentosWf').enable(); 
-            this.getBoton('diagrama_gantt').enable();
-              
-            return tb 
+          this.getBoton('btnRepOC').enable(); 
+          this.getBoton('diagrama_gantt').enable();
+          this.getBoton('btnChequeoDocumentosWf').enable();
+          return tb 
      }, 
      
-    
-     
-     liberaMenu:function(){
+	  liberaMenu:function() {
         var tb = Phx.vista.CotizacionOC.superclass.liberaMenu.call(this);
         if(tb){
-            this.getBoton('fin_registro').disable();
-            this.getBoton('btnAdjudicar').disable();
-            this.getBoton('btnSolCon').disable();
-            this.getBoton('ant_estado').disable();
             this.getBoton('btnReporte').disable();
-            this.getBoton('btnSendMail').disable(); 
-            this.getBoton('btnPreing').disable();
-            this.getBoton('btnRepOC').disable();
-            this.getBoton('btnObs').disable();
-            this.getBoton('btnForm500').disable(); 
+            this.getBoton('btnRepOC').disable(); 
             this.getBoton('diagrama_gantt').disable();
             this.getBoton('btnChequeoDocumentosWf').disable();
             this.menuAdq.disable();
-            
-            
          }
-       
-      
        return tb
     },
     
-    
-    
-    
-    onSendMail:function(){
-        
-       Phx.CP.loadingShow();
-        
-        var rec=this.sm.getSelected();
-        Ext.Ajax.request({
-            url:'../../sis_adquisiciones/control/Cotizacion/sendMailCotizacion',
-            params:{id_cotizacion:rec.data.id_cotizacion,
-                    id_proceso_compra:rec.data.id_proceso_compra,
-                    total:'unitario',
-                    tipo:rec.data.estado,
-                    email:rec.data.email},
-            success: this.successMail,
-            failure: this.conexionFailure,
-            scope:this
-        }); 
-        
-        
-    },
-    
-      successMail:function(resp){
-            Phx.CP.loadingHide();
-           
-            var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
-            if(!reg.ROOT.error){
-                alert('Correo enviado con exito')
-             }else{
-                alert('ocurrio un error durante el proceso')
-            }
-        } ,
-    //WIZARD
-    sigEstado:function(){                   
-            var rec=this.sm.getSelected();
-            if (rec.data.estado == 'adjudicado' && rec.data.requiere_contrato == 'si') {
-            	this.forzar_documentos = 'si';
-            	this.gruposBarraTareas = [{name:"legales",title:"Doc. Legales",grupo:0,height:0},
-                            {name:"proceso",title:"Doc del Proceso",grupo:1,height:0}];
-            } else {
-            	this.forzar_documentos = 'no';
-            	this.gruposBarraTareas = [{name:"proceso",title:"Doc del Proceso",grupo:0,height:0},
-                            {name:"legales",title:"Doc. Legales",grupo:1,height:0}];
-            }
-            
-            Phx.CP.loadWindows('../../../sis_workflow/vista/estado_wf/FormEstadoWf.php',
-            'Estado de Wf',
-            {
-                modal:true,
-                width:700,
-                height:450
-            }, {data:{
-                   id_estado_wf: rec.data.id_estado_wf,
-                   id_proceso_wf: rec.data.id_proceso_wf,
-                   fecha_ini: rec.data.fecha_tentativa,
-                   forzar_documentos : this.forzar_documentos,
-                   gruposBarraTareas: this.gruposBarraTareas,
-                   forzar_documentos : this.forzar_documentos,
-                   gruposBarraTareas: this.gruposBarraTareas,
-                   check_fisico : 'si'
-               }}, this.idContenedor,'FormEstadoWf',
-            {
-                config:[{
-                          event:'beforesave',
-                          delegate: this.onSaveWizard,
-                          
-                        }],
-                
-                scope:this
-             })
-               
-     },
-     
-    
-     onSaveWizard:function(wizard,resp){
-        Phx.CP.loadingShow();
-         
-        Ext.Ajax.request({
-            url:'../../sis_adquisiciones/control/Cotizacion/habilitarPago',
-            params:{
-                id_proceso_wf_act:  resp.id_proceso_wf_act,
-                id_estado_wf_act:   resp.id_estado_wf_act,
-                id_tipo_estado:     resp.id_tipo_estado,
-                id_funcionario_wf:  resp.id_funcionario_wf,
-                id_depto_wf:        resp.id_depto_wf,
-                obs:                resp.obs,
-                json_procesos:      Ext.util.JSON.encode(resp.procesos)
-                },
-            success:this.successWizard,
-            failure: this.conexionFailure,
-            argument:{wizard:wizard},
-            timeout:this.timeout,
-            scope:this
-        });
-    },
-     
-    successWizard:function(resp){
-        Phx.CP.loadingHide();
-        resp.argument.wizard.panel.destroy()
-        this.reload();
-     },
-     
-     onOpenObs:function() {
-            var rec=this.sm.getSelected();
-            
-            var data = {
-            	id_proceso_wf: rec.data.id_proceso_wf,
-            	id_estado_wf: rec.data.id_estado_wf,
-            	num_tramite: rec.data.num_tramite
-            }
-            
-            console.log(rec.data)
-            Phx.CP.loadWindows('../../../sis_workflow/vista/obs/Obs.php',
-                    'Observaciones del WF',
-                    {
-                        width:'80%',
-                        height:'70%'
-                    },
-                    data,
-                    this.idContenedor,
-                    'Obs'
-        )
-    },
-    onBtnForm500: function(){
-    	    var data = this.getSelectedData();
-            Phx.CP.loadingShow();
-           	Ext.Ajax.request({
-                // form:this.form.getForm().getEl(),
-                url:'../../sis_adquisiciones/control/Cotizacion/cambioFomrulario500',
-                params:{id_cotizacion: data.id_cotizacion},
-                success: this.successSinc,
-                failure: this.conexionFailure,
-                timeout:this.timeout,
-                scope:this
-            });
-          
-   }
-    
-};
+	bdel:false,
+	bnew:false,
+	bedit:false,
+	bsave:false,
+	south:{	   
+        url:'../../../sis_adquisiciones/vista/cotizacion_det/CotizacionDet.php',
+        title:'Detalles Cotizacion', 
+        height : '50%',
+        cls:'CotizacionDet'}
+	}
+)
 </script>

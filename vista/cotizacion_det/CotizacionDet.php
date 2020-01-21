@@ -5,6 +5,13 @@
 *@author  Gonzalo Sarmiento Sejas
 *@date 21-03-2013 21:44:43
 *@description Archivo con la interfaz de usuario que permite la ejecucion de todas las funcionalidades del sistema
+ * 
+   HISTORIAL DE MODIFICACIONES:
+       
+ ISSUE            FECHA:              AUTOR                 DESCRIPCION
+   
+ #0               21-03-2013        RAC KPLIAN        Creación
+ #16              20/01/2020        RAC KPLIAN       fix bug nombre de clase
 */
 
 header("content-type: text/javascript; charset=UTF-8");
@@ -552,7 +559,7 @@ Phx.vista.CotizacionDet=Ext.extend(Phx.gridInterfaz,{
 	 preparaMenu:function(n){
 	      var data = this.getSelectedData();
           var tb =this.tbar;
-          Phx.vista.Cotizacion.superclass.preparaMenu.call(this,n);  
+          Phx.vista.CotizacionDet.superclass.preparaMenu.call(this,n);  
               
               if(this.maestro.estado ==  'cotizado'){
                  this.getBoton('adjudicar_det').enable();
@@ -582,7 +589,7 @@ Phx.vista.CotizacionDet=Ext.extend(Phx.gridInterfaz,{
             return tb 
      }, 
      liberaMenu:function(){
-        var tb = Phx.vista.Cotizacion.superclass.liberaMenu.call(this);
+        var tb = Phx.vista.CotizacionDet.superclass.liberaMenu.call(this);
         if(tb){
              
             this.getBoton('adjudicar_det').disable();
