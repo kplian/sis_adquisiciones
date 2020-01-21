@@ -152,12 +152,12 @@ BEGIN
             --#16 cambio de consulta
 			--Sentencia de la consulta de conteo de registros
 			v_consulta:='SELECT count(cot.id_cotizacion)
-					    from adq.tcotizacion cot
+					    from adq.vorden_compra cot
                         where '||v_filtro;
 			
 			--Definicion de la respuesta		    
 			v_consulta:=v_consulta||v_parametros.filtro;
-
+            raise notice '%',v_consulta;
 			--Devuelve la respuesta
 			return v_consulta;
 

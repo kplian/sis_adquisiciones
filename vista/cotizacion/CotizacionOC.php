@@ -3,7 +3,7 @@
 *@package pXP
 *@file Cotizacion.php
 *@author  Gonzalo Sarmiento Sejas
-*@date 21-03-2013 14:48:35
+*@date 21-03-2013 14:48:35  
 *@description Archivo con la interfaz de usuario que permite la ejecucion de todas las funcionalidades del sistema
  *  * * ISSUE            FECHA:		      AUTOR       DESCRIPCION
 
@@ -125,7 +125,6 @@ Phx.vista.CotizacionOC=Ext.extend(Phx.gridInterfaz,{
                  }
             },
             type:'TextField',
-            filters:{pfiltro:'sol.num_tramite',type:'string'},
             id_grupo:1,
             grid:true,
             form:false
@@ -153,7 +152,7 @@ Phx.vista.CotizacionOC=Ext.extend(Phx.gridInterfaz,{
                         }}
             },
             type:'TextField',
-            filters:{pfiltro:'sol.num_tramite',type:'string'},
+            filters:{pfiltro:'num_tramite',type:'string'},
             bottom_filter: true,
             id_grupo:1,
             grid:true,
@@ -179,7 +178,7 @@ Phx.vista.CotizacionOC=Ext.extend(Phx.gridInterfaz,{
                 maxLength:30
             },
             type:'TextField',
-            filters:{pfiltro:'cot.estado',
+            filters:{pfiltro:'estado',
                      options: ['borrador','cotizado','adjudicado','recomendado','contro_pendiente','contrato_eleborado','pago_habilitado','finalizada','anulada'],	
 	       		 	 type:'list'},
             
@@ -210,12 +209,7 @@ Phx.vista.CotizacionOC=Ext.extend(Phx.gridInterfaz,{
 	    					// turn on remote sorting
 	    					remoteSort: true,
 	    					baseParams:{par_filtro:'codigo#desc_proveedor#nit'}
-	    				}),
-	    		tpl:'<tpl for=".">\
-		                       <div class="x-combo-list-item"><p><b>Codigo: </b>{codigo}</p>\
-		                      <p><b>Proveedor: </b>{desc_proveedor}</p>\
-		                      <p><b>Nit:</b>{nit}</p> \
-		                     </div></tpl>',		
+	    				}),	
         	    valueField: 'id_proveedor',
         	    displayField: 'desc_proveedor',
         	    gdisplayField: 'desc_proveedor',
@@ -243,7 +237,7 @@ Phx.vista.CotizacionOC=Ext.extend(Phx.gridInterfaz,{
 			},
 	           			
 			type:'ComboBox',
-			filters:{pfiltro:'pro.desc_proveedor',type:'string'},
+			filters:{pfiltro:'desc_proveedor',type:'string'},
 			bottom_filter: true,
 			id_grupo:1,
 			grid:true,
@@ -270,7 +264,7 @@ Phx.vista.CotizacionOC=Ext.extend(Phx.gridInterfaz,{
                 maxLength:4
             },
             type:'Field',
-            filters:{pfiltro:'sol.numero',type:'string'},
+            filters:{pfiltro:'numero',type:'string'},
             id_grupo:1,
             grid:true,
             form:false
@@ -297,7 +291,7 @@ Phx.vista.CotizacionOC=Ext.extend(Phx.gridInterfaz,{
                 maxLength:4
             },
             type:'Field',
-            filters:{pfiltro:'cot.numero_oc',type:'string'},
+            filters:{pfiltro:'numero_oc',type:'string'},
             bottom_filter:true,
             id_grupo:1,
             grid:true,
@@ -314,7 +308,7 @@ Phx.vista.CotizacionOC=Ext.extend(Phx.gridInterfaz,{
                         renderer:function (value,p,record){return value?value.dateFormat('d/m/Y'):''}
             },
             type:'DateField',
-            filters:{pfiltro:'cot.fecha_coti',type:'date'},
+            filters:{pfiltro:'fecha_coti',type:'date'},
             id_grupo:1,
             grid:true,
             form:true
@@ -332,7 +326,7 @@ Phx.vista.CotizacionOC=Ext.extend(Phx.gridInterfaz,{
             type:'ComboRec',
             id_grupo:1,
             filters:{   
-                pfiltro:'mon.moneda#mon.codigo',
+                pfiltro:'moneda#desc_moneda',
                 type:'string'
             },
             grid:true,
@@ -379,7 +373,7 @@ Phx.vista.CotizacionOC=Ext.extend(Phx.gridInterfaz,{
 				decimalPrecision : 10
             },
             type:'NumberField',
-            filters:{pfiltro:'cot.tipo_cambio_conv',type:'numeric'},
+            filters:{pfiltro:'tipo_cambio_conv',type:'numeric'},
             id_grupo:1,
             grid:true,
             form:false
@@ -395,7 +389,7 @@ Phx.vista.CotizacionOC=Ext.extend(Phx.gridInterfaz,{
 				maxLength:450
 			},
 			type:'TextArea',
-			filters:{pfiltro:'cot.lugar_entrega',type:'string'},
+			filters:{pfiltro:'lugar_entrega',type:'string'},
 			id_grupo:1,
 			grid:true,
 			form:false
@@ -410,7 +404,7 @@ Phx.vista.CotizacionOC=Ext.extend(Phx.gridInterfaz,{
 				maxLength:450
 			},
 			type:'TextArea',
-			filters:{pfiltro:'cot.forma_pago',type:'string'},
+			filters:{pfiltro:'forma_pago',type:'string'},
 			id_grupo:1,
 			grid:true,
 			form:false
@@ -437,7 +431,7 @@ Phx.vista.CotizacionOC=Ext.extend(Phx.gridInterfaz,{
 			},
 			
 			type: 'ComboRec',
-			filters:{pfiltro:'cot.tipo_entrega',type:'string'},
+			filters:{pfiltro:'tipo_entrega',type:'string'},
 			id_grupo: 0,
 			grid: true,
 			form: false
@@ -454,7 +448,7 @@ Phx.vista.CotizacionOC=Ext.extend(Phx.gridInterfaz,{
                 maxLength:150
             },
             type:'TextField',
-            filters:{pfiltro:'cot.tiempo_entrega',type:'string'},
+            filters:{pfiltro:'tiempo_entrega',type:'string'},
             valorInicial:'5 días a partir del dia siguiente de emitida la presente orden',
             id_grupo:1,
             grid:true,
@@ -474,7 +468,7 @@ Phx.vista.CotizacionOC=Ext.extend(Phx.gridInterfaz,{
 						renderer:function (value,p,record){return value?value.dateFormat('d/m/Y'):''}
 			},
 			type:'DateField',
-			filters:{pfiltro:'cot.fecha_venc',type:'date'},
+			filters:{pfiltro:'fecha_venc',type:'date'},
 			id_grupo:1,
 			grid:true,
 			form:false
@@ -492,7 +486,7 @@ Phx.vista.CotizacionOC=Ext.extend(Phx.gridInterfaz,{
                         renderer:function (value,p,record){return value?value.dateFormat('d/m/Y'):''}
             },
             type:'DateField',
-            filters:{pfiltro:'cot.fecha_entrega',type:'date'},
+            filters:{pfiltro:'fecha_entrega',type:'date'},
             id_grupo:1,
             grid:true,
             form:false
@@ -507,7 +501,7 @@ Phx.vista.CotizacionOC=Ext.extend(Phx.gridInterfaz,{
 				gwidth: 100
 			},
 			type:'TextArea',
-			filters:{pfiltro:'cot.obs',type:'string'},
+			filters:{pfiltro:'obs',type:'string'},
 			id_grupo:1,
 			grid:true,
 			form:false
@@ -523,7 +517,7 @@ Phx.vista.CotizacionOC=Ext.extend(Phx.gridInterfaz,{
 						renderer:function (value,p,record){return value?value.dateFormat('d/m/Y'):''}
 			},
 			type:'DateField',
-			filters:{pfiltro:'cot.fecha_adju',type:'date'},
+			filters:{pfiltro:'fecha_adju',type:'date'},
 			id_grupo:1,
 			grid:true,
 			form:false
@@ -538,7 +532,7 @@ Phx.vista.CotizacionOC=Ext.extend(Phx.gridInterfaz,{
 				maxLength:50
 			},
 			type:'TextField',
-			filters:{pfiltro:'cot.nro_contrato',type:'string'},
+			filters:{pfiltro:'nro_contrato',type:'string'},
 			id_grupo:1,
 			grid:true,
 			form:false
@@ -559,7 +553,7 @@ Phx.vista.CotizacionOC=Ext.extend(Phx.gridInterfaz,{
                  }
 			},
 			type:'TextField',
-			filters:{pfiltro:'cot.tiene_form500',type:'list',options: ['si','no','requiere']},
+			filters:{pfiltro:'tiene_form500',type:'list',options: ['si','no','requiere']},
 			id_grupo:1,
 			grid:false,
 			form:false
@@ -575,7 +569,7 @@ Phx.vista.CotizacionOC=Ext.extend(Phx.gridInterfaz,{
 				maxLength:50
 			},
 			type:'TextField',
-			filters:{pfiltro:'cot.funcionario_contacto',type:'string'},
+			filters:{pfiltro:'funcionario_contacto',type:'string'},
 			id_grupo:1,
 			grid:true,
 			form:false
@@ -591,7 +585,7 @@ Phx.vista.CotizacionOC=Ext.extend(Phx.gridInterfaz,{
 				maxLength:50
 			},
 			type:'TextField',
-			filters:{pfiltro:'cot.telefono_contacto',type:'string'},
+			filters:{pfiltro:'telefono_contacto',type:'string'},
 			id_grupo:1,
 			grid:true,
 			form:false
@@ -607,7 +601,7 @@ Phx.vista.CotizacionOC=Ext.extend(Phx.gridInterfaz,{
 				maxLength:50
 			},
 			type:'TextField',
-			filters:{pfiltro:'cot.correo_contacto',type:'string'},
+			filters:{pfiltro:'correo_contacto',type:'string'},
 			id_grupo:1,
 			grid:true,
 			form:false
@@ -634,7 +628,7 @@ Phx.vista.CotizacionOC=Ext.extend(Phx.gridInterfaz,{
 			type:  'ComboBox',
 			valorInicial: 'si',
 			id_grupo: 1,
-			filters: {	pfiltro:'cot.prellenar_oferta',
+			filters: {	pfiltro:'prellenar_oferta',
 	       		         type: 'list',
 	       				 options: ['si','no']
 	       		 	},
@@ -651,7 +645,7 @@ Phx.vista.CotizacionOC=Ext.extend(Phx.gridInterfaz,{
 				maxLength:10
 			},
 			type:'TextField',
-			filters:{pfiltro:'cot.estado_reg',type:'string'},
+			filters:{pfiltro:'estado_reg',type:'string'},
 			id_grupo:1,
 			grid:true,
 			form:false
@@ -667,7 +661,7 @@ Phx.vista.CotizacionOC=Ext.extend(Phx.gridInterfaz,{
 						renderer:function (value,p,record){return value?value.dateFormat('d/m/Y H:i:s'):''}
 			},
 			type:'DateField',
-			filters:{pfiltro:'cot.fecha_reg',type:'date'},
+			filters:{pfiltro:'fecha_reg',type:'date'},
 			id_grupo:1,
 			grid:true,
 			form:false
@@ -682,7 +676,7 @@ Phx.vista.CotizacionOC=Ext.extend(Phx.gridInterfaz,{
 				maxLength:4
 			},
 			type:'NumberField',
-			filters:{pfiltro:'usu1.cuenta',type:'string'},
+			filters:{pfiltro:'usr_reg',type:'string'},
 			id_grupo:1,
 			grid:true,
 			form:false
@@ -698,7 +692,7 @@ Phx.vista.CotizacionOC=Ext.extend(Phx.gridInterfaz,{
 						renderer:function (value,p,record){return value?value.dateFormat('d/m/Y H:i:s'):''}
 			},
 			type:'DateField',
-			filters:{pfiltro:'cot.fecha_mod',type:'date'},
+			filters:{pfiltro:'fecha_mod',type:'date'},
 			id_grupo:1,
 			grid:true,
 			form:false
@@ -714,7 +708,7 @@ Phx.vista.CotizacionOC=Ext.extend(Phx.gridInterfaz,{
 				maxLength:4
 			},
 			type:'NumberField',
-			filters:{pfiltro:'usu2.cuenta',type:'string'},
+			filters:{pfiltro:'usr_mod',type:'string'},
 			id_grupo:1,
 			grid:true,
 			form:false
@@ -728,8 +722,7 @@ Phx.vista.CotizacionOC=Ext.extend(Phx.gridInterfaz,{
 				gwidth: 100,
 				maxLength:450
 			},
-			type:'TextArea',
-			//filters:{pfiltro:'cot.forma_pago',type:'string'},
+			type:'TextArea',		
 			id_grupo:1,
 			grid:true,
 			form:false
@@ -744,7 +737,6 @@ Phx.vista.CotizacionOC=Ext.extend(Phx.gridInterfaz,{
 				gwidth: 100
 			},
 			type:'NumberField',
-			//filters:{pfiltro:'cot.obs',type:'string'},
 			id_grupo:1,
 			grid:true,
 			form:false
@@ -758,8 +750,7 @@ Phx.vista.CotizacionOC=Ext.extend(Phx.gridInterfaz,{
 				height:'150',
 				gwidth: 100
 			},
-			type:'NumberField',
-			//filters:{pfiltro:'cot.obs',type:'string'},
+			type:'NumberField',			
 			id_grupo:1,
 			grid:true,
 			form:false
