@@ -1,3 +1,5 @@
+--------------- SQL ---------------
+
 CREATE OR REPLACE FUNCTION adq.f_cotizacion_sel (
   p_administrador integer,
   p_id_usuario integer,
@@ -10,7 +12,7 @@ $body$
  SISTEMA:		Adquisiciones
  FUNCION: 		adq.f_cotizacion_sel
  DESCRIPCION:   Funcion que devuelve conjuntos de registros de las consultas relacionadas con la tabla 'adq.tcotizacion'
- AUTOR: 		Gonzalo Sarmiento Sejas
+ AUTOR: 		Rensi Arteaga Copari
  FECHA:	        21-03-2013 14:48:35
  COMENTARIOS:	
 ***************************************************************************
@@ -19,6 +21,14 @@ $body$
  DESCRIPCION:	
  AUTOR:			
  FECHA:		
+ 
+   HISTORIAL DE MODIFICACIONES:
+       
+ ISSUE            FECHA:              AUTOR                 DESCRIPCION
+   
+ #0               05/09/2013        RAC KPLIAN        Creación
+ #16               20/01/2020        RAC KPLIAN        Mejor el rendimiento de la interface de Ordenes y Cotizaciones, issue #16
+
 ***************************************************************************/
 
 DECLARE
@@ -59,88 +69,59 @@ BEGIN
                 v_filtro = '';
             END IF;
             
+            --#16 cambio de consulta
             
     		--Sentencia de la consulta
-			v_consulta:='WITH detalle as (
-                                       Select 
-                                        cd.id_cotizacion,
-                                        sum(cd.cantidad_adju *cd.precio_unitario) as total_adjudicado,
-                                        sum(cd.cantidad_coti *cd.precio_unitario) as total_cotizado,
-                                        sum(cd.cantidad_adju *cd.precio_unitario_mb) as total_adjudicado_mb
-                                      FROM  adq.tcotizacion_det  cd
-                                      WHERE cd.estado_reg = ''activo''
-                                      GROUP by cd.id_cotizacion
-                                      
-                        )
-                      select
-						cot.id_cotizacion,
-						cot.estado_reg,
-						cot.estado,
-						cot.lugar_entrega,
-						cot.tipo_entrega,
-						cot.fecha_coti,
-						COALESCE(cot.numero_oc,''S/N''),
-						cot.id_proveedor,
-                        pro.desc_proveedor,					
-						cot.fecha_entrega,
-						cot.id_moneda,
-                        mon.moneda,
-						cot.id_proceso_compra,
-						cot.fecha_venc,
-						cot.obs,
-						cot.fecha_adju,
-						cot.nro_contrato,					
-						cot.fecha_reg,
-						cot.id_usuario_reg,
-						cot.fecha_mod,
-						cot.id_usuario_mod,
-						usu1.cuenta as usr_reg,
-						usu2.cuenta as usr_mod,
-                        cot.id_estado_wf,
-                        cot.id_proceso_wf,
-                        mon.codigo as desc_moneda,
-                        cot.tipo_cambio_conv,
-                        pro.email,
-                        sol.numero,
-                        sol.num_tramite,
-                        cot.id_obligacion_pago,
-                        cot.tiempo_entrega,
-                        cot.funcionario_contacto,
-                        cot.telefono_contacto,
-                        cot.correo_contacto,
-                        cot.prellenar_oferta,
-                        cot.forma_pago,
-                        cot.requiere_contrato,
-                        d.total_adjudicado,
-                        d.total_cotizado,
-                        d.total_adjudicado_mb,
-                        cot.tiene_form500,
-                        cot.correo_oc,
-                        (SELECT ARRAY_TO_STRING(ARRAY_AGG(DISTINCT(cc.codigo_cc)), ''<br>'')
-                        from adq.tcotizacion_det ctd						
-				        inner join adq.tsolicitud_det sold on sold.id_solicitud_det=  ctd.id_solicitud_det
-				        inner join param.tconcepto_ingas cig on cig.id_concepto_ingas = sold.id_concepto_ingas
-						inner join param.vcentro_costo cc on cc.id_centro_costo = sold.id_centro_costo
-                        WHERE cot.id_cotizacion=ctd.id_cotizacion)::VARCHAR AS cecos,                                                                       
-                        (SELECT sum(ctdet.cantidad_adju) 
-                        FROM adq.tcotizacion_det ctdet                                                                             
-                        WHERE ctdet.id_cotizacion=cot.id_cotizacion
-                        group by cot.id_cotizacion)as total,                        
-                        (SELECT ARRAY_TO_STRING(ARRAY_AGG(DISTINCT(cta.nro_cuenta)), ''<br>'')
-                        from adq.tcotizacion_det ctd						
-                        inner join adq.tsolicitud_det sold on sold.id_solicitud_det=  ctd.id_solicitud_det
-                        left join conta.tcuenta cta on cta.id_cuenta = sold.id_cuenta                          
-                        WHERE cot.id_cotizacion=ctd.id_cotizacion)::VARCHAR AS nro_cuenta
-                        
-						from adq.tcotizacion cot
-                        inner join adq.tproceso_compra proc on proc.id_proceso_compra = cot.id_proceso_compra
-                        inner join adq.tsolicitud sol on sol.id_solicitud = proc.id_solicitud
-						inner join segu.tusuario usu1 on usu1.id_usuario = cot.id_usuario_reg
-						inner join detalle d on d.id_cotizacion = cot.id_cotizacion
-				        inner join param.tmoneda mon on mon.id_moneda = cot.id_moneda
-                        inner join param.vproveedor pro on pro.id_proveedor = cot.id_proveedor
-                        left join segu.tusuario usu2 on usu2.id_usuario = cot.id_usuario_mod
-                        
+			v_consulta:='
+                        select
+                        id_cotizacion,
+                        estado_reg,
+                        estado,
+                        lugar_entrega,
+                        tipo_entrega,
+                        fecha_coti,
+                        numero_oc,
+                        id_proveedor,
+                        desc_proveedor,                    
+                        fecha_entrega,
+                        id_moneda,
+                        moneda,
+                        id_proceso_compra,
+                        fecha_venc,
+                        obs,
+                        fecha_adju,
+                        nro_contrato,                    
+                        fecha_reg,
+                        id_usuario_reg,
+                        fecha_mod,
+                        id_usuario_mod,
+                        usr_reg,
+                        usr_mod,
+                        id_estado_wf,
+                        id_proceso_wf,
+                        desc_moneda,
+                        tipo_cambio_conv,
+                        email,
+                        numero,
+                        num_tramite,
+                        id_obligacion_pago,
+                        tiempo_entrega,
+                        funcionario_contacto,
+                        telefono_contacto,
+                        correo_contacto,
+                        prellenar_oferta,
+                        forma_pago,
+                        requiere_contrato,
+                        total_adjudicado,
+                        total_cotizado,
+                        total_adjudicado_mb,
+                        tiene_form500,
+                        correo_oc,
+                        cecos,                                                                       
+                        total,                        
+                        nro_cuenta
+                     
+                     from adq.vorden_compra cot
                         where '||v_filtro;
 			
            
@@ -161,36 +142,17 @@ BEGIN
 
 	elsif(p_transaccion='ADQ_COT_CONT')then
 
-		begin
-        
+		begin     
+               
             IF  pxp.f_existe_parametro(p_tabla, 'id_proceso_compra') THEN
             	v_filtro = 'cot.id_proceso_compra='||v_parametros.id_proceso_compra||' and ';
             ELSE
                 v_filtro = '';
-            END IF;
-            
+            END IF;            
+            --#16 cambio de consulta
 			--Sentencia de la consulta de conteo de registros
-			v_consulta:='WITH detalle as (
-                                       Select 
-                                        cd.id_cotizacion,
-                                        sum(cd.cantidad_adju *cd.precio_unitario) as total_adjudicado,
-                                        sum(cd.cantidad_coti *cd.precio_unitario) as total_cotizado,
-                                        sum(cd.cantidad_adju *cd.precio_unitario_mb) as total_adjudicado_mb
-                                      FROM  adq.tcotizacion_det  cd
-                                      WHERE cd.estado_reg = ''activo''
-                                      GROUP by cd.id_cotizacion
-                                      
-                        )
-                        SELECT count(cot.id_cotizacion)
+			v_consulta:='SELECT count(cot.id_cotizacion)
 					    from adq.tcotizacion cot
-                        inner join adq.tproceso_compra proc on proc.id_proceso_compra = cot.id_proceso_compra
-                        inner join adq.tsolicitud sol on sol.id_solicitud = proc.id_solicitud
-						inner join segu.tusuario usu1 on usu1.id_usuario = cot.id_usuario_reg
-						inner join detalle d on d.id_cotizacion = cot.id_cotizacion
-				        inner join param.tmoneda mon on mon.id_moneda = cot.id_moneda
-                        inner join param.vproveedor pro on pro.id_proveedor = cot.id_proveedor
-                        left join segu.tusuario usu2 on usu2.id_usuario = cot.id_usuario_mod
-                        
                         where '||v_filtro;
 			
 			--Definicion de la respuesta		    
