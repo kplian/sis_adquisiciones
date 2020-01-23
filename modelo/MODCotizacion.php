@@ -5,7 +5,15 @@
 *@author  Gonzalo Sarmiento Sejas
 *@date 21-03-2013 14:48:35
 *@description Clase que envia los parametros requeridos a la Base de datos para la ejecucion de las funciones, y que recibe la respuesta del resultado de la ejecucion de las mismas
-*/
+
+   HISTORIAL DE MODIFICACIONES:
+       
+ ISSUE            FECHA:              AUTOR                 DESCRIPCION
+   
+ #0               05/09/2013        RAC KPLIAN        Creación
+ #16               20/01/2020        RAC KPLIAN        Mejor el rendimiento de la interface de Ordenes y Cotizaciones, issue #16
+ 
+ * */
 
 class MODCotizacion extends MODbase{
 	
@@ -74,7 +82,7 @@ class MODCotizacion extends MODbase{
 		
 		$this->captura('cecos','varchar');
 		$this->captura('total','numeric');
-		$this->captura('nro_cuenta','varchar');
+		$this->captura('nro_cuenta','text');
 		
 		//Ejecuta la instruccion
 		$this->armarConsulta();
