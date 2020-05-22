@@ -4894,4 +4894,453 @@ WITH detalle AS(
                    bq.id_cotizacion;
                    
 
-/***********************************F-DEP-RAC-ADQ-2-20/01/2020*****************************************/                   
+
+/***********************************F-DEP-RAC-ADQ-2-20/01/2020*****************************************/
+/***********************************I-DEP-EGS-ADQ-3-11/03/2020*****************************************/
+select pxp.f_insert_testructura_gui ('REPPAG', 'REPADQ');
+/***********************************F-DEP-EGS-ADQ-3-11/03/2020*****************************************/
+/***********************************I-DEP-EGS-ADQ-3-20/05/2020*****************************************/
+CREATE OR REPLACE VIEW adq.vorden_compra(
+    id_cotizacion,
+    estado_reg,
+    estado,
+    lugar_entrega,
+    tipo_entrega,
+    fecha_coti,
+    numero_oc,
+    id_proveedor,
+    desc_proveedor,
+    fecha_entrega,
+    id_moneda,
+    moneda,
+    id_proceso_compra,
+    fecha_venc,
+    obs,
+    fecha_adju,
+    nro_contrato,
+    fecha_reg,
+    id_usuario_reg,
+    fecha_mod,
+    id_usuario_mod,
+    usr_reg,
+    usr_mod,
+    id_estado_wf,
+    id_proceso_wf,
+    desc_moneda,
+    tipo_cambio_conv,
+    email,
+    numero,
+    num_tramite,
+    id_obligacion_pago,
+    tiempo_entrega,
+    funcionario_contacto,
+    telefono_contacto,
+    correo_contacto,
+    prellenar_oferta,
+    forma_pago,
+    requiere_contrato,
+    total_adjudicado,
+    total_cotizado,
+    total_adjudicado_mb,
+    tiene_form500,
+    correo_oc,
+    cecos,
+    total,
+    nro_cuenta,
+    id_categoria_compra,
+    codigo_proceso,
+    desc_categoria_compra)
+AS
+WITH detalle AS(
+  SELECT cd.id_cotizacion,
+         sum(cd.cantidad_adju * cd.precio_unitario) AS total_adjudicado,
+         sum(cd.cantidad_coti * cd.precio_unitario) AS total_cotizado,
+         sum(cd.cantidad_adju * cd.precio_unitario_mb) AS total_adjudicado_mb
+  FROM adq.tcotizacion_det cd
+  WHERE cd.estado_reg::text = 'activo'::text
+  GROUP BY cd.id_cotizacion), base_query AS(
+    SELECT cot.id_cotizacion,
+           cot.estado_reg,
+           cot.estado,
+           cot.lugar_entrega,
+           cot.tipo_entrega,
+           cot.fecha_coti,
+           COALESCE(cot.numero_oc, 'S/N'::character varying) AS numero_oc,
+           cot.id_proveedor,
+           pro.desc_proveedor,
+           cot.fecha_entrega,
+           cot.id_moneda,
+           mon.moneda,
+           cot.id_proceso_compra,
+           cot.fecha_venc,
+           cot.obs,
+           cot.fecha_adju,
+           cot.nro_contrato,
+           cot.fecha_reg,
+           cot.id_usuario_reg,
+           cot.fecha_mod,
+           cot.id_usuario_mod,
+           usu1.cuenta AS usr_reg,
+           usu2.cuenta AS usr_mod,
+           cot.id_estado_wf,
+           cot.id_proceso_wf,
+           mon.codigo AS desc_moneda,
+           cot.tipo_cambio_conv,
+           pro.email,
+           sol.numero,
+           sol.num_tramite,
+           cot.id_obligacion_pago,
+           cot.tiempo_entrega,
+           cot.funcionario_contacto,
+           cot.telefono_contacto,
+           cot.correo_contacto,
+           cot.prellenar_oferta,
+           cot.forma_pago,
+           cot.requiere_contrato,
+           d.total_adjudicado,
+           d.total_cotizado,
+           d.total_adjudicado_mb,
+           cot.tiene_form500,
+           cot.correo_oc,
+           sol.id_categoria_compra,
+           proc.codigo_proceso,
+           ctp.nombre AS desc_categoria_compra
+    FROM adq.tcotizacion cot
+         JOIN adq.tproceso_compra proc ON proc.id_proceso_compra = cot.id_proceso_compra
+         JOIN adq.tsolicitud sol ON sol.id_solicitud = proc.id_solicitud
+         JOIN segu.tusuario usu1 ON usu1.id_usuario = cot.id_usuario_reg
+         JOIN detalle d ON d.id_cotizacion = cot.id_cotizacion
+         JOIN param.tmoneda mon ON mon.id_moneda = cot.id_moneda
+         JOIN param.vproveedor pro ON pro.id_proveedor = cot.id_proveedor
+         LEFT JOIN segu.tusuario usu2 ON usu2.id_usuario = cot.id_usuario_mod
+         LEFT JOIN adq.tcategoria_compra ctp ON ctp.id_categoria_compra = sol.id_categoria_compra), cantidad_adjudicada_query AS(
+      SELECT ctdet.id_cotizacion,
+             sum(ctdet.cantidad_adju) AS cantidad_adjudicada
+      FROM adq.tcotizacion_det ctdet
+           JOIN base_query base ON base.id_cotizacion = ctdet.id_cotizacion
+      GROUP BY ctdet.id_cotizacion), cecos_query AS(
+        SELECT ctd.id_cotizacion,
+               array_to_string(array_agg(DISTINCT upper(cc.codigo_cc)), '<br>'::text)::character varying AS cecos
+        FROM adq.tcotizacion_det ctd
+             JOIN adq.tsolicitud_det sold ON sold.id_solicitud_det = ctd.id_solicitud_det
+             JOIN param.tconcepto_ingas cig ON cig.id_concepto_ingas = sold.id_concepto_ingas
+             JOIN param.vcentro_costo cc ON cc.id_centro_costo = sold.id_centro_costo
+             JOIN base_query base ON base.id_cotizacion = ctd.id_cotizacion
+        GROUP BY ctd.id_cotizacion), nro_cuenta_query AS(
+          SELECT ctd.id_cotizacion,
+                 array_to_string(array_agg(DISTINCT cta.nro_cuenta), '<br>'::text) AS nro_cuenta
+          FROM adq.tcotizacion_det ctd
+               JOIN adq.tsolicitud_det sold ON sold.id_solicitud_det = ctd.id_solicitud_det
+               LEFT JOIN conta.tcuenta cta ON cta.id_cuenta = sold.id_cuenta
+               JOIN base_query base ON base.id_cotizacion = ctd.id_cotizacion
+          GROUP BY ctd.id_cotizacion)
+            SELECT bq.id_cotizacion,
+                   bq.estado_reg,
+                   bq.estado,
+                   bq.lugar_entrega,
+                   bq.tipo_entrega,
+                   bq.fecha_coti,
+                   bq.numero_oc,
+                   bq.id_proveedor,
+                   bq.desc_proveedor,
+                   bq.fecha_entrega,
+                   bq.id_moneda,
+                   bq.moneda,
+                   bq.id_proceso_compra,
+                   bq.fecha_venc,
+                   bq.obs,
+                   bq.fecha_adju,
+                   bq.nro_contrato,
+                   bq.fecha_reg,
+                   bq.id_usuario_reg,
+                   bq.fecha_mod,
+                   bq.id_usuario_mod,
+                   bq.usr_reg,
+                   bq.usr_mod,
+                   bq.id_estado_wf,
+                   bq.id_proceso_wf,
+                   bq.desc_moneda,
+                   bq.tipo_cambio_conv,
+                   bq.email,
+                   bq.numero,
+                   bq.num_tramite,
+                   bq.id_obligacion_pago,
+                   bq.tiempo_entrega,
+                   bq.funcionario_contacto,
+                   bq.telefono_contacto,
+                   bq.correo_contacto,
+                   bq.prellenar_oferta,
+                   bq.forma_pago,
+                   bq.requiere_contrato,
+                   bq.total_adjudicado,
+                   bq.total_cotizado,
+                   bq.total_adjudicado_mb,
+                   bq.tiene_form500,
+                   bq.correo_oc,
+                   cq.cecos,
+                   caq.cantidad_adjudicada AS total,
+                   ncq.nro_cuenta,
+                   bq.id_categoria_compra,
+                   bq.codigo_proceso,
+                   bq.desc_categoria_compra
+            FROM base_query bq
+                 LEFT JOIN cantidad_adjudicada_query caq ON caq.id_cotizacion = bq.id_cotizacion
+                 LEFT JOIN cecos_query cq ON cq.id_cotizacion = bq.id_cotizacion
+                 LEFT JOIN nro_cuenta_query ncq ON ncq.id_cotizacion = bq.id_cotizacion;
+
+   -----------------SQL-----------------------------
+  CREATE OR REPLACE VIEW adq.vreporte_pago(
+    num_tramite,
+    id_depto,
+    nombre_depto_obp,
+    id_proveedor,
+    desc_proveedor,
+    id_plan_pago,
+    estado_reg,
+    nro_cuota,
+    monto_ejecutar_total_mb,
+    nro_sol_pago,
+    tipo_cambio,
+    fecha_pag,
+    id_proceso_wf,
+    fecha_dev,
+    estado,
+    tipo_pago,
+    monto_ejecutar_total_mo,
+    descuento_anticipo_mb,
+    obs_descuentos_anticipo,
+    id_plan_pago_fk,
+    id_obligacion_pago,
+    id_plantilla,
+    descuento_anticipo,
+    otros_descuentos,
+    tipo,
+    obs_monto_no_pagado,
+    obs_otros_descuentos,
+    monto,
+    id_int_comprobante,
+    nombre_pago,
+    monto_no_pagado_mb,
+    monto_mb,
+    id_estado_wf,
+    id_cuenta_bancaria,
+    otros_descuentos_mb,
+    forma_pago,
+    monto_no_pagado,
+    fecha_reg,
+    id_usuario_reg,
+    fecha_mod,
+    id_usuario_mod,
+    usr_reg,
+    usr_mod,
+    fecha_tentativa,
+    desc_plantilla,
+    liquido_pagable,
+    total_prorrateado,
+    total_pagado,
+    desc_cuenta_bancaria,
+    sinc_presupuesto,
+    monto_retgar_mb,
+    monto_retgar_mo,
+    descuento_ley,
+    obs_descuentos_ley,
+    descuento_ley_mb,
+    porc_descuento_ley,
+    nro_cheque,
+    nro_cuenta_bancaria,
+    id_cuenta_bancaria_mov,
+    desc_deposito,
+    numero_op,
+    id_depto_conta,
+    id_moneda,
+    tipo_moneda,
+    desc_moneda,
+    porc_monto_excento_var,
+    monto_excento,
+    obs_wf,
+    obs_descuento_inter_serv,
+    descuento_inter_serv,
+    porc_monto_retgar,
+    desc_funcionario1,
+    revisado_asistente,
+    conformidad,
+    fecha_conformidad,
+    tipo_obligacion,
+    monto_ajuste_ag,
+    monto_ajuste_siguiente_pago,
+    pago_variable,
+    monto_anticipo,
+    fecha_costo_ini,
+    fecha_costo_fin,
+    funcionario_wf,
+    tiene_form500,
+    id_depto_lb,
+    desc_depto_lb,
+    ultima_cuota_dev,
+    id_depto_conta_pp,
+    desc_depto_conta_pp,
+    contador_estados,
+    prioridad_lp,
+    id_gestion,
+    id_periodo,
+    pago_borrador,
+    codigo_tipo_anticipo,
+    cecos)
+AS
+WITH cecos(
+    id_plan_pago,
+    cecos) AS(
+  SELECT pl.id_plan_pago,
+         array_to_string(array_agg(DISTINCT upper(cc.codigo_cc)), '<br>'::text)::character varying AS cecos
+  FROM tes.tplan_pago pl
+       JOIN tes.tprorrateo pro_1 ON pro_1.id_plan_pago = pl.id_plan_pago
+       JOIN tes.tobligacion_det obgd ON obgd.id_obligacion_det = pro_1.id_obligacion_det
+       JOIN param.tconcepto_ingas cig ON cig.id_concepto_ingas = obgd.id_concepto_ingas
+       JOIN param.vcentro_costo cc ON cc.id_centro_costo = obgd.id_centro_costo
+  GROUP BY pl.id_plan_pago), cecos_detalle(
+      id_obligacion_pago,
+      cecos) AS(
+    SELECT ob.id_obligacion_pago,
+           array_to_string(array_agg(DISTINCT upper(cc.codigo_cc)), '<br>'::text)::character varying AS cecos
+    FROM tes.tobligacion_pago ob
+         JOIN tes.tobligacion_det obgd ON obgd.id_obligacion_pago = ob.id_obligacion_pago
+         JOIN param.tconcepto_ingas cig ON cig.id_concepto_ingas = obgd.id_concepto_ingas
+         JOIN param.vcentro_costo cc ON cc.id_centro_costo = obgd.id_centro_costo
+    GROUP BY ob.id_obligacion_pago)
+      SELECT op.num_tramite,
+             op.id_depto,
+             dep.nombre AS nombre_depto_obp,
+             op.id_proveedor,
+             pv.desc_proveedor,
+             plapa.id_plan_pago,
+             plapa.estado_reg,
+             plapa.nro_cuota,
+             plapa.monto_ejecutar_total_mb,
+             plapa.nro_sol_pago,
+             plapa.tipo_cambio,
+             plapa.fecha_pag,
+             plapa.id_proceso_wf,
+             plapa.fecha_dev,
+             plapa.estado,
+             plapa.tipo_pago,
+             plapa.monto_ejecutar_total_mo,
+             plapa.descuento_anticipo_mb,
+             plapa.obs_descuentos_anticipo,
+             plapa.id_plan_pago_fk,
+             plapa.id_obligacion_pago,
+             plapa.id_plantilla,
+             plapa.descuento_anticipo,
+             plapa.otros_descuentos,
+             plapa.tipo,
+             plapa.obs_monto_no_pagado,
+             plapa.obs_otros_descuentos,
+             plapa.monto,
+             plapa.id_int_comprobante,
+             plapa.nombre_pago,
+             plapa.monto_no_pagado_mb,
+             plapa.monto_mb,
+             plapa.id_estado_wf,
+             plapa.id_cuenta_bancaria,
+             plapa.otros_descuentos_mb,
+             plapa.forma_pago,
+             plapa.monto_no_pagado,
+             plapa.fecha_reg,
+             plapa.id_usuario_reg,
+             plapa.fecha_mod,
+             plapa.id_usuario_mod,
+             usu1.cuenta AS usr_reg,
+             usu2.cuenta AS usr_mod,
+             plapa.fecha_tentativa,
+             pla.desc_plantilla,
+             plapa.liquido_pagable,
+             plapa.total_prorrateado,
+             plapa.total_pagado,
+             ((COALESCE(cb.nombre_institucion, 'S/N'::character varying)::text || ' ('::text) || COALESCE(cb.nro_cuenta, 'S/C'::character varying)::
+               text) || ')'::text AS desc_cuenta_bancaria,
+             plapa.sinc_presupuesto,
+             plapa.monto_retgar_mb,
+             plapa.monto_retgar_mo,
+             plapa.descuento_ley,
+             plapa.obs_descuentos_ley,
+             plapa.descuento_ley_mb,
+             plapa.porc_descuento_ley,
+             plapa.nro_cheque,
+             plapa.nro_cuenta_bancaria,
+             plapa.id_cuenta_bancaria_mov,
+             cbanmo.descripcion AS desc_deposito,
+             op.numero AS numero_op,
+             op.id_depto_conta,
+             op.id_moneda,
+             mon.tipo_moneda,
+             mon.codigo AS desc_moneda,
+             plapa.porc_monto_excento_var,
+             plapa.monto_excento,
+             ew.obs AS obs_wf,
+             plapa.obs_descuento_inter_serv,
+             plapa.descuento_inter_serv,
+             plapa.porc_monto_retgar,
+             fun.desc_funcionario1,
+             plapa.revisado_asistente,
+             plapa.conformidad,
+             plapa.fecha_conformidad,
+             op.tipo_obligacion,
+             plapa.monto_ajuste_ag,
+             plapa.monto_ajuste_siguiente_pago,
+             op.pago_variable,
+             plapa.monto_anticipo,
+             plapa.fecha_costo_ini,
+             plapa.fecha_costo_fin,
+             funwf.desc_funcionario1 AS funcionario_wf,
+             plapa.tiene_form500,
+             plapa.id_depto_lb,
+             depto.nombre AS desc_depto_lb,
+             op.ultima_cuota_dev,
+             plapa.id_depto_conta AS id_depto_conta_pp,
+             depc.nombre_corto AS desc_depto_conta_pp,
+             (
+               SELECT count(*) AS count
+               FROM unnest(pwf.id_tipo_estado_wfs) elemento(elemento)
+               WHERE elemento.elemento = ew.id_tipo_estado
+             ) AS contador_estados,
+             depto.prioridad AS prioridad_lp,
+             (
+               SELECT ges.id_gestion
+               FROM param.tgestion ges
+               WHERE ges.gestion = date_part('year'::text, plapa.fecha_pag)::integer OFFSET 0
+               LIMIT 1
+             ) AS id_gestion,
+             (
+               SELECT tperiodo.id_periodo
+               FROM param.tperiodo
+               WHERE plapa.fecha_pag >= tperiodo.fecha_ini AND
+                     plapa.fecha_pag <= tperiodo.fecha_fin OFFSET 0
+               LIMIT 1
+             ) AS id_periodo,
+             plapa.pago_borrador,
+             plapa.codigo_tipo_anticipo,
+             CASE
+               WHEN plapa.tipo::text = 'ant_parcial'::text OR plapa.tipo::text = 'anticipo'::text OR plapa.tipo::text = 'dev_garantia'::text THEN
+                 ce.cecos
+               ELSE cec.cecos
+             END AS cecos
+      FROM tes.tplan_pago plapa
+           JOIN wf.tproceso_wf pwf ON pwf.id_proceso_wf = plapa.id_proceso_wf
+           JOIN tes.tobligacion_pago op ON op.id_obligacion_pago = plapa.id_obligacion_pago
+           JOIN param.tmoneda mon ON mon.id_moneda = op.id_moneda
+           JOIN wf.testado_wf ew ON ew.id_estado_wf = plapa.id_estado_wf
+           LEFT JOIN param.tplantilla pla ON pla.id_plantilla = plapa.id_plantilla
+           JOIN segu.tusuario usu1 ON usu1.id_usuario = plapa.id_usuario_reg
+           LEFT JOIN tes.vcuenta_bancaria cb ON cb.id_cuenta_bancaria = plapa.id_cuenta_bancaria
+           LEFT JOIN segu.tusuario usu2 ON usu2.id_usuario = plapa.id_usuario_mod
+           LEFT JOIN tes.tcuenta_bancaria_mov cbanmo ON cbanmo.id_cuenta_bancaria_mov = plapa.id_cuenta_bancaria_mov
+           LEFT JOIN param.vproveedor pro ON pro.id_proveedor = op.id_proveedor
+           LEFT JOIN orga.vfuncionario fun ON fun.id_funcionario = op.id_funcionario
+           LEFT JOIN orga.vfuncionario funwf ON funwf.id_funcionario = ew.id_funcionario
+           LEFT JOIN param.tdepto depto ON depto.id_depto = plapa.id_depto_lb
+           LEFT JOIN tes.tts_libro_bancos lb ON plapa.id_int_comprobante = lb.id_int_comprobante
+           LEFT JOIN param.tdepto depc ON depc.id_depto = plapa.id_depto_conta
+           LEFT JOIN param.tdepto dep ON dep.id_depto = op.id_depto
+           LEFT JOIN param.vproveedor pv ON pv.id_proveedor = op.id_proveedor
+           LEFT JOIN cecos cec ON cec.id_plan_pago = plapa.id_plan_pago
+           LEFT JOIN cecos_detalle ce ON ce.id_obligacion_pago = plapa.id_obligacion_pago;
+/***********************************F-DEP-EGS-ADQ-3-20/05/2020*****************************************/

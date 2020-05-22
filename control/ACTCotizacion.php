@@ -5,6 +5,8 @@
 *@author  Gonzalo Sarmiento Sejas
 *@date 21-03-2013 14:48:35
 *@description Clase que recibe los parametros enviados por la vista para mandar a la capa de Modelo
+ ISSUE       AUTHOR          FECHA           DESCRIPCION
+ #18           EGS            22/05/2020      Filtros Para Cotizaciones
 */
 require_once(dirname(__FILE__).'/../../pxp/pxpReport/ReportWriter.php');
 require_once(dirname(__FILE__).'/../reportes/RCotizacion.php');
@@ -27,6 +29,36 @@ class ACTCotizacion extends ACTbase{
 		if($this->objParam->getParametro('filtro_campo')!=''){
             $this->objParam->addFiltro($this->objParam->getParametro('filtro_campo')." = ".$this->objParam->getParametro('filtro_valor'));  
         }
+
+		///////#18
+
+        if($this->objParam->getParametro('desde')!='' && $this->objParam->getParametro('hasta')!=''){
+            $this->objParam->addFiltro("( cot.fecha_coti::date  BETWEEN ''%".$this->objParam->getParametro('desde')."%''::date  and ''%".$this->objParam->getParametro('hasta')."%''::date)");
+        }
+
+        if($this->objParam->getParametro('desde')!='' && $this->objParam->getParametro('hasta')==''){
+            $this->objParam->addFiltro("( cot.fecha_coti::date  >= ''%".$this->objParam->getParametro('desde')."%''::date)");
+        }
+
+        if($this->objParam->getParametro('desde')=='' && $this->objParam->getParametro('hasta')!=''){
+            $this->objParam->addFiltro("( cot.fecha_coti::date  <= ''%".$this->objParam->getParametro('hasta')."%''::date)");
+        }
+        if($this->objParam->getParametro('num_tramite')!=''){
+            $this->objParam->addFiltro("cot.num_tramite like ''%".$this->objParam->getParametro('num_tramite')."%'' ");
+        }
+        if($this->objParam->getParametro('id_proveedor')!=''){
+            $this->objParam->addFiltro("cot.id_proveedor = ''".$this->objParam->getParametro('id_proveedor')."'' ");
+        }
+        if($this->objParam->getParametro('id_categoria_compra')!=''){
+            $this->objParam->addFiltro("cot.id_categoria_compra = ''".$this->objParam->getParametro('id_categoria_compra')."'' ");
+        }
+        if($this->objParam->getParametro('codigo_proceso')!=''){
+            $this->objParam->addFiltro("cot.codigo_proceso like ''%".$this->objParam->getParametro('codigo_proceso')."%'' ");
+        }
+        if($this->objParam->getParametro('codigo_tcc')!=''){
+            $this->objParam->addFiltro(" cot.cecos::varchar like ''%".strtoupper($this->objParam->getParametro('codigo_tcc'))."%''");
+        }
+        ///////////
 		
 		if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
 			$this->objReporte = new Reporte($this->objParam,$this);
@@ -582,6 +614,26 @@ class ACTCotizacion extends ACTbase{
     function cambioFomrulario500(){
         $this->objFunc=$this->create('MODCotizacion');  
         $this->res=$this->objFunc->cambioFomrulario500($this->objParam);
+        $this->res->imprimirRespuesta($this->res->generarJson());
+    }
+    function ListarNumTraCot(){
+        if($this->objParam->getParametro('num_tramite')!=''){
+            $this->objParam->addFiltro("cot.num_tramite = ".$this->objParam->getParametro('num_tramite'));
+        }
+        $this->objParam->defecto('ordenacion','num_tramite');
+        $this->objParam->defecto('dir_ordenacion','asc');
+        $this->objFunc=$this->create('MODCotizacion');
+        $this->res=$this->objFunc->ListarNumTraCot($this->objParam);
+        $this->res->imprimirRespuesta($this->res->generarJson());
+    }
+    function ListarCodigoProcesoCot(){
+        if($this->objParam->getParametro('codigo_proceso')!=''){
+            $this->objParam->addFiltro("cot.codigo_proceso = ".$this->objParam->getParametro('codigo_proceso'));
+        }
+        $this->objParam->defecto('ordenacion','codigo_proceso');
+        $this->objParam->defecto('dir_ordenacion','asc');
+        $this->objFunc=$this->create('MODCotizacion');
+        $this->res=$this->objFunc->ListarCodigoProcesoCot($this->objParam);
         $this->res->imprimirRespuesta($this->res->generarJson());
     }
     
