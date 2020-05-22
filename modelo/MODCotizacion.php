@@ -10,9 +10,9 @@
        
  ISSUE            FECHA:              AUTOR                 DESCRIPCION
    
- #0               05/09/2013        RAC KPLIAN        Creación
- #16               20/01/2020        RAC KPLIAN        Mejor el rendimiento de la interface de Ordenes y Cotizaciones, issue #16
- 
+ #0               05/09/2013        RAC KPLIAN           Creación
+ #16               20/01/2020        RAC KPLIAN          Mejor el rendimiento de la interface de Ordenes y Cotizaciones, issue #16
+ #18              22/05/2020           EGS               Campos Adicionales Para Cotizaciones
  * */
 
 class MODCotizacion extends MODbase{
@@ -26,9 +26,11 @@ class MODCotizacion extends MODbase{
 		$this->procedimiento='adq.f_cotizacion_sel';
 		$this->transaccion='ADQ_COT_SEL';
 		$this->tipo_procedimiento='SEL';//tipo de transaccion
-				
-		
-		$this->setParametro('id_funcionario_usu','id_funcionario_usu','int4');
+
+        $this->setParametro('groupBy','groupBy','varchar');
+        $this->setParametro('groupDir','groupDir','varchar');
+
+        $this->setParametro('id_funcionario_usu','id_funcionario_usu','int4');
         $this->setParametro('tipo_interfaz','tipo_interfaz','varchar');
         $this->setParametro('historico','historico','varchar');
         
@@ -83,7 +85,10 @@ class MODCotizacion extends MODbase{
 		$this->captura('cecos','varchar');
 		$this->captura('total','numeric');
 		$this->captura('nro_cuenta','text');
-		
+        $this->captura('id_categoria_compra','integer');//#18
+        $this->captura('codigo_proceso','varchar');//#18
+        $this->captura('desc_categoria_compra','varchar');//#18
+
 		//Ejecuta la instruccion
 		$this->armarConsulta();
 		$this->ejecutarConsulta();
@@ -725,7 +730,39 @@ class MODCotizacion extends MODbase{
 		
 		//Devuelve la respuesta
 		return $this->respuesta;
-	}	
+	}
+    function ListarNumTraCot(){
+        //Definicion de variables para ejecucion del procedimientp
+        $this->procedimiento='adq.f_cotizacion_sel';
+        $this->transaccion='ADQ_NUMCOT_SEL';
+        $this->tipo_procedimiento='SEL';//tipo de transaccion
+
+        //Definicion de la lista del resultado del query
+        $this->captura('num_tramite','varchar');
+
+        //Ejecuta la instruccion
+        $this->armarConsulta();
+        $this->ejecutarConsulta();
+
+        //Devuelve la respuesta
+        return $this->respuesta;
+    }
+    Function ListarCodigoProcesoCot(){
+        //Definicion de variables para ejecucion del procedimientp
+    $this->procedimiento='adq.f_cotizacion_sel';
+    $this->transaccion='ADQ_CODPRCOT_SEL';
+    $this->tipo_procedimiento='SEL';//tipo de transaccion
+
+        //Definicion de la lista del resultado del query
+    $this->captura('codigo_proceso','varchar');
+
+        //Ejecuta la instruccion
+    $this->armarConsulta();
+    $this->ejecutarConsulta();
+
+        //Devuelve la respuesta
+    return $this->respuesta;
+    }
 
 			
 }

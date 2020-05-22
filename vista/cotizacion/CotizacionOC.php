@@ -8,13 +8,24 @@
  *  * * ISSUE            FECHA:		      AUTOR       DESCRIPCION
 
  #16               20/01/2020        RAC KPLIAN        Creacion, Mejor el rendimiento de la interface de Ordenes y Cotizaciones, issue #16
-*/
+#18                 22/05/2020          EGS             Se agregan campos
+ */
 
 header("content-type: text/javascript; charset=UTF-8");
 ?>
 <script>
 Phx.vista.CotizacionOC=Ext.extend(Phx.gridInterfaz,{
     tam_pag: 50,
+    bottom_filter: true,
+    egrid: false,
+    tipoStore: 'GroupingStore',//GroupingStore o JsonStore 
+    remoteGroup: true,
+    groupField:'num_tramite',
+    viewGrid: new Ext.grid.GroupingView({
+        forceFit:false,
+        //groupTextTpl: '{text} ({[values.rs.length]} {[values.rs.length > 1 ? "Items" : "Item"]})'
+    }),
+    
     constructor: function(config){
 	    this.maestro = config;
 		//llama al constructor de la clase padre
@@ -40,6 +51,8 @@ Phx.vista.CotizacionOC=Ext.extend(Phx.gridInterfaz,{
         this.load({params:{start:0, limit:this.tam_pag}});
 	
 	},
+
+
 	
 	 diagramGantt:function(){           
             var data=this.sm.getSelected().data.id_proceso_wf;
@@ -755,6 +768,34 @@ Phx.vista.CotizacionOC=Ext.extend(Phx.gridInterfaz,{
 			grid:true,
 			form:false
 		},
+        {//#18
+            config:{
+                name: 'codigo_proceso',
+                fieldLabel: 'Codigo Proceso',
+                allowBlank: true,
+                anchor: '80%',
+                gwidth: 100,
+                maxLength:10
+            },
+            type:'TextField',
+            id_grupo:1,
+            grid:true,
+            form:false
+        },
+        {//#18
+            config:{
+                name: 'desc_categoria_compra',
+                fieldLabel: 'Categoria compra',
+                allowBlank: true,
+                anchor: '80%',
+                gwidth: 100,
+                maxLength:10
+            },
+            type:'TextField',
+            id_grupo:1,
+            grid:true,
+            form:false
+        },
 	],
 	
 	title:'Cotizaciones',
@@ -795,7 +836,7 @@ Phx.vista.CotizacionOC=Ext.extend(Phx.gridInterfaz,{
         'telefono_contacto',
         'correo_contacto', 'correo_oc',
         'prellenar_oferta', 'forma_pago', 'requiere_contrato','total_adjudicado','total_cotizado','total_adjudicado_mb','tiene_form500','total','cecos'
-        ,'nro_cuenta'
+        ,'nro_cuenta','codigo_proceso','desc_categoria_compra'//#18
 		
 	],
     rowExpander: new Ext.ux.grid.RowExpander({
@@ -977,7 +1018,17 @@ Phx.vista.CotizacionOC=Ext.extend(Phx.gridInterfaz,{
         url:'../../../sis_adquisiciones/vista/cotizacion_det/CotizacionDet.php',
         title:'Detalles Cotizacion', 
         height : '50%',
-        cls:'CotizacionDet'}
+        cls:'CotizacionDet'},
+    onReloadPage:function(param){
+
+        var me = this;
+        this.initFiltro(param);
+    },
+
+    initFiltro: function(param){
+        this.store.baseParams=param;
+        this.load( { params: { start:0, limit: this.tam_pag } });
+    },
 	}
 )
 </script>

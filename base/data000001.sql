@@ -1015,3 +1015,7 @@ select wf.f_import_testructura_estado ('insert','asignado','finalizado','PRESOL'
 /***********************************I-DAT-EGS-ADQ-2-13/09/2019*****************************************/
 select pxp.f_insert_tgui ('Proveedores', 'Proveedores de compra', 'ADQ.4', 'si', 2, 'sis_adquisiciones/vista/proveedor/ProveedorAdq.php', 2, '', 'ProveedorAdq', 'ADQ');
 /***********************************F-DAT-EGS-ADQ-2-13/09/2019*****************************************/
+/***********************************I-DAT-EGS-ADQ-3-11/03/2020*****************************************/
+select pxp.f_insert_tgui ('Reporte Pagos', 'Reporte Pagos', 'REPPAG', 'si', 2, 'sis_adquisiciones/vista/reporte_pago/FormFiltro.php', 3, '', 'FormFiltro', 'ADQ');
+select pxp.f_insert_tgui ('Cotizaciones/Ordenes', 'Cotizaciones y Ordenes de Compra', 'COTOC', 'si', 10, 'sis_adquisiciones/vista/reporte_cotizacion/FormFiltro.php', 2, '', 'FormFiltro', 'ADQ');
+/***********************************F-DAT-EGS-ADQ-3-11/03/2020*****************************************/
