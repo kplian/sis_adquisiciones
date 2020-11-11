@@ -22,3 +22,22 @@ update adq.tsolicitud set
     id_depto=5
 WHERE id_solicitud = 6272;
 /********************************************F-DAUP-EGS-ADQ-1-16/10/2020********************************************/
+/********************************************I-DAUP-EGS-ADQ-2-11/11/2020********************************************/
+--Dato original
+-- update adq.tsolicitud set
+--     id_depto=16
+-- WHERE id_solicitud = 6274;
+--Cambio
+update adq.tsolicitud set
+    id_depto=5
+WHERE id_solicitud = 6274;
+
+--Dato original
+-- update adq.tsolicitud set
+--     id_depto=16
+-- WHERE id_solicitud = 6275;
+--Cambio
+update adq.tsolicitud set
+    id_depto=5
+WHERE id_solicitud = 6275;
+/********************************************F-DAUP-EGS-ADQ-2-11/11/2020********************************************/
