@@ -51,3 +51,13 @@ update adq.tsolicitud set
     id_depto=5
 WHERE id_solicitud = 6674;
 /********************************************F-DAUP-EGS-ADQ-3-12/11/2020********************************************/
+/********************************************I-DAUP-EGS-ADQ-4-17/11/2020********************************************/
+--Dato original
+-- update adq.tsolicitud set
+--     id_depto=16
+-- WHERE id_solicitud = 6512;
+--Cambio
+update adq.tsolicitud set
+    id_depto=5
+WHERE id_solicitud = 6512;
+/********************************************F-DAUP-EGS-ADQ-4-17/11/2020********************************************/
