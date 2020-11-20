@@ -61,3 +61,13 @@ update adq.tsolicitud set
     id_depto=5
 WHERE id_solicitud = 6512;
 /********************************************F-DAUP-EGS-ADQ-4-17/11/2020********************************************/
+/********************************************I-DAUP-EGS-ADQ-5-20/11/2020********************************************/
+--Dato original
+-- update adq.tcotizacion set
+--     tiempo_entrega= '45 días a partir del dia siguiente de confirmado el deposito de pago.'
+-- WHERE id_cotizacion = 5186;
+--Cambio
+update adq.tcotizacion set
+    tiempo_entrega= '45 días a partir del día siguiente de recibido los documentos de embarque.'
+WHERE id_cotizacion = 5186;
+/********************************************F-DAUP-EGS-ADQ-5-20/11/2020********************************************/
