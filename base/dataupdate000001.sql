@@ -71,3 +71,24 @@ update adq.tcotizacion set
     tiempo_entrega= '45 días a partir del día siguiente de recibido los documentos de embarque.'
 WHERE id_cotizacion = 5186;
 /********************************************F-DAUP-EGS-ADQ-5-20/11/2020********************************************/
+<<<<<<< HEAD
+=======
+/********************************************I-DAUP-EGS-ADQ-ETR-2008-08/12/2020********************************************/
+--Dato original
+-- update adq.tsolicitud set
+--     id_depto=16
+-- WHERE id_solicitud = 6664;
+--Cambio
+update adq.tsolicitud set
+    id_depto=5
+WHERE id_solicitud = 6664;
+--Dato original
+-- update adq.tsolicitud set
+--     id_depto=16
+-- WHERE id_solicitud = 6663;
+--Cambio
+update adq.tsolicitud set
+    id_depto=5
+WHERE id_solicitud = 6663;
+/********************************************F-DAUP-EGS-ADQ-ETR-2008-08/12/2020********************************************/
+>>>>>>> remotes/origin/test
