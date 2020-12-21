@@ -280,6 +280,234 @@ BEGIN
             return v_consulta;
 
         end;
+        
+	
+        /*********************************
+        #TRANSACCION:  'ADQ_CONSREP_SEL'
+        #DESCRIPCION:    Consulta de datos
+        #AUTOR:        admin
+        #FECHA:        10-04-2013 15:43:23
+        ***********************************/
+
+    	ELSIF(p_transaccion='ADQ_CONSREP_SEL')THEN
+        BEGIN
+
+            --Sentencia de la consulta
+            v_consulta:='SELECT 
+                        sol.num_tramite::varchar,
+                        sol.justificacion::varchar,
+                        cot.id_proveedor::integer,
+                        cot.desc_proveedor::varchar,
+                        pc.id_funcionario::integer,
+                        pc.desc_funcionario::varchar,
+                        cot.id_moneda::integer,
+                        mon.moneda::varchar,
+                        COALESCE(sum(cotd.cantidad_adju * cotd.precio_unitario), 0::numeric)::numeric AS monto_total_adjudicado,
+                        COALESCE(sum(cotd.cantidad_adju * cotd.precio_unitario_mb), 0::numeric)::numeric AS monto_total_adjudicado_mb,
+                        pc.fecha_reg::date,
+                        oc.fecha_adju::date,
+                        oc.fecha_coti::date,
+                        oc.cecos::varchar,
+                        sol.id_proceso_wf,
+                        (
+                        SELECT max(tesw.fecha_reg) 
+                        FROM wf.testado_wf tesw 
+                        JOIN wf.tproceso_wf pw ON pw.id_proceso_wf=tesw.id_proceso_wf
+                        JOIN wf.ttipo_estado te ON te.id_tipo_estado=tesw.id_tipo_estado
+                        WHERE 
+                        te.nombre_estado=''Solicitud Aprobada'' AND
+                        tesw.id_proceso_wf=sol.id_proceso_wf
+                        limit 1
+                        )::date as fecha_apro
+                        
+                        FROM adq.vcotizacion cot
+                        JOIN adq.tcotizacion_det cotd ON cotd.id_cotizacion = cot.id_cotizacion
+                        JOIN adq.tsolicitud sol ON sol.id_solicitud=cot.id_solicitud
+                        JOIN adq.vproceso_compra pc ON pc.id_solicitud=sol.id_solicitud
+                        JOIN adq.vorden_compra oc ON oc.id_proceso_compra=pc.id_proceso_compra
+                        JOIN param.tmoneda mon ON mon.id_moneda=cot.id_moneda
+                        WHERE 
+                        cot.estado not in(''anulado'') AND
+                        sol.estado not in(''anulado'') AND
+                        pc.estado not in(''anulado'') AND
+                        oc.estado not in(''anulado'') AND '; 
+            v_consulta:=v_consulta||v_parametros.filtro;           
+            v_consulta:=v_consulta||'
+            			GROUP BY
+                        sol.num_tramite,
+                        sol.justificacion,
+                        cot.id_proveedor,
+                        cot.desc_proveedor,
+                        pc.id_funcionario,
+                        pc.desc_funcionario,
+                        cot.id_moneda,
+                        mon.moneda,
+                        pc.fecha_reg,
+                        oc.fecha_adju,
+                        oc.fecha_coti,
+                        sol.id_proceso_wf,
+                        oc.cecos';
+                        
+            --Definicion de la respuesta
+            v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
+            raise notice '%',v_consulta;
+            --raise exception '%',v_consulta;
+            --Devuelve la respuesta
+            return v_consulta;
+        END;
+    
+    	/*********************************
+        #TRANSACCION:  'ADQ_CONSREP_CONT'
+        #DESCRIPCION:    Consulta de datos
+        #AUTOR:        admin
+        #FECHA:        10-04-2013 15:43:23
+        ***********************************/
+
+    	ELSIF(p_transaccion='ADQ_CONSREP_CONT')THEN
+        BEGIN
+
+            --Sentencia de la consulta
+            v_consulta:='WITH parcial AS (
+            			SELECT 
+                        sol.num_tramite::varchar,
+                        sol.justificacion::varchar,
+                        cot.id_proveedor::integer,
+                        cot.desc_proveedor::varchar,
+                        pc.id_funcionario::integer,
+                        pc.desc_funcionario::varchar,
+                        cot.id_moneda::integer,
+                        mon.moneda::varchar,
+                        COALESCE(sum(cotd.cantidad_adju * cotd.precio_unitario), 0::numeric)::numeric AS monto_total_adjudicado,
+                        COALESCE(sum(cotd.cantidad_adju * cotd.precio_unitario_mb), 0::numeric)::numeric AS monto_total_adjudicado_mb,
+                        pc.fecha_reg::date,
+                        oc.fecha_adju::date,
+                        oc.fecha_coti::date,
+                        oc.cecos::varchar,
+                        sol.id_proceso_wf,
+                        (
+                        SELECT max(tesw.fecha_reg)
+                        FROM wf.testado_wf tesw 
+                        JOIN wf.tproceso_wf pw ON pw.id_proceso_wf=tesw.id_proceso_wf
+                        JOIN wf.ttipo_estado te ON te.id_tipo_estado=tesw.id_tipo_estado
+                        WHERE 
+                        te.nombre_estado=''Solicitud Aprobada'' AND
+                        tesw.id_proceso_wf=sol.id_proceso_wf
+                        limit 1
+                        )::date as fecha_apro
+                        
+                        FROM adq.vcotizacion cot
+                        JOIN adq.tcotizacion_det cotd ON cotd.id_cotizacion = cot.id_cotizacion
+                        JOIN adq.tsolicitud sol ON sol.id_solicitud=cot.id_solicitud
+                        JOIN adq.vproceso_compra pc ON pc.id_solicitud=sol.id_solicitud
+                        JOIN adq.vorden_compra oc ON oc.id_proceso_compra=pc.id_proceso_compra
+                        JOIN param.tmoneda mon ON mon.id_moneda=cot.id_moneda
+                        WHERE 
+                        cot.estado not in(''anulado'') AND
+                        sol.estado not in(''anulado'') AND
+                        pc.estado not in(''anulado'') AND
+                        oc.estado not in(''anulado'') AND '; 
+            v_consulta:=v_consulta||v_parametros.filtro;           
+            v_consulta:=v_consulta||'
+            		    GROUP BY
+                        sol.num_tramite,
+                        sol.justificacion,
+                        cot.id_proveedor,
+                        cot.desc_proveedor,
+                        pc.id_funcionario,
+                        pc.desc_funcionario,
+                        cot.id_moneda,
+                        mon.moneda,
+                        pc.fecha_reg,
+                        oc.fecha_adju,
+                        oc.fecha_coti,
+                        sol.id_proceso_wf,
+                        oc.cecos)
+                        
+                        SELECT
+                        count(num_tramite) as total
+                        FROM parcial';
+          
+            --Definicion de la respuesta
+            raise notice '%',v_consulta;
+            --raise exception '%',v_consulta;
+            --Devuelve la respuesta
+            return v_consulta;
+        END;
+        
+        /*********************************
+        #TRANSACCION:  'ADQ_CONSREP_REP'
+        #DESCRIPCION:    Consulta de datos
+        #AUTOR:        admin
+        #FECHA:        10-04-2013 15:43:23
+        ***********************************/
+
+    	ELSIF(p_transaccion='ADQ_CONSREP_REP')THEN
+        BEGIN
+
+            --Sentencia de la consulta
+            v_consulta:='SELECT 
+                        sol.num_tramite::varchar,
+                        sol.justificacion::varchar,
+                        cot.id_proveedor::integer,
+                        cot.desc_proveedor::varchar,
+                        pc.id_funcionario::integer,
+                        pc.desc_funcionario::varchar,
+                        cot.id_moneda::integer,
+                        mon.moneda::varchar,
+                        COALESCE(sum(cotd.cantidad_adju * cotd.precio_unitario), 0::numeric)::numeric AS monto_total_adjudicado,
+                        COALESCE(sum(cotd.cantidad_adju * cotd.precio_unitario_mb), 0::numeric)::numeric AS monto_total_adjudicado_mb,
+                        pc.fecha_reg::date,
+                        oc.fecha_adju::date,
+                        oc.fecha_coti::date,
+                        oc.cecos::varchar,
+                        sol.id_proceso_wf,
+                        (
+                        SELECT max(tesw.fecha_reg) 
+                        FROM wf.testado_wf tesw 
+                        JOIN wf.tproceso_wf pw ON pw.id_proceso_wf=tesw.id_proceso_wf
+                        JOIN wf.ttipo_estado te ON te.id_tipo_estado=tesw.id_tipo_estado
+                        WHERE 
+                        te.nombre_estado=''Solicitud Aprobada'' AND
+                        tesw.id_proceso_wf=sol.id_proceso_wf
+                        limit 1
+                        )::date as fecha_apro
+                        
+                        FROM adq.vcotizacion cot
+                        JOIN adq.tcotizacion_det cotd ON cotd.id_cotizacion = cot.id_cotizacion
+                        JOIN adq.tsolicitud sol ON sol.id_solicitud=cot.id_solicitud
+                        JOIN adq.vproceso_compra pc ON pc.id_solicitud=sol.id_solicitud
+                        JOIN adq.vorden_compra oc ON oc.id_proceso_compra=pc.id_proceso_compra
+                        JOIN param.tmoneda mon ON mon.id_moneda=cot.id_moneda
+                        WHERE 
+                        cot.estado not in(''anulado'') AND
+                        sol.estado not in(''anulado'') AND
+                        pc.estado not in(''anulado'') AND
+                        oc.estado not in(''anulado'') AND '; 
+            v_consulta:=v_consulta||v_parametros.filtro;           
+            v_consulta:=v_consulta||'
+            			GROUP BY
+                        sol.num_tramite,
+                        sol.justificacion,
+                        cot.id_proveedor,
+                        cot.desc_proveedor,
+                        pc.id_funcionario,
+                        pc.desc_funcionario,
+                        cot.id_moneda,
+                        mon.moneda,
+                        pc.fecha_reg,
+                        oc.fecha_adju,
+                        oc.fecha_coti,
+                        sol.id_proceso_wf,
+                        oc.cecos';
+                        
+            --Definicion de la respuesta
+            --v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
+            raise notice '%',v_consulta;
+            --raise exception '%',v_consulta;
+            --Devuelve la respuesta
+            return v_consulta;
+        END;
+            
     else
 
 
@@ -303,4 +531,5 @@ LANGUAGE 'plpgsql'
 VOLATILE
 CALLED ON NULL INPUT
 SECURITY INVOKER
+PARALLEL UNSAFE
 COST 100;
