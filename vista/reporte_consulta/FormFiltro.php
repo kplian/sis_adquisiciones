@@ -203,8 +203,7 @@ Phx.vista.FormFiltro=Ext.extend(Phx.frmInterfaz,{
                 hiddenName: 'id_categoria_compra',
                 fieldLabel: 'Categoria de Compra',
                 typeAhead: false,
-                forceSelection: false,
-                allowBlank: false,
+                allowBlank: true,
                 emptyText: 'Categorias...',
                 store: new Ext.data.JsonStore({
                     url: '../../sis_adquisiciones/control/CategoriaCompra/listarCategoriaCompra',
