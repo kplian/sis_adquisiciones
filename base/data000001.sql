@@ -1019,3 +1019,11 @@ select pxp.f_insert_tgui ('Proveedores', 'Proveedores de compra', 'ADQ.4', 'si',
 select pxp.f_insert_tgui ('Reporte Pagos', 'Reporte Pagos', 'REPPAG', 'si', 2, 'sis_adquisiciones/vista/reporte_pago/FormFiltro.php', 3, '', 'FormFiltro', 'ADQ');
 select pxp.f_insert_tgui ('Cotizaciones/Ordenes', 'Cotizaciones y Ordenes de Compra', 'COTOC', 'si', 10, 'sis_adquisiciones/vista/reporte_cotizacion/FormFiltro.php', 2, '', 'FormFiltro', 'ADQ');
 /***********************************F-DAT-EGS-ADQ-3-11/03/2020*****************************************/
+
+
+
+/***********************************I-DAT-MGM-ADQ-1-21/12/2020*****************************************/
+select pxp.f_insert_tgui ('Reporte Estado', 'Reporte Estado', 'REPEST', 'si', 5, 'sis_adquisiciones/vista/reporte_consulta/FormFiltro.php', 3, '', 'FormFiltro', 'ADQ');
+/***********************************F-DAT-MGM-ADQ-1-21/12/2020*****************************************/
+
+

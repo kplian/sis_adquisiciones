@@ -5344,3 +5344,7 @@ WITH cecos(
            LEFT JOIN cecos cec ON cec.id_plan_pago = plapa.id_plan_pago
            LEFT JOIN cecos_detalle ce ON ce.id_obligacion_pago = plapa.id_obligacion_pago;
 /***********************************F-DEP-EGS-ADQ-3-20/05/2020*****************************************/
+
+/***********************************I-DEP-MGM-ADQ-1-21/12/2020*****************************************/
+select pxp.f_insert_testructura_gui ('REPEST', 'REPADQ');
+/***********************************F-DEP-MGM-ADQ-1-21/12/2020*****************************************/
