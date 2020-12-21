@@ -138,13 +138,12 @@ Phx.vista.FormFiltro=Ext.extend(Phx.frmInterfaz,{
             config: {
                 name: 'id_proveedor',
                 fieldLabel: 'Proveedor',
-                anchor: '80%',
+                anchor: '90%',
                 tinit: false,
                 allowBlank: true,
                 origen: 'PROVEEDOR',
                 gdisplayField: 'desc_proveedor',
                 gwidth: 150,
-                anchor: '90%',
                 listWidth: '280',
                 resizable: true
             },
@@ -196,6 +195,45 @@ Phx.vista.FormFiltro=Ext.extend(Phx.frmInterfaz,{
             id_grupo: 0,
             filters: {pfiltro: 'tcc.codigo#tcc.descripcion',type: 'string'},
             grid: true,
+            form: true
+        },
+        {
+            config: {
+                name: 'id_categoria_compra',
+                hiddenName: 'id_categoria_compra',
+                fieldLabel: 'Categoria de Compra',
+                typeAhead: false,
+                forceSelection: false,
+                allowBlank: false,
+                emptyText: 'Categorias...',
+                store: new Ext.data.JsonStore({
+                    url: '../../sis_adquisiciones/control/CategoriaCompra/listarCategoriaCompra',
+                    id: 'id_categoria_compra',
+                    root: 'datos',
+                    sortInfo: {
+                        field: 'catcomp.nombre',
+                        direction: 'ASC'
+                    },
+                    totalProperty: 'total',
+                    fields: ['id_categoria_compra', 'nombre', 'codigo'],
+                    // turn on remote sorting
+                    remoteSort: true,
+                    baseParams: { par_filtro: 'catcomp.nombre#catcomp.codigo', codigo_subsistema: 'ADQ'}
+                }),
+                valueField: 'id_categoria_compra',
+                displayField: 'nombre',
+                triggerAction: 'all',
+                lazyRender: true,
+                mode: 'remote',
+                pageSize: 20,
+                queryDelay: 200,
+                listWidth:180,
+                minChars: 2,
+                anchor: '90%',
+                tpl: '<tpl for="."><div class="x-combo-list-item"><p>{nombre}</p>Codigo: <strong>{codigo}</strong> </div></tpl>'
+            },
+            type: 'ComboBox',
+            id_grupo: 0,
             form: true
         },
     ],

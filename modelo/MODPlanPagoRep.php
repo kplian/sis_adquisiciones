@@ -186,6 +186,7 @@ class MODPlanPagoRep extends MODbase{
 		$this->captura('fecha_coti','date');
 		$this->captura('cecos','varchar');
 		$this->captura('id_proceso_wf','int4');
+		$this->captura('id_categoria_compra','int4');
 		$this->captura('fecha_apro','date');
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -208,7 +209,7 @@ class MODPlanPagoRep extends MODbase{
 		$this->setParametro('num_tramite','num_tramite','varchar');
 		$this->setParametro('id_proveedor','id_proveedor','int4');
 		$this->setParametro('codigo_tcc','codigo_tcc','varchar');
-		
+		$this->setParametro('id_categoria_compra','id_categoria_compra','int4');
 		//Definicion de la lista del resultado del query
 		$this->captura('num_tramite','varchar');
 		$this->captura('justificacion','varchar');
@@ -225,6 +226,7 @@ class MODPlanPagoRep extends MODbase{
 		$this->captura('fecha_coti','date');
 		$this->captura('cecos','varchar');
 		$this->captura('id_proceso_wf','int4');
+		$this->captura('id_categoria_compra','int4');
 		$this->captura('fecha_apro','date');
 		
 		//Ejecuta la instruccion

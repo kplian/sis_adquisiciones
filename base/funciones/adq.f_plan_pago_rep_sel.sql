@@ -309,6 +309,7 @@ BEGIN
                         oc.fecha_coti::date,
                         oc.cecos::varchar,
                         sol.id_proceso_wf,
+                        sol.id_categoria_compra,
                         (
                         SELECT max(tesw.fecha_reg) 
                         FROM wf.testado_wf tesw 
@@ -346,6 +347,7 @@ BEGIN
                         oc.fecha_adju,
                         oc.fecha_coti,
                         sol.id_proceso_wf,
+                        sol.id_categoria_compra,
                         oc.cecos';
                         
             --Definicion de la respuesta
@@ -384,6 +386,7 @@ BEGIN
                         oc.fecha_coti::date,
                         oc.cecos::varchar,
                         sol.id_proceso_wf,
+                        sol.id_categoria_compra,
                         (
                         SELECT max(tesw.fecha_reg)
                         FROM wf.testado_wf tesw 
@@ -421,6 +424,7 @@ BEGIN
                         oc.fecha_adju,
                         oc.fecha_coti,
                         sol.id_proceso_wf,
+                        sol.id_categoria_compra,
                         oc.cecos)
                         
                         SELECT
@@ -461,6 +465,7 @@ BEGIN
                         oc.fecha_coti::date,
                         oc.cecos::varchar,
                         sol.id_proceso_wf,
+                        sol.id_categoria_compra,
                         (
                         SELECT max(tesw.fecha_reg) 
                         FROM wf.testado_wf tesw 
@@ -498,6 +503,7 @@ BEGIN
                         oc.fecha_adju,
                         oc.fecha_coti,
                         sol.id_proceso_wf,
+                        sol.id_categoria_compra,
                         oc.cecos';
                         
             --Definicion de la respuesta

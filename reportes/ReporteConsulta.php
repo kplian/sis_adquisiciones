@@ -42,18 +42,20 @@ class ReporteConsulta
         $datos = $this->objParam->getParametro('datos');	
         $columnas = 0;
         $this->docexcel->setActiveSheetIndex(0);
-        $this->docexcel->getActiveSheet()->getColumnDimension('A')->setWidth(30);
+        $this->docexcel->getActiveSheet()->getColumnDimension('A')->setWidth(7);
         $this->docexcel->getActiveSheet()->getColumnDimension('B')->setWidth(40);
         $this->docexcel->getActiveSheet()->getColumnDimension('C')->setWidth(40);
-        $this->docexcel->getActiveSheet()->getColumnDimension('D')->setWidth(15);
+        $this->docexcel->getActiveSheet()->getColumnDimension('D')->setWidth(40);
         $this->docexcel->getActiveSheet()->getColumnDimension('E')->setWidth(15);
         $this->docexcel->getActiveSheet()->getColumnDimension('F')->setWidth(15);
-        $this->docexcel->getActiveSheet()->getColumnDimension('G')->setWidth(19);
-        $this->docexcel->getActiveSheet()->getColumnDimension('H')->setWidth(20);
+        $this->docexcel->getActiveSheet()->getColumnDimension('G')->setWidth(15);
+        $this->docexcel->getActiveSheet()->getColumnDimension('H')->setWidth(15);
         $this->docexcel->getActiveSheet()->getColumnDimension('I')->setWidth(20);
         $this->docexcel->getActiveSheet()->getColumnDimension('J')->setWidth(20);
         $this->docexcel->getActiveSheet()->getColumnDimension('K')->setWidth(20);
         $this->docexcel->getActiveSheet()->getColumnDimension('L')->setWidth(20);
+        $this->docexcel->getActiveSheet()->getColumnDimension('M')->setWidth(20);
+        $this->docexcel->getActiveSheet()->getColumnDimension('N')->setWidth(20);
         //
         function dias_laborales($inicio, $fin)
         {
@@ -103,43 +105,49 @@ class ReporteConsulta
                 'style' => PHPExcel_Style_Border::BORDER_THIN
             )
         ));
-        $this->docexcel->getActiveSheet()->setCellValue('B1','DETALLE DE PROCESOS CONCLUIDOS Y EVALUADOS');
-        $this->docexcel->getActiveSheet()->getStyle('B1:F1')->applyFromArray($styleTitulos);
-        $this->docexcel->getActiveSheet()->mergeCells('B1:F1');
+        $this->docexcel->getActiveSheet()->setCellValue('C1','DETALLE DE PROCESOS CONCLUIDOS Y EVALUADOS');
+        $this->docexcel->getActiveSheet()->getStyle('C1:G1')->applyFromArray($styleTitulos);
+        $this->docexcel->getActiveSheet()->mergeCells('C1:G1');
 
-        $this->docexcel->getActiveSheet()->getStyle('A5:L5')->getAlignment()->setWrapText(true);
-        $this->docexcel->getActiveSheet()->getStyle('A5:L5')->applyFromArray($styleDetalle);
+        $this->docexcel->getActiveSheet()->getStyle('A5:N5')->getAlignment()->setWrapText(true);
+        $this->docexcel->getActiveSheet()->getStyle('A5:N5')->applyFromArray($styleDetalle);
         //*************************************Cabecera*****************************************
-        $this->docexcel->getActiveSheet()->setCellValue('A5','Suministro/Servicio');
-        $this->docexcel->getActiveSheet()->setCellValue('B5','Proveedor');
-        $this->docexcel->getActiveSheet()->setCellValue('C5','Responsable');
-        $this->docexcel->getActiveSheet()->setCellValue('D5','Estado');
-        $this->docexcel->getActiveSheet()->setCellValue('E5','Fecha ingreso documentos');
-        $this->docexcel->getActiveSheet()->setCellValue('F5','Fecha generacion orden de compra');
-        $this->docexcel->getActiveSheet()->setCellValue('G5','DÍAS HABILES');
-        $this->docexcel->getActiveSheet()->setCellValue('H5','Monto adjudicación');
-        $this->docexcel->getActiveSheet()->setCellValue('I5','Fecha Prevista');
-        $this->docexcel->getActiveSheet()->setCellValue('J5','Fecha Recepción');
-        $this->docexcel->getActiveSheet()->setCellValue('K5','Fecha Evaluación Seguimiento');
-        $this->docexcel->getActiveSheet()->setCellValue('L5','Eval. Total');
+        $this->docexcel->getActiveSheet()->setCellValue('A5','No');
+        $this->docexcel->getActiveSheet()->setCellValue('B5','Suministro/Servicio');
+        $this->docexcel->getActiveSheet()->setCellValue('C5','Proveedor');
+        $this->docexcel->getActiveSheet()->setCellValue('D5','Responsable');
+        $this->docexcel->getActiveSheet()->setCellValue('E5','Estado');
+        $this->docexcel->getActiveSheet()->setCellValue('F5','Fecha ingreso documentos');
+        $this->docexcel->getActiveSheet()->setCellValue('G5','Fecha generacion orden de compra');
+        $this->docexcel->getActiveSheet()->setCellValue('H5','DÍAS HABILES');
+        $this->docexcel->getActiveSheet()->setCellValue('I5','Monto adjudicación');
+        $this->docexcel->getActiveSheet()->setCellValue('J5','Monto adjudicación');
+        $this->docexcel->getActiveSheet()->setCellValue('K5','Fecha Prevista');
+        $this->docexcel->getActiveSheet()->setCellValue('L5','Fecha Recepción');
+        $this->docexcel->getActiveSheet()->setCellValue('M5','Fecha Evaluación Seguimiento');
+        $this->docexcel->getActiveSheet()->setCellValue('N5','Eval. Total');
         //*************************************Detalle*****************************************
         $fila = 6;
         $dias_labo=0;
+        $i=1;
         foreach($datos as $value) {
             $dias_labo = dias_laborales($value['fecha_apro'],$value['fecha_adju']);
-            $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(0, $fila, $value['justificacion']);
-            $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(1, $fila, $value['desc_proveedor']);
-            $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(2, $fila, $value['desc_funcionario']);
-            $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(3, $fila, '');
-            $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(4, $fila, date("d/m/Y", strtotime( $value['fecha_apro'])));
-            $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(5, $fila, date("d/m/Y", strtotime($value['fecha_adju'])));
+            $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(0, $fila, $i);
+            $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(1, $fila, $value['justificacion']);
+            $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(2, $fila, $value['desc_proveedor']);
+            $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(3, $fila, $value['desc_funcionario']);
+            $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(4, $fila, '');
+            $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(5, $fila, date("d/m/Y", strtotime($value['fecha_apro'])));
+            $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(6, $fila, date("d/m/Y", strtotime($value['fecha_adju'])));
             if($dias_labo==0){
-                $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(6, $fila, 'Error en diferencia');
+                $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(7, $fila, 'Error en diferencia');
             }else{
-                $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(6, $fila, $dias_labo);
+                $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(7, $fila, $dias_labo);
             }
-            $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(7, $fila, number_format($value['monto_total_adjudicado_mb'],2));
+            $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(8, $fila, number_format($value['monto_total_adjudicado_mb'],2));
+            $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(9, $fila, $value['moneda']);
             $fila++;
+            $i++;
         }
     }
 

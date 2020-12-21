@@ -298,6 +298,7 @@ Phx.vista.ReporteConsulta=Ext.extend(Phx.gridInterfaz,{
         num_tramite=param.num_tramite;
         id_proveedor=param.id_proveedor;
         codigo_tcc=param.codigo_tcc;
+        id_categoria_compra=param.id_categoria_compra;
         this.initFiltro(param);
     },
     //
@@ -320,6 +321,7 @@ Phx.vista.ReporteConsulta=Ext.extend(Phx.gridInterfaz,{
                 'num_tramite':num_tramite,
                 'id_proveedor':id_proveedor,
                 'codigo_tcc':codigo_tcc,
+                'id_categoria_compra':id_categoria_compra
             },
             success: this.successExport,
             failure: this.conexionFailure,

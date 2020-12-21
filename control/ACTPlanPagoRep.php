@@ -188,6 +188,9 @@ class ACTPlanPagoRep extends ACTbase{
         if($this->objParam->getParametro('codigo_tcc')!=''){
             $this->objParam->addFiltro(" oc.cecos::varchar like ''%".strtoupper($this->objParam->getParametro('codigo_tcc'))."%'' ");
         }
+        if($this->objParam->getParametro('id_categoria_compra')!=''){
+            $this->objParam->addFiltro("sol.id_categoria_compra = ''".$this->objParam->getParametro('id_categoria_compra')."'' ");
+        }
         $this->objFunc = $this->create('MODPlanPagoRep');
         $this->res = $this->objFunc->recuperarConsulta($this->objParam);
         $this->objParam->addParametro('datos',$this->res->datos);
