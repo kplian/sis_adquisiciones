@@ -995,4 +995,109 @@ ALTER TABLE adq.tcotizacion_det
   ALTER COLUMN cantidad_adju TYPE NUMERIC(19,2);
 
 /***********************************F-SCP-EGS-ADQ-3-28/08/2019****************************************/
+/***********************************I-SCP-EGS-ADQ-ETR-2176-22/12/2020****************************************/
+CREATE SCHEMA sql_server AUTHORIZATION postgres;
+CREATE FOREIGN TABLE sql_server.boleta (
+  idboleta INTEGER,
+  idtipo INTEGER,
+  idtipodoc INTEGER,
+  nrodoc VARCHAR,
+  otorgante BYTEA,
+  monto NUMERIC,
+  montomoneda INTEGER,
+  acuentade VARCHAR,
+  idgerencia INTEGER,
+  codresponsable VARCHAR,
+  responsable VARCHAR,
+  paragarantizar BYTEA,
+  fechaaccion DATE,
+  fechainicio TIMESTAMP WITHOUT TIME ZONE,
+  fechafin TIMESTAMP WITHOUT TIME ZONE,
+  observaciones VARCHAR,
+  estado INTEGER,
+  beneficiario VARCHAR,
+  idgarantizar INTEGER,
+  idinvitacion INTEGER,
+  idproyecto INTEGER
+)
+SERVER mssql_csa_prod
+OPTIONS (query 'SELECT [idBoleta] as idboleta
+      ,[idTipo] as idtipo
+      ,[idTipoDoc] as idtipodoc
+      ,[nroDoc] as nrodoc
+      ,[otorgante]
+      ,[monto]
+      ,[montoMoneda] as montomoneda
+      ,[aCuentaDe] as acuentade
+      ,[idGerencia] as idgerencia
+      ,[codResponsable] as codresponsable
+      ,[responsable]
+      ,[paraGarantizar] as paragarantizar
+      ,[fechaAccion] as fechaaccion
+      ,[fechaInicio] as fechainicio
+      ,[fechaFin] as fechafin
+      ,[observaciones]
+      ,[estado]
+      ,[beneficiario]
+      ,[idGarantizar] as idgarantizar
+      ,[IDInvitacion] as idinvitacion
+      ,[IdProyecto] as idproyecto
+  FROM [CSA_PROD].[dbo].[Boleta]');
+
+ALTER TABLE sql_server.boleta
+  OWNER TO postgres;
+
+CREATE FOREIGN TABLE sql_server.boletatipodoc (
+  idtipodoc INTEGER,
+  tipodocumento BYTEA
+)
+SERVER mssql_csa_prod
+OPTIONS (query 'SELECT [idTipoDoc] as idtipodoc
+      ,[TipoDocumento] as tipodocumento
+  FROM [CSA_PROD].[dbo].[BoletaTipoDoc]');
+
+ALTER TABLE sql_server.boletatipodoc
+  OWNER TO postgres;
+
+  CREATE FOREIGN TABLE sql_server.datosgenerales (
+  cd_empleado VARCHAR,
+  primer_nombre VARCHAR,
+  segundo_nombre VARCHAR,
+  apellido_p VARCHAR,
+  apellido_m VARCHAR,
+  estado VARCHAR,
+  correo VARCHAR
+)
+SERVER mssql_csa_prod
+OPTIONS (query 'SELECT [Cd_Empleado] as cd_empleado
+      ,[Primer_Nombre] as primer_nombre
+      ,[Segundo_Nombre] as segundo_nombre
+      ,[Apellido_P] as apellido_p
+      ,[Apellido_M] as apellido_m
+      ,[Estado] as estado
+      ,[Correo] as correo
+  FROM [BDSCP]..[DatosGenerales]');
+
+ALTER TABLE sql_server.datosgenerales
+  OWNER TO postgres;
+
+  CREATE FOREIGN TABLE sql_server.invitacion (
+  idinvitacion INTEGER,
+  cd_empleado_gestor DOUBLE PRECISION,
+  codinvitacion VARCHAR,
+  codresponsable VARCHAR
+)
+SERVER mssql_csa_prod
+OPTIONS (query 'SELECT [IDInvitacion] as idinvitacion
+      ,[Cd_empleado_gestor] as cd_empleado_gestor
+      ,[CodInvitacion] as codinvitacion
+      ,[CodResponsable] as codresponsable
+  FROM [CSA_PROD].[dbo].[Invitacion]');
+
+ALTER TABLE sql_server.invitacion
+  OWNER TO postgres;
+
+/***********************************F-SCP-EGS-ADQ-ETR-2176-22/12/2020****************************************/
+
+
 
