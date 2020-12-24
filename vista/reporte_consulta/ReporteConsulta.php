@@ -47,7 +47,7 @@ Phx.vista.ReporteConsulta=Ext.extend(Phx.gridInterfaz,{
             grid:true,
             form:false
         },
-        {
+        /*{
             config: {
                 name: 'id_proveedor',
                 fieldLabel: 'Proveedor',
@@ -64,6 +64,24 @@ Phx.vista.ReporteConsulta=Ext.extend(Phx.gridInterfaz,{
             id_grupo: 1,
             bottom_filter: true,
             grid: true,
+        },*/
+        {
+            config:{
+                name: 'desc_proveedor',
+                fieldLabel: 'Proveedor',
+                allowBlank: true,
+                anchor: '80%',
+                gwidth: 250,
+                maxLength:200,
+                renderer:function(value,p,record){
+                    var x =record.data.desc_proveedor;
+                    var s = x.replaceAll(',', '<br>');
+                    return s;
+                }
+            },
+            type:'TextField',
+            id_grupo:1,
+            grid:true,
         },
         {
             config:{
@@ -90,7 +108,7 @@ Phx.vista.ReporteConsulta=Ext.extend(Phx.gridInterfaz,{
         {
             config:{
                 name: 'desc_funcionario',
-                fieldLabel: 'Proveedor',
+                fieldLabel: 'Funcionario',
                 allowBlank: true,
                 anchor: '80%',
                 gwidth: 250,
@@ -98,10 +116,10 @@ Phx.vista.ReporteConsulta=Ext.extend(Phx.gridInterfaz,{
             },
             type:'TextField',
             id_grupo:1,
-            filters:{pfiltro:'pc.desc_funcionario',type:'string'},
+            filters:{pfiltro:'fun.desc_funcionario1',type:'string'},
             grid:true,
         },
-        {
+        /*{
             config:{
                 name: 'fecha_fin',
                 fieldLabel: 'Fecha',
@@ -114,7 +132,7 @@ Phx.vista.ReporteConsulta=Ext.extend(Phx.gridInterfaz,{
             filters:{pfiltro:'fecha_fin',type:'date'},
             id_grupo:1,
             grid:false
-        },
+        },*/
         {
             config:{
                 name: 'moneda',
@@ -163,7 +181,7 @@ Phx.vista.ReporteConsulta=Ext.extend(Phx.gridInterfaz,{
             id_grupo:1,
             grid:true,
         },
-        {
+        /*{
             config:{
                 name: 'fecha_reg',
                 fieldLabel: 'Fecha Aprobacion',
@@ -176,7 +194,7 @@ Phx.vista.ReporteConsulta=Ext.extend(Phx.gridInterfaz,{
             filters:{pfiltro:'pc.fecha_reg',type:'date'},
             id_grupo:1,
             grid:false
-        },
+        },*/
         {
             config:{
                 name: 'fecha_apro',
@@ -213,6 +231,10 @@ Phx.vista.ReporteConsulta=Ext.extend(Phx.gridInterfaz,{
                 anchor: '80%',
                 gwidth: 250,
                 maxLength:200,
+                renderer:function(value,p,record){
+                    var x =record.data.cecos.replaceAll(',', '<br>');
+                    return x;
+                }
             },
             type:'TextField',
             id_grupo:1,
@@ -272,7 +294,7 @@ Phx.vista.ReporteConsulta=Ext.extend(Phx.gridInterfaz,{
     fields: [
         {name:'num_tramite', type: 'string'},
         {name:'justificacion', type: 'string'},
-        {name:'id_proveedor', type: 'numeric'},
+        //{name:'id_proveedor', type: 'numeric'},
         {name:'desc_proveedor', type: 'string'},
         {name:'id_funcionario', type: 'numeric'},
         {name:'desc_funcionario', type: 'string'},
@@ -281,8 +303,8 @@ Phx.vista.ReporteConsulta=Ext.extend(Phx.gridInterfaz,{
         'id_moneda','diferencia','id_proceso_wf',
         'monto_total_adjudicado','monto_total_adjudicado_mb',
         {name:'fecha_adju', type: 'date',dateFormat:'Y-m-d'},
-        {name:'fecha_coti', type: 'date',dateFormat:'Y-m-d'},
-        {name:'fecha_reg', type: 'date',dateFormat:'Y-m-d'},
+        //{name:'fecha_coti', type: 'date',dateFormat:'Y-m-d'},
+        //{name:'fecha_reg', type: 'date',dateFormat:'Y-m-d'},
         {name:'fecha_apro', type: 'date',dateFormat:'Y-m-d'},
     ],
     //

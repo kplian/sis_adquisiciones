@@ -173,21 +173,22 @@ class MODPlanPagoRep extends MODbase{
 		
 		$this->captura('num_tramite','varchar');
 		$this->captura('justificacion','varchar');
-		$this->captura('id_proveedor','int4');
+		//$this->captura('id_proveedor','int4');
 		$this->captura('desc_proveedor','varchar');
 		$this->captura('id_funcionario','int4');
 		$this->captura('desc_funcionario','varchar');
 		$this->captura('id_moneda','int4');
 		$this->captura('moneda','varchar');
-		$this->captura('monto_total_adjudicado','numeric');
-		$this->captura('monto_total_adjudicado_mb','numeric');
-		$this->captura('fecha_reg','date');
+		
+		//$this->captura('fecha_reg','date');
 		$this->captura('fecha_adju','date');
-		$this->captura('fecha_coti','date');
+		$this->captura('fecha_apro','date');
 		$this->captura('cecos','varchar');
 		$this->captura('id_proceso_wf','int4');
 		$this->captura('id_categoria_compra','int4');
-		$this->captura('fecha_apro','date');
+
+		$this->captura('monto_total_adjudicado','numeric');
+		$this->captura('monto_total_adjudicado_mb','numeric');
 		//Ejecuta la instruccion
 		$this->armarConsulta();
 		$this->ejecutarConsulta();
@@ -213,22 +214,22 @@ class MODPlanPagoRep extends MODbase{
 		//Definicion de la lista del resultado del query
 		$this->captura('num_tramite','varchar');
 		$this->captura('justificacion','varchar');
-		$this->captura('id_proveedor','int4');
+		//$this->captura('id_proveedor','int4');
 		$this->captura('desc_proveedor','varchar');
 		$this->captura('id_funcionario','int4');
 		$this->captura('desc_funcionario','varchar');
 		$this->captura('id_moneda','int4');
 		$this->captura('moneda','varchar');
-		$this->captura('monto_total_adjudicado','numeric');
-		$this->captura('monto_total_adjudicado_mb','numeric');
-		$this->captura('fecha_reg','date');
+		
+		//$this->captura('fecha_reg','date');
 		$this->captura('fecha_adju','date');
-		$this->captura('fecha_coti','date');
+		$this->captura('fecha_apro','date');
 		$this->captura('cecos','varchar');
 		$this->captura('id_proceso_wf','int4');
 		$this->captura('id_categoria_compra','int4');
-		$this->captura('fecha_apro','date');
-		
+
+		$this->captura('monto_total_adjudicado','numeric');
+		$this->captura('monto_total_adjudicado_mb','numeric');
 		//Ejecuta la instruccion
 		$this->armarConsulta();
 		$this->ejecutarConsulta();

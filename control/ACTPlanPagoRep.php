@@ -140,6 +140,9 @@ class ACTPlanPagoRep extends ACTbase{
         if($this->objParam->getParametro('codigo_tcc')!=''){
             $this->objParam->addFiltro(" oc.cecos::varchar like ''%".strtoupper($this->objParam->getParametro('codigo_tcc'))."%'' ");
         }
+        if($this->objParam->getParametro('id_categoria_compra')!=''){
+            $this->objParam->addFiltro("sol.id_categoria_compra = ''".$this->objParam->getParametro('id_categoria_compra')."'' ");
+        }
         //$this->objParam->addParametro('id_funcionario_usu',$_SESSION["ss_id_funcionario"]);
 
         if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){

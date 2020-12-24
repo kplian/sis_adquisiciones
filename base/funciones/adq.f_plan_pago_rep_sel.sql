@@ -294,61 +294,57 @@ BEGIN
 
             --Sentencia de la consulta
             v_consulta:='SELECT 
+                        DISTINCT 
                         sol.num_tramite::varchar,
                         sol.justificacion::varchar,
-                        cot.id_proveedor::integer,
-                        cot.desc_proveedor::varchar,
-                        pc.id_funcionario::integer,
-                        pc.desc_funcionario::varchar,
+                        pxp.list(distinct p.desc_proveedor)::varchar as desc_proveedor,
+                        fun.id_funcionario::integer,
+                        fun.desc_funcionario1::varchar as desc_funcionario,
                         cot.id_moneda::integer,
                         mon.moneda::varchar,
-                        COALESCE(sum(cotd.cantidad_adju * cotd.precio_unitario), 0::numeric)::numeric AS monto_total_adjudicado,
-                        COALESCE(sum(cotd.cantidad_adju * cotd.precio_unitario_mb), 0::numeric)::numeric AS monto_total_adjudicado_mb,
-                        pc.fecha_reg::date,
-                        oc.fecha_adju::date,
-                        oc.fecha_coti::date,
-                        oc.cecos::varchar,
-                        sol.id_proceso_wf,
-                        sol.id_categoria_compra,
+                        cot.fecha_adju::date,
                         (
-                        SELECT max(tesw.fecha_reg) 
-                        FROM wf.testado_wf tesw 
+                        SELECT max(tesw.fecha_reg)
+                        FROM wf.testado_wf tesw
                         JOIN wf.tproceso_wf pw ON pw.id_proceso_wf=tesw.id_proceso_wf
                         JOIN wf.ttipo_estado te ON te.id_tipo_estado=tesw.id_tipo_estado
-                        WHERE 
+                        WHERE
                         te.nombre_estado=''Solicitud Aprobada'' AND
                         tesw.id_proceso_wf=sol.id_proceso_wf
                         limit 1
-                        )::date as fecha_apro
-                        
-                        FROM adq.vcotizacion cot
-                        JOIN adq.tcotizacion_det cotd ON cotd.id_cotizacion = cot.id_cotizacion
-                        JOIN adq.tsolicitud sol ON sol.id_solicitud=cot.id_solicitud
-                        JOIN adq.vproceso_compra pc ON pc.id_solicitud=sol.id_solicitud
-                        JOIN adq.vorden_compra oc ON oc.id_proceso_compra=pc.id_proceso_compra
-                        JOIN param.tmoneda mon ON mon.id_moneda=cot.id_moneda
-                        WHERE 
-                        cot.estado not in(''anulado'') AND
-                        sol.estado not in(''anulado'') AND
-                        pc.estado not in(''anulado'') AND
-                        oc.estado not in(''anulado'') AND '; 
+                        )::date as fecha_apro,
+                        pxp.list(distinct cc.codigo_cc)::varchar as cecos,
+                        sol.id_proceso_wf::integer,
+                        sol.id_categoria_compra::integer,                                                                        
+                        COALESCE(sum(cdt.cantidad_adju * cdt.precio_unitario), 0::numeric) AS monto_total_adjudicado,
+                        COALESCE(sum(cdt.cantidad_adju * cdt.precio_unitario_mb), 0::numeric) AS monto_total_adjudicado_mb
+                        FROM adq.tcotizacion cot
+                        JOIN adq.tproceso_compra proc ON proc.id_proceso_compra = cot.id_proceso_compra
+                        JOIN adq.tsolicitud sol ON sol.id_solicitud = proc.id_solicitud
+                        LEFT JOIN adq.tcotizacion_det cdt ON cdt.id_cotizacion = cot.id_cotizacion
+                        LEFT JOIN adq.tsolicitud_det sd ON sd.id_solicitud_det = cdt.id_solicitud_det
+                        LEFT JOIN param.tconcepto_ingas ci ON ci.id_concepto_ingas = sd.id_concepto_ingas
+                        JOIN param.vcentro_costo cc ON cc.id_centro_costo = sd.id_centro_costo
+                        JOIN param.tmoneda mon ON mon.id_moneda = sol.id_moneda
+                        JOIN orga.vfuncionario_cargo fun ON fun.id_funcionario = sol.id_funcionario AND fun.estado_reg_asi::text = ''activo''::text
+                        JOIN param.vproveedor p ON p.id_proveedor = cot.id_proveedor
+                        JOIN adq.tcategoria_compra cac ON cac.id_categoria_compra = sol.id_categoria_compra
+                        WHERE fun.fecha_asignacion <= sol.fecha_soli AND
+                        fun.fecha_finalizacion >= sol.fecha_soli OR
+                        fun.fecha_asignacion <= sol.fecha_soli AND
+                        fun.fecha_finalizacion IS NULL AND '; 
             v_consulta:=v_consulta||v_parametros.filtro;           
             v_consulta:=v_consulta||'
             			GROUP BY
                         sol.num_tramite,
                         sol.justificacion,
-                        cot.id_proveedor,
-                        cot.desc_proveedor,
-                        pc.id_funcionario,
-                        pc.desc_funcionario,
+                        fun.id_funcionario,
+                        fun.desc_funcionario1,
                         cot.id_moneda,
                         mon.moneda,
-                        pc.fecha_reg,
-                        oc.fecha_adju,
-                        oc.fecha_coti,
-                        sol.id_proceso_wf,
+                        cot.fecha_adju,
                         sol.id_categoria_compra,
-                        oc.cecos';
+                        sol.id_proceso_wf';
                         
             --Definicion de la respuesta
             v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
@@ -371,61 +367,57 @@ BEGIN
             --Sentencia de la consulta
             v_consulta:='WITH parcial AS (
             			SELECT 
-                        sol.num_tramite::varchar,
-                        sol.justificacion::varchar,
-                        cot.id_proveedor::integer,
-                        cot.desc_proveedor::varchar,
-                        pc.id_funcionario::integer,
-                        pc.desc_funcionario::varchar,
-                        cot.id_moneda::integer,
-                        mon.moneda::varchar,
-                        COALESCE(sum(cotd.cantidad_adju * cotd.precio_unitario), 0::numeric)::numeric AS monto_total_adjudicado,
-                        COALESCE(sum(cotd.cantidad_adju * cotd.precio_unitario_mb), 0::numeric)::numeric AS monto_total_adjudicado_mb,
-                        pc.fecha_reg::date,
-                        oc.fecha_adju::date,
-                        oc.fecha_coti::date,
-                        oc.cecos::varchar,
-                        sol.id_proceso_wf,
-                        sol.id_categoria_compra,
+                        DISTINCT 
+                        sol.num_tramite,
+                        sol.justificacion,
+                        pxp.list(distinct p.desc_proveedor)::varchar as desc_proveedor,
+                        fun.id_funcionario,
+                        fun.desc_funcionario1 as desc_funcionario,
+                        cot.id_moneda,
+                        mon.moneda,
+                        cot.fecha_adju,
                         (
                         SELECT max(tesw.fecha_reg)
-                        FROM wf.testado_wf tesw 
+                        FROM wf.testado_wf tesw
                         JOIN wf.tproceso_wf pw ON pw.id_proceso_wf=tesw.id_proceso_wf
                         JOIN wf.ttipo_estado te ON te.id_tipo_estado=tesw.id_tipo_estado
-                        WHERE 
+                        WHERE
                         te.nombre_estado=''Solicitud Aprobada'' AND
                         tesw.id_proceso_wf=sol.id_proceso_wf
                         limit 1
-                        )::date as fecha_apro
-                        
-                        FROM adq.vcotizacion cot
-                        JOIN adq.tcotizacion_det cotd ON cotd.id_cotizacion = cot.id_cotizacion
-                        JOIN adq.tsolicitud sol ON sol.id_solicitud=cot.id_solicitud
-                        JOIN adq.vproceso_compra pc ON pc.id_solicitud=sol.id_solicitud
-                        JOIN adq.vorden_compra oc ON oc.id_proceso_compra=pc.id_proceso_compra
-                        JOIN param.tmoneda mon ON mon.id_moneda=cot.id_moneda
-                        WHERE 
-                        cot.estado not in(''anulado'') AND
-                        sol.estado not in(''anulado'') AND
-                        pc.estado not in(''anulado'') AND
-                        oc.estado not in(''anulado'') AND '; 
+                        )::date as fecha_apro,
+                        pxp.list(distinct cc.codigo_cc) as cecos,
+                        sol.id_proceso_wf,
+                        sol.id_categoria_compra,                                                                        
+                        COALESCE(sum(cdt.cantidad_adju * cdt.precio_unitario), 0::numeric) AS monto_total_adjudicado,
+                        COALESCE(sum(cdt.cantidad_adju * cdt.precio_unitario_mb), 0::numeric) AS monto_total_adjudicado_mb
+                        FROM adq.tcotizacion cot
+                        JOIN adq.tproceso_compra proc ON proc.id_proceso_compra = cot.id_proceso_compra
+                        JOIN adq.tsolicitud sol ON sol.id_solicitud = proc.id_solicitud
+                        LEFT JOIN adq.tcotizacion_det cdt ON cdt.id_cotizacion = cot.id_cotizacion
+                        LEFT JOIN adq.tsolicitud_det sd ON sd.id_solicitud_det = cdt.id_solicitud_det
+                        LEFT JOIN param.tconcepto_ingas ci ON ci.id_concepto_ingas = sd.id_concepto_ingas
+                        JOIN param.vcentro_costo cc ON cc.id_centro_costo = sd.id_centro_costo
+                        JOIN param.tmoneda mon ON mon.id_moneda = sol.id_moneda
+                        JOIN orga.vfuncionario_cargo fun ON fun.id_funcionario = sol.id_funcionario AND fun.estado_reg_asi::text = ''activo''::text
+                        JOIN param.vproveedor p ON p.id_proveedor = cot.id_proveedor
+                        JOIN adq.tcategoria_compra cac ON cac.id_categoria_compra = sol.id_categoria_compra
+                        WHERE fun.fecha_asignacion <= sol.fecha_soli AND
+                        fun.fecha_finalizacion >= sol.fecha_soli OR
+                        fun.fecha_asignacion <= sol.fecha_soli AND
+                        fun.fecha_finalizacion IS NULL AND '; 
             v_consulta:=v_consulta||v_parametros.filtro;           
             v_consulta:=v_consulta||'
             		    GROUP BY
                         sol.num_tramite,
                         sol.justificacion,
-                        cot.id_proveedor,
-                        cot.desc_proveedor,
-                        pc.id_funcionario,
-                        pc.desc_funcionario,
+                        fun.id_funcionario,
+                        fun.desc_funcionario1,
                         cot.id_moneda,
                         mon.moneda,
-                        pc.fecha_reg,
-                        oc.fecha_adju,
-                        oc.fecha_coti,
-                        sol.id_proceso_wf,
+                        cot.fecha_adju,
                         sol.id_categoria_compra,
-                        oc.cecos)
+                        sol.id_proceso_wf)
                         
                         SELECT
                         count(num_tramite) as total
@@ -450,61 +442,57 @@ BEGIN
 
             --Sentencia de la consulta
             v_consulta:='SELECT 
+                        DISTINCT 
                         sol.num_tramite::varchar,
                         sol.justificacion::varchar,
-                        cot.id_proveedor::integer,
-                        cot.desc_proveedor::varchar,
-                        pc.id_funcionario::integer,
-                        pc.desc_funcionario::varchar,
+                        pxp.list(distinct p.desc_proveedor)::varchar as desc_proveedor,
+                        fun.id_funcionario::integer,
+                        fun.desc_funcionario1::varchar as desc_funcionario,
                         cot.id_moneda::integer,
                         mon.moneda::varchar,
-                        COALESCE(sum(cotd.cantidad_adju * cotd.precio_unitario), 0::numeric)::numeric AS monto_total_adjudicado,
-                        COALESCE(sum(cotd.cantidad_adju * cotd.precio_unitario_mb), 0::numeric)::numeric AS monto_total_adjudicado_mb,
-                        pc.fecha_reg::date,
-                        oc.fecha_adju::date,
-                        oc.fecha_coti::date,
-                        oc.cecos::varchar,
-                        sol.id_proceso_wf,
-                        sol.id_categoria_compra,
+                        cot.fecha_adju::date,
                         (
-                        SELECT max(tesw.fecha_reg) 
-                        FROM wf.testado_wf tesw 
+                        SELECT max(tesw.fecha_reg)
+                        FROM wf.testado_wf tesw
                         JOIN wf.tproceso_wf pw ON pw.id_proceso_wf=tesw.id_proceso_wf
                         JOIN wf.ttipo_estado te ON te.id_tipo_estado=tesw.id_tipo_estado
-                        WHERE 
+                        WHERE
                         te.nombre_estado=''Solicitud Aprobada'' AND
                         tesw.id_proceso_wf=sol.id_proceso_wf
                         limit 1
-                        )::date as fecha_apro
-                        
-                        FROM adq.vcotizacion cot
-                        JOIN adq.tcotizacion_det cotd ON cotd.id_cotizacion = cot.id_cotizacion
-                        JOIN adq.tsolicitud sol ON sol.id_solicitud=cot.id_solicitud
-                        JOIN adq.vproceso_compra pc ON pc.id_solicitud=sol.id_solicitud
-                        JOIN adq.vorden_compra oc ON oc.id_proceso_compra=pc.id_proceso_compra
-                        JOIN param.tmoneda mon ON mon.id_moneda=cot.id_moneda
-                        WHERE 
-                        cot.estado not in(''anulado'') AND
-                        sol.estado not in(''anulado'') AND
-                        pc.estado not in(''anulado'') AND
-                        oc.estado not in(''anulado'') AND '; 
+                        )::date as fecha_apro,
+                        pxp.list(distinct cc.codigo_cc)::varchar as cecos,
+                        sol.id_proceso_wf::integer,
+                        sol.id_categoria_compra::integer,                                                                        
+                        COALESCE(sum(cdt.cantidad_adju * cdt.precio_unitario), 0::numeric) AS monto_total_adjudicado,
+                        COALESCE(sum(cdt.cantidad_adju * cdt.precio_unitario_mb), 0::numeric) AS monto_total_adjudicado_mb
+                        FROM adq.tcotizacion cot
+                        JOIN adq.tproceso_compra proc ON proc.id_proceso_compra = cot.id_proceso_compra
+                        JOIN adq.tsolicitud sol ON sol.id_solicitud = proc.id_solicitud
+                        LEFT JOIN adq.tcotizacion_det cdt ON cdt.id_cotizacion = cot.id_cotizacion
+                        LEFT JOIN adq.tsolicitud_det sd ON sd.id_solicitud_det = cdt.id_solicitud_det
+                        LEFT JOIN param.tconcepto_ingas ci ON ci.id_concepto_ingas = sd.id_concepto_ingas
+                        JOIN param.vcentro_costo cc ON cc.id_centro_costo = sd.id_centro_costo
+                        JOIN param.tmoneda mon ON mon.id_moneda = sol.id_moneda
+                        JOIN orga.vfuncionario_cargo fun ON fun.id_funcionario = sol.id_funcionario AND fun.estado_reg_asi::text = ''activo''::text
+                        JOIN param.vproveedor p ON p.id_proveedor = cot.id_proveedor
+                        JOIN adq.tcategoria_compra cac ON cac.id_categoria_compra = sol.id_categoria_compra
+                        WHERE fun.fecha_asignacion <= sol.fecha_soli AND
+                        fun.fecha_finalizacion >= sol.fecha_soli OR
+                        fun.fecha_asignacion <= sol.fecha_soli AND
+                        fun.fecha_finalizacion IS NULL AND '; 
             v_consulta:=v_consulta||v_parametros.filtro;           
             v_consulta:=v_consulta||'
-            			GROUP BY
+                        GROUP BY
                         sol.num_tramite,
                         sol.justificacion,
-                        cot.id_proveedor,
-                        cot.desc_proveedor,
-                        pc.id_funcionario,
-                        pc.desc_funcionario,
+                        fun.id_funcionario,
+                        fun.desc_funcionario1,
                         cot.id_moneda,
                         mon.moneda,
-                        pc.fecha_reg,
-                        oc.fecha_adju,
-                        oc.fecha_coti,
-                        sol.id_proceso_wf,
+                        cot.fecha_adju,
                         sol.id_categoria_compra,
-                        oc.cecos';
+                        sol.id_proceso_wf';
                         
             --Definicion de la respuesta
             --v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
