@@ -99,3 +99,21 @@ update adq.tsolicitud set
     id_depto=5
 WHERE id_solicitud = 6732;
 /********************************************F-DAUP-EGS-ADQ-ETR-2542-14/01/2021********************************************/
+
+/********************************************I-DAUP-EGS-ADQ-ETR-2758-14/01/2021********************************************/
+--Dato original
+-- update adq.tsolicitud set
+--     id_depto=17
+-- WHERE id_solicitud = 6992;
+-- update wf.testado_wf set
+--     id_depto = 17
+-- where id_estado_wf = 1200951;
+--Cambio
+update adq.tsolicitud set
+    id_depto=5
+WHERE id_solicitud = 6992;
+
+update wf.testado_wf set
+    id_depto = 5
+where id_estado_wf = 1200951;
+/********************************************F-DAUP-EGS-ADQ-ETR-2758-14/01/2021********************************************/
