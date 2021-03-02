@@ -159,3 +159,21 @@ where id_estado_wf = 1251779;
 delete from wf.testado_wf
 where id_estado_wf = 1262817;
 /********************************************F-DAUP-EGS-ADQ-ETR-3079-25/02/2021********************************************/
+
+/********************************************I-DAUP-EGS-ADQ-ETR-3108-02/03/2021********************************************/
+--Dato original
+-- update adq.tsolicitud set
+--     id_depto=17
+-- WHERE id_solicitud = 7058;
+-- update wf.testado_wf set
+--     id_depto = 17
+-- where id_estado_wf = 1260455;
+--Cambio
+update adq.tsolicitud set
+    id_depto=5
+WHERE id_solicitud = 7058;
+
+update wf.testado_wf set
+    id_depto = 5
+where id_estado_wf = 1260455;
+/********************************************F-DAUP-EGS-ADQ-ETR-3108-02/03/2021********************************************/
