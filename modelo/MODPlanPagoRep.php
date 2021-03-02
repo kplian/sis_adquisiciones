@@ -164,6 +164,78 @@ class MODPlanPagoRep extends MODbase{
 
         //Devuelve la respuesta
         return $this->respuesta;
-    }
+	}
+	//
+	function listarReporteConsulta(){
+		$this->procedimiento='adq.f_plan_pago_rep_sel';
+		$this->transaccion='ADQ_CONSREP_SEL';
+		$this->tipo_procedimiento='SEL';
+		
+		$this->captura('num_tramite','varchar');
+		$this->captura('justificacion','varchar');
+		//$this->captura('id_proveedor','int4');
+		$this->captura('desc_proveedor','varchar');
+		$this->captura('id_funcionario','int4');
+		$this->captura('desc_funcionario','varchar');
+		$this->captura('id_moneda','int4');
+		$this->captura('moneda','varchar');
+		
+		//$this->captura('fecha_reg','date');
+		$this->captura('fecha_adju','date');
+		$this->captura('fecha_apro','date');
+		$this->captura('cecos','varchar');
+		$this->captura('id_proceso_wf','int4');
+		$this->captura('id_categoria_compra','int4');
+
+		$this->captura('monto_total_adjudicado','numeric');
+		$this->captura('monto_total_adjudicado_mb','numeric');
+		//Ejecuta la instruccion
+		$this->armarConsulta();
+		$this->ejecutarConsulta();
+		//Devuelve la respuesta
+		return $this->respuesta;
+	}
+	//
+	function recuperarConsulta(){
+		//Definicion de variables para ejecucion del procedimientp
+		$this->procedimiento='adq.f_plan_pago_rep_sel';
+		$this->transaccion='ADQ_CONSREP_REP';
+		$this->tipo_procedimiento='SEL';//tipo de transaccion
+		$this->setCount(false);
+	  
+		//captura parametros adicionales para el count
+		$this->setParametro('id_gestion','id_gestion','int4');
+		$this->setParametro('desde','desde','date');
+		$this->setParametro('hasta','hasta','date');
+		$this->setParametro('num_tramite','num_tramite','varchar');
+		$this->setParametro('id_proveedor','id_proveedor','int4');
+		$this->setParametro('codigo_tcc','codigo_tcc','varchar');
+		$this->setParametro('id_categoria_compra','id_categoria_compra','int4');
+		//Definicion de la lista del resultado del query
+		$this->captura('num_tramite','varchar');
+		$this->captura('justificacion','varchar');
+		//$this->captura('id_proveedor','int4');
+		$this->captura('desc_proveedor','varchar');
+		$this->captura('id_funcionario','int4');
+		$this->captura('desc_funcionario','varchar');
+		$this->captura('id_moneda','int4');
+		$this->captura('moneda','varchar');
+		
+		//$this->captura('fecha_reg','date');
+		$this->captura('fecha_adju','date');
+		$this->captura('fecha_apro','date');
+		$this->captura('cecos','varchar');
+		$this->captura('id_proceso_wf','int4');
+		$this->captura('id_categoria_compra','int4');
+
+		$this->captura('monto_total_adjudicado','numeric');
+		$this->captura('monto_total_adjudicado_mb','numeric');
+		//Ejecuta la instruccion
+		$this->armarConsulta();
+		$this->ejecutarConsulta();
+
+		//Devuelve la respuesta
+		return $this->respuesta;
+	}
 }
 ?>
