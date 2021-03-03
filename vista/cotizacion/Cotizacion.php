@@ -8,6 +8,7 @@
  *  * * ISSUE            FECHA:		      AUTOR       DESCRIPCION
  *   	#1 			19/09/2018			EGS			se mejoro el combo de proveedor
  * *    #2 			21/09/2018			EGS			se mejoro el combo de tipo de entregas
+ *      #ETR-3151   03/03/2021          EGS         Se amplia el campo de caracteres de los cecos de 450 a 700
 */
 header("content-type: text/javascript; charset=UTF-8");
 ?>
@@ -751,7 +752,7 @@ Phx.vista.Cotizacion=Ext.extend(Phx.gridInterfaz,{
 				allowBlank: true,
 				anchor: '80%',
 				gwidth: 100,
-				maxLength:450
+				maxLength:700 //#ETR-3151
 			},
 			type:'TextArea',
 			//filters:{pfiltro:'cot.forma_pago',type:'string'},
