@@ -1027,3 +1027,13 @@ INSERT INTO param.ttipo_envio_correo ("id_usuario_reg", "estado_reg", "codigo", 
 VALUES
   (1, E'activo', E'BCSA', E'Recordatorio CSA boleta de garantias', E'5', E'no', NULL, E'adq.f_alerta_boleta_csa_ime', E'<font color=\"99CC00\" size=\"5\"><font size=\"4\">{TIPO_PROCESO}</font></font><br><br><b>&nbsp;</b>Tramite:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; &nbsp;&nbsp; <b>{NUM_TRAMITE}</b><br><b>&nbsp;</b>Usuario :<b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {USUARIO_PREVIO} </b>en estado<b>&nbsp; {ESTADO_ANTERIOR}<br></b>&nbsp;<b>Responsable:&nbsp;&nbsp; &nbsp;&nbsp; </b><b>{FUNCIONARIO_PREVIO}&nbsp; {DEPTO_PREVIO}<br>&nbsp;</b>Estado Actual<b>: &nbsp; &nbsp;&nbsp; {ESTADO_ACTUAL}</b><br><br><br>&nbsp;{OBS} <br>', E'Aviso WF ,  {PROCESO_MACRO}  ({NUM_TRAMITE})', E'si', E'', E'', NULL);
 /***********************************F-DAT-EGS-ADQ-ETR-2176-22/12/2020*****************************************/
+
+/***********************************I-DAT-YMR-ADQ-ETR-2180-29/03/2021*****************************************/
+select param.f_import_tcatalogo_tipo ('insert','boleta_estado','ADQ','tboleta');
+select param.f_import_tcatalogo ('insert','ADQ','Abierto','1','boleta_estado');
+select param.f_import_tcatalogo ('insert','ADQ','Por Vencer','2','boleta_estado');
+select param.f_import_tcatalogo ('insert','ADQ','Vencido','3','boleta_estado');
+select param.f_import_tcatalogo ('insert','ADQ','Cerrado','4','boleta_estado');
+
+select pxp.f_insert_tgui ('Boleta Garantia CSA', 'Boleta Garantia CSA', 'BOLG', 'si', 6, 'sis_adquisiciones/vista/boleta/FormFiltro.php', 3, '', 'FormFiltro', 'ADQ');
+/***********************************F-DAT-YMR-ADQ-ETR-2180-29/03/2021*****************************************/
