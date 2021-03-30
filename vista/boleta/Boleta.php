@@ -179,9 +179,8 @@ Phx.vista.Boleta=Ext.extend(Phx.gridInterfaz,{
                 name: 'gestor',
                 fieldLabel: 'Gestor',
                 allowBlank: true,
-                anchor: '80%',
-                gwidth: 200,
-                maxLength:-5
+                anchor: '90%',
+                gwidth: 200
             },
             type:'TextField',
             filters:{pfiltro:'bolg.gestor',type:'string'},
@@ -194,8 +193,8 @@ Phx.vista.Boleta=Ext.extend(Phx.gridInterfaz,{
                 name: 'responsable',
                 fieldLabel: 'Responsable',
                 allowBlank: true,
-                anchor: '80%',
-                gwidth: 100
+                anchor: '90%',
+                gwidth: 200
             },
             type:'TextField',
             filters:{pfiltro:'responsable',type:'string'},
