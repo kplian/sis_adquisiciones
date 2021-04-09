@@ -12,6 +12,7 @@
    
  #0               21-03-2013        RAC KPLIAN        Creación
  #16              20/01/2020        RAC KPLIAN       fix bug nombre de clase
+#ETR-3616         09/04/2021        EGS               Se aumenta el tamaño del campo de descipcion
 */
 
 header("content-type: text/javascript; charset=UTF-8");
@@ -280,7 +281,7 @@ Phx.vista.CotizacionDet=Ext.extend(Phx.gridInterfaz,{
                                                 }
                                             
                                         },
-                maxLength:700
+                maxLength:800 //#ETR-3616
             },
             type:'TextArea',
             filters:{pfiltro:'sold.descripcion',type:'string'},
