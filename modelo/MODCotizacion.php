@@ -13,6 +13,7 @@
  #0               05/09/2013        RAC KPLIAN           Creación
  #16               20/01/2020        RAC KPLIAN          Mejor el rendimiento de la interface de Ordenes y Cotizaciones, issue #16
  #18              22/05/2020           EGS               Campos Adicionales Para Cotizaciones
+#ETR-3771          27/04/2021          EGS                 Se agrega el cmp tipo de solicitud
  * */
 
 class MODCotizacion extends MODbase{
@@ -88,6 +89,7 @@ class MODCotizacion extends MODbase{
         $this->captura('id_categoria_compra','integer');//#18
         $this->captura('codigo_proceso','varchar');//#18
         $this->captura('desc_categoria_compra','varchar');//#18
+        $this->captura('tipo_sol','varchar'); //#TR-3771
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();

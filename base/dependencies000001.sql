@@ -5352,3 +5352,195 @@ select pxp.f_insert_testructura_gui ('REPEST', 'REPADQ');
 /***********************************I-DEP-YMR-ADQ-5-29/03/2021*****************************************/
 select pxp.f_insert_testructura_gui ('BOLG', 'REPADQ');
 /***********************************F-DEP-YMR-ADQ-5-29/03/2021*****************************************/
+/***********************************I-DEP-EGS-ADQ-ETR-3771-27/04/2021*****************************************/
+CREATE OR REPLACE VIEW adq.vorden_compra(
+                                         id_cotizacion,
+                                         estado_reg,
+                                         estado,
+                                         lugar_entrega,
+                                         tipo_entrega,
+                                         fecha_coti,
+                                         numero_oc,
+                                         id_proveedor,
+                                         desc_proveedor,
+                                         fecha_entrega,
+                                         id_moneda,
+                                         moneda,
+                                         id_proceso_compra,
+                                         fecha_venc,
+                                         obs,
+                                         fecha_adju,
+                                         nro_contrato,
+                                         fecha_reg,
+                                         id_usuario_reg,
+                                         fecha_mod,
+                                         id_usuario_mod,
+                                         usr_reg,
+                                         usr_mod,
+                                         id_estado_wf,
+                                         id_proceso_wf,
+                                         desc_moneda,
+                                         tipo_cambio_conv,
+                                         email,
+                                         numero,
+                                         num_tramite,
+                                         id_obligacion_pago,
+                                         tiempo_entrega,
+                                         funcionario_contacto,
+                                         telefono_contacto,
+                                         correo_contacto,
+                                         prellenar_oferta,
+                                         forma_pago,
+                                         requiere_contrato,
+                                         total_adjudicado,
+                                         total_cotizado,
+                                         total_adjudicado_mb,
+                                         tiene_form500,
+                                         correo_oc,
+                                         cecos,
+                                         total,
+                                         nro_cuenta,
+                                         id_categoria_compra,
+                                         codigo_proceso,
+                                         desc_categoria_compra,
+                                         tipo_sol)
+AS
+WITH detalle AS(
+    SELECT cd.id_cotizacion,
+           sum(cd.cantidad_adju * cd.precio_unitario) AS total_adjudicado,
+           sum(cd.cantidad_coti * cd.precio_unitario) AS total_cotizado,
+           sum(cd.cantidad_adju * cd.precio_unitario_mb) AS total_adjudicado_mb
+    FROM adq.tcotizacion_det cd
+    WHERE cd.estado_reg::text = 'activo'::text
+    GROUP BY cd.id_cotizacion), base_query AS(
+    SELECT cot.id_cotizacion,
+           cot.estado_reg,
+           cot.estado,
+           cot.lugar_entrega,
+           cot.tipo_entrega,
+           cot.fecha_coti,
+           COALESCE(cot.numero_oc, 'S/N'::character varying) AS numero_oc,
+           cot.id_proveedor,
+           pro.desc_proveedor,
+           cot.fecha_entrega,
+           cot.id_moneda,
+           mon.moneda,
+           cot.id_proceso_compra,
+           cot.fecha_venc,
+           cot.obs,
+           cot.fecha_adju,
+           cot.nro_contrato,
+           cot.fecha_reg,
+           cot.id_usuario_reg,
+           cot.fecha_mod,
+           cot.id_usuario_mod,
+           usu1.cuenta AS usr_reg,
+           usu2.cuenta AS usr_mod,
+           cot.id_estado_wf,
+           cot.id_proceso_wf,
+           mon.codigo AS desc_moneda,
+           cot.tipo_cambio_conv,
+           pro.email,
+           sol.numero,
+           sol.num_tramite,
+           cot.id_obligacion_pago,
+           cot.tiempo_entrega,
+           cot.funcionario_contacto,
+           cot.telefono_contacto,
+           cot.correo_contacto,
+           cot.prellenar_oferta,
+           cot.forma_pago,
+           cot.requiere_contrato,
+           d.total_adjudicado,
+           d.total_cotizado,
+           d.total_adjudicado_mb,
+           cot.tiene_form500,
+           cot.correo_oc,
+           sol.id_categoria_compra,
+           proc.codigo_proceso,
+           ctp.nombre AS desc_categoria_compra,
+           sol.tipo AS tipo_sol
+    FROM adq.tcotizacion cot
+             JOIN adq.tproceso_compra proc ON proc.id_proceso_compra = cot.id_proceso_compra
+             JOIN adq.tsolicitud sol ON sol.id_solicitud = proc.id_solicitud
+             JOIN segu.tusuario usu1 ON usu1.id_usuario = cot.id_usuario_reg
+             JOIN detalle d ON d.id_cotizacion = cot.id_cotizacion
+             JOIN param.tmoneda mon ON mon.id_moneda = cot.id_moneda
+             JOIN param.vproveedor pro ON pro.id_proveedor = cot.id_proveedor
+             LEFT JOIN segu.tusuario usu2 ON usu2.id_usuario = cot.id_usuario_mod
+             LEFT JOIN adq.tcategoria_compra ctp ON ctp.id_categoria_compra = sol.id_categoria_compra), cantidad_adjudicada_query AS(
+    SELECT ctdet.id_cotizacion,
+           sum(ctdet.cantidad_adju) AS cantidad_adjudicada
+    FROM adq.tcotizacion_det ctdet
+             JOIN base_query base ON base.id_cotizacion = ctdet.id_cotizacion
+    GROUP BY ctdet.id_cotizacion), cecos_query AS(
+    SELECT ctd.id_cotizacion,
+           array_to_string(array_agg(DISTINCT upper(cc.codigo_cc)), '<br>'::text)::character varying AS cecos
+    FROM adq.tcotizacion_det ctd
+             JOIN adq.tsolicitud_det sold ON sold.id_solicitud_det = ctd.id_solicitud_det
+             JOIN param.tconcepto_ingas cig ON cig.id_concepto_ingas = sold.id_concepto_ingas
+             JOIN param.vcentro_costo cc ON cc.id_centro_costo = sold.id_centro_costo
+             JOIN base_query base ON base.id_cotizacion = ctd.id_cotizacion
+    GROUP BY ctd.id_cotizacion), nro_cuenta_query AS(
+    SELECT ctd.id_cotizacion,
+           array_to_string(array_agg(DISTINCT cta.nro_cuenta), '<br>'::text) AS nro_cuenta
+    FROM adq.tcotizacion_det ctd
+             JOIN adq.tsolicitud_det sold ON sold.id_solicitud_det = ctd.id_solicitud_det
+             LEFT JOIN conta.tcuenta cta ON cta.id_cuenta = sold.id_cuenta
+             JOIN base_query base ON base.id_cotizacion = ctd.id_cotizacion
+    GROUP BY ctd.id_cotizacion)
+SELECT bq.id_cotizacion,
+       bq.estado_reg,
+       bq.estado,
+       bq.lugar_entrega,
+       bq.tipo_entrega,
+       bq.fecha_coti,
+       bq.numero_oc,
+       bq.id_proveedor,
+       bq.desc_proveedor,
+       bq.fecha_entrega,
+       bq.id_moneda,
+       bq.moneda,
+       bq.id_proceso_compra,
+       bq.fecha_venc,
+       bq.obs,
+       bq.fecha_adju,
+       bq.nro_contrato,
+       bq.fecha_reg,
+       bq.id_usuario_reg,
+       bq.fecha_mod,
+       bq.id_usuario_mod,
+       bq.usr_reg,
+       bq.usr_mod,
+       bq.id_estado_wf,
+       bq.id_proceso_wf,
+       bq.desc_moneda,
+       bq.tipo_cambio_conv,
+       bq.email,
+       bq.numero,
+       bq.num_tramite,
+       bq.id_obligacion_pago,
+       bq.tiempo_entrega,
+       bq.funcionario_contacto,
+       bq.telefono_contacto,
+       bq.correo_contacto,
+       bq.prellenar_oferta,
+       bq.forma_pago,
+       bq.requiere_contrato,
+       bq.total_adjudicado,
+       bq.total_cotizado,
+       bq.total_adjudicado_mb,
+       bq.tiene_form500,
+       bq.correo_oc,
+       cq.cecos,
+       caq.cantidad_adjudicada AS total,
+       ncq.nro_cuenta,
+       bq.id_categoria_compra,
+       bq.codigo_proceso,
+       bq.desc_categoria_compra,
+       bq.tipo_sol
+FROM base_query bq
+         LEFT JOIN cantidad_adjudicada_query caq ON caq.id_cotizacion = bq.id_cotizacion
+         LEFT JOIN cecos_query cq ON cq.id_cotizacion = bq.id_cotizacion
+         LEFT JOIN nro_cuenta_query ncq ON ncq.id_cotizacion = bq.id_cotizacion;
+/***********************************F-DEP-EGS-ADQ-ETR-3771-27/04/2021*****************************************/
