@@ -814,7 +814,7 @@ Phx.vista.CotizacionOC=Ext.extend(Phx.gridInterfaz,{
                     fields: ['ID', 'valor'],
                     data :    [['bien','Bien'],
                         ['servicio','Servicio'],
-                        ['llave_mano','Llave en mano']
+                        ['llavemano','Llave en mano']
                     ]
 
                 }),

@@ -310,7 +310,7 @@ Phx.vista.FormFiltro=Ext.extend(Phx.frmInterfaz,{
                     fields: ['ID', 'valor'],
                     data :    [['bien','Bien'],
                         ['servicio','Servicio'],
-                        ['llave_mano','Llave en mano']
+                        ['llavemano','Llave en mano']
                     ]
 
                 }),
