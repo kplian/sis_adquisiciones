@@ -294,6 +294,35 @@ Phx.vista.FormFiltro=Ext.extend(Phx.frmInterfaz,{
             grid: true,
             form: true
         },
+        {
+            config:{ //#ETR-3771
+                name:'tipo_sol',
+                fieldLabel:'Tipo',
+                allowBlank:true,
+                emptyText:'...',
+                typeAhead: true,
+                triggerAction: 'all',
+                lazyRender:true,
+                mode: 'local',
+                gwidth: 100,
+                anchor: '90%',
+                store:new Ext.data.ArrayStore({
+                    fields: ['ID', 'valor'],
+                    data :    [['bien','Bien'],
+                        ['servicio','Servicio'],
+                        ['llave_mano','Llave en mano']
+                    ]
+
+                }),
+                valueField:'ID',
+                displayField:'valor',
+            },
+            type:'ComboBox',
+
+            id_grupo:0,
+            grid:true,
+            form:true
+        },
 
 
     ],
@@ -318,6 +347,7 @@ Phx.vista.FormFiltro=Ext.extend(Phx.frmInterfaz,{
             var categoria_compra =this.Cmp.id_categoria_compra.getValue();
             var codproceso=this.Cmp.codigo_proceso.getValue();
             var codtcc=this.Cmp.codigo_tcc.getValue();
+            var tiposol=this.Cmp.tipo_sol.getValue(); //#ETR-3771
 
 			this.onEnablePanel(this.idContenedor + '-east',
 				Ext.apply(parametros,{
@@ -325,6 +355,7 @@ Phx.vista.FormFiltro=Ext.extend(Phx.frmInterfaz,{
                                         'id_categoria_compra' : categoria_compra,
                                         'codigo_proceso' : codproceso,
                                         'codigo_tcc' : codtcc,
+                                         'tipo_sol':tiposol, //#ETR-3771
                                         'groupBy' : 'num_tramite',
                                         'groupDir' : 'ASC'
 									 }));

@@ -7,7 +7,9 @@
 *@description Clase que recibe los parametros enviados por la vista para mandar a la capa de Modelo
  ISSUE       AUTHOR          FECHA           DESCRIPCION
  #18           EGS            22/05/2020      Filtros Para Cotizaciones
-*/
+#ETR-3771      EGS           27/04/2021      Se agrega el cmp tipo de solicitud
+
+ */
 require_once(dirname(__FILE__).'/../../pxp/pxpReport/ReportWriter.php');
 require_once(dirname(__FILE__).'/../reportes/RCotizacion.php');
 require_once(dirname(__FILE__).'/../reportes/ROrdenCompra.php');
@@ -57,6 +59,9 @@ class ACTCotizacion extends ACTbase{
         }
         if($this->objParam->getParametro('codigo_tcc')!=''){
             $this->objParam->addFiltro(" cot.cecos::varchar like ''%".strtoupper($this->objParam->getParametro('codigo_tcc'))."%''");
+        }
+        if($this->objParam->getParametro('tipo_sol')!=''){ //#ETR-3771
+            $this->objParam->addFiltro("lower(cot.tipo_sol) = ''".$this->objParam->getParametro('tipo_sol')."'' ");
         }
         ///////////
 		

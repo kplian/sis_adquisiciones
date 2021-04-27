@@ -5,10 +5,12 @@
 *@author  Gonzalo Sarmiento Sejas
 *@date 21-03-2013 14:48:35  
 *@description Archivo con la interfaz de usuario que permite la ejecucion de todas las funcionalidades del sistema
- *  * * ISSUE            FECHA:		      AUTOR       DESCRIPCION
+ *  ISSUE               FECHA:		      AUTOR         DESCRIPCION
 
- #16               20/01/2020        RAC KPLIAN        Creacion, Mejor el rendimiento de la interface de Ordenes y Cotizaciones, issue #16
-#18                 22/05/2020          EGS             Se agregan campos
+    #16               20/01/2020          RAC KPLIAN    Creacion, Mejor el rendimiento de la interface de Ordenes y Cotizaciones, issue #16
+    #18               22/05/2020          EGS           Se agregan campos
+ *  #ETR-3771          27/04/2021         EGS           Se agrega el cmp tipo de solicitud
+
  */
 
 header("content-type: text/javascript; charset=UTF-8");
@@ -796,6 +798,35 @@ Phx.vista.CotizacionOC=Ext.extend(Phx.gridInterfaz,{
             grid:true,
             form:false
         },
+        {
+            config:{ //#ETR-3771
+                name:'tipo_sol',
+                fieldLabel:'Tipo',
+                allowBlank:true,
+                emptyText:'...',
+                typeAhead: true,
+                triggerAction: 'all',
+                lazyRender:true,
+                mode: 'local',
+                gwidth: 100,
+                anchor: '90%',
+                store:new Ext.data.ArrayStore({
+                    fields: ['ID', 'valor'],
+                    data :    [['bien','Bien'],
+                        ['servicio','Servicio'],
+                        ['llave_mano','Llave en mano']
+                    ]
+
+                }),
+                valueField:'ID',
+                displayField:'valor',
+            },
+            type:'ComboBox',
+
+            id_grupo:0,
+            grid:true,
+            form:true
+        },
 	],
 	
 	title:'Cotizaciones',
@@ -836,7 +867,8 @@ Phx.vista.CotizacionOC=Ext.extend(Phx.gridInterfaz,{
         'telefono_contacto',
         'correo_contacto', 'correo_oc',
         'prellenar_oferta', 'forma_pago', 'requiere_contrato','total_adjudicado','total_cotizado','total_adjudicado_mb','tiene_form500','total','cecos'
-        ,'nro_cuenta','codigo_proceso','desc_categoria_compra'//#18
+        ,'nro_cuenta','codigo_proceso','desc_categoria_compra',//#18
+        {name:'tipo_sol', type: 'string'} //#ETR-3771
 		
 	],
     rowExpander: new Ext.ux.grid.RowExpander({
