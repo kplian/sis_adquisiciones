@@ -62,9 +62,8 @@ DECLARE
     v_id_categoria_compra				integer;
     v_total_mb							numeric;
     v_adq_estado_comprometido_sol		varchar;
-    
-    
-   
+    v_id_funcionario                    integer;
+    v_num_tramite                       varchar;
 			    
 BEGIN
 
@@ -98,7 +97,9 @@ p_hstore->'id_solicitud'
             s.numero,
             s.fecha_soli,
             s.presu_comprometido,
-            s.id_categoria_compra
+            s.id_categoria_compra,
+            s.num_tramite,
+            s.id_funcionario
           into 
           
             v_id_proceso_wf,
@@ -109,8 +110,9 @@ p_hstore->'id_solicitud'
             v_numero_sol,
             v_fecha_soli,
             presu_comprometido,
-            v_id_categoria_compra
-            
+            v_id_categoria_compra,
+            v_num_tramite,
+            v_id_funcionario
           from adq.tsolicitud s
           where s.id_solicitud=p_id_solicitud;
           
@@ -418,7 +420,13 @@ p_hstore->'id_solicitud'
             END IF; 
 
        
-          
+            IF va_codigo_estado[1] = 'liberacion' then
+                v_resp = param.f_insertar_notificacion(p_administrador, p_id_usuario, p_id_solicitud, v_id_proceso_wf,
+                                                      va_id_tipo_estado[1], v_id_funcionario,
+                                                      v_id_funcionario_estado_sig, 'adquisicones', 'adq',
+                                                      'El tramite ' || v_num_tramite || ' esta pendiente de liberación',
+                                                      'Adquisicion - ' || v_num_tramite,'SolicitudVb');
+            end if;
            -- actualiza estado en la solicitud
           
            update adq.tsolicitud  s set 
