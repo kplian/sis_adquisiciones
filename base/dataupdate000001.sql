@@ -177,3 +177,13 @@ update wf.testado_wf set
     id_depto = 5
 where id_estado_wf = 1260455;
 /********************************************F-DAUP-EGS-ADQ-ETR-3108-02/03/2021********************************************/
+/********************************************I-DAUP-EGS-ADQ-ETR-4118-28/05/2021********************************************/
+--Dato original
+-- update adq.tsolicitud set
+--     id_depto=15
+-- WHERE id_solicitud = 7411;
+--Cambio
+update adq.tsolicitud set
+    id_depto = 5
+WHERE id_solicitud = 7411;
+/********************************************F-DAUP-EGS-ADQ-ETR-4118-28/05/2021********************************************/
