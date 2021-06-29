@@ -1098,6 +1098,31 @@ ALTER TABLE sql_server.invitacion
   OWNER TO postgres;
 
 /***********************************F-SCP-EGS-ADQ-ETR-2176-22/12/2020****************************************/
+/***********************************I-SCP-EGS-ADQ-ETR-4294-29/06/2021****************************************/
+CREATE TABLE adq.tboleta_csa (
+     id_boleta_csa SERIAL NOT NULL,
+     fecha_reg TIMESTAMP WITHOUT TIME ZONE DEFAULT now() NOT NULL,
+     idboleta INTEGER,
+     diasrestantes INTEGER,
+     correo VARCHAR,
+     nrodoc VARCHAR,
+     fechaaccion DATE,
+     fechainicio TIMESTAMP WITHOUT TIME ZONE,
+     fechafin TIMESTAMP WITHOUT TIME ZONE,
+     tipodocumento VARCHAR,
+     otorgante VARCHAR,
+     paragarantizar VARCHAR,
+     gestor TEXT,
+     cd_empleado_gestor VARCHAR,
+     estado INTEGER,
+     id_alarmas INTEGER [],
+     correos VARCHAR [],
+     CONSTRAINT tboleta_csa_pkey PRIMARY KEY(id_boleta_csa)
+)
+    WITH (oids = false);
+/***********************************F-SCP-EGS-ADQ-ETR-4294-29/06/2021****************************************/
+
+
 
 
 
