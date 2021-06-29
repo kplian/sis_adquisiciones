@@ -120,6 +120,7 @@ BEGIN
                     FROM sql_server.boleta b
                 )
                 SELECT
+                    i.codinvitacion,
                     b.idboleta,
                     dr.diasRestantes,
                     dg.correo,
@@ -163,7 +164,8 @@ BEGIN
                         paragarantizar,
                         gestor,
                         cd_empleado_gestor,
-                        estado
+                        estado,
+                        codinvitacion
                     )
                     VALUES (
                                now(),
@@ -179,7 +181,8 @@ BEGIN
                                v_record.paragarantizar,
                                v_record.gestor,
                                v_record.cd_empleado_gestor,
-                               v_record.estado
+                               v_record.estado,
+                               v_record.codinvitacion
                            )RETURNING id_boleta_csa into v_id_boleta_csa;
 
                     v_correos=null;
