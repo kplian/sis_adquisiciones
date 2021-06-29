@@ -85,6 +85,9 @@ DECLARE
     v_month_acc             varchar;
     v_day_acc               varchar;
     v_fecha_acc             varchar;
+    v_correos               varchar[];
+    v_id_alarmas               integer[];
+    v_id_boleta_csa         integer;
 
 
 BEGIN
@@ -110,8 +113,7 @@ BEGIN
         IF v_habilitado = 'si' THEN
 
             FOR  v_record IN(
-                with diasR (idboleta,
-                            diasRestantes)as(
+                with diasR (idboleta,diasRestantes)as(
                     SELECT
                         b.idboleta,
                         (b.fechafin::date - now()::date)::integer AS diasRestantes
@@ -120,9 +122,7 @@ BEGIN
                 SELECT
                     b.idboleta,
                     dr.diasRestantes,
-                    b.fechafin::date,
                     dg.correo,
-                    b.idboleta,
                     b.nrodoc,
                     b.fechaaccion,
                     b.fechainicio,
@@ -134,17 +134,57 @@ BEGIN
                     i.Cd_empleado_gestor::varchar,
                     b.estado
                 FROM sql_server.boleta b
-                         JOIN sql_server.datosgenerales dg ON dg.cd_empleado = b.codresponsable
-                         JOIN sql_server.boletatipodoc btd ON btd.idTipoDoc = b.idTipoDoc
+                         LEFT JOIN sql_server.datosgenerales dg ON dg.cd_empleado = b.codresponsable
+                         LEFT JOIN sql_server.boletatipodoc btd ON btd.idTipoDoc = b.idTipoDoc
                          LEFT JOIN sql_server.invitacion i ON i.IDInvitacion=  b.IDInvitacion
                          LEFT JOIN sql_server.datosgenerales dgi ON dgi.Cd_Empleado = i.Cd_empleado_gestor::varchar
                          LEFT JOIN diasR dr on dr.idboleta = b.idboleta
                 WHERE
                         diasRestantes <= 30 and
-                        b.estado::INTEGER in (1,2)
+                        diasRestantes >= -30 and
+                        b.estado::INTEGER in (1,2,3)
                 ORDER BY diasRestantes DESC
 
             )LOOP
+                    --guardando data
+                    INSERT INTO
+                        adq.tboleta_csa
+                    (
+                        fecha_reg,
+                        idboleta,
+                        diasrestantes,
+                        correo,
+                        nrodoc,
+                        fechaaccion,
+                        fechainicio,
+                        fechafin,
+                        tipodocumento,
+                        otorgante,
+                        paragarantizar,
+                        gestor,
+                        cd_empleado_gestor,
+                        estado
+                    )
+                    VALUES (
+                               now(),
+                               v_record.idboleta,
+                               v_record.diasrestantes,
+                               v_record.correo,
+                               v_record.nrodoc,
+                               v_record.fechaaccion,
+                               v_record.fechainicio,
+                               v_record.fechafin,
+                               v_record.tipodocumento,
+                               v_record.otorgante,
+                               v_record.paragarantizar,
+                               v_record.gestor,
+                               v_record.cd_empleado_gestor,
+                               v_record.estado
+                           )RETURNING id_boleta_csa into v_id_boleta_csa;
+
+                    v_correos=null;
+                    v_id_alarmas=null;
+
                     v_fecha_inicio = v_record.fechainicio ;
                     v_fecha_limite = v_record.fechafin ;
                     v_dias_restantes = v_record.diasRestantes ;
@@ -259,6 +299,9 @@ BEGIN
                                 null,
                                 null
                             );
+                        v_id_alarmas = array_append(v_id_alarmas,v_id_alarma);
+                        v_correos = array_append(v_correos,v_record.correo);
+
 
                         --enviamos las copias del correo a funcionarios
                         FOR v_copia IN(
@@ -292,7 +335,8 @@ BEGIN
                                         null
                                     );
 
-
+                                v_id_alarmas = array_append(v_id_alarmas,v_id_alarma);
+                                v_correos = array_append(v_correos,v_copia.email_empresa);
 
 
                             END LOOP;
@@ -349,12 +393,18 @@ BEGIN
                                         null
                                     );
 
-
+                                v_id_alarmas = array_append(v_id_alarmas,v_id_alarma);
+                                v_correos = array_append(v_correos,v_copia.email_empresa);
 
 
                             END LOOP;
 
                     END IF;
+
+                    UPDATE adq.tboleta_csa set
+                                               id_alarmas = v_id_alarmas,
+                                               correos = v_correos
+                    WHERE id_boleta_csa = v_id_boleta_csa;
 
                 END LOOP;
 
