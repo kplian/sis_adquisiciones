@@ -1,8 +1,11 @@
-CREATE OR REPLACE FUNCTION adq.ft_boleta_sel(p_administrador integer,
-                                             p_id_usuario    integer,
-                                             p_tabla         varchar,
-                                             p_transaccion   varchar) RETURNS varchar AS
-    $body$          
+CREATE OR REPLACE FUNCTION adq.ft_boleta_sel (
+  p_administrador integer,
+  p_id_usuario integer,
+  p_tabla varchar,
+  p_transaccion varchar
+)
+RETURNS varchar AS
+$body$
     /**************************************************************************
      SISTEMA:        Adquisiciones
      FUNCION:         adq.ft_boleta_sel
@@ -40,7 +43,8 @@ BEGIN
     
         BEGIN
             --Sentencia de la consulta
-            v_consulta := ' with boletas(idboleta, diasRestantes, fechainicio, fechafin, estado, codresponsable, otorgante, nrodoc, fechaaccion, paragarantizar, idTipoDoc, IDInvitacion) as
+            v_consulta := ' with 
+ boletas(idboleta, diasRestantes, fechainicio, fechafin, estado, codresponsable, otorgante, nrodoc, fechaaccion, paragarantizar, idTipoDoc, IDInvitacion) as
                            (SELECT b.idboleta,
                                    (b.fechafin ::date - now() ::date) ::integer AS diasRestantes,
                                    b.fechainicio ::date,
@@ -60,7 +64,14 @@ BEGIN
                           tipoBoleta(idTipoDoc, tipodocumento) as
                            (select btd.idTipoDoc ::integer,
                                    convert_from(btd.tipodocumento, ''LATIN1'' ::name) ::character varying as tipodocumento
-                              from sql_server.boletatipodoc btd)
+                              from sql_server.boletatipodoc btd),
+                              datosgenerales(cd_empleado, completo) as
+                             (SELECT dd.cd_empleado ::integer,
+                                   (convert_from(dd.primer_nombre::bytea, ''LATIN1'' ::name) || '' '' ||
+                                   convert_from(dd.segundo_nombre::bytea, ''LATIN1'' ::name) || '' '' ||
+                                   convert_from(dd.apellido_p::bytea, ''LATIN1'' ::name) || '' '' ||
+                                   convert_from(dd.apellido_m::bytea, ''LATIN1'' ::name))::varchar AS completo
+                              FROM sql_server.datosgenerales dd)
                           SELECT b.idboleta,
                                  b.nrodoc,
                                  tb.tipodocumento,
@@ -89,19 +100,19 @@ BEGIN
                                  b.fechaaccion,
                                  b.paragarantizar,
                                  i.Cd_empleado_gestor ::varchar,
-                                 vf.desc_funcionario1 ::varchar AS gestor,
+                                 (i.Cd_empleado_gestor::varchar || '' - '' || COALESCE(uu.completo::varchar,''''))::varchar AS gestor,
                                  b.codresponsable,
-                                 vf2.desc_funcionario1 ::varchar as responsable
+                                 u2.completo ::varchar as responsable
                             FROM boletas b
                             left join invitacion i ON i.IDInvitacion = b.IDInvitacion
                             left join tipoBoleta tb on tb.idTipoDoc = b.idTipoDoc
-                            left JOIN orga.vfuncionario vf on vf.codigo like concat(''%'', COALESCE(i.Cd_empleado_gestor::varchar,''NULL''))
-                            left JOIN orga.vfuncionario vf2 on vf2.codigo like concat(''%'', b.codresponsable ::varchar)
-                           WHERE  ';
+                            left join datosgenerales uu on uu.cd_empleado::varchar = i.Cd_empleado_gestor::varchar
+                            left join datosgenerales u2 on u2.cd_empleado::varchar = b.codresponsable ::varchar
+                           WHERE ';
         
             --Definicion de la respuesta
             v_consulta := v_consulta || v_parametros.filtro;
-            v_consulta := v_consulta || ' ORDER BY diasRestantes DESC limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
+            v_consulta := v_consulta || ' order by ' || v_parametros.ordenacion || ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' OFFSET ' || v_parametros.puntero;
         
             --Devuelve la respuesta
             RETURN v_consulta;
@@ -118,7 +129,8 @@ BEGIN
     
         BEGIN
             --Sentencia de la consulta de conteo de registros
-            v_consulta := ' with boletas(idboleta, diasRestantes, fechainicio, fechafin, estado, codresponsable, otorgante, nrodoc, fechaaccion, paragarantizar, idTipoDoc, IDInvitacion) as
+            v_consulta := ' with 
+ boletas(idboleta, diasRestantes, fechainicio, fechafin, estado, codresponsable, otorgante, nrodoc, fechaaccion, paragarantizar, idTipoDoc, IDInvitacion) as
                            (SELECT b.idboleta,
                                    (b.fechafin ::date - now() ::date) ::integer AS diasRestantes,
                                    b.fechainicio ::date,
@@ -126,7 +138,7 @@ BEGIN
                                    b.estado ::integer,
                                    b.codresponsable ::varchar,
                                    convert_from(b.otorgante, ''LATIN1'' ::name) ::character varying as otorgante,
-                                   convert_from(b.nrodoc::bytea, ''LATIN1'' ::name)::character varying as nrodoc,
+								   convert_from(b.nrodoc::bytea, ''LATIN1'' ::name)::character varying as nrodoc,
                                    b.fechaaccion ::date,
                                    convert_from(b.paragarantizar, ''LATIN1'' ::name) ::character varying as paragarantizar,
                                    b.idTipoDoc ::integer,
@@ -138,14 +150,21 @@ BEGIN
                           tipoBoleta(idTipoDoc, tipodocumento) as
                            (select btd.idTipoDoc ::integer,
                                    convert_from(btd.tipodocumento, ''LATIN1'' ::name) ::character varying as tipodocumento
-                              from sql_server.boletatipodoc btd)
+                              from sql_server.boletatipodoc btd),
+                              datosgenerales(cd_empleado, completo) as
+                             (SELECT dd.cd_empleado ::integer,
+                                   (convert_from(dd.primer_nombre::bytea, ''LATIN1'' ::name) || '' '' ||
+                                   convert_from(dd.segundo_nombre::bytea, ''LATIN1'' ::name) || '' '' ||
+                                   convert_from(dd.apellido_p::bytea, ''LATIN1'' ::name) || '' '' ||
+                                   convert_from(dd.apellido_m::bytea, ''LATIN1'' ::name))::varchar AS completo
+                              FROM sql_server.datosgenerales dd)
                           SELECT count(*)
                             FROM boletas b
                             left join invitacion i ON i.IDInvitacion = b.IDInvitacion
                             left join tipoBoleta tb on tb.idTipoDoc = b.idTipoDoc
-                            left JOIN orga.vfuncionario vf on vf.codigo like concat(''%'', COALESCE(i.Cd_empleado_gestor::varchar,''NULL''))
-                            left JOIN orga.vfuncionario vf2 on vf2.codigo like concat(''%'', b.codresponsable ::varchar)
-                           WHERE ';
+                            left join datosgenerales uu on uu.cd_empleado::varchar = i.Cd_empleado_gestor::varchar
+                            left join datosgenerales u2 on u2.cd_empleado::varchar = b.codresponsable ::varchar
+                           WHERE     ';
         
             --Definicion de la respuesta            
             v_consulta := v_consulta || v_parametros.filtro;
@@ -164,15 +183,23 @@ BEGIN
     ELSIF (p_transaccion = 'ADQ_PERSON_SEL') then
         BEGIN
         
-            v_consulta := 'with usuarios(cd_empleado, completo) as
-                           (SELECT dd.cd_empleado ::integer,
-                                   (dd.primer_nombre || '' '' || dd.segundo_nombre || '' '' ||
-                                   dd.apellido_p || '' '' || dd.apellido_m) ::varchar AS completo
-                              FROM sql_server.datosgenerales dd)
-                          SELECT pt.cd_empleado ::integer as id_persona, vf.desc_funcionario1::varchar as nombre
-                            FROM usuarios as pt
-                            JOIN orga.vfuncionario vf on vf.codigo like concat(''%'', pt.cd_empleado ::varchar)
-                           where vf.desc_funcionario1 is not null and ';
+            v_consulta := 'with ges(cd_empleado, estado) as                             
+                            (select g.cd_empleado::integer,
+                                    g.estado::integer
+                            from sql_server.gestor g),
+                            usuarios(cd_empleado, completo) as
+                             (SELECT dd.cd_empleado ::integer,
+                                     (convert_from(dd.primer_nombre::bytea, ''LATIN1'' ::name) || '' '' ||
+                                   convert_from(dd.segundo_nombre::bytea, ''LATIN1'' ::name) || '' '' ||
+                                   convert_from(dd.apellido_p::bytea, ''LATIN1'' ::name) || '' '' ||
+                                   convert_from(dd.apellido_m::bytea, ''LATIN1'' ::name))::varchar AS completo
+                                FROM sql_server.datosgenerales dd)
+                            select g.cd_empleado  ::integer as id_persona,
+                            		u.completo::varchar as nom,
+                                   (g.cd_empleado::integer  || '' - '' || COALESCE(u.completo::varchar, ''''))::varchar as nombre
+                            from ges g
+                            LEFT JOIN usuarios u on u.cd_empleado = g.cd_empleado
+                             where ';
         
             v_consulta := v_consulta || v_parametros.filtro;
             
@@ -192,15 +219,21 @@ BEGIN
     
         BEGIN
         
-            v_consulta := ' with usuarios(cd_empleado, completo) as
-                           (SELECT dd.cd_empleado ::integer,
-                                   (dd.primer_nombre || '' '' || dd.segundo_nombre || '' '' ||
-                                   dd.apellido_p || '' '' || dd.apellido_m) ::varchar AS completo
-                              FROM sql_server.datosgenerales dd)
-                            SELECT count(*)
-                              FROM usuarios as pt
-                              JOIN orga.vfuncionario vf on vf.codigo like concat(''%'', pt.cd_empleado ::varchar)
-                             where vf.desc_funcionario1 is not null  and ';
+            v_consulta := 'with ges(cd_empleado, estado) as                             
+                            (select g.cd_empleado::integer,
+                                    g.estado::integer
+                            from sql_server.gestor g),
+                            usuarios(cd_empleado, completo) as
+                             (SELECT dd.cd_empleado ::integer,
+                                     (convert_from(dd.primer_nombre::bytea, ''LATIN1'' ::name) || '' '' ||
+                                   convert_from(dd.segundo_nombre::bytea, ''LATIN1'' ::name) || '' '' ||
+                                   convert_from(dd.apellido_p::bytea, ''LATIN1'' ::name) || '' '' ||
+                                   convert_from(dd.apellido_m::bytea, ''LATIN1'' ::name))::varchar AS completo
+                                FROM sql_server.datosgenerales dd)
+                            select count(*)
+                            from ges g
+                            LEFT JOIN usuarios u on u.cd_empleado = g.cd_empleado
+                             where ';
             v_consulta := v_consulta || v_parametros.filtro;
             
             --Devuelve la respuesta
@@ -208,6 +241,68 @@ BEGIN
         
         END;
     
+    /*******************************
+     #TRANSACCION:  ADQ_PERRES_SEL
+     #DESCRIPCION:  Selecciona Personas
+     #AUTOR:    ymedina
+     #FECHA:    25/08/20
+    ***********************************/
+    ELSIF (p_transaccion = 'ADQ_PERRES_SEL') then
+        BEGIN
+       
+       		v_consulta := 'with usuarios(cd_empleado, completo) as
+                           (SELECT dd.cd_empleado ::integer,
+                                   (convert_from(dd.primer_nombre::bytea, ''LATIN1'' ::name) || '' '' ||
+                                   convert_from(dd.segundo_nombre::bytea, ''LATIN1'' ::name) || '' '' ||
+                                   convert_from(dd.apellido_p::bytea, ''LATIN1'' ::name) || '' '' ||
+                                   convert_from(dd.apellido_m::bytea, ''LATIN1'' ::name))::varchar AS completo
+                              FROM sql_server.datosgenerales dd
+                              join sql_server.boleta b on b.codresponsable::varchar = dd.cd_empleado::varchar
+                              )
+                          SELECT distinct(pt.cd_empleado) ::integer as id_persona, vf.desc_funcionario1::varchar as nombre
+                            FROM usuarios as pt
+                            JOIN orga.vfuncionario vf on vf.codigo like concat(''%'', pt.cd_empleado ::varchar)
+                           where vf.desc_funcionario1 is not null and ';
+        	
+            v_consulta := v_consulta || v_parametros.filtro;
+            
+            v_consulta := v_consulta || ' order by ' || v_parametros.ordenacion || ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' OFFSET ' || v_parametros.puntero;
+            raise notice 'dd %', v_consulta;
+            return v_consulta;
+        
+        END;
+    
+    /*********************************
+     #TRANSACCION:  'ADQ_PERRES_CONT'
+     #DESCRIPCION:    Conteo de registros
+     #AUTOR:        ymedina
+     #FECHA:        15-07-2020 15:06:16
+    ***********************************/
+    ELSIF (p_transaccion = 'ADQ_PERRES_CONT') THEN
+    
+        BEGIN
+        
+            v_consulta := ' with usuarios(cd_empleado, completo) as
+                           (SELECT dd.cd_empleado ::integer,
+                                   (convert_from(dd.primer_nombre::bytea, ''LATIN1'' ::name) || '' '' ||
+                                   convert_from(dd.segundo_nombre::bytea, ''LATIN1'' ::name) || '' '' ||
+                                   convert_from(dd.apellido_p::bytea, ''LATIN1'' ::name) || '' '' ||
+                                   convert_from(dd.apellido_m::bytea, ''LATIN1'' ::name))::varchar AS completo
+                              FROM sql_server.datosgenerales dd
+                              join sql_server.boleta b on b.codresponsable::varchar = dd.cd_empleado::varchar
+                              )
+                          SELECT count(distinct(pt.cd_empleado)::integer)
+                            FROM usuarios as pt
+                            JOIN orga.vfuncionario vf on vf.codigo like concat(''%'', pt.cd_empleado ::varchar)
+                           where vf.desc_funcionario1 is not null and ';
+                           
+            v_consulta := v_consulta || v_parametros.filtro;
+            
+            --Devuelve la respuesta
+            RETURN v_consulta;
+        
+        END;
+        
     /*******************************
      #TRANSACCION:  ADQ_BOTOR_SEL
      #DESCRIPCION:  Selecciona Personas
@@ -272,6 +367,11 @@ EXCEPTION
                                     'procedimientos',
                                     v_nombre_funcion);
         RAISE EXCEPTION '%', v_resp;
-END; $body$
-    LANGUAGE 'plpgsql' VOLATILE CALLED ON NULL INPUT SECURITY INVOKER PARALLEL UNSAFE COST 100;
-
+END;
+$body$
+LANGUAGE 'plpgsql'
+VOLATILE
+CALLED ON NULL INPUT
+SECURITY INVOKER
+PARALLEL UNSAFE
+COST 100;

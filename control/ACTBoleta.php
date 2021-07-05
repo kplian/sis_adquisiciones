@@ -15,7 +15,7 @@
 class ACTBoleta extends ACTbase{    
             
     function listarBoleta(){
-		$this->objParam->defecto('ordenacion','idboleta');
+		$this->objParam->defecto('ordenacion','fechafin');
         $this->objParam->defecto('dir_ordenacion','asc');
 
         if($this->objParam->getParametro('desde')!='' && $this->objParam->getParametro('hasta')!=''){
@@ -90,6 +90,33 @@ class ACTBoleta extends ACTbase{
             $this->objFunSeguridad = $this->create('MODBoleta');
             //ejecuta el metodo de lista personas a travez de la intefaz objetoFunSeguridad
             $this->res=$this->objFunSeguridad->listarPersona();
+
+        }
+        //imprime respuesta en formato JSON para enviar lo a la interface (vista)
+        $this->res->imprimirRespuesta($this->res->generarJson());
+    }
+	
+	function listarResponsable(){
+
+        //el objeto objParam contiene todas la variables recibidad desde la interfaz
+
+        // parametros de ordenacion por defecto
+        $this->objParam->defecto('ordenacion','desc_funcionario1');
+        $this->objParam->defecto('dir_ordenacion','asc');
+
+        if($this->objParam->getParametro('nombre')!=''){
+            $this->objParam->addFiltro("vf.desc_funcionario1::varchar ilike ''%".$this->objParam->getParametro('nombre')."%'' ");
+        }
+
+        //crea el objetoFunSeguridad que contiene todos los metodos del sistema de seguridad
+        if ($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
+            $this->objReporte=new Reporte($this->objParam, $this);
+            $this->res=$this->objReporte->generarReporteListado('MODBoleta','listarResponsable');
+        }
+        else {
+            $this->objFunSeguridad = $this->create('MODBoleta');
+            //ejecuta el metodo de lista personas a travez de la intefaz objetoFunSeguridad
+            $this->res=$this->objFunSeguridad->listarResponsable();
 
         }
         //imprime respuesta en formato JSON para enviar lo a la interface (vista)

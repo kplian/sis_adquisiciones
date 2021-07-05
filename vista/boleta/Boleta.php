@@ -109,7 +109,7 @@ Phx.vista.Boleta=Ext.extend(Phx.gridInterfaz,{
                 renderer:function (value,p,record){return value?value.dateFormat('d/m/Y'):''}
             },
             type:'DateField',
-            filters:{pfiltro:'bolg.fechainicio',type:'date'},
+            filters:{pfiltro:'b.fechainicio',type:'date'},
             id_grupo:1,
             grid:true,
             form:true
@@ -125,7 +125,7 @@ Phx.vista.Boleta=Ext.extend(Phx.gridInterfaz,{
                 renderer:function (value,p,record){return value?value.dateFormat('d/m/Y'):''}
             },
             type:'DateField',
-            filters:{pfiltro:'bolg.fechafin',type:'date'},
+            filters:{pfiltro:' b.fechafin',type:'date'},
             id_grupo:1,
             grid:true,
             form:true
@@ -229,8 +229,8 @@ Phx.vista.Boleta=Ext.extend(Phx.gridInterfaz,{
         
     ],
     sortInfo:{
-        field: 'idboleta',
-        direction: 'ASC'
+        field: 'fechafin',
+        direction: 'DESC'
     },
     bdel: false,
     bedit: false,

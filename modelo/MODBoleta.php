@@ -57,6 +57,25 @@ class MODBoleta extends MODbase{
         $this->tipo_procedimiento='SEL';
 
         $this->captura('id_persona','integer');
+		$this->captura('nom','varchar');
+        $this->captura('nombre','varchar');
+
+        //Ejecuta la funcion
+        $this->armarConsulta();
+        $this->ejecutarConsulta();
+
+        return $this->respuesta;
+
+    }
+	
+	function listarResponsable(){
+        //Definicion de variables para ejecucion del procedimiento
+        $this->procedimiento='adq.ft_boleta_sel';
+        $this->transaccion='ADQ_PERRES_SEL';
+        $this->tipo_procedimiento='SEL';
+		//$this->setCount(false);
+
+        $this->captura('id_persona','integer');
         $this->captura('nombre','varchar');
 
         //Ejecuta la funcion
