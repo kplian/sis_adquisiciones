@@ -69,7 +69,7 @@ header("content-type: text/javascript; charset=UTF-8");
                         id: 'id_persona',
                         root: 'datos',
                         sortInfo: {
-                            field: 'nombre',
+                            field: 'nom',
                             direction: 'ASC'
                         },
                         totalProperty: 'total',
@@ -207,7 +207,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     allowBlank: true,
                     emptyText: 'Elija una opción...',
                     store: new Ext.data.JsonStore({
-                        url: '../../sis_adquisiciones/control/Boleta/listarPersona',
+                        url: '../../sis_adquisiciones/control/Boleta/listarResponsable',
                         id: 'id_persona',
                         root: 'datos',
                         sortInfo: {
@@ -244,7 +244,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 },
                 type: 'ComboBox',
                 id_grupo: 0,
-                filters: {pfiltro: 'p.nombre',type: 'string'},
+                //filters: {pfiltro: 'p.nombre',type: 'string'},
                 grid: true,
                 form: true
             },

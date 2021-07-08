@@ -1126,5 +1126,21 @@ ALTER TABLE adq.tboleta_csa
     ADD COLUMN codinvitacion VARCHAR;
 /***********************************F-SCP-EGS-ADQ-ETR-4294-1-29/06/2021****************************************/
 
+/***********************************I-SCP-YMR-ADQ-ETR-4294-3-05/07/2021****************************************/
+
+CREATE FOREIGN TABLE sql_server.gestor (
+  cd_empleado INTEGER,
+  categoria INTEGER,
+  orden INTEGER,
+  estado INTEGER
+) 
+SERVER mssql_csa_prod
+OPTIONS (query 'SELECT [Cd_Empleado] as cd_empleado
+      ,[Categoria] as categoria
+      ,[Orden] as orden
+      ,[Activo] as estado
+  FROM [CSA_PROD].[dbo].[GESTORES_gestores]');
+  
+/***********************************F-SCP-YMR-ADQ-ETR-4294-3-05/07/2021****************************************/
 
 
