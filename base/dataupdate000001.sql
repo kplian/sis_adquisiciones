@@ -187,3 +187,20 @@ update adq.tsolicitud set
     id_depto = 5
 WHERE id_solicitud = 7411;
 /********************************************F-DAUP-EGS-ADQ-ETR-4118-28/05/2021********************************************/
+
+/********************************************I-DAUP-EGS-ADQ-ETR-4667-20/07/2021********************************************/
+--Dato original
+-- update adq.tsolicitud_det set
+--     descripcion = 'Camioneta Doble Cabina 4x4 3800 cc a 5000 cc'
+-- WHERE id_solicitud_det = 16672;
+-- update adq.tsolicitud_det set
+--     descripcion = 'Camioneta Doble Cabina 4x4 2600 cc a 3000 cc'
+-- WHERE id_solicitud_det = 16673;
+--Cambio
+update adq.tsolicitud_det set
+    descripcion = 'Camioneta Doble Cabina 4x4 (2600 cc a 3000 cc)'
+WHERE id_solicitud_det = 16672;
+update adq.tsolicitud_det set
+    descripcion = 'Camioneta Doble Cabina 4x4 (3800 cc a 5000 cc)'
+WHERE id_solicitud_det = 16673;
+/********************************************F-DAUP-EGS-ADQ-ETR-4667-20/07/2021********************************************/
