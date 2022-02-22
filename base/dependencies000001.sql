@@ -141,9 +141,6 @@ ALTER TABLE adq.tcotizacion_det
 /***********************************I-DEP-JRR-ADQ-104-04/04/2013****************************************/
 
 ALTER TABLE adq.tcategoria_compra
-  ALTER COLUMN id_proceso_macro SET NOT NULL;
-
-ALTER TABLE adq.tcategoria_compra
   ADD CONSTRAINT fk_tcategoria_compra__id_proceso_macro FOREIGN KEY (id_proceso_macro)
     REFERENCES wf.tproceso_macro(id_proceso_macro)
     ON DELETE NO ACTION
@@ -794,60 +791,45 @@ CREATE TRIGGER trpc_tr
 
 
  
- /***********************************I-DEP-RAC-ADQ-1-05/06/2014*****************************************/
  
---------------- SQL ---------------
-
-CREATE OR REPLACE VIEW tes.vcomp_devtesprov_plan_pago
-AS
-  SELECT pp.id_plan_pago,
-         op.id_proveedor,
-         p.desc_proveedor,
-         op.id_moneda,
-         op.id_depto_conta,
-         op.numero,
-         now() AS fecha_actual,
-         pp.estado,
-         pp.monto_ejecutar_total_mb,
-         pp.monto_ejecutar_total_mo,
-         pp.monto,
-         pp.monto_mb,
-         pp.monto_retgar_mb,
-         pp.monto_retgar_mo,
-         pp.monto_no_pagado,
-         pp.monto_no_pagado_mb,
-         pp.otros_descuentos,
-         pp.otros_descuentos_mb,
-         pp.id_plantilla,
-         pp.id_cuenta_bancaria,
-         pp.id_cuenta_bancaria_mov,
-         pp.nro_cheque,
-         pp.nro_cuenta_bancaria,
-         op.num_tramite,
-         pp.tipo,
-         op.id_gestion AS id_gestion_cuentas,
-         pp.id_int_comprobante,
-         pp.liquido_pagable,
-         pp.liquido_pagable_mb,
-         pp.nombre_pago,
-         pp.porc_monto_excento_var,
-         (COALESCE(op.numero, '' )||' '|| COALESCE(pp.obs_monto_no_pagado, '' ))::character varying AS obs_pp
-        
-  FROM tes.tplan_pago pp
-       JOIN tes.tobligacion_pago op ON pp.id_obligacion_pago =
-        op.id_obligacion_pago
-       JOIN param.vproveedor p ON p.id_proveedor = op.id_proveedor;
-/***********************************F-DEP-RAC-ADQ-1-05/06/2014*****************************************/
- 
- 
- 
- 
- 
- 
-/***********************************I-DEP-RAC-ADQ-1-19/08/2014*****************************************/
- --------------- SQL ---------------
-
-CREATE OR REPLACE VIEW adq.vsolicitud_compra
+/***********************************I-DEP-RAC-ADQ-1-20/08/2014*****************************************/
+  CREATE OR REPLACE VIEW adq.vsolicitud_compra(
+    id_solicitud,
+    id_proveedor,
+    desc_proveedor,
+    id_moneda,
+    id_depto,
+    numero,
+    fecha_soli,
+    estado,
+    num_tramite,
+    id_gestion,
+    justificacion,
+    rotulo_comercial,
+    id_categoria_compra,
+    codigo,
+    precio_total,
+    precio_total_mb,
+    codigo_categoria,
+    nombre_categoria,
+    id_proceso_wf,
+    detalle,
+    desc_funcionario1,
+    codigo_uo,
+    nombre_unidad,
+    tipo,
+    tipo_concepto,
+    nombre_cargo,
+    nombre_unidad_cargo,
+    email_empresa,
+    desc_usuario,
+    id_funcionario_supervisor,
+    id_funcionario_aprobador,
+    prioridad,
+    nombre_depto,
+    precontrato,
+    id_funcionario_rpc,
+    id_funcionario)
 AS
   SELECT DISTINCT sol.id_solicitud,
          sol.id_proveedor,
@@ -863,32 +845,53 @@ AS
          p.rotulo_comercial,
          sol.id_categoria_compra,
          mon.codigo,
-         sum(sd.precio_total) AS precio_total,
-         sum(sd.precio_unitario_mb * sd.cantidad::numeric) AS precio_total_mb,
-         COALESCE(cac.codigo, '' ::character varying) AS codigo_categoria,
-         COALESCE(cac.nombre, '' ::character varying) AS nombre_categoria,
+         COALESCE(sum(sd.precio_total), 0::numeric) AS precio_total,
+         COALESCE(sum(sd.precio_unitario_mb * sd.cantidad::numeric), 0::numeric)
+           AS precio_total_mb,
+         COALESCE(cac.codigo, ''::character varying) AS codigo_categoria,
+         COALESCE(cac.nombre, ''::character varying) AS nombre_categoria,
          sol.id_proceso_wf,
-         ('<table>' ::text || pxp.html_rows((((('<td>' ::text ||
-          ci.desc_ingas::text) || ' <br>' ::text) || sd.descripcion) || '</td>'
-           ::text) ::character varying) ::text) || '</table>' ::text AS detalle,
+         ((('<table border="1"><TR>
+   <TH>Concepto</TH>
+   <TH>Detalle</TH>
+   <TH>Cantidad</TH>
+   <TH>P / U ('::text || mon.codigo::text) || ')</TH>'::text) || pxp.html_rows((
+     ((((((('<td>'::text || COALESCE(ci.desc_ingas::text, '-'::text)) || '</td>
+       <td>'::text) || COALESCE(sd.descripcion, '-'::text)) || '</td> <td>'::
+         text) || COALESCE(sd.cantidad::text, '-'::text)) || '</td> <td>'::text)
+         || COALESCE(round(sd.precio_unitario, 2)::text, '-'::text)) || '</td> '
+         ::text)::character varying)::text) || '</table>'::text AS detalle,
          fun.desc_funcionario1,
          uo.codigo AS codigo_uo,
          uo.nombre_unidad,
          lower(sol.tipo::text) AS tipo,
          lower(sol.tipo_concepto::text) AS tipo_concepto,
          fun.nombre_cargo,
-         fun.nombre_unidad AS nombre_unidad_cargo
+         fun.nombre_unidad AS nombre_unidad_cargo,
+         fun.email_empresa,
+         usu.desc_persona AS desc_usuario,
+         COALESCE(sol.id_funcionario_supervisor, 0) AS id_funcionario_supervisor
+  ,
+         COALESCE(sol.id_funcionario_aprobador, 0) AS id_funcionario_aprobador,
+         dep.prioridad,
+         dep.nombre AS nombre_depto,
+         sol.precontrato,
+         sol.id_funcionario_rpc,
+         sol.id_funcionario
   FROM adq.tsolicitud sol
-       JOIN adq.tsolicitud_det sd ON sd.id_solicitud = sol.id_solicitud
-       JOIN param.tconcepto_ingas ci ON ci.id_concepto_ingas =
-        sd.id_concepto_ingas
+       LEFT JOIN adq.tsolicitud_det sd ON sd.id_solicitud = sol.id_solicitud AND
+         sd.estado_reg::text = 'activo'::text
+       LEFT JOIN param.tconcepto_ingas ci ON ci.id_concepto_ingas =
+         sd.id_concepto_ingas
        JOIN param.tmoneda mon ON mon.id_moneda = sol.id_moneda
+       JOIN param.tdepto dep ON dep.id_depto = sol.id_depto
        JOIN orga.vfuncionario_cargo fun ON fun.id_funcionario =
-        sol.id_funcionario
+         sol.id_funcionario AND fun.estado_reg_asi::text = 'activo'::text
        JOIN orga.tuo uo ON uo.id_uo = sol.id_uo
+       JOIN segu.vusuario usu ON usu.id_usuario = sol.id_usuario_reg
        LEFT JOIN param.vproveedor p ON p.id_proveedor = sol.id_proveedor
        LEFT JOIN adq.tcategoria_compra cac ON cac.id_categoria_compra =
-        sol.id_categoria_compra
+         sol.id_categoria_compra
   WHERE fun.fecha_asignacion <= sol.fecha_soli AND
         fun.fecha_finalizacion >= sol.fecha_soli OR
         fun.fecha_asignacion <= sol.fecha_soli AND
@@ -915,19 +918,16 @@ AS
            sol.tipo_concepto,
            sol.tipo,
            fun.nombre_cargo,
-           fun.nombre_unidad;
-/***********************************F-DEP-RAC-ADQ-1-19/08/2014*****************************************/
- 
- 
- 
- 
- 
-/***********************************I-DEP-RAC-ADQ-1-20/08/2014*****************************************/
- 
+           fun.nombre_unidad,
+           fun.email_empresa,
+           usu.desc_persona,
+           dep.prioridad,
+           dep.nombre,
+           sol.id_funcionario_rpc;
  
 --------------- SQL ---------------
 
-CREATE OR REPLACE VIEW adq.vcotizacion(
+ CREATE OR REPLACE VIEW adq.vcotizacion(
     id_cotizacion,
     numero_oc,
     codigo_proceso,
@@ -961,7 +961,12 @@ CREATE OR REPLACE VIEW adq.vcotizacion(
     tipo,
     tipo_concepto,
     nombre_cargo,
-    nombre_unidad_cargo)
+    nombre_unidad_cargo,
+    requiere_contrato,
+    nro_contrato,
+    precontrato,
+    ots,
+    conceptos)
 AS
   SELECT DISTINCT cot.id_cotizacion,
          cot.numero_oc,
@@ -981,40 +986,48 @@ AS
          p.rotulo_comercial,
          sol.id_categoria_compra,
          mon.codigo,
-         sum(sd.precio_total) AS precio_total,
-         sum(sd.precio_unitario_mb * sd.cantidad::numeric) AS precio_total_mb,
-         sum(cd.cantidad_adju * cd.precio_unitario) AS monto_total_adjudicado,
-         sum(cd.cantidad_adju * cd.precio_unitario_mb) AS
-          monto_total_adjudicado_mb,
-         COALESCE(cac.codigo, '' ::character varying) AS codigo_categoria,
-         COALESCE(cac.nombre, '' ::character varying) AS nombre_categoria,
+         COALESCE(sum(sd.precio_total), 0::numeric) AS precio_total,
+         COALESCE(sum(sd.precio_unitario_mb * sd.cantidad::numeric), 0::numeric)
+           AS precio_total_mb,
+         COALESCE(sum(cd.cantidad_adju * cd.precio_unitario), 0::numeric) AS
+           monto_total_adjudicado,
+         COALESCE(sum(cd.cantidad_adju * cd.precio_unitario_mb), 0::numeric) AS
+           monto_total_adjudicado_mb,
+         COALESCE(cac.codigo, ''::character varying) AS codigo_categoria,
+         COALESCE(cac.nombre, ''::character varying) AS nombre_categoria,
          sol.id_proceso_wf AS id_proceso_wf_sol,
          cot.id_proceso_wf,
-         ('<table>' ::text || pxp.html_rows((((('<td>' ::text ||
-          ci.desc_ingas::text) || ' <br>' ::text) || sd.descripcion) || '</td>'
-           ::text) ::character varying) ::text) || '</table>' ::text AS detalle,
+         ('<table>'::text || pxp.html_rows((((('<td>'::text || ci.desc_ingas::
+           text) || ' <br>'::text) || sd.descripcion) || '</td>'::text)::
+           character varying)::text) || '</table>'::text AS detalle,
          fun.desc_funcionario1,
          uo.codigo AS codigo_uo,
          uo.nombre_unidad,
          lower(sol.tipo::text) AS tipo,
          lower(sol.tipo_concepto::text) AS tipo_concepto,
          fun.nombre_cargo,
-         fun.nombre_unidad AS nombre_unidad_cargo
+         fun.nombre_unidad AS nombre_unidad_cargo,
+         cot.requiere_contrato,
+         cot.nro_contrato,
+         sol.precontrato,
+         pxp.list(sd.id_orden_trabajo::text) AS ots,
+         pxp.list(sd.id_concepto_ingas::text) AS conceptos
   FROM adq.tcotizacion cot
        JOIN adq.tproceso_compra pro ON pro.id_proceso_compra =
-        cot.id_proceso_compra
+         cot.id_proceso_compra
        JOIN adq.tsolicitud sol ON sol.id_solicitud = pro.id_solicitud
-       JOIN adq.tcotizacion_det cd ON cd.id_cotizacion = cot.id_cotizacion
-       JOIN adq.tsolicitud_det sd ON sd.id_solicitud_det = cd.id_solicitud_det
-       JOIN param.tconcepto_ingas ci ON ci.id_concepto_ingas =
-        sd.id_concepto_ingas
+       LEFT JOIN adq.tcotizacion_det cd ON cd.id_cotizacion = cot.id_cotizacion
+       LEFT JOIN adq.tsolicitud_det sd ON sd.id_solicitud_det =
+         cd.id_solicitud_det
+       LEFT JOIN param.tconcepto_ingas ci ON ci.id_concepto_ingas =
+         sd.id_concepto_ingas
        JOIN param.tmoneda mon ON mon.id_moneda = sol.id_moneda
        JOIN orga.vfuncionario_cargo fun ON fun.id_funcionario =
-        sol.id_funcionario AND fun.estado_reg_asi::text = 'activo' ::text
+         sol.id_funcionario AND fun.estado_reg_asi::text = 'activo'::text
        JOIN orga.tuo uo ON uo.id_uo = sol.id_uo
        JOIN param.vproveedor p ON p.id_proveedor = cot.id_proveedor
        JOIN adq.tcategoria_compra cac ON cac.id_categoria_compra =
-        sol.id_categoria_compra
+         sol.id_categoria_compra
   WHERE fun.fecha_asignacion <= sol.fecha_soli AND
         fun.fecha_finalizacion >= sol.fecha_soli OR
         fun.fecha_asignacion <= sol.fecha_soli AND
@@ -1045,106 +1058,12 @@ AS
            sol.tipo_concepto,
            sol.tipo,
            fun.nombre_cargo,
-           fun.nombre_unidad;
+           fun.nombre_unidad,
+           cot.requiere_contrato,
+           cot.nro_contrato,
+           sol.precontrato;
+      -----------------------------SQL------------------------------------
 
---------------- SQL ---------------
-
-CREATE OR REPLACE VIEW adq.vsolicitud_compra(
-    id_solicitud,
-    id_proveedor,
-    desc_proveedor,
-    id_moneda,
-    id_depto,
-    numero,
-    fecha_soli,
-    estado,
-    num_tramite,
-    id_gestion,
-    justificacion,
-    rotulo_comercial,
-    id_categoria_compra,
-    codigo,
-    precio_total,
-    precio_total_mb,
-    codigo_categoria,
-    nombre_categoria,
-    id_proceso_wf,
-    detalle,
-    desc_funcionario1,
-    codigo_uo,
-    nombre_unidad,
-    tipo,
-    tipo_concepto,
-    nombre_cargo,
-    nombre_unidad_cargo)
-AS
-  SELECT DISTINCT sol.id_solicitud,
-         sol.id_proveedor,
-         p.desc_proveedor,
-         sol.id_moneda,
-         sol.id_depto,
-         sol.numero,
-         sol.fecha_soli,
-         sol.estado,
-         sol.num_tramite,
-         sol.id_gestion,
-         sol.justificacion,
-         p.rotulo_comercial,
-         sol.id_categoria_compra,
-         mon.codigo,
-         sum(sd.precio_total) AS precio_total,
-         sum(sd.precio_unitario_mb * sd.cantidad::numeric) AS precio_total_mb,
-         COALESCE(cac.codigo, '' ::character varying) AS codigo_categoria,
-         COALESCE(cac.nombre, '' ::character varying) AS nombre_categoria,
-         sol.id_proceso_wf,
-         ('<table>' ::text || pxp.html_rows((((('<td>' ::text ||
-          ci.desc_ingas::text) || ' <br>' ::text) || sd.descripcion) || '</td>'
-           ::text) ::character varying) ::text) || '</table>' ::text AS detalle,
-         fun.desc_funcionario1,
-         uo.codigo AS codigo_uo,
-         uo.nombre_unidad,
-         lower(sol.tipo::text) AS tipo,
-         lower(sol.tipo_concepto::text) AS tipo_concepto,
-         fun.nombre_cargo,
-         fun.nombre_unidad AS nombre_unidad_cargo
-  FROM adq.tsolicitud sol
-       JOIN adq.tsolicitud_det sd ON sd.id_solicitud = sol.id_solicitud
-       JOIN param.tconcepto_ingas ci ON ci.id_concepto_ingas =
-        sd.id_concepto_ingas
-       JOIN param.tmoneda mon ON mon.id_moneda = sol.id_moneda
-       JOIN orga.vfuncionario_cargo fun ON fun.id_funcionario =
-        sol.id_funcionario AND fun.estado_reg_asi::text = 'activo' ::text
-       JOIN orga.tuo uo ON uo.id_uo = sol.id_uo
-       LEFT JOIN param.vproveedor p ON p.id_proveedor = sol.id_proveedor
-       LEFT JOIN adq.tcategoria_compra cac ON cac.id_categoria_compra =
-        sol.id_categoria_compra
-  WHERE fun.fecha_asignacion <= sol.fecha_soli AND
-        fun.fecha_finalizacion >= sol.fecha_soli OR
-        fun.fecha_asignacion <= sol.fecha_soli AND
-        fun.fecha_finalizacion IS NULL
-  GROUP BY sol.id_solicitud,
-           sol.id_proveedor,
-           p.desc_proveedor,
-           sol.id_moneda,
-           sol.id_depto,
-           sol.numero,
-           sol.fecha_soli,
-           sol.estado,
-           sol.num_tramite,
-           sol.id_gestion,
-           sol.justificacion,
-           p.rotulo_comercial,
-           sol.id_categoria_compra,
-           cac.codigo,
-           cac.nombre,
-           mon.codigo,
-           fun.desc_funcionario1,
-           uo.codigo,
-           uo.nombre_unidad,
-           sol.tipo_concepto,
-           sol.tipo,
-           fun.nombre_cargo,
-           fun.nombre_unidad;
 
  /***********************************F-DEP-RAC-ADQ-1-20/08/2014*****************************************/
  
@@ -1210,13 +1129,13 @@ AS
          mon.codigo,
          sum(sd.precio_total) AS precio_total,
          sum(sd.precio_unitario_mb * sd.cantidad::numeric) AS precio_total_mb,
-         COALESCE(cac.codigo, '' ::character varying) AS codigo_categoria,
-         COALESCE(cac.nombre, '' ::character varying) AS nombre_categoria,
+         COALESCE(cac.codigo, ''::character varying) AS codigo_categoria,
+         COALESCE(cac.nombre, ''::character varying) AS nombre_categoria,
          sol.id_proceso_wf AS id_proceso_wf_sol,
          pro.id_proceso_wf,
-         ('<table>' ::text || pxp.html_rows((((('<td>' ::text ||
-          ci.desc_ingas::text) || ' <br>' ::text) || sd.descripcion) || '</td>'
-           ::text) ::character varying) ::text) || '</table>' ::text AS detalle,
+         ('<table>'::text || pxp.html_rows((((('<td>'::text || ci.desc_ingas::
+           text) || ' <br>'::text) || sd.descripcion) || '</td>'::text)::
+           character varying)::text) || '</table>'::text AS detalle,
          fun.desc_funcionario1,
          uo.codigo AS codigo_uo,
          uo.nombre_unidad,
@@ -1228,14 +1147,14 @@ AS
        JOIN adq.tsolicitud sol ON sol.id_solicitud = pro.id_solicitud
        JOIN adq.tsolicitud_det sd ON sd.id_solicitud = sol.id_solicitud
        JOIN param.tconcepto_ingas ci ON ci.id_concepto_ingas =
-        sd.id_concepto_ingas
+         sd.id_concepto_ingas
        JOIN param.tmoneda mon ON mon.id_moneda = sol.id_moneda
        JOIN orga.vfuncionario_cargo fun ON fun.id_funcionario =
-        sol.id_funcionario AND fun.estado_reg_asi::text = 'activo' ::text
+         sol.id_funcionario AND fun.estado_reg_asi::text = 'activo'::text
        JOIN orga.tuo uo ON uo.id_uo = sol.id_uo
        JOIN param.vproveedor p ON p.id_proveedor = sol.id_proveedor
        JOIN adq.tcategoria_compra cac ON cac.id_categoria_compra =
-        sol.id_categoria_compra
+         sol.id_categoria_compra
   WHERE fun.fecha_asignacion <= sol.fecha_soli AND
         fun.fecha_finalizacion >= sol.fecha_soli OR
         fun.fecha_asignacion <= sol.fecha_soli AND
@@ -1271,1340 +1190,7 @@ AS
 
 
 
-/***********************************I-DEP-JRR-ADQ-1-10/09/2014*****************************************/
-CREATE OR REPLACE VIEW adq.vsolicitud_compra(
-    id_solicitud,
-    id_proveedor,
-    desc_proveedor,
-    id_moneda,
-    id_depto,
-    numero,
-    fecha_soli,
-    estado,
-    num_tramite,
-    id_gestion,
-    justificacion,
-    rotulo_comercial,
-    id_categoria_compra,
-    codigo,
-    precio_total,
-    precio_total_mb,
-    codigo_categoria,
-    nombre_categoria,
-    id_proceso_wf,
-    detalle,
-    desc_funcionario1,
-    codigo_uo,
-    nombre_unidad,
-    tipo,
-    tipo_concepto,
-    nombre_cargo,
-    nombre_unidad_cargo,
-    email_empresa,
-    desc_usuario)
-AS
-  SELECT DISTINCT sol.id_solicitud,
-         sol.id_proveedor,
-         p.desc_proveedor,
-         sol.id_moneda,
-         sol.id_depto,
-         sol.numero,
-         sol.fecha_soli,
-         sol.estado,
-         sol.num_tramite,
-         sol.id_gestion,
-         sol.justificacion,
-         p.rotulo_comercial,
-         sol.id_categoria_compra,
-         mon.codigo,
-         sum(sd.precio_total) AS precio_total,
-         sum(sd.precio_unitario_mb * sd.cantidad::numeric) AS precio_total_mb,
-         COALESCE(cac.codigo, '' ::character varying) AS codigo_categoria,
-         COALESCE(cac.nombre, '' ::character varying) AS nombre_categoria,
-         sol.id_proceso_wf,
-         ('<table>' ::text || pxp.html_rows((((('<td>' ::text ||
-          ci.desc_ingas::text) || ' <br>' ::text) || sd.descripcion) || '</td>'
-           ::text) ::character varying) ::text) || '</table>' ::text AS detalle,
-         fun.desc_funcionario1,
-         uo.codigo AS codigo_uo,
-         uo.nombre_unidad,
-         lower(sol.tipo::text) AS tipo,
-         lower(sol.tipo_concepto::text) AS tipo_concepto,
-         fun.nombre_cargo,
-         fun.nombre_unidad AS nombre_unidad_cargo,
-         fun.email_empresa,
-         usu.desc_persona AS desc_usuario
-  FROM adq.tsolicitud sol
-       JOIN adq.tsolicitud_det sd ON sd.id_solicitud = sol.id_solicitud
-       JOIN param.tconcepto_ingas ci ON ci.id_concepto_ingas =
-        sd.id_concepto_ingas
-       JOIN param.tmoneda mon ON mon.id_moneda = sol.id_moneda
-       JOIN orga.vfuncionario_cargo fun ON fun.id_funcionario =
-        sol.id_funcionario AND fun.estado_reg_asi::text = 'activo' ::text
-       JOIN orga.tuo uo ON uo.id_uo = sol.id_uo
-       JOIN segu.vusuario usu ON usu.id_usuario = sol.id_usuario_reg
-       LEFT JOIN param.vproveedor p ON p.id_proveedor = sol.id_proveedor
-       LEFT JOIN adq.tcategoria_compra cac ON cac.id_categoria_compra =
-        sol.id_categoria_compra
-  WHERE fun.fecha_asignacion <= sol.fecha_soli AND
-        fun.fecha_finalizacion >= sol.fecha_soli OR
-        fun.fecha_asignacion <= sol.fecha_soli AND
-        fun.fecha_finalizacion IS NULL
-  GROUP BY sol.id_solicitud,
-           sol.id_proveedor,
-           p.desc_proveedor,
-           sol.id_moneda,
-           sol.id_depto,
-           sol.numero,
-           sol.fecha_soli,
-           sol.estado,
-           sol.num_tramite,
-           sol.id_gestion,
-           sol.justificacion,
-           p.rotulo_comercial,
-           sol.id_categoria_compra,
-           cac.codigo,
-           cac.nombre,
-           mon.codigo,
-           fun.desc_funcionario1,
-           uo.codigo,
-           uo.nombre_unidad,
-           sol.tipo_concepto,
-           sol.tipo,
-           fun.nombre_cargo,
-           fun.nombre_unidad,
-           fun.email_empresa,
-           usu.desc_persona;
-           
-/***********************************F-DEP-JRR-ADQ-1-10/09/2014*****************************************/
-
-
-
-/***********************************I-DEP-RAC-ADQ-1-22/09/2014*****************************************/
-
-CREATE OR REPLACE VIEW adq.vsolicitud_compra(
-    id_solicitud,
-    id_proveedor,
-    desc_proveedor,
-    id_moneda,
-    id_depto,
-    numero,
-    fecha_soli,
-    estado,
-    num_tramite,
-    id_gestion,
-    justificacion,
-    rotulo_comercial,
-    id_categoria_compra,
-    codigo,
-    precio_total,
-    precio_total_mb,
-    codigo_categoria,
-    nombre_categoria,
-    id_proceso_wf,
-    detalle,
-    desc_funcionario1,
-    codigo_uo,
-    nombre_unidad,
-    tipo,
-    tipo_concepto,
-    nombre_cargo,
-    nombre_unidad_cargo,
-    email_empresa,
-    desc_usuario,
-    id_funcionario_supervisor,
-    id_funcionario_aprobador)
-AS
-  SELECT DISTINCT sol.id_solicitud,
-         sol.id_proveedor,
-         p.desc_proveedor,
-         sol.id_moneda,
-         sol.id_depto,
-         sol.numero,
-         sol.fecha_soli,
-         sol.estado,
-         sol.num_tramite,
-         sol.id_gestion,
-         sol.justificacion,
-         p.rotulo_comercial,
-         sol.id_categoria_compra,
-         mon.codigo,
-         sum(sd.precio_total) AS precio_total,
-         sum(sd.precio_unitario_mb * sd.cantidad::numeric) AS precio_total_mb,
-         COALESCE(cac.codigo, ''::character varying) AS codigo_categoria,
-         COALESCE(cac.nombre, ''::character varying) AS nombre_categoria,
-         sol.id_proceso_wf,
-         ('<table>'::text || pxp.html_rows((((('<td>'::text || ci.desc_ingas::
-           text) || ' <br>'::text) || sd.descripcion) || '</td>'::text)::
-           character varying)::text) || '</table>'::text AS detalle,
-         fun.desc_funcionario1,
-         uo.codigo AS codigo_uo,
-         uo.nombre_unidad,
-         lower(sol.tipo::text) AS tipo,
-         lower(sol.tipo_concepto::text) AS tipo_concepto,
-         fun.nombre_cargo,
-         fun.nombre_unidad AS nombre_unidad_cargo,
-         fun.email_empresa,
-         usu.desc_persona AS desc_usuario,
-         COALESCE(sol.id_funcionario_supervisor, 0) AS id_funcionario_supervisor
-  ,
-         COALESCE(sol.id_funcionario_aprobador, 0) AS id_funcionario_aprobador
-  FROM adq.tsolicitud sol
-       JOIN adq.tsolicitud_det sd ON sd.id_solicitud = sol.id_solicitud
-       JOIN param.tconcepto_ingas ci ON ci.id_concepto_ingas =
-         sd.id_concepto_ingas
-       JOIN param.tmoneda mon ON mon.id_moneda = sol.id_moneda
-       JOIN orga.vfuncionario_cargo fun ON fun.id_funcionario =
-         sol.id_funcionario AND fun.estado_reg_asi::text = 'activo'::text
-       JOIN orga.tuo uo ON uo.id_uo = sol.id_uo
-       JOIN segu.vusuario usu ON usu.id_usuario = sol.id_usuario_reg
-       LEFT JOIN param.vproveedor p ON p.id_proveedor = sol.id_proveedor
-       LEFT JOIN adq.tcategoria_compra cac ON cac.id_categoria_compra =
-         sol.id_categoria_compra
-  WHERE fun.fecha_asignacion <= sol.fecha_soli AND
-        fun.fecha_finalizacion >= sol.fecha_soli OR
-        fun.fecha_asignacion <= sol.fecha_soli AND
-        fun.fecha_finalizacion IS NULL
-  GROUP BY sol.id_solicitud,
-           sol.id_proveedor,
-           p.desc_proveedor,
-           sol.id_moneda,
-           sol.id_depto,
-           sol.numero,
-           sol.fecha_soli,
-           sol.estado,
-           sol.num_tramite,
-           sol.id_gestion,
-           sol.justificacion,
-           p.rotulo_comercial,
-           sol.id_categoria_compra,
-           cac.codigo,
-           cac.nombre,
-           mon.codigo,
-           fun.desc_funcionario1,
-           uo.codigo,
-           uo.nombre_unidad,
-           sol.tipo_concepto,
-           sol.tipo,
-           fun.nombre_cargo,
-           fun.nombre_unidad,
-           fun.email_empresa,
-           usu.desc_persona;
-
-/***********************************F-DEP-RAC-ADQ-1-22/09/2014*****************************************/
-
-
-/***********************************I-DEP-RAC-ADQ-1-26/09/2014*****************************************/
-
-
-CREATE OR REPLACE VIEW adq.vsolicitud_compra(
-    id_solicitud,
-    id_proveedor,
-    desc_proveedor,
-    id_moneda,
-    id_depto,
-    numero,
-    fecha_soli,
-    estado,
-    num_tramite,
-    id_gestion,
-    justificacion,
-    rotulo_comercial,
-    id_categoria_compra,
-    codigo,
-    precio_total,
-    precio_total_mb,
-    codigo_categoria,
-    nombre_categoria,
-    id_proceso_wf,
-    detalle,
-    desc_funcionario1,
-    codigo_uo,
-    nombre_unidad,
-    tipo,
-    tipo_concepto,
-    nombre_cargo,
-    nombre_unidad_cargo,
-    email_empresa,
-    desc_usuario,
-    id_funcionario_supervisor,
-    id_funcionario_aprobador)
-AS
-  SELECT DISTINCT sol.id_solicitud,
-         sol.id_proveedor,
-         p.desc_proveedor,
-         sol.id_moneda,
-         sol.id_depto,
-         sol.numero,
-         sol.fecha_soli,
-         sol.estado,
-         sol.num_tramite,
-         sol.id_gestion,
-         sol.justificacion,
-         p.rotulo_comercial,
-         sol.id_categoria_compra,
-         mon.codigo,
-         sum(sd.precio_total) AS precio_total,
-         sum(sd.precio_unitario_mb * sd.cantidad::numeric) AS precio_total_mb,
-         COALESCE(cac.codigo, ''::character varying) AS codigo_categoria,
-         COALESCE(cac.nombre, ''::character varying) AS nombre_categoria,
-         sol.id_proceso_wf,
-         ('<table>'::text || pxp.html_rows((((('<td>'::text || ci.desc_ingas::
-           text) || ' <br>'::text) || sd.descripcion) || '</td>'::text)::
-           character varying)::text) || '</table>'::text AS detalle,
-         fun.desc_funcionario1,
-         uo.codigo AS codigo_uo,
-         uo.nombre_unidad,
-         lower(sol.tipo::text) AS tipo,
-         lower(sol.tipo_concepto::text) AS tipo_concepto,
-         fun.nombre_cargo,
-         fun.nombre_unidad AS nombre_unidad_cargo,
-         fun.email_empresa,
-         usu.desc_persona AS desc_usuario,
-         COALESCE(sol.id_funcionario_supervisor, 0) AS id_funcionario_supervisor
-  ,
-         COALESCE(sol.id_funcionario_aprobador, 0) AS id_funcionario_aprobador
-  FROM adq.tsolicitud sol
-       LEFT JOIN adq.tsolicitud_det sd ON sd.id_solicitud = sol.id_solicitud
-       LEFT JOIN param.tconcepto_ingas ci ON ci.id_concepto_ingas =
-         sd.id_concepto_ingas
-       JOIN param.tmoneda mon ON mon.id_moneda = sol.id_moneda
-       JOIN orga.vfuncionario_cargo fun ON fun.id_funcionario =
-         sol.id_funcionario AND fun.estado_reg_asi::text = 'activo'::text
-       JOIN orga.tuo uo ON uo.id_uo = sol.id_uo
-       JOIN segu.vusuario usu ON usu.id_usuario = sol.id_usuario_reg
-       LEFT JOIN param.vproveedor p ON p.id_proveedor = sol.id_proveedor
-       LEFT JOIN adq.tcategoria_compra cac ON cac.id_categoria_compra =
-         sol.id_categoria_compra
-  WHERE fun.fecha_asignacion <= sol.fecha_soli AND
-        fun.fecha_finalizacion >= sol.fecha_soli OR
-        fun.fecha_asignacion <= sol.fecha_soli AND
-        fun.fecha_finalizacion IS NULL
-  GROUP BY sol.id_solicitud,
-           sol.id_proveedor,
-           p.desc_proveedor,
-           sol.id_moneda,
-           sol.id_depto,
-           sol.numero,
-           sol.fecha_soli,
-           sol.estado,
-           sol.num_tramite,
-           sol.id_gestion,
-           sol.justificacion,
-           p.rotulo_comercial,
-           sol.id_categoria_compra,
-           cac.codigo,
-           cac.nombre,
-           mon.codigo,
-           fun.desc_funcionario1,
-           uo.codigo,
-           uo.nombre_unidad,
-           sol.tipo_concepto,
-           sol.tipo,
-           fun.nombre_cargo,
-           fun.nombre_unidad,
-           fun.email_empresa,
-           usu.desc_persona;
-           
-/***********************************F-DEP-RAC-ADQ-1-26/09/2014*****************************************/
-           
-
-/***********************************I-DEP-RAC-ADQ-1-29/09/2014*****************************************/
- 
---------------- SQL ---------------
-
-CREATE OR REPLACE VIEW adq.vsolicitud_compra(
-    id_solicitud,
-    id_proveedor,
-    desc_proveedor,
-    id_moneda,
-    id_depto,
-    numero,
-    fecha_soli,
-    estado,
-    num_tramite,
-    id_gestion,
-    justificacion,
-    rotulo_comercial,
-    id_categoria_compra,
-    codigo,
-    precio_total,
-    precio_total_mb,
-    codigo_categoria,
-    nombre_categoria,
-    id_proceso_wf,
-    detalle,
-    desc_funcionario1,
-    codigo_uo,
-    nombre_unidad,
-    tipo,
-    tipo_concepto,
-    nombre_cargo,
-    nombre_unidad_cargo,
-    email_empresa,
-    desc_usuario,
-    id_funcionario_supervisor,
-    id_funcionario_aprobador)
-AS
-  SELECT DISTINCT sol.id_solicitud,
-         sol.id_proveedor,
-         p.desc_proveedor,
-         sol.id_moneda,
-         sol.id_depto,
-         sol.numero,
-         sol.fecha_soli,
-         sol.estado,
-         sol.num_tramite,
-         sol.id_gestion,
-         sol.justificacion,
-         p.rotulo_comercial,
-         sol.id_categoria_compra,
-         mon.codigo,
-         COALESCE(sum(sd.precio_total),0) AS precio_total,
-         COALESCE(sum(sd.precio_unitario_mb * sd.cantidad::numeric),0) AS precio_total_mb,
-         COALESCE(cac.codigo, ''::character varying) AS codigo_categoria,
-         COALESCE(cac.nombre, ''::character varying) AS nombre_categoria,
-         sol.id_proceso_wf,
-         ('<table>'::text || pxp.html_rows((((('<td>'::text || ci.desc_ingas::
-           text) || ' <br>'::text) || sd.descripcion) || '</td>'::text)::
-           character varying)::text) || '</table>'::text AS detalle,
-         fun.desc_funcionario1,
-         uo.codigo AS codigo_uo,
-         uo.nombre_unidad,
-         lower(sol.tipo::text) AS tipo,
-         lower(sol.tipo_concepto::text) AS tipo_concepto,
-         fun.nombre_cargo,
-         fun.nombre_unidad AS nombre_unidad_cargo,
-         fun.email_empresa,
-         usu.desc_persona AS desc_usuario,
-         COALESCE(sol.id_funcionario_supervisor, 0) AS id_funcionario_supervisor
-  ,
-         COALESCE(sol.id_funcionario_aprobador, 0) AS id_funcionario_aprobador
-  FROM adq.tsolicitud sol
-       LEFT JOIN adq.tsolicitud_det sd ON sd.id_solicitud = sol.id_solicitud
-       LEFT JOIN param.tconcepto_ingas ci ON ci.id_concepto_ingas =
-         sd.id_concepto_ingas
-       JOIN param.tmoneda mon ON mon.id_moneda = sol.id_moneda
-       JOIN orga.vfuncionario_cargo fun ON fun.id_funcionario =
-         sol.id_funcionario AND fun.estado_reg_asi::text = 'activo'::text
-       JOIN orga.tuo uo ON uo.id_uo = sol.id_uo
-       JOIN segu.vusuario usu ON usu.id_usuario = sol.id_usuario_reg
-       LEFT JOIN param.vproveedor p ON p.id_proveedor = sol.id_proveedor
-       LEFT JOIN adq.tcategoria_compra cac ON cac.id_categoria_compra =
-         sol.id_categoria_compra
-  WHERE fun.fecha_asignacion <= sol.fecha_soli AND
-        fun.fecha_finalizacion >= sol.fecha_soli OR
-        fun.fecha_asignacion <= sol.fecha_soli AND
-        fun.fecha_finalizacion IS NULL
-  GROUP BY sol.id_solicitud,
-           sol.id_proveedor,
-           p.desc_proveedor,
-           sol.id_moneda,
-           sol.id_depto,
-           sol.numero,
-           sol.fecha_soli,
-           sol.estado,
-           sol.num_tramite,
-           sol.id_gestion,
-           sol.justificacion,
-           p.rotulo_comercial,
-           sol.id_categoria_compra,
-           cac.codigo,
-           cac.nombre,
-           mon.codigo,
-           fun.desc_funcionario1,
-           uo.codigo,
-           uo.nombre_unidad,
-           sol.tipo_concepto,
-           sol.tipo,
-           fun.nombre_cargo,
-           fun.nombre_unidad,
-           fun.email_empresa,
-           usu.desc_persona;
-
-/***********************************F-DEP-RAC-ADQ-1-29/09/2014*****************************************/
-/***********************************I-DEP-JRR-ADQ-1-01/10/2014*****************************************/
-
- -- object recreation
-DROP VIEW adq.vcotizacion;
-
-CREATE VIEW adq.vcotizacion(
-    id_cotizacion,
-    numero_oc,
-    codigo_proceso,
-    num_cotizacion,
-    id_solicitud,
-    id_proveedor,
-    desc_proveedor,
-    id_moneda,
-    id_depto,
-    numero,
-    fecha_soli,
-    estado,
-    num_tramite,
-    id_gestion,
-    justificacion,
-    rotulo_comercial,
-    id_categoria_compra,
-    codigo,
-    precio_total,
-    precio_total_mb,
-    monto_total_adjudicado,
-    monto_total_adjudicado_mb,
-    codigo_categoria,
-    nombre_categoria,
-    id_proceso_wf_sol,
-    id_proceso_wf,
-    detalle,
-    desc_funcionario1,
-    codigo_uo,
-    nombre_unidad,
-    tipo,
-    tipo_concepto,
-    nombre_cargo,
-    nombre_unidad_cargo,
-    requiere_contrato,
-    nro_contrato)
-AS
-  SELECT DISTINCT cot.id_cotizacion,
-         cot.numero_oc,
-         pro.codigo_proceso,
-         pro.num_cotizacion,
-         sol.id_solicitud,
-         p.id_proveedor,
-         p.desc_proveedor,
-         sol.id_moneda,
-         sol.id_depto,
-         sol.numero,
-         sol.fecha_soli,
-         sol.estado,
-         sol.num_tramite,
-         sol.id_gestion,
-         sol.justificacion,
-         p.rotulo_comercial,
-         sol.id_categoria_compra,
-         mon.codigo,
-         COALESCE(sum(sd.precio_total), 0::numeric) AS precio_total,
-         COALESCE(sum(sd.precio_unitario_mb * sd.cantidad::numeric), 0::numeric)
-          AS precio_total_mb,
-         COALESCE(sum(cd.cantidad_adju * cd.precio_unitario), 0::numeric) AS
-          monto_total_adjudicado,
-         COALESCE(sum(cd.cantidad_adju * cd.precio_unitario_mb), 0::numeric) AS
-          monto_total_adjudicado_mb,
-         COALESCE(cac.codigo, '' ::character varying) AS codigo_categoria,
-         COALESCE(cac.nombre, '' ::character varying) AS nombre_categoria,
-         sol.id_proceso_wf AS id_proceso_wf_sol,
-         cot.id_proceso_wf,
-         ('<table>' ::text || pxp.html_rows((((('<td>' ::text ||
-          ci.desc_ingas::text) || ' <br>' ::text) || sd.descripcion) || '</td>'
-           ::text) ::character varying) ::text) || '</table>' ::text AS detalle,
-         fun.desc_funcionario1,
-         uo.codigo AS codigo_uo,
-         uo.nombre_unidad,
-         lower(sol.tipo::text) AS tipo,
-         lower(sol.tipo_concepto::text) AS tipo_concepto,
-         fun.nombre_cargo,
-         fun.nombre_unidad AS nombre_unidad_cargo,
-         cot.requiere_contrato,
-         cot.nro_contrato
-  FROM adq.tcotizacion cot
-       JOIN adq.tproceso_compra pro ON pro.id_proceso_compra =
-        cot.id_proceso_compra
-       JOIN adq.tsolicitud sol ON sol.id_solicitud = pro.id_solicitud
-       LEFT JOIN adq.tcotizacion_det cd ON cd.id_cotizacion = cot.id_cotizacion
-       LEFT JOIN adq.tsolicitud_det sd ON sd.id_solicitud_det =
-        cd.id_solicitud_det
-       LEFT JOIN param.tconcepto_ingas ci ON ci.id_concepto_ingas =
-        sd.id_concepto_ingas
-       JOIN param.tmoneda mon ON mon.id_moneda = sol.id_moneda
-       JOIN orga.vfuncionario_cargo fun ON fun.id_funcionario =
-        sol.id_funcionario AND fun.estado_reg_asi::text = 'activo' ::text
-       JOIN orga.tuo uo ON uo.id_uo = sol.id_uo
-       JOIN param.vproveedor p ON p.id_proveedor = cot.id_proveedor
-       JOIN adq.tcategoria_compra cac ON cac.id_categoria_compra =
-        sol.id_categoria_compra
-  WHERE fun.fecha_asignacion <= sol.fecha_soli AND
-        fun.fecha_finalizacion >= sol.fecha_soli OR
-        fun.fecha_asignacion <= sol.fecha_soli AND
-        fun.fecha_finalizacion IS NULL
-  GROUP BY cot.id_cotizacion,
-           cot.numero_oc,
-           pro.codigo_proceso,
-           pro.num_cotizacion,
-           sol.id_solicitud,
-           p.id_proveedor,
-           p.desc_proveedor,
-           sol.id_moneda,
-           sol.id_depto,
-           sol.numero,
-           sol.fecha_soli,
-           sol.estado,
-           sol.num_tramite,
-           sol.id_gestion,
-           sol.justificacion,
-           p.rotulo_comercial,
-           sol.id_categoria_compra,
-           cac.codigo,
-           cac.nombre,
-           mon.codigo,
-           fun.desc_funcionario1,
-           uo.codigo,
-           uo.nombre_unidad,
-           sol.tipo_concepto,
-           sol.tipo,
-           fun.nombre_cargo,
-           fun.nombre_unidad,
-           cot.requiere_contrato,
-           cot.nro_contrato;
-
-/***********************************F-DEP-JRR-ADQ-1-01/10/2014*****************************************/
-
-
-
-
-
-
-/***********************************I-DEP-RAC-ADQ-1-03/10/2014*****************************************/
-
-
---------------- SQL ---------------
-
-CREATE OR REPLACE VIEW adq.vsolicitud_compra(
-    id_solicitud,
-    id_proveedor,
-    desc_proveedor,
-    id_moneda,
-    id_depto,
-    numero,
-    fecha_soli,
-    estado,
-    num_tramite,
-    id_gestion,
-    justificacion,
-    rotulo_comercial,
-    id_categoria_compra,
-    codigo,
-    precio_total,
-    precio_total_mb,
-    codigo_categoria,
-    nombre_categoria,
-    id_proceso_wf,
-    detalle,
-    desc_funcionario1,
-    codigo_uo,
-    nombre_unidad,
-    tipo,
-    tipo_concepto,
-    nombre_cargo,
-    nombre_unidad_cargo,
-    email_empresa,
-    desc_usuario,
-    id_funcionario_supervisor,
-    id_funcionario_aprobador)
-AS
-  SELECT DISTINCT sol.id_solicitud,
-         sol.id_proveedor,
-         p.desc_proveedor,
-         sol.id_moneda,
-         sol.id_depto,
-         sol.numero,
-         sol.fecha_soli,
-         sol.estado,
-         sol.num_tramite,
-         sol.id_gestion,
-         sol.justificacion,
-         p.rotulo_comercial,
-         sol.id_categoria_compra,
-         mon.codigo,
-         COALESCE(sum(sd.precio_total), 0::numeric) AS precio_total,
-         COALESCE(sum(sd.precio_unitario_mb * sd.cantidad::numeric), 0::numeric)
-           AS precio_total_mb,
-         COALESCE(cac.codigo, ''::character varying) AS codigo_categoria,
-         COALESCE(cac.nombre, ''::character varying) AS nombre_categoria,
-         sol.id_proceso_wf,
-         ('<table>'::text || pxp.html_rows((((('<td>'::text || ci.desc_ingas::
-           text) || ' <br>'::text) || sd.descripcion) || '</td>'::text)::
-           character varying)::text) || '</table>'::text AS detalle,
-         fun.desc_funcionario1,
-         uo.codigo AS codigo_uo,
-         uo.nombre_unidad,
-         lower(sol.tipo::text) AS tipo,
-         lower(sol.tipo_concepto::text) AS tipo_concepto,
-         fun.nombre_cargo,
-         fun.nombre_unidad AS nombre_unidad_cargo,
-         fun.email_empresa,
-         usu.desc_persona AS desc_usuario,
-         COALESCE(sol.id_funcionario_supervisor, 0) AS id_funcionario_supervisor
-  ,
-         COALESCE(sol.id_funcionario_aprobador, 0) AS id_funcionario_aprobador
-  FROM adq.tsolicitud sol
-       LEFT JOIN adq.tsolicitud_det sd ON sd.id_solicitud = sol.id_solicitud and  sd.estado_reg = 'activo'
-       LEFT JOIN param.tconcepto_ingas ci ON ci.id_concepto_ingas =
-         sd.id_concepto_ingas
-       JOIN param.tmoneda mon ON mon.id_moneda = sol.id_moneda
-       JOIN orga.vfuncionario_cargo fun ON fun.id_funcionario =
-         sol.id_funcionario AND fun.estado_reg_asi::text = 'activo'::text
-       JOIN orga.tuo uo ON uo.id_uo = sol.id_uo
-       JOIN segu.vusuario usu ON usu.id_usuario = sol.id_usuario_reg
-       LEFT JOIN param.vproveedor p ON p.id_proveedor = sol.id_proveedor
-       LEFT JOIN adq.tcategoria_compra cac ON cac.id_categoria_compra =
-         sol.id_categoria_compra
-  WHERE fun.fecha_asignacion <= sol.fecha_soli AND
-        fun.fecha_finalizacion >= sol.fecha_soli OR
-        fun.fecha_asignacion <= sol.fecha_soli AND
-        fun.fecha_finalizacion IS NULL
-  GROUP BY sol.id_solicitud,
-           sol.id_proveedor,
-           p.desc_proveedor,
-           sol.id_moneda,
-           sol.id_depto,
-           sol.numero,
-           sol.fecha_soli,
-           sol.estado,
-           sol.num_tramite,
-           sol.id_gestion,
-           sol.justificacion,
-           p.rotulo_comercial,
-           sol.id_categoria_compra,
-           cac.codigo,
-           cac.nombre,
-           mon.codigo,
-           fun.desc_funcionario1,
-           uo.codigo,
-           uo.nombre_unidad,
-           sol.tipo_concepto,
-           sol.tipo,
-           fun.nombre_cargo,
-           fun.nombre_unidad,
-           fun.email_empresa,
-           usu.desc_persona;
-
-
-/***********************************F-DEP-RAC-ADQ-1-03/10/2014*****************************************/
- 
-
 /***********************************I-DEP-RAC-ADQ-1-21/10/2014*****************************************/
-
-CREATE OR REPLACE VIEW adq.vsolicitud_compra(
-    id_solicitud,
-    id_proveedor,
-    desc_proveedor,
-    id_moneda,
-    id_depto,
-    numero,
-    fecha_soli,
-    estado,
-    num_tramite,
-    id_gestion,
-    justificacion,
-    rotulo_comercial,
-    id_categoria_compra,
-    codigo,
-    precio_total,
-    precio_total_mb,
-    codigo_categoria,
-    nombre_categoria,
-    id_proceso_wf,
-    detalle,
-    desc_funcionario1,
-    codigo_uo,
-    nombre_unidad,
-    tipo,
-    tipo_concepto,
-    nombre_cargo,
-    nombre_unidad_cargo,
-    email_empresa,
-    desc_usuario,
-    id_funcionario_supervisor,
-    id_funcionario_aprobador)
-AS
-  SELECT DISTINCT sol.id_solicitud,
-         sol.id_proveedor,
-         p.desc_proveedor,
-         sol.id_moneda,
-         sol.id_depto,
-         sol.numero,
-         sol.fecha_soli,
-         sol.estado,
-         sol.num_tramite,
-         sol.id_gestion,
-         sol.justificacion,
-         p.rotulo_comercial,
-         sol.id_categoria_compra,
-         mon.codigo,
-         COALESCE(sum(sd.precio_total), 0::numeric) AS precio_total,
-         COALESCE(sum(sd.precio_unitario_mb * sd.cantidad::numeric), 0::numeric)
-           AS precio_total_mb,
-         COALESCE(cac.codigo, ''::character varying) AS codigo_categoria,
-         COALESCE(cac.nombre, ''::character varying) AS nombre_categoria,
-         sol.id_proceso_wf,
-         ('<table>'::text || pxp.html_rows((((('<td>'::text || ci.desc_ingas::
-           text) || ' <br>'::text) || sd.descripcion) || '</td>'::text)::
-           character varying)::text) || '</table>'::text AS detalle,
-         fun.desc_funcionario1,
-         uo.codigo AS codigo_uo,
-         uo.nombre_unidad,
-         lower(sol.tipo::text) AS tipo,
-         lower(sol.tipo_concepto::text) AS tipo_concepto,
-         fun.nombre_cargo,
-         fun.nombre_unidad AS nombre_unidad_cargo,
-         fun.email_empresa,
-         usu.desc_persona AS desc_usuario,
-         COALESCE(sol.id_funcionario_supervisor, 0) AS id_funcionario_supervisor
-  ,
-         COALESCE(sol.id_funcionario_aprobador, 0) AS id_funcionario_aprobador
-  FROM adq.tsolicitud sol
-       LEFT JOIN adq.tsolicitud_det sd ON sd.id_solicitud = sol.id_solicitud AND
-         sd.estado_reg::text = 'activo'::text
-       LEFT JOIN param.tconcepto_ingas ci ON ci.id_concepto_ingas =
-         sd.id_concepto_ingas
-       JOIN param.tmoneda mon ON mon.id_moneda = sol.id_moneda
-       JOIN orga.vfuncionario_cargo fun ON fun.id_funcionario =
-         sol.id_funcionario AND fun.estado_reg_asi::text = 'activo'::text
-       JOIN orga.tuo uo ON uo.id_uo = sol.id_uo
-       JOIN segu.vusuario usu ON usu.id_usuario = sol.id_usuario_reg
-       LEFT JOIN param.vproveedor p ON p.id_proveedor = sol.id_proveedor
-       LEFT JOIN adq.tcategoria_compra cac ON cac.id_categoria_compra =
-         sol.id_categoria_compra
-  WHERE fun.fecha_asignacion <= sol.fecha_soli AND
-        fun.fecha_finalizacion >= sol.fecha_soli OR
-        fun.fecha_asignacion <= sol.fecha_soli AND
-        fun.fecha_finalizacion IS NULL
-  GROUP BY sol.id_solicitud,
-           sol.id_proveedor,
-           p.desc_proveedor,
-           sol.id_moneda,
-           sol.id_depto,
-           sol.numero,
-           sol.fecha_soli,
-           sol.estado,
-           sol.num_tramite,
-           sol.id_gestion,
-           sol.justificacion,
-           p.rotulo_comercial,
-           sol.id_categoria_compra,
-           cac.codigo,
-           cac.nombre,
-           mon.codigo,
-           fun.desc_funcionario1,
-           uo.codigo,
-           uo.nombre_unidad,
-           sol.tipo_concepto,
-           sol.tipo,
-           fun.nombre_cargo,
-           fun.nombre_unidad,
-           fun.email_empresa,
-           usu.desc_persona;
-           
-           
-           
-           
-     CREATE OR REPLACE VIEW adq.vcotizacion(
-    id_cotizacion,
-    numero_oc,
-    codigo_proceso,
-    num_cotizacion,
-    id_solicitud,
-    id_proveedor,
-    desc_proveedor,
-    id_moneda,
-    id_depto,
-    numero,
-    fecha_soli,
-    estado,
-    num_tramite,
-    id_gestion,
-    justificacion,
-    rotulo_comercial,
-    id_categoria_compra,
-    codigo,
-    precio_total,
-    precio_total_mb,
-    monto_total_adjudicado,
-    monto_total_adjudicado_mb,
-    codigo_categoria,
-    nombre_categoria,
-    id_proceso_wf_sol,
-    id_proceso_wf,
-    detalle,
-    desc_funcionario1,
-    codigo_uo,
-    nombre_unidad,
-    tipo,
-    tipo_concepto,
-    nombre_cargo,
-    nombre_unidad_cargo,
-    requiere_contrato,
-    nro_contrato)
-AS
-  SELECT DISTINCT cot.id_cotizacion,
-         cot.numero_oc,
-         pro.codigo_proceso,
-         pro.num_cotizacion,
-         sol.id_solicitud,
-         p.id_proveedor,
-         p.desc_proveedor,
-         sol.id_moneda,
-         sol.id_depto,
-         sol.numero,
-         sol.fecha_soli,
-         sol.estado,
-         sol.num_tramite,
-         sol.id_gestion,
-         sol.justificacion,
-         p.rotulo_comercial,
-         sol.id_categoria_compra,
-         mon.codigo,
-         COALESCE(sum(sd.precio_total), 0::numeric) AS precio_total,
-         COALESCE(sum(sd.precio_unitario_mb * sd.cantidad::numeric), 0::numeric)
-           AS precio_total_mb,
-         COALESCE(sum(cd.cantidad_adju * cd.precio_unitario), 0::numeric) AS
-           monto_total_adjudicado,
-         COALESCE(sum(cd.cantidad_adju * cd.precio_unitario_mb), 0::numeric) AS
-           monto_total_adjudicado_mb,
-         COALESCE(cac.codigo, ''::character varying) AS codigo_categoria,
-         COALESCE(cac.nombre, ''::character varying) AS nombre_categoria,
-         sol.id_proceso_wf AS id_proceso_wf_sol,
-         cot.id_proceso_wf,
-         ('<table>'::text || pxp.html_rows((((('<td>'::text || ci.desc_ingas::
-           text) || ' <br>'::text) || sd.descripcion) || '</td>'::text)::
-           character varying)::text) || '</table>'::text AS detalle,
-         fun.desc_funcionario1,
-         uo.codigo AS codigo_uo,
-         uo.nombre_unidad,
-         lower(sol.tipo::text) AS tipo,
-         lower(sol.tipo_concepto::text) AS tipo_concepto,
-         fun.nombre_cargo,
-         fun.nombre_unidad AS nombre_unidad_cargo,
-         cot.requiere_contrato,
-         cot.nro_contrato
-  FROM adq.tcotizacion cot
-       JOIN adq.tproceso_compra pro ON pro.id_proceso_compra =
-         cot.id_proceso_compra
-       JOIN adq.tsolicitud sol ON sol.id_solicitud = pro.id_solicitud
-       LEFT JOIN adq.tcotizacion_det cd ON cd.id_cotizacion = cot.id_cotizacion
-       LEFT JOIN adq.tsolicitud_det sd ON sd.id_solicitud_det =
-         cd.id_solicitud_det
-       LEFT JOIN param.tconcepto_ingas ci ON ci.id_concepto_ingas =
-         sd.id_concepto_ingas
-       JOIN param.tmoneda mon ON mon.id_moneda = sol.id_moneda
-       JOIN orga.vfuncionario_cargo fun ON fun.id_funcionario =
-         sol.id_funcionario AND fun.estado_reg_asi::text = 'activo'::text
-       JOIN orga.tuo uo ON uo.id_uo = sol.id_uo
-       JOIN param.vproveedor p ON p.id_proveedor = cot.id_proveedor
-       JOIN adq.tcategoria_compra cac ON cac.id_categoria_compra =
-         sol.id_categoria_compra
-  WHERE fun.fecha_asignacion <= sol.fecha_soli AND
-        fun.fecha_finalizacion >= sol.fecha_soli OR
-        fun.fecha_asignacion <= sol.fecha_soli AND
-        fun.fecha_finalizacion IS NULL
-  GROUP BY cot.id_cotizacion,
-           cot.numero_oc,
-           pro.codigo_proceso,
-           pro.num_cotizacion,
-           sol.id_solicitud,
-           p.id_proveedor,
-           p.desc_proveedor,
-           sol.id_moneda,
-           sol.id_depto,
-           sol.numero,
-           sol.fecha_soli,
-           sol.estado,
-           sol.num_tramite,
-           sol.id_gestion,
-           sol.justificacion,
-           p.rotulo_comercial,
-           sol.id_categoria_compra,
-           cac.codigo,
-           cac.nombre,
-           mon.codigo,
-           fun.desc_funcionario1,
-           uo.codigo,
-           uo.nombre_unidad,
-           sol.tipo_concepto,
-           sol.tipo,
-           fun.nombre_cargo,
-           fun.nombre_unidad,
-           cot.requiere_contrato,
-           cot.nro_contrato;
-           
-           
-           
-           CREATE OR REPLACE VIEW adq.vproceso_compra(
-    id_proceso_compra,
-    id_depto,
-    num_convocatoria,
-    id_solicitud,
-    id_estado_wf,
-    fecha_ini_proc,
-    obs_proceso,
-    id_proceso_wf,
-    num_tramite,
-    codigo_proceso,
-    estado_reg,
-    estado,
-    num_cotizacion,
-    id_usuario_reg,
-    fecha_reg,
-    fecha_mod,
-    id_usuario_mod,
-    usr_reg,
-    usr_mod,
-    desc_depto,
-    desc_funcionario,
-    desc_solicitud,
-    desc_moneda,
-    instruc_rpc,
-    id_categoria_compra,
-    usr_aux,
-    id_moneda,
-    id_funcionario,
-    id_usuario_auxiliar,
-    desc_cotizacion)
-AS
-  SELECT proc.id_proceso_compra,
-         proc.id_depto,
-         proc.num_convocatoria,
-         proc.id_solicitud,
-         proc.id_estado_wf,
-         proc.fecha_ini_proc,
-         proc.obs_proceso,
-         proc.id_proceso_wf,
-         proc.num_tramite,
-         proc.codigo_proceso,
-         proc.estado_reg,
-         proc.estado,
-         proc.num_cotizacion,
-         proc.id_usuario_reg,
-         proc.fecha_reg,
-         proc.fecha_mod,
-         proc.id_usuario_mod,
-         usu1.cuenta AS usr_reg,
-         usu2.cuenta AS usr_mod,
-         dep.codigo AS desc_depto,
-         fun.desc_funcionario1 AS desc_funcionario,
-         sol.numero AS desc_solicitud,
-         mon.codigo AS desc_moneda,
-         sol.instruc_rpc,
-         sol.id_categoria_compra,
-         usua.cuenta AS usr_aux,
-         sol.id_moneda,
-         sol.id_funcionario,
-         proc.id_usuario_auxiliar,
-         adq.f_get_desc_cotizaciones(proc.id_proceso_compra) AS desc_cotizacion
-  FROM adq.tproceso_compra proc
-       JOIN segu.tusuario usu1 ON usu1.id_usuario = proc.id_usuario_reg
-       JOIN param.tdepto dep ON dep.id_depto = proc.id_depto
-       JOIN adq.tsolicitud sol ON sol.id_solicitud = proc.id_solicitud
-       JOIN orga.vfuncionario fun ON fun.id_funcionario = sol.id_funcionario
-       JOIN param.tmoneda mon ON mon.id_moneda = sol.id_moneda
-       LEFT JOIN segu.tusuario usu2 ON usu2.id_usuario = proc.id_usuario_mod
-       LEFT JOIN segu.tusuario usua ON usua.id_usuario =
-         proc.id_usuario_auxiliar;   
-         
-         
-         
-         
-         CREATE OR REPLACE VIEW adq.vproceso_compra_wf(
-    id_proceso_compra,
-    codigo_proceso,
-    num_cotizacion,
-    id_solicitud,
-    id_proveedor_solicitud,
-    des_proveedor_solicitud,
-    id_moneda,
-    id_depto,
-    numero,
-    fecha_soli,
-    estado,
-    num_tramite,
-    id_gestion,
-    justificacion,
-    rotulo_comercial,
-    id_categoria_compra,
-    codigo,
-    precio_total,
-    precio_total_mb,
-    codigo_categoria,
-    nombre_categoria,
-    id_proceso_wf_sol,
-    id_proceso_wf,
-    detalle,
-    desc_funcionario1,
-    codigo_uo,
-    nombre_unidad,
-    tipo,
-    tipo_concepto,
-    nombre_cargo,
-    nombre_unidad_cargo)
-AS
-  SELECT DISTINCT pro.id_proceso_compra,
-         pro.codigo_proceso,
-         pro.num_cotizacion,
-         sol.id_solicitud,
-         p.id_proveedor AS id_proveedor_solicitud,
-         p.desc_proveedor AS des_proveedor_solicitud,
-         sol.id_moneda,
-         sol.id_depto,
-         sol.numero,
-         sol.fecha_soli,
-         sol.estado,
-         sol.num_tramite,
-         sol.id_gestion,
-         sol.justificacion,
-         p.rotulo_comercial,
-         sol.id_categoria_compra,
-         mon.codigo,
-         sum(sd.precio_total) AS precio_total,
-         sum(sd.precio_unitario_mb * sd.cantidad::numeric) AS precio_total_mb,
-         COALESCE(cac.codigo, ''::character varying) AS codigo_categoria,
-         COALESCE(cac.nombre, ''::character varying) AS nombre_categoria,
-         sol.id_proceso_wf AS id_proceso_wf_sol,
-         pro.id_proceso_wf,
-         ('<table>'::text || pxp.html_rows((((('<td>'::text || ci.desc_ingas::
-           text) || ' <br>'::text) || sd.descripcion) || '</td>'::text)::
-           character varying)::text) || '</table>'::text AS detalle,
-         fun.desc_funcionario1,
-         uo.codigo AS codigo_uo,
-         uo.nombre_unidad,
-         lower(sol.tipo::text) AS tipo,
-         lower(sol.tipo_concepto::text) AS tipo_concepto,
-         fun.nombre_cargo,
-         fun.nombre_unidad AS nombre_unidad_cargo
-  FROM adq.tproceso_compra pro
-       JOIN adq.tsolicitud sol ON sol.id_solicitud = pro.id_solicitud
-       JOIN adq.tsolicitud_det sd ON sd.id_solicitud = sol.id_solicitud
-       JOIN param.tconcepto_ingas ci ON ci.id_concepto_ingas =
-         sd.id_concepto_ingas
-       JOIN param.tmoneda mon ON mon.id_moneda = sol.id_moneda
-       JOIN orga.vfuncionario_cargo fun ON fun.id_funcionario =
-         sol.id_funcionario AND fun.estado_reg_asi::text = 'activo'::text
-       JOIN orga.tuo uo ON uo.id_uo = sol.id_uo
-       JOIN param.vproveedor p ON p.id_proveedor = sol.id_proveedor
-       JOIN adq.tcategoria_compra cac ON cac.id_categoria_compra =
-         sol.id_categoria_compra
-  WHERE fun.fecha_asignacion <= sol.fecha_soli AND
-        fun.fecha_finalizacion >= sol.fecha_soli OR
-        fun.fecha_asignacion <= sol.fecha_soli AND
-        fun.fecha_finalizacion IS NULL
-  GROUP BY pro.id_proceso_compra,
-           pro.codigo_proceso,
-           pro.num_cotizacion,
-           sol.id_solicitud,
-           p.id_proveedor,
-           p.desc_proveedor,
-           sol.id_moneda,
-           sol.id_depto,
-           sol.numero,
-           sol.fecha_soli,
-           sol.estado,
-           sol.num_tramite,
-           sol.id_gestion,
-           sol.justificacion,
-           p.rotulo_comercial,
-           sol.id_categoria_compra,
-           cac.codigo,
-           cac.nombre,
-           mon.codigo,
-           fun.desc_funcionario1,
-           uo.codigo,
-           uo.nombre_unidad,
-           sol.tipo_concepto,
-           sol.tipo,
-           fun.nombre_cargo,
-           fun.nombre_unidad;   
-
-/***********************************F-DEP-RAC-ADQ-1-21/10/2014*****************************************/
- 
-
-
-
-/***********************************I-DEP-RAC-ADQ-1-29/12/2014*****************************************/
- 
-
---------------- SQL ---------------
-
-CREATE OR REPLACE VIEW adq.vproceso_compra(
-    id_proceso_compra,
-    id_depto,
-    num_convocatoria,
-    id_solicitud,
-    id_estado_wf,
-    fecha_ini_proc,
-    obs_proceso,
-    id_proceso_wf,
-    num_tramite,
-    codigo_proceso,
-    estado_reg,
-    estado,
-    num_cotizacion,
-    id_usuario_reg,
-    fecha_reg,
-    fecha_mod,
-    id_usuario_mod,
-    usr_reg,
-    usr_mod,
-    desc_depto,
-    desc_funcionario,
-    desc_solicitud,
-    desc_moneda,
-    instruc_rpc,
-    id_categoria_compra,
-    usr_aux,
-    id_moneda,
-    id_funcionario,
-    id_usuario_auxiliar,
-    desc_cotizacion,
-    objeto)
-AS
-  SELECT proc.id_proceso_compra,
-         proc.id_depto,
-         proc.num_convocatoria,  
-         proc.id_solicitud,
-         proc.id_estado_wf,
-         proc.fecha_ini_proc,
-         proc.obs_proceso,
-         proc.id_proceso_wf,
-         proc.num_tramite,
-         proc.codigo_proceso,
-         proc.estado_reg,
-         proc.estado,
-         proc.num_cotizacion,
-         proc.id_usuario_reg,
-         proc.fecha_reg,
-         proc.fecha_mod,
-         proc.id_usuario_mod,
-         usu1.cuenta AS usr_reg,
-         usu2.cuenta AS usr_mod,
-         dep.codigo AS desc_depto,
-         fun.desc_funcionario1 AS desc_funcionario,
-         sol.numero AS desc_solicitud,
-         mon.codigo AS desc_moneda,
-         sol.instruc_rpc,
-         sol.id_categoria_compra,
-         usua.cuenta AS usr_aux,
-         sol.id_moneda,
-         sol.id_funcionario,
-         proc.id_usuario_auxiliar,
-         adq.f_get_desc_cotizaciones(proc.id_proceso_compra) AS desc_cotizacion,
-         proc.objeto
-  FROM adq.tproceso_compra proc
-       JOIN segu.tusuario usu1 ON usu1.id_usuario = proc.id_usuario_reg
-       JOIN param.tdepto dep ON dep.id_depto = proc.id_depto
-       JOIN adq.tsolicitud sol ON sol.id_solicitud = proc.id_solicitud
-       JOIN orga.vfuncionario fun ON fun.id_funcionario = sol.id_funcionario
-       JOIN param.tmoneda mon ON mon.id_moneda = sol.id_moneda
-       LEFT JOIN segu.tusuario usu2 ON usu2.id_usuario = proc.id_usuario_mod
-       LEFT JOIN segu.tusuario usua ON usua.id_usuario =
-         proc.id_usuario_auxiliar;
-
-
-/***********************************F-DEP-RAC-ADQ-1-29/12/2014*****************************************/
- 
-
-
-/***********************************I-DEP-RAC-ADQ-1-04/03/2015*****************************************/
- 
-
---------------- SQL ---------------
-
- -- object recreation
-DROP VIEW adq.vsolicitud_compra;
-
-CREATE VIEW adq.vsolicitud_compra
-AS
-  SELECT DISTINCT sol.id_solicitud,
-         sol.id_proveedor,
-         p.desc_proveedor,
-         sol.id_moneda,
-         sol.id_depto,
-         sol.numero,
-         sol.fecha_soli,
-         sol.estado,
-         sol.num_tramite,
-         sol.id_gestion,
-         sol.justificacion,
-         p.rotulo_comercial,
-         sol.id_categoria_compra,
-         mon.codigo,
-         COALESCE(sum(sd.precio_total), 0::numeric) AS precio_total,
-         COALESCE(sum(sd.precio_unitario_mb * sd.cantidad::numeric), 0::numeric)
-           AS precio_total_mb,
-         COALESCE(cac.codigo, ''::character varying) AS codigo_categoria,
-         COALESCE(cac.nombre, ''::character varying) AS nombre_categoria,
-         sol.id_proceso_wf,
-         ('<table>'::text || pxp.html_rows((((('<td>'::text || ci.desc_ingas::
-           text) || ' <br>'::text) || sd.descripcion) || '</td>'::text)::
-           character varying)::text) || '</table>'::text AS detalle,
-         fun.desc_funcionario1,
-         uo.codigo AS codigo_uo,
-         uo.nombre_unidad,
-         lower(sol.tipo::text) AS tipo,
-         lower(sol.tipo_concepto::text) AS tipo_concepto,
-         fun.nombre_cargo,
-         fun.nombre_unidad AS nombre_unidad_cargo,
-         fun.email_empresa,
-         usu.desc_persona AS desc_usuario,
-         COALESCE(sol.id_funcionario_supervisor, 0) AS id_funcionario_supervisor
-  ,
-         COALESCE(sol.id_funcionario_aprobador, 0) AS id_funcionario_aprobador,
-         dep.prioridad,
-         dep.nombre as nombre_depto
-  FROM adq.tsolicitud sol
-       LEFT JOIN adq.tsolicitud_det sd ON sd.id_solicitud = sol.id_solicitud AND
-         sd.estado_reg::text = 'activo'::text
-       LEFT JOIN param.tconcepto_ingas ci ON ci.id_concepto_ingas =
-         sd.id_concepto_ingas
-       JOIN param.tmoneda mon ON mon.id_moneda = sol.id_moneda
-       JOIN param.tdepto dep on dep.id_depto = sol.id_depto
-       JOIN orga.vfuncionario_cargo fun ON fun.id_funcionario =
-         sol.id_funcionario AND fun.estado_reg_asi::text = 'activo'::text
-       JOIN orga.tuo uo ON uo.id_uo = sol.id_uo
-       JOIN segu.vusuario usu ON usu.id_usuario = sol.id_usuario_reg
-       LEFT JOIN param.vproveedor p ON p.id_proveedor = sol.id_proveedor
-       LEFT JOIN adq.tcategoria_compra cac ON cac.id_categoria_compra =
-         sol.id_categoria_compra
-  WHERE fun.fecha_asignacion <= sol.fecha_soli AND
-        fun.fecha_finalizacion >= sol.fecha_soli OR
-        fun.fecha_asignacion <= sol.fecha_soli AND
-        fun.fecha_finalizacion IS NULL
-  GROUP BY sol.id_solicitud,
-           sol.id_proveedor,
-           p.desc_proveedor,
-           sol.id_moneda,
-           sol.id_depto,
-           sol.numero,
-           sol.fecha_soli,
-           sol.estado,
-           sol.num_tramite,
-           sol.id_gestion,
-           sol.justificacion,
-           p.rotulo_comercial,
-           sol.id_categoria_compra,
-           cac.codigo,
-           cac.nombre,
-           mon.codigo,
-           fun.desc_funcionario1,
-           uo.codigo,
-           uo.nombre_unidad,
-           sol.tipo_concepto,
-           sol.tipo,
-           fun.nombre_cargo,
-           fun.nombre_unidad,
-           fun.email_empresa,
-           usu.desc_persona,
-           dep.prioridad,
-           dep.nombre;
-
-ALTER TABLE adq.vsolicitud_compra
-  OWNER TO postgres;
-/***********************************F-DEP-RAC-ADQ-1-04/03/2015*****************************************/
-
-/***********************************I-DEP-RAC-ADQ-1-11/03/2015*****************************************/
-
---------------- SQL ---------------
-
-DROP VIEW adq.vproceso_compra;
 
 CREATE OR REPLACE VIEW adq.vproceso_compra(
     id_proceso_compra,
@@ -2696,796 +1282,16 @@ GROUP BY cot_1.id_proceso_compra
      LEFT JOIN cotizaciones cot ON cot.id_proceso_compra = proc.id_proceso_compra
      LEFT JOIN segu.tusuario usu2 ON usu2.id_usuario = proc.id_usuario_mod
      LEFT JOIN segu.tusuario usua ON usua.id_usuario = proc.id_usuario_auxiliar;
-/***********************************F-DEP-RAC-ADQ-1-11/03/2015*****************************************/
-
-
-
-
-/***********************************I-DEP-RAC-ADQ-1-24/03/2015*****************************************/
-
---------------- SQL ---------------
-
- -- object recreation
-DROP VIEW adq.vsolicitud_compra;
-
-CREATE VIEW adq.vsolicitud_compra
-AS
-  SELECT DISTINCT sol.id_solicitud,
-         sol.id_proveedor,
-         p.desc_proveedor,
-         sol.id_moneda,
-         sol.id_depto,
-         sol.numero,
-         sol.fecha_soli,
-         sol.estado,
-         sol.num_tramite,
-         sol.id_gestion,
-         sol.justificacion,
-         p.rotulo_comercial,
-         sol.id_categoria_compra,
-         mon.codigo,
-         COALESCE(sum(sd.precio_total), 0::numeric) AS precio_total,
-         COALESCE(sum(sd.precio_unitario_mb * sd.cantidad::numeric), 0::numeric)
-           AS precio_total_mb,
-         COALESCE(cac.codigo, ''::character varying) AS codigo_categoria,
-         COALESCE(cac.nombre, ''::character varying) AS nombre_categoria,
-         sol.id_proceso_wf,
-         ('<table>'::text || pxp.html_rows((((('<td>'::text || ci.desc_ingas::
-           text) || ' <br>'::text) || sd.descripcion) || '</td>'::text)::
-           character varying)::text) || '</table>'::text AS detalle,
-         fun.desc_funcionario1,
-         uo.codigo AS codigo_uo,
-         uo.nombre_unidad,
-         lower(sol.tipo::text) AS tipo,
-         lower(sol.tipo_concepto::text) AS tipo_concepto,
-         fun.nombre_cargo,
-         fun.nombre_unidad AS nombre_unidad_cargo,
-         fun.email_empresa,
-         usu.desc_persona AS desc_usuario,
-         COALESCE(sol.id_funcionario_supervisor, 0) AS id_funcionario_supervisor
-  ,
-         COALESCE(sol.id_funcionario_aprobador, 0) AS id_funcionario_aprobador,
-         dep.prioridad,
-         dep.nombre AS nombre_depto,
-         sol.precontrato
-  FROM adq.tsolicitud sol
-       LEFT JOIN adq.tsolicitud_det sd ON sd.id_solicitud = sol.id_solicitud AND
-         sd.estado_reg::text = 'activo'::text
-       LEFT JOIN param.tconcepto_ingas ci ON ci.id_concepto_ingas =
-         sd.id_concepto_ingas
-       JOIN param.tmoneda mon ON mon.id_moneda = sol.id_moneda
-       JOIN param.tdepto dep ON dep.id_depto = sol.id_depto
-       JOIN orga.vfuncionario_cargo fun ON fun.id_funcionario =
-         sol.id_funcionario AND fun.estado_reg_asi::text = 'activo'::text
-       JOIN orga.tuo uo ON uo.id_uo = sol.id_uo
-       JOIN segu.vusuario usu ON usu.id_usuario = sol.id_usuario_reg
-       LEFT JOIN param.vproveedor p ON p.id_proveedor = sol.id_proveedor
-       LEFT JOIN adq.tcategoria_compra cac ON cac.id_categoria_compra =
-         sol.id_categoria_compra
-  WHERE fun.fecha_asignacion <= sol.fecha_soli AND
-        fun.fecha_finalizacion >= sol.fecha_soli OR
-        fun.fecha_asignacion <= sol.fecha_soli AND
-        fun.fecha_finalizacion IS NULL
-  GROUP BY sol.id_solicitud,
-           sol.id_proveedor,
-           p.desc_proveedor,
-           sol.id_moneda,
-           sol.id_depto,
-           sol.numero,
-           sol.fecha_soli,
-           sol.estado,
-           sol.num_tramite,
-           sol.id_gestion,
-           sol.justificacion,
-           p.rotulo_comercial,
-           sol.id_categoria_compra,
-           cac.codigo,
-           cac.nombre,
-           mon.codigo,
-           fun.desc_funcionario1,
-           uo.codigo,
-           uo.nombre_unidad,
-           sol.tipo_concepto,
-           sol.tipo,
-           fun.nombre_cargo,
-           fun.nombre_unidad,
-           fun.email_empresa,
-           usu.desc_persona,
-           dep.prioridad,
-           dep.nombre;
-
-ALTER TABLE adq.vsolicitud_compra
-  OWNER TO postgres;
-
-/***********************************F-DEP-RAC-ADQ-1-24/03/2015*****************************************/
-
-/***********************************I-DEP-JRR-ADQ-1-01/04/2015*****************************************/
-CREATE OR REPLACE VIEW adq.vcotizacion(
-    id_cotizacion,
-    numero_oc,
-    codigo_proceso,
-    num_cotizacion,
-    id_solicitud,
-    id_proveedor,
-    desc_proveedor,
-    id_moneda,
-    id_depto,
-    numero,
-    fecha_soli,
-    estado,
-    num_tramite,
-    id_gestion,
-    justificacion,
-    rotulo_comercial,
-    id_categoria_compra,
-    codigo,
-    precio_total,
-    precio_total_mb,
-    monto_total_adjudicado,
-    monto_total_adjudicado_mb,
-    codigo_categoria,
-    nombre_categoria,
-    id_proceso_wf_sol,
-    id_proceso_wf,
-    detalle,
-    desc_funcionario1,
-    codigo_uo,
-    nombre_unidad,
-    tipo,
-    tipo_concepto,
-    nombre_cargo,
-    nombre_unidad_cargo,
-    requiere_contrato,
-    nro_contrato,
-    precontrato)
-AS
-  SELECT DISTINCT cot.id_cotizacion,
-         cot.numero_oc,
-         pro.codigo_proceso,
-         pro.num_cotizacion,
-         sol.id_solicitud,
-         p.id_proveedor,
-         p.desc_proveedor,
-         sol.id_moneda,
-         sol.id_depto,
-         sol.numero,
-         sol.fecha_soli,
-         sol.estado,
-         sol.num_tramite,
-         sol.id_gestion,
-         sol.justificacion,
-         p.rotulo_comercial,
-         sol.id_categoria_compra,
-         mon.codigo,
-         COALESCE(sum(sd.precio_total), 0::numeric) AS precio_total,
-         COALESCE(sum(sd.precio_unitario_mb * sd.cantidad::numeric), 0::numeric)
-           AS precio_total_mb,
-         COALESCE(sum(cd.cantidad_adju * cd.precio_unitario), 0::numeric) AS
-           monto_total_adjudicado,
-         COALESCE(sum(cd.cantidad_adju * cd.precio_unitario_mb), 0::numeric) AS
-           monto_total_adjudicado_mb,
-         COALESCE(cac.codigo, '' ::character varying) AS codigo_categoria,
-         COALESCE(cac.nombre, '' ::character varying) AS nombre_categoria,
-         sol.id_proceso_wf AS id_proceso_wf_sol,
-         cot.id_proceso_wf,
-         ('<table>' ::text || pxp.html_rows((((('<td>' ::text ||
-           ci.desc_ingas::text) || ' <br>' ::text) || sd.descripcion) || '</td>'
-           ::text) ::character varying) ::text) || '</table>' ::text AS detalle,
-         fun.desc_funcionario1,
-         uo.codigo AS codigo_uo,
-         uo.nombre_unidad,
-         lower(sol.tipo::text) AS tipo,
-         lower(sol.tipo_concepto::text) AS tipo_concepto,
-         fun.nombre_cargo,
-         fun.nombre_unidad AS nombre_unidad_cargo,
-         cot.requiere_contrato,
-         cot.nro_contrato,
-         sol.precontrato
-  FROM adq.tcotizacion cot
-       JOIN adq.tproceso_compra pro ON pro.id_proceso_compra =
-         cot.id_proceso_compra
-       JOIN adq.tsolicitud sol ON sol.id_solicitud = pro.id_solicitud
-       LEFT JOIN adq.tcotizacion_det cd ON cd.id_cotizacion = cot.id_cotizacion
-       LEFT JOIN adq.tsolicitud_det sd ON sd.id_solicitud_det =
-         cd.id_solicitud_det
-       LEFT JOIN param.tconcepto_ingas ci ON ci.id_concepto_ingas =
-         sd.id_concepto_ingas
-       JOIN param.tmoneda mon ON mon.id_moneda = sol.id_moneda
-       JOIN orga.vfuncionario_cargo fun ON fun.id_funcionario =
-         sol.id_funcionario AND fun.estado_reg_asi::text = 'activo' ::text
-       JOIN orga.tuo uo ON uo.id_uo = sol.id_uo
-       JOIN param.vproveedor p ON p.id_proveedor = cot.id_proveedor
-       JOIN adq.tcategoria_compra cac ON cac.id_categoria_compra =
-         sol.id_categoria_compra
-  WHERE fun.fecha_asignacion <= sol.fecha_soli AND
-        fun.fecha_finalizacion >= sol.fecha_soli OR
-        fun.fecha_asignacion <= sol.fecha_soli AND
-        fun.fecha_finalizacion IS NULL
-  GROUP BY cot.id_cotizacion,
-           cot.numero_oc,
-           pro.codigo_proceso,
-           pro.num_cotizacion,
-           sol.id_solicitud,
-           p.id_proveedor,
-           p.desc_proveedor,
-           sol.id_moneda,
-           sol.id_depto,
-           sol.numero,
-           sol.fecha_soli,
-           sol.estado,
-           sol.num_tramite,
-           sol.id_gestion,
-           sol.justificacion,
-           p.rotulo_comercial,
-           sol.id_categoria_compra,
-           cac.codigo,
-           cac.nombre,
-           mon.codigo,
-           fun.desc_funcionario1,
-           uo.codigo,
-           uo.nombre_unidad,
-           sol.tipo_concepto,
-           sol.tipo,
-           fun.nombre_cargo,
-           fun.nombre_unidad,
-           cot.requiere_contrato,
-           cot.nro_contrato,
-           sol.precontrato;
-           
-/***********************************F-DEP-JRR-ADQ-1-01/04/2015*****************************************/
-
-
-/***********************************I-DEP-RAC-ADQ-1-21/04/2015*****************************************/
-
---------------- SQL ---------------
-
-CREATE OR REPLACE VIEW adq.vsolicitud_compra(
-    id_solicitud,
-    id_proveedor,
-    desc_proveedor,
-    id_moneda,
-    id_depto,
-    numero,
-    fecha_soli,
-    estado,
-    num_tramite,
-    id_gestion,
-    justificacion,
-    rotulo_comercial,
-    id_categoria_compra,
-    codigo,
-    precio_total,
-    precio_total_mb,
-    codigo_categoria,
-    nombre_categoria,
-    id_proceso_wf,
-    detalle,
-    desc_funcionario1,
-    codigo_uo,
-    nombre_unidad,
-    tipo,
-    tipo_concepto,
-    nombre_cargo,
-    nombre_unidad_cargo,
-    email_empresa,
-    desc_usuario,
-    id_funcionario_supervisor,
-    id_funcionario_aprobador,
-    prioridad,
-    nombre_depto,
-    precontrato)
-AS
-  SELECT DISTINCT sol.id_solicitud,
-         sol.id_proveedor,
-         p.desc_proveedor,
-         sol.id_moneda,
-         sol.id_depto,
-         sol.numero,
-         sol.fecha_soli,
-         sol.estado,
-         sol.num_tramite,
-         sol.id_gestion,
-         sol.justificacion,
-         p.rotulo_comercial,
-         sol.id_categoria_compra,
-         mon.codigo,
-         COALESCE(sum(sd.precio_total), 0::numeric) AS precio_total,
-         COALESCE(sum(sd.precio_unitario_mb * sd.cantidad::numeric), 0::numeric)
-           AS precio_total_mb,
-         COALESCE(cac.codigo, ''::character varying) AS codigo_categoria,
-         COALESCE(cac.nombre, ''::character varying) AS nombre_categoria,
-         sol.id_proceso_wf,
-         ('<table>'::text || pxp.html_rows((((('<td>'::text || ci.desc_ingas::
-           text) || ' <br>'::text) || sd.descripcion) || '</td>'::text)::
-           character varying)::text) || '</table>'::text AS detalle,
-         fun.desc_funcionario1,
-         uo.codigo AS codigo_uo,
-         uo.nombre_unidad,
-         lower(sol.tipo::text) AS tipo,
-         lower(sol.tipo_concepto::text) AS tipo_concepto,
-         fun.nombre_cargo,
-         fun.nombre_unidad AS nombre_unidad_cargo,
-         fun.email_empresa,
-         usu.desc_persona AS desc_usuario,
-         COALESCE(sol.id_funcionario_supervisor, 0) AS id_funcionario_supervisor
-  ,
-         COALESCE(sol.id_funcionario_aprobador, 0) AS id_funcionario_aprobador,
-         dep.prioridad,
-         dep.nombre AS nombre_depto,
-         sol.precontrato,
-         sol.id_funcionario_rpc
-  FROM adq.tsolicitud sol
-       LEFT JOIN adq.tsolicitud_det sd ON sd.id_solicitud = sol.id_solicitud AND
-         sd.estado_reg::text = 'activo'::text
-       LEFT JOIN param.tconcepto_ingas ci ON ci.id_concepto_ingas =
-         sd.id_concepto_ingas
-       JOIN param.tmoneda mon ON mon.id_moneda = sol.id_moneda
-       JOIN param.tdepto dep ON dep.id_depto = sol.id_depto
-       JOIN orga.vfuncionario_cargo fun ON fun.id_funcionario =
-         sol.id_funcionario AND fun.estado_reg_asi::text = 'activo'::text
-       JOIN orga.tuo uo ON uo.id_uo = sol.id_uo
-       JOIN segu.vusuario usu ON usu.id_usuario = sol.id_usuario_reg
-       LEFT JOIN param.vproveedor p ON p.id_proveedor = sol.id_proveedor
-       LEFT JOIN adq.tcategoria_compra cac ON cac.id_categoria_compra =
-         sol.id_categoria_compra
-  WHERE fun.fecha_asignacion <= sol.fecha_soli AND
-        fun.fecha_finalizacion >= sol.fecha_soli OR
-        fun.fecha_asignacion <= sol.fecha_soli AND
-        fun.fecha_finalizacion IS NULL
-  GROUP BY sol.id_solicitud,
-           sol.id_proveedor,
-           p.desc_proveedor,
-           sol.id_moneda,
-           sol.id_depto,
-           sol.numero,
-           sol.fecha_soli,
-           sol.estado,
-           sol.num_tramite,
-           sol.id_gestion,
-           sol.justificacion,
-           p.rotulo_comercial,
-           sol.id_categoria_compra,
-           cac.codigo,
-           cac.nombre,
-           mon.codigo,
-           fun.desc_funcionario1,
-           uo.codigo,
-           uo.nombre_unidad,
-           sol.tipo_concepto,
-           sol.tipo,
-           fun.nombre_cargo,
-           fun.nombre_unidad,
-           fun.email_empresa,
-           usu.desc_persona,
-           dep.prioridad,
-           dep.nombre,
-           sol.id_funcionario_rpc;
-           
-/***********************************F-DEP-RAC-ADQ-1-21/04/2015*****************************************/
-
-/***********************************I-DEP-JRR-ADQ-0-06/05/2015*****************************************/
-CREATE OR REPLACE VIEW adq.vcotizacion(
-    id_cotizacion,
-    numero_oc,
-    codigo_proceso,
-    num_cotizacion,
-    id_solicitud,
-    id_proveedor,
-    desc_proveedor,
-    id_moneda,
-    id_depto,
-    numero,
-    fecha_soli,
-    estado,
-    num_tramite,
-    id_gestion,
-    justificacion,
-    rotulo_comercial,
-    id_categoria_compra,
-    codigo,
-    precio_total,
-    precio_total_mb,
-    monto_total_adjudicado,
-    monto_total_adjudicado_mb,
-    codigo_categoria,
-    nombre_categoria,
-    id_proceso_wf_sol,
-    id_proceso_wf,
-    detalle,
-    desc_funcionario1,
-    codigo_uo,
-    nombre_unidad,
-    tipo,
-    tipo_concepto,
-    nombre_cargo,
-    nombre_unidad_cargo,
-    requiere_contrato,
-    nro_contrato,
-    precontrato,
-    ots,
-    conceptos)
-AS
-  SELECT DISTINCT cot.id_cotizacion,
-         cot.numero_oc,
-         pro.codigo_proceso,
-         pro.num_cotizacion,
-         sol.id_solicitud,
-         p.id_proveedor,
-         p.desc_proveedor,
-         sol.id_moneda,
-         sol.id_depto,
-         sol.numero,
-         sol.fecha_soli,
-         sol.estado,
-         sol.num_tramite,
-         sol.id_gestion,
-         sol.justificacion,
-         p.rotulo_comercial,
-         sol.id_categoria_compra,
-         mon.codigo,
-         COALESCE(sum(sd.precio_total), 0::numeric) AS precio_total,
-         COALESCE(sum(sd.precio_unitario_mb * sd.cantidad::numeric), 0::numeric)
-           AS precio_total_mb,
-         COALESCE(sum(cd.cantidad_adju * cd.precio_unitario), 0::numeric) AS
-           monto_total_adjudicado,
-         COALESCE(sum(cd.cantidad_adju * cd.precio_unitario_mb), 0::numeric) AS
-           monto_total_adjudicado_mb,
-         COALESCE(cac.codigo, '' ::character varying) AS codigo_categoria,
-         COALESCE(cac.nombre, '' ::character varying) AS nombre_categoria,
-         sol.id_proceso_wf AS id_proceso_wf_sol,
-         cot.id_proceso_wf,
-         ('<table>' ::text || pxp.html_rows((((('<td>' ::text ||
-           ci.desc_ingas::text) || ' <br>' ::text) || sd.descripcion) || '</td>'
-           ::text) ::character varying) ::text) || '</table>' ::text AS detalle,
-         fun.desc_funcionario1,
-         uo.codigo AS codigo_uo,
-         uo.nombre_unidad,
-         lower(sol.tipo::text) AS tipo,
-         lower(sol.tipo_concepto::text) AS tipo_concepto,
-         fun.nombre_cargo,
-         fun.nombre_unidad AS nombre_unidad_cargo,
-         cot.requiere_contrato,
-         cot.nro_contrato,
-         sol.precontrato,
-         pxp.list(sd.id_orden_trabajo::text) AS ots,
-         pxp.list(sd.id_concepto_ingas::text) AS conceptos
-  FROM adq.tcotizacion cot
-       JOIN adq.tproceso_compra pro ON pro.id_proceso_compra =
-         cot.id_proceso_compra
-       JOIN adq.tsolicitud sol ON sol.id_solicitud = pro.id_solicitud
-       LEFT JOIN adq.tcotizacion_det cd ON cd.id_cotizacion = cot.id_cotizacion
-       LEFT JOIN adq.tsolicitud_det sd ON sd.id_solicitud_det =
-         cd.id_solicitud_det
-       LEFT JOIN param.tconcepto_ingas ci ON ci.id_concepto_ingas =
-         sd.id_concepto_ingas
-       JOIN param.tmoneda mon ON mon.id_moneda = sol.id_moneda
-       JOIN orga.vfuncionario_cargo fun ON fun.id_funcionario =
-         sol.id_funcionario AND fun.estado_reg_asi::text = 'activo' ::text
-       JOIN orga.tuo uo ON uo.id_uo = sol.id_uo
-       JOIN param.vproveedor p ON p.id_proveedor = cot.id_proveedor
-       JOIN adq.tcategoria_compra cac ON cac.id_categoria_compra =
-         sol.id_categoria_compra
-  WHERE fun.fecha_asignacion <= sol.fecha_soli AND
-        fun.fecha_finalizacion >= sol.fecha_soli OR
-        fun.fecha_asignacion <= sol.fecha_soli AND
-        fun.fecha_finalizacion IS NULL
-  GROUP BY cot.id_cotizacion,
-           cot.numero_oc,
-           pro.codigo_proceso,
-           pro.num_cotizacion,
-           sol.id_solicitud,
-           p.id_proveedor,
-           p.desc_proveedor,
-           sol.id_moneda,
-           sol.id_depto,
-           sol.numero,
-           sol.fecha_soli,
-           sol.estado,
-           sol.num_tramite,
-           sol.id_gestion,
-           sol.justificacion,
-           p.rotulo_comercial,
-           sol.id_categoria_compra,
-           cac.codigo,
-           cac.nombre,
-           mon.codigo,
-           fun.desc_funcionario1,
-           uo.codigo,
-           uo.nombre_unidad,
-           sol.tipo_concepto,
-           sol.tipo,
-           fun.nombre_cargo,
-           fun.nombre_unidad,
-           cot.requiere_contrato,
-           cot.nro_contrato,
-           sol.precontrato;
-
-/***********************************F-DEP-JRR-ADQ-0-06/05/2015*****************************************/
-
-
-
-/***********************************I-DEP-RAC-ADQ-0-12/05/2015*****************************************/
-
-
-/***********************************F-DEP-RAC-ADQ-0-12/05/2015*****************************************/
-
-
-/***********************************I-DEP-RAC-ADQ-0-27/05/2015*****************************************/
-
-CREATE OR REPLACE VIEW adq.vsolicitud_compra(
-    id_solicitud,
-    id_proveedor,
-    desc_proveedor,
-    id_moneda,
-    id_depto,
-    numero,
-    fecha_soli,
-    estado,
-    num_tramite,
-    id_gestion,
-    justificacion,
-    rotulo_comercial,
-    id_categoria_compra,
-    codigo,
-    precio_total,
-    precio_total_mb,
-    codigo_categoria,
-    nombre_categoria,
-    id_proceso_wf,
-    detalle,
-    desc_funcionario1,
-    codigo_uo,
-    nombre_unidad,
-    tipo,
-    tipo_concepto,
-    nombre_cargo,
-    nombre_unidad_cargo,
-    email_empresa,
-    desc_usuario,
-    id_funcionario_supervisor,
-    id_funcionario_aprobador,
-    prioridad,
-    nombre_depto,
-    precontrato,
-    id_funcionario_rpc)
-AS
-  SELECT DISTINCT sol.id_solicitud,
-         sol.id_proveedor,
-         p.desc_proveedor,
-         sol.id_moneda,
-         sol.id_depto,
-         sol.numero,
-         sol.fecha_soli,
-         sol.estado,
-         sol.num_tramite,
-         sol.id_gestion,
-         sol.justificacion,
-         p.rotulo_comercial,
-         sol.id_categoria_compra,
-         mon.codigo,
-         COALESCE(sum(sd.precio_total), 0::numeric) AS precio_total,
-         COALESCE(sum(sd.precio_unitario_mb * sd.cantidad::numeric), 0::numeric)
-           AS precio_total_mb,
-         COALESCE(cac.codigo, ''::character varying) AS codigo_categoria,
-         COALESCE(cac.nombre, ''::character varying) AS nombre_categoria,
-         sol.id_proceso_wf,
-         ((('<table border="1"><TR> 
-   <TH>Concepto</TH> 
-   <TH>Detalle</TH> 
-   <TH>Cantidad</TH>
-   <TH>P / U ('::text || mon.codigo::text) || ')</TH>'::text) || pxp.html_rows((
-     ((((((('<td>'::text || COALESCE(ci.desc_ingas::text, '-'::text)) ||
-     '</td> <td>'::text) || COALESCE(sd.descripcion, '-'::text)) || '</td> <td>'
-     ::text) || COALESCE(sd.cantidad::text, '-'::text)) || '</td> <td>'::text)
-     || COALESCE(round(sd.precio_unitario, 2)::text, '-'::text)) || '</td> '::
-     text)::character varying)::text) || '</table>'::text AS detalle,
-         fun.desc_funcionario1,
-         uo.codigo AS codigo_uo,
-         uo.nombre_unidad,
-         lower(sol.tipo::text) AS tipo,
-         lower(sol.tipo_concepto::text) AS tipo_concepto,
-         fun.nombre_cargo,
-         fun.nombre_unidad AS nombre_unidad_cargo,
-         fun.email_empresa,
-         usu.desc_persona AS desc_usuario,
-         COALESCE(sol.id_funcionario_supervisor, 0) AS id_funcionario_supervisor
-  ,
-         COALESCE(sol.id_funcionario_aprobador, 0) AS id_funcionario_aprobador,
-         dep.prioridad,
-         dep.nombre AS nombre_depto,
-         sol.precontrato,
-         sol.id_funcionario_rpc
-  FROM adq.tsolicitud sol
-       LEFT JOIN adq.tsolicitud_det sd ON sd.id_solicitud = sol.id_solicitud AND
-         sd.estado_reg::text = 'activo'::text
-       LEFT JOIN param.tconcepto_ingas ci ON ci.id_concepto_ingas =
-         sd.id_concepto_ingas
-       JOIN param.tmoneda mon ON mon.id_moneda = sol.id_moneda
-       JOIN param.tdepto dep ON dep.id_depto = sol.id_depto
-       JOIN orga.vfuncionario_cargo fun ON fun.id_funcionario =
-         sol.id_funcionario AND fun.estado_reg_asi::text = 'activo'::text
-       JOIN orga.tuo uo ON uo.id_uo = sol.id_uo
-       JOIN segu.vusuario usu ON usu.id_usuario = sol.id_usuario_reg
-       LEFT JOIN param.vproveedor p ON p.id_proveedor = sol.id_proveedor
-       LEFT JOIN adq.tcategoria_compra cac ON cac.id_categoria_compra =
-         sol.id_categoria_compra
-  WHERE fun.fecha_asignacion <= sol.fecha_soli AND
-        fun.fecha_finalizacion >= sol.fecha_soli OR
-        fun.fecha_asignacion <= sol.fecha_soli AND
-        fun.fecha_finalizacion IS NULL
-  GROUP BY sol.id_solicitud,
-           sol.id_proveedor,
-           p.desc_proveedor,
-           sol.id_moneda,
-           sol.id_depto,
-           sol.numero,
-           sol.fecha_soli,
-           sol.estado,
-           sol.num_tramite,
-           sol.id_gestion,
-           sol.justificacion,
-           p.rotulo_comercial,
-           sol.id_categoria_compra,
-           cac.codigo,
-           cac.nombre,
-           mon.codigo,
-           fun.desc_funcionario1,
-           uo.codigo,
-           uo.nombre_unidad,
-           sol.tipo_concepto,
-           sol.tipo,
-           fun.nombre_cargo,
-           fun.nombre_unidad,
-           fun.email_empresa,
-           usu.desc_persona,
-           dep.prioridad,
-           dep.nombre,
-           sol.id_funcionario_rpc;
-
-
-/***********************************F-DEP-RAC-ADQ-0-27/05/2015*****************************************/
-
-/***********************************I-DEP-JRR-ADQ-0-08/08/2016*****************************************/
-CREATE OR REPLACE VIEW adq.vsolicitud_compra(
-    id_solicitud,
-    id_proveedor,
-    desc_proveedor,
-    id_moneda,
-    id_depto,
-    numero,
-    fecha_soli,
-    estado,
-    num_tramite,
-    id_gestion,
-    justificacion,
-    rotulo_comercial,
-    id_categoria_compra,
-    codigo,
-    precio_total,
-    precio_total_mb,
-    codigo_categoria,
-    nombre_categoria,
-    id_proceso_wf,
-    detalle,
-    desc_funcionario1,
-    codigo_uo,
-    nombre_unidad,
-    tipo,
-    tipo_concepto,
-    nombre_cargo,
-    nombre_unidad_cargo,
-    email_empresa,
-    desc_usuario,
-    id_funcionario_supervisor,
-    id_funcionario_aprobador,
-    prioridad,
-    nombre_depto,
-    precontrato,
-    id_funcionario_rpc,
-    id_funcionario)
-AS
-  SELECT DISTINCT sol.id_solicitud,
-         sol.id_proveedor,
-         p.desc_proveedor,
-         sol.id_moneda,
-         sol.id_depto,
-         sol.numero,
-         sol.fecha_soli,
-         sol.estado,
-         sol.num_tramite,
-         sol.id_gestion,
-         sol.justificacion,
-         p.rotulo_comercial,
-         sol.id_categoria_compra,
-         mon.codigo,
-         COALESCE(sum(sd.precio_total), 0::numeric) AS precio_total,
-         COALESCE(sum(sd.precio_unitario_mb * sd.cantidad::numeric), 0::numeric)
-           AS precio_total_mb,
-         COALESCE(cac.codigo, ''::character varying) AS codigo_categoria,
-         COALESCE(cac.nombre, ''::character varying) AS nombre_categoria,
-         sol.id_proceso_wf,
-         ((('<table border="1"><TR>
-   <TH>Concepto</TH>
-   <TH>Detalle</TH>
-   <TH>Cantidad</TH>
-   <TH>P / U ('::text || mon.codigo::text) || ')</TH>'::text) || pxp.html_rows((
-     ((((((('<td>'::text || COALESCE(ci.desc_ingas::text, '-'::text)) ||
-     '</td> <td>'::text) || COALESCE(sd.descripcion, '-'::text)) || '</td> <td>'
-     ::text) || COALESCE(sd.cantidad::text, '-'::text)) || '</td> <td>'::text)
-     || COALESCE(round(sd.precio_unitario, 2)::text, '-'::text)) || '</td> '::
-     text)::character varying)::text) || '</table>'::text AS detalle,
-         fun.desc_funcionario1,
-         uo.codigo AS codigo_uo,
-         uo.nombre_unidad,
-         lower(sol.tipo::text) AS tipo,
-         lower(sol.tipo_concepto::text) AS tipo_concepto,
-         fun.nombre_cargo,
-         fun.nombre_unidad AS nombre_unidad_cargo,
-         fun.email_empresa,
-         usu.desc_persona AS desc_usuario,
-         COALESCE(sol.id_funcionario_supervisor, 0) AS id_funcionario_supervisor
-  ,
-         COALESCE(sol.id_funcionario_aprobador, 0) AS id_funcionario_aprobador,
-         dep.prioridad,
-         dep.nombre AS nombre_depto,
-         sol.precontrato,
-         sol.id_funcionario_rpc,
-         sol.id_funcionario
-  FROM adq.tsolicitud sol
-       LEFT JOIN adq.tsolicitud_det sd ON sd.id_solicitud = sol.id_solicitud AND
-         sd.estado_reg::text = 'activo'::text
-       LEFT JOIN param.tconcepto_ingas ci ON ci.id_concepto_ingas =
-         sd.id_concepto_ingas
-       JOIN param.tmoneda mon ON mon.id_moneda = sol.id_moneda
-       JOIN param.tdepto dep ON dep.id_depto = sol.id_depto
-       JOIN orga.vfuncionario_cargo fun ON fun.id_funcionario =
-         sol.id_funcionario AND fun.estado_reg_asi::text = 'activo'::text
-       JOIN orga.tuo uo ON uo.id_uo = sol.id_uo
-       JOIN segu.vusuario usu ON usu.id_usuario = sol.id_usuario_reg
-       LEFT JOIN param.vproveedor p ON p.id_proveedor = sol.id_proveedor
-       LEFT JOIN adq.tcategoria_compra cac ON cac.id_categoria_compra =
-         sol.id_categoria_compra
-  WHERE fun.fecha_asignacion <= sol.fecha_soli AND
-        fun.fecha_finalizacion >= sol.fecha_soli OR
-        fun.fecha_asignacion <= sol.fecha_soli AND
-        fun.fecha_finalizacion IS NULL
-  GROUP BY sol.id_solicitud,
-           sol.id_proveedor,
-           p.desc_proveedor,
-           sol.id_moneda,
-           sol.id_depto,
-           sol.numero,
-           sol.fecha_soli,
-           sol.estado,
-           sol.num_tramite,
-           sol.id_gestion,
-           sol.justificacion,
-           p.rotulo_comercial,
-           sol.id_categoria_compra,
-           cac.codigo,
-           cac.nombre,
-           mon.codigo,
-           fun.desc_funcionario1,
-           uo.codigo,
-           uo.nombre_unidad,
-           sol.tipo_concepto,
-           sol.tipo,
-           fun.nombre_cargo,
-           fun.nombre_unidad,
-           fun.email_empresa,
-           usu.desc_persona,
-           dep.prioridad,
-           dep.nombre,
-           sol.id_funcionario_rpc;
-
-  /***********************************F-DEP-JRR-ADQ-0-08/08/2016*****************************************/
+   
+/***********************************F-DEP-RAC-ADQ-1-21/10/2014*****************************************/
+ 
 
 /***********************************I-DEP-GVC-ADQ-0-05/12/2016*****************************************/
-DROP VIEW adq.vsolicitud_compra;
-DROP VIEW adq.vcotizacion;
 
+
+/*
 ALTER TABLE adq.tsolicitud
-  ALTER COLUMN precontrato TYPE VARCHAR(40) COLLATE pg_catalog."default";
+  ALTER COLUMN precontrato TYPE VARCHAR(40) COLLATE pg_catalog."default";*/
 
 
 /***********************************F-DEP-GVC-ADQ-0-05/12/2016*****************************************/
@@ -3493,212 +1299,6 @@ ALTER TABLE adq.tsolicitud
 
 
 /***********************************I-DEP-CAP-ADQ-0-01/12/2018*****************************************/
-
-CREATE VIEW adq.vcotizacion (
-    id_cotizacion,
-    numero_oc,
-    codigo_proceso,
-    num_cotizacion,
-    id_solicitud,
-    id_proveedor,
-    desc_proveedor,
-    id_moneda,
-    id_depto,
-    numero,
-    fecha_soli,
-    estado,
-    num_tramite,
-    id_gestion,
-    justificacion,
-    rotulo_comercial,
-    id_categoria_compra,
-    codigo,
-    precio_total,
-    precio_total_mb,
-    monto_total_adjudicado,
-    monto_total_adjudicado_mb,
-    codigo_categoria,
-    nombre_categoria,
-    id_proceso_wf_sol,
-    id_proceso_wf,
-    detalle,
-    desc_funcionario1,
-    codigo_uo,
-    nombre_unidad,
-    tipo,
-    tipo_concepto,
-    nombre_cargo,
-    nombre_unidad_cargo,
-    requiere_contrato,
-    nro_contrato,
-    precontrato,
-    ots,
-    conceptos)
-AS
-SELECT DISTINCT cot.id_cotizacion,
-    cot.numero_oc,
-    pro.codigo_proceso,
-    pro.num_cotizacion,
-    sol.id_solicitud,
-    p.id_proveedor,
-    p.desc_proveedor,
-    sol.id_moneda,
-    sol.id_depto,
-    sol.numero,
-    sol.fecha_soli,
-    sol.estado,
-    sol.num_tramite,
-    sol.id_gestion,
-    sol.justificacion,
-    p.rotulo_comercial,
-    sol.id_categoria_compra,
-    mon.codigo,
-    COALESCE(sum(sd.precio_total), 0::numeric) AS precio_total,
-    COALESCE(sum(sd.precio_unitario_mb * sd.cantidad::numeric), 0::numeric) AS
-        precio_total_mb,
-    COALESCE(sum(cd.cantidad_adju * cd.precio_unitario), 0::numeric) AS
-        monto_total_adjudicado,
-    COALESCE(sum(cd.cantidad_adju * cd.precio_unitario_mb), 0::numeric) AS
-        monto_total_adjudicado_mb,
-    COALESCE(cac.codigo, ''::character varying) AS codigo_categoria,
-    COALESCE(cac.nombre, ''::character varying) AS nombre_categoria,
-    sol.id_proceso_wf AS id_proceso_wf_sol,
-    cot.id_proceso_wf,
-    ('<table>'::text || pxp.html_rows((((('<td>'::text || ci.desc_ingas::text)
-        || ' <br>'::text) || sd.descripcion) || '</td>'::text)::character varying)::text) || '</table>'::text AS detalle,
-    fun.desc_funcionario1,
-    uo.codigo AS codigo_uo,
-    uo.nombre_unidad,
-    lower(sol.tipo::text) AS tipo,
-    lower(sol.tipo_concepto::text) AS tipo_concepto,
-    fun.nombre_cargo,
-    fun.nombre_unidad AS nombre_unidad_cargo,
-    cot.requiere_contrato,
-    cot.nro_contrato,
-    sol.precontrato,
-    pxp.list(sd.id_orden_trabajo::text) AS ots,
-    pxp.list(sd.id_concepto_ingas::text) AS conceptos
-FROM adq.tcotizacion cot
-     JOIN adq.tproceso_compra pro ON pro.id_proceso_compra = cot.id_proceso_compra
-     JOIN adq.tsolicitud sol ON sol.id_solicitud = pro.id_solicitud
-     LEFT JOIN adq.tcotizacion_det cd ON cd.id_cotizacion = cot.id_cotizacion
-     LEFT JOIN adq.tsolicitud_det sd ON sd.id_solicitud_det = cd.id_solicitud_det
-     LEFT JOIN param.tconcepto_ingas ci ON ci.id_concepto_ingas = sd.id_concepto_ingas
-     JOIN param.tmoneda mon ON mon.id_moneda = sol.id_moneda
-     JOIN orga.vfuncionario_cargo fun ON fun.id_funcionario =
-         sol.id_funcionario AND fun.estado_reg_asi::text = 'activo'::text
-     JOIN orga.tuo uo ON uo.id_uo = sol.id_uo
-     JOIN param.vproveedor p ON p.id_proveedor = cot.id_proveedor
-     JOIN adq.tcategoria_compra cac ON cac.id_categoria_compra = sol.id_categoria_compra
-WHERE fun.fecha_asignacion <= sol.fecha_soli AND fun.fecha_finalizacion >=
-    sol.fecha_soli OR fun.fecha_asignacion <= sol.fecha_soli AND fun.fecha_finalizacion IS NULL
-GROUP BY cot.id_cotizacion, cot.numero_oc, pro.codigo_proceso,
-    pro.num_cotizacion, sol.id_solicitud, p.id_proveedor, p.desc_proveedor, sol.id_moneda, sol.id_depto, sol.numero, sol.fecha_soli, sol.estado, sol.num_tramite, sol.id_gestion, sol.justificacion, p.rotulo_comercial, sol.id_categoria_compra, cac.codigo, cac.nombre, mon.codigo, fun.desc_funcionario1, uo.codigo, uo.nombre_unidad, sol.tipo_concepto, sol.tipo, fun.nombre_cargo, fun.nombre_unidad, cot.requiere_contrato, cot.nro_contrato, sol.precontrato;
-    
-
-    
-CREATE VIEW adq.vsolicitud_compra (
-    id_solicitud,
-    id_proveedor,
-    desc_proveedor,
-    id_moneda,
-    id_depto,
-    numero,
-    fecha_soli,
-    estado,
-    num_tramite,
-    id_gestion,
-    justificacion,
-    rotulo_comercial,
-    id_categoria_compra,
-    codigo,
-    precio_total,
-    precio_total_mb,
-    codigo_categoria,
-    nombre_categoria,
-    id_proceso_wf,
-    detalle,
-    desc_funcionario1,
-    codigo_uo,
-    nombre_unidad,
-    tipo,
-    tipo_concepto,
-    nombre_cargo,
-    nombre_unidad_cargo,
-    email_empresa,
-    desc_usuario,
-    id_funcionario_supervisor,
-    id_funcionario_aprobador,
-    prioridad,
-    nombre_depto,
-    precontrato,
-    id_funcionario_rpc,
-    id_funcionario)
-AS
-SELECT DISTINCT sol.id_solicitud,
-    sol.id_proveedor,
-    p.desc_proveedor,
-    sol.id_moneda,
-    sol.id_depto,
-    sol.numero,
-    sol.fecha_soli,
-    sol.estado,
-    sol.num_tramite,
-    sol.id_gestion,
-    sol.justificacion,
-    p.rotulo_comercial,
-    sol.id_categoria_compra,
-    mon.codigo,
-    COALESCE(sum(sd.precio_total), 0::numeric) AS precio_total,
-    COALESCE(sum(sd.precio_unitario_mb * sd.cantidad::numeric), 0::numeric) AS
-        precio_total_mb,
-    COALESCE(cac.codigo, ''::character varying) AS codigo_categoria,
-    COALESCE(cac.nombre, ''::character varying) AS nombre_categoria,
-    sol.id_proceso_wf,
-    ((('<table border="1"><TR>
-   <TH>Concepto</TH>
-   <TH>Detalle</TH>
-   <TH>Cantidad</TH>
-   <TH>P / U
-       ('::text || mon.codigo::text) || ')</TH>'::text) || pxp.html_rows((((((((('<td>'::text || COALESCE(ci.desc_ingas::text, '-'::text)) || '</td>
-       <td>'::text) || COALESCE(sd.descripcion, '-'::text)) || '</td>
-           <td>'::text) || COALESCE(sd.cantidad::text, '-'::text)) || '</td> <td>'::text) || COALESCE(round(sd.precio_unitario, 2)::text, '-'::text)) || '</td> '::text)::character varying)::text) || '</table>'::text AS detalle,
-    fun.desc_funcionario1,
-    uo.codigo AS codigo_uo,
-    uo.nombre_unidad,
-    lower(sol.tipo::text) AS tipo,
-    lower(sol.tipo_concepto::text) AS tipo_concepto,
-    fun.nombre_cargo,
-    fun.nombre_unidad AS nombre_unidad_cargo,
-    fun.email_empresa,
-    usu.desc_persona AS desc_usuario,
-    COALESCE(sol.id_funcionario_supervisor, 0) AS id_funcionario_supervisor,
-    COALESCE(sol.id_funcionario_aprobador, 0) AS id_funcionario_aprobador,
-    dep.prioridad,
-    dep.nombre AS nombre_depto,
-    sol.precontrato,
-    sol.id_funcionario_rpc,
-    sol.id_funcionario
-FROM adq.tsolicitud sol
-     LEFT JOIN adq.tsolicitud_det sd ON sd.id_solicitud = sol.id_solicitud AND
-         sd.estado_reg::text = 'activo'::text
-     LEFT JOIN param.tconcepto_ingas ci ON ci.id_concepto_ingas = sd.id_concepto_ingas
-     JOIN param.tmoneda mon ON mon.id_moneda = sol.id_moneda
-     JOIN param.tdepto dep ON dep.id_depto = sol.id_depto
-     JOIN orga.vfuncionario_cargo fun ON fun.id_funcionario =
-         sol.id_funcionario AND fun.estado_reg_asi::text = 'activo'::text
-     JOIN orga.tuo uo ON uo.id_uo = sol.id_uo
-     JOIN segu.vusuario usu ON usu.id_usuario = sol.id_usuario_reg
-     LEFT JOIN param.vproveedor p ON p.id_proveedor = sol.id_proveedor
-     LEFT JOIN adq.tcategoria_compra cac ON cac.id_categoria_compra =
-         sol.id_categoria_compra
-WHERE fun.fecha_asignacion <= sol.fecha_soli AND fun.fecha_finalizacion >=
-    sol.fecha_soli OR fun.fecha_asignacion <= sol.fecha_soli AND fun.fecha_finalizacion IS NULL
-GROUP BY sol.id_solicitud, sol.id_proveedor, p.desc_proveedor, sol.id_moneda,
-    sol.id_depto, sol.numero, sol.fecha_soli, sol.estado, sol.num_tramite, sol.id_gestion, sol.justificacion, p.rotulo_comercial, sol.id_categoria_compra, cac.codigo, cac.nombre, mon.codigo, fun.desc_funcionario1, uo.codigo, uo.nombre_unidad, sol.tipo_concepto, sol.tipo, fun.nombre_cargo, fun.nombre_unidad, fun.email_empresa, usu.desc_persona, dep.prioridad, dep.nombre, sol.id_funcionario_rpc;
-    
-    
-  
 
 select pxp.f_insert_testructura_gui ('ADQ', 'SISTEMA');
 select pxp.f_insert_testructura_gui ('ADQ.1', 'ADQ');
@@ -4361,604 +1961,69 @@ CREATE TRIGGER tr_delete_soldet_up_presoldet
   ON adq.tsolicitud_det FOR EACH ROW 
   EXECUTE PROCEDURE adq.f_tr_delete_soldet_up_presoldet();
 /***********************************F-DEP-EGS-ADQ-0-08/02/2019*****************************************/
-/***********************************I-DEP-EGS-ADQ-1-28/08/2019*****************************************/
-/*
- * Se recrea las views al cambiar el tipo de cantidad en la solicitud det de integer a numeric
- */
-CREATE OR REPLACE VIEW adq.vproceso_compra_wf(
-    id_proceso_compra,
-    codigo_proceso,
-    num_cotizacion,
-    id_solicitud,
-    id_proveedor_solicitud,
-    des_proveedor_solicitud,
-    id_moneda,
-    id_depto,
-    numero,
-    fecha_soli,
-    estado,
-    num_tramite,
-    id_gestion,
-    justificacion,
-    rotulo_comercial,
-    id_categoria_compra,
-    codigo,
-    precio_total,
-    precio_total_mb,
-    codigo_categoria,
-    nombre_categoria,
-    id_proceso_wf_sol,
-    id_proceso_wf,
-    detalle,
-    desc_funcionario1,
-    codigo_uo,
-    nombre_unidad,
-    tipo,
-    tipo_concepto,
-    nombre_cargo,
-    nombre_unidad_cargo)
-AS
-  SELECT DISTINCT pro.id_proceso_compra,
-         pro.codigo_proceso,
-         pro.num_cotizacion,
-         sol.id_solicitud,
-         p.id_proveedor AS id_proveedor_solicitud,
-         p.desc_proveedor AS des_proveedor_solicitud,
-         sol.id_moneda,
-         sol.id_depto,
-         sol.numero,
-         sol.fecha_soli,
-         sol.estado,
-         sol.num_tramite,
-         sol.id_gestion,
-         sol.justificacion,
-         p.rotulo_comercial,
-         sol.id_categoria_compra,
-         mon.codigo,
-         sum(sd.precio_total) AS precio_total,
-         sum(sd.precio_unitario_mb * sd.cantidad::numeric) AS precio_total_mb,
-         COALESCE(cac.codigo, ''::character varying) AS codigo_categoria,
-         COALESCE(cac.nombre, ''::character varying) AS nombre_categoria,
-         sol.id_proceso_wf AS id_proceso_wf_sol,
-         pro.id_proceso_wf,
-         ('<table>'::text || pxp.html_rows((((('<td>'::text || ci.desc_ingas::
-           text) || ' <br>'::text) || sd.descripcion) || '</td>'::text)::
-           character varying)::text) || '</table>'::text AS detalle,
-         fun.desc_funcionario1,
-         uo.codigo AS codigo_uo,
-         uo.nombre_unidad,
-         lower(sol.tipo::text) AS tipo,
-         lower(sol.tipo_concepto::text) AS tipo_concepto,
-         fun.nombre_cargo,
-         fun.nombre_unidad AS nombre_unidad_cargo
-  FROM adq.tproceso_compra pro
-       JOIN adq.tsolicitud sol ON sol.id_solicitud = pro.id_solicitud
-       JOIN adq.tsolicitud_det sd ON sd.id_solicitud = sol.id_solicitud
-       JOIN param.tconcepto_ingas ci ON ci.id_concepto_ingas =
-         sd.id_concepto_ingas
-       JOIN param.tmoneda mon ON mon.id_moneda = sol.id_moneda
-       JOIN orga.vfuncionario_cargo fun ON fun.id_funcionario =
-         sol.id_funcionario AND fun.estado_reg_asi::text = 'activo'::text
-       JOIN orga.tuo uo ON uo.id_uo = sol.id_uo
-       JOIN param.vproveedor p ON p.id_proveedor = sol.id_proveedor
-       JOIN adq.tcategoria_compra cac ON cac.id_categoria_compra =
-         sol.id_categoria_compra
-  WHERE fun.fecha_asignacion <= sol.fecha_soli AND
-        fun.fecha_finalizacion >= sol.fecha_soli OR
-        fun.fecha_asignacion <= sol.fecha_soli AND
-        fun.fecha_finalizacion IS NULL
-  GROUP BY pro.id_proceso_compra,
-           pro.codigo_proceso,
-           pro.num_cotizacion,
-           sol.id_solicitud,
-           p.id_proveedor,
-           p.desc_proveedor,
-           sol.id_moneda,
-           sol.id_depto,
-           sol.numero,
-           sol.fecha_soli,
-           sol.estado,
-           sol.num_tramite,
-           sol.id_gestion,
-           sol.justificacion,
-           p.rotulo_comercial,
-           sol.id_categoria_compra,
-           cac.codigo,
-           cac.nombre,
-           mon.codigo,
-           fun.desc_funcionario1,
-           uo.codigo,
-           uo.nombre_unidad,
-           sol.tipo_concepto,
-           sol.tipo,
-           fun.nombre_cargo,
-           fun.nombre_unidad;
-     -------------------------SQL---------------------------------------
-     CREATE OR REPLACE VIEW adq.vcotizacion(
-    id_cotizacion,
-    numero_oc,
-    codigo_proceso,
-    num_cotizacion,
-    id_solicitud,
-    id_proveedor,
-    desc_proveedor,
-    id_moneda,
-    id_depto,
-    numero,
-    fecha_soli,
-    estado,
-    num_tramite,
-    id_gestion,
-    justificacion,
-    rotulo_comercial,
-    id_categoria_compra,
-    codigo,
-    precio_total,
-    precio_total_mb,
-    monto_total_adjudicado,
-    monto_total_adjudicado_mb,
-    codigo_categoria,
-    nombre_categoria,
-    id_proceso_wf_sol,
-    id_proceso_wf,
-    detalle,
-    desc_funcionario1,
-    codigo_uo,
-    nombre_unidad,
-    tipo,
-    tipo_concepto,
-    nombre_cargo,
-    nombre_unidad_cargo,
-    requiere_contrato,
-    nro_contrato,
-    precontrato,
-    ots,
-    conceptos)
-AS
-  SELECT DISTINCT cot.id_cotizacion,
-         cot.numero_oc,
-         pro.codigo_proceso,
-         pro.num_cotizacion,
-         sol.id_solicitud,
-         p.id_proveedor,
-         p.desc_proveedor,
-         sol.id_moneda,
-         sol.id_depto,
-         sol.numero,
-         sol.fecha_soli,
-         sol.estado,
-         sol.num_tramite,
-         sol.id_gestion,
-         sol.justificacion,
-         p.rotulo_comercial,
-         sol.id_categoria_compra,
-         mon.codigo,
-         COALESCE(sum(sd.precio_total), 0::numeric) AS precio_total,
-         COALESCE(sum(sd.precio_unitario_mb * sd.cantidad::numeric), 0::numeric)
-           AS precio_total_mb,
-         COALESCE(sum(cd.cantidad_adju * cd.precio_unitario), 0::numeric) AS
-           monto_total_adjudicado,
-         COALESCE(sum(cd.cantidad_adju * cd.precio_unitario_mb), 0::numeric) AS
-           monto_total_adjudicado_mb,
-         COALESCE(cac.codigo, ''::character varying) AS codigo_categoria,
-         COALESCE(cac.nombre, ''::character varying) AS nombre_categoria,
-         sol.id_proceso_wf AS id_proceso_wf_sol,
-         cot.id_proceso_wf,
-         ('<table>'::text || pxp.html_rows((((('<td>'::text || ci.desc_ingas::
-           text) || ' <br>'::text) || sd.descripcion) || '</td>'::text)::
-           character varying)::text) || '</table>'::text AS detalle,
-         fun.desc_funcionario1,
-         uo.codigo AS codigo_uo,
-         uo.nombre_unidad,
-         lower(sol.tipo::text) AS tipo,
-         lower(sol.tipo_concepto::text) AS tipo_concepto,
-         fun.nombre_cargo,
-         fun.nombre_unidad AS nombre_unidad_cargo,
-         cot.requiere_contrato,
-         cot.nro_contrato,
-         sol.precontrato,
-         pxp.list(sd.id_orden_trabajo::text) AS ots,
-         pxp.list(sd.id_concepto_ingas::text) AS conceptos
-  FROM adq.tcotizacion cot
-       JOIN adq.tproceso_compra pro ON pro.id_proceso_compra =
-         cot.id_proceso_compra
-       JOIN adq.tsolicitud sol ON sol.id_solicitud = pro.id_solicitud
-       LEFT JOIN adq.tcotizacion_det cd ON cd.id_cotizacion = cot.id_cotizacion
-       LEFT JOIN adq.tsolicitud_det sd ON sd.id_solicitud_det =
-         cd.id_solicitud_det
-       LEFT JOIN param.tconcepto_ingas ci ON ci.id_concepto_ingas =
-         sd.id_concepto_ingas
-       JOIN param.tmoneda mon ON mon.id_moneda = sol.id_moneda
-       JOIN orga.vfuncionario_cargo fun ON fun.id_funcionario =
-         sol.id_funcionario AND fun.estado_reg_asi::text = 'activo'::text
-       JOIN orga.tuo uo ON uo.id_uo = sol.id_uo
-       JOIN param.vproveedor p ON p.id_proveedor = cot.id_proveedor
-       JOIN adq.tcategoria_compra cac ON cac.id_categoria_compra =
-         sol.id_categoria_compra
-  WHERE fun.fecha_asignacion <= sol.fecha_soli AND
-        fun.fecha_finalizacion >= sol.fecha_soli OR
-        fun.fecha_asignacion <= sol.fecha_soli AND
-        fun.fecha_finalizacion IS NULL
-  GROUP BY cot.id_cotizacion,
-           cot.numero_oc,
-           pro.codigo_proceso,
-           pro.num_cotizacion,
-           sol.id_solicitud,
-           p.id_proveedor,
-           p.desc_proveedor,
-           sol.id_moneda,
-           sol.id_depto,
-           sol.numero,
-           sol.fecha_soli,
-           sol.estado,
-           sol.num_tramite,
-           sol.id_gestion,
-           sol.justificacion,
-           p.rotulo_comercial,
-           sol.id_categoria_compra,
-           cac.codigo,
-           cac.nombre,
-           mon.codigo,
-           fun.desc_funcionario1,
-           uo.codigo,
-           uo.nombre_unidad,
-           sol.tipo_concepto,
-           sol.tipo,
-           fun.nombre_cargo,
-           fun.nombre_unidad,
-           cot.requiere_contrato,
-           cot.nro_contrato,
-           sol.precontrato;
-      -----------------------------SQL------------------------------------
-      CREATE OR REPLACE VIEW adq.vsolicitud_compra(
-    id_solicitud,
-    id_proveedor,
-    desc_proveedor,
-    id_moneda,
-    id_depto,
-    numero,
-    fecha_soli,
-    estado,
-    num_tramite,
-    id_gestion,
-    justificacion,
-    rotulo_comercial,
-    id_categoria_compra,
-    codigo,
-    precio_total,
-    precio_total_mb,
-    codigo_categoria,
-    nombre_categoria,
-    id_proceso_wf,
-    detalle,
-    desc_funcionario1,
-    codigo_uo,
-    nombre_unidad,
-    tipo,
-    tipo_concepto,
-    nombre_cargo,
-    nombre_unidad_cargo,
-    email_empresa,
-    desc_usuario,
-    id_funcionario_supervisor,
-    id_funcionario_aprobador,
-    prioridad,
-    nombre_depto,
-    precontrato,
-    id_funcionario_rpc,
-    id_funcionario)
-AS
-  SELECT DISTINCT sol.id_solicitud,
-         sol.id_proveedor,
-         p.desc_proveedor,
-         sol.id_moneda,
-         sol.id_depto,
-         sol.numero,
-         sol.fecha_soli,
-         sol.estado,
-         sol.num_tramite,
-         sol.id_gestion,
-         sol.justificacion,
-         p.rotulo_comercial,
-         sol.id_categoria_compra,
-         mon.codigo,
-         COALESCE(sum(sd.precio_total), 0::numeric) AS precio_total,
-         COALESCE(sum(sd.precio_unitario_mb * sd.cantidad::numeric), 0::numeric)
-           AS precio_total_mb,
-         COALESCE(cac.codigo, ''::character varying) AS codigo_categoria,
-         COALESCE(cac.nombre, ''::character varying) AS nombre_categoria,
-         sol.id_proceso_wf,
-         ((('<table border="1"><TR>
-   <TH>Concepto</TH>
-   <TH>Detalle</TH>
-   <TH>Cantidad</TH>
-   <TH>P / U ('::text || mon.codigo::text) || ')</TH>'::text) || pxp.html_rows((
-     ((((((('<td>'::text || COALESCE(ci.desc_ingas::text, '-'::text)) || '</td>
-       <td>'::text) || COALESCE(sd.descripcion, '-'::text)) || '</td> <td>'::
-         text) || COALESCE(sd.cantidad::text, '-'::text)) || '</td> <td>'::text)
-         || COALESCE(round(sd.precio_unitario, 2)::text, '-'::text)) || '</td> '
-         ::text)::character varying)::text) || '</table>'::text AS detalle,
-         fun.desc_funcionario1,
-         uo.codigo AS codigo_uo,
-         uo.nombre_unidad,
-         lower(sol.tipo::text) AS tipo,
-         lower(sol.tipo_concepto::text) AS tipo_concepto,
-         fun.nombre_cargo,
-         fun.nombre_unidad AS nombre_unidad_cargo,
-         fun.email_empresa,
-         usu.desc_persona AS desc_usuario,
-         COALESCE(sol.id_funcionario_supervisor, 0) AS id_funcionario_supervisor
-  ,
-         COALESCE(sol.id_funcionario_aprobador, 0) AS id_funcionario_aprobador,
-         dep.prioridad,
-         dep.nombre AS nombre_depto,
-         sol.precontrato,
-         sol.id_funcionario_rpc,
-         sol.id_funcionario
-  FROM adq.tsolicitud sol
-       LEFT JOIN adq.tsolicitud_det sd ON sd.id_solicitud = sol.id_solicitud AND
-         sd.estado_reg::text = 'activo'::text
-       LEFT JOIN param.tconcepto_ingas ci ON ci.id_concepto_ingas =
-         sd.id_concepto_ingas
-       JOIN param.tmoneda mon ON mon.id_moneda = sol.id_moneda
-       JOIN param.tdepto dep ON dep.id_depto = sol.id_depto
-       JOIN orga.vfuncionario_cargo fun ON fun.id_funcionario =
-         sol.id_funcionario AND fun.estado_reg_asi::text = 'activo'::text
-       JOIN orga.tuo uo ON uo.id_uo = sol.id_uo
-       JOIN segu.vusuario usu ON usu.id_usuario = sol.id_usuario_reg
-       LEFT JOIN param.vproveedor p ON p.id_proveedor = sol.id_proveedor
-       LEFT JOIN adq.tcategoria_compra cac ON cac.id_categoria_compra =
-         sol.id_categoria_compra
-  WHERE fun.fecha_asignacion <= sol.fecha_soli AND
-        fun.fecha_finalizacion >= sol.fecha_soli OR
-        fun.fecha_asignacion <= sol.fecha_soli AND
-        fun.fecha_finalizacion IS NULL
-  GROUP BY sol.id_solicitud,
-           sol.id_proveedor,
-           p.desc_proveedor,
-           sol.id_moneda,
-           sol.id_depto,
-           sol.numero,
-           sol.fecha_soli,
-           sol.estado,
-           sol.num_tramite,
-           sol.id_gestion,
-           sol.justificacion,
-           p.rotulo_comercial,
-           sol.id_categoria_compra,
-           cac.codigo,
-           cac.nombre,
-           mon.codigo,
-           fun.desc_funcionario1,
-           uo.codigo,
-           uo.nombre_unidad,
-           sol.tipo_concepto,
-           sol.tipo,
-           fun.nombre_cargo,
-           fun.nombre_unidad,
-           fun.email_empresa,
-           usu.desc_persona,
-           dep.prioridad,
-           dep.nombre,
-           sol.id_funcionario_rpc;
-/***********************************F-DEP-EGS-ADQ-1-28/08/2019*****************************************/
+
 ***********************************I-DEP-RAC-ADQ-2-20/01/2020*****************************************/
 
-CREATE OR REPLACE VIEW adq.vorden_compra
-AS
-WITH detalle AS(
-  SELECT cd.id_cotizacion,
-         sum(cd.cantidad_adju * cd.precio_unitario) AS total_adjudicado,
-         sum(cd.cantidad_coti * cd.precio_unitario) AS total_cotizado,
-         sum(cd.cantidad_adju * cd.precio_unitario_mb) AS total_adjudicado_mb
-  FROM adq.tcotizacion_det cd
-  WHERE cd.estado_reg::TEXT = 'activo'::TEXT
-  GROUP BY cd.id_cotizacion), 
-  
-  base_query AS(
-    SELECT cot.id_cotizacion,
-           cot.estado_reg,
-           cot.estado,
-           cot.lugar_entrega,
-           cot.tipo_entrega,
-           cot.fecha_coti,
-           COALESCE(cot.numero_oc, 'S/N'::character VARYING) AS numero_oc,
-           cot.id_proveedor,
-           pro.desc_proveedor,
-           cot.fecha_entrega,
-           cot.id_moneda,
-           mon.moneda,
-           cot.id_proceso_compra,
-           cot.fecha_venc,
-           cot.obs,
-           cot.fecha_adju,
-           cot.nro_contrato,
-           cot.fecha_reg,
-           cot.id_usuario_reg,
-           cot.fecha_mod,
-           cot.id_usuario_mod,
-           usu1.cuenta AS usr_reg,
-           usu2.cuenta AS usr_mod,
-           cot.id_estado_wf,
-           cot.id_proceso_wf,
-           mon.codigo AS desc_moneda,
-           cot.tipo_cambio_conv,
-           pro.email,
-           sol.numero,
-           sol.num_tramite,
-           cot.id_obligacion_pago,
-           cot.tiempo_entrega,
-           cot.funcionario_contacto,
-           cot.telefono_contacto,
-           cot.correo_contacto,
-           cot.prellenar_oferta,
-           cot.forma_pago,
-           cot.requiere_contrato,
-           d.total_adjudicado,
-           d.total_cotizado,
-           d.total_adjudicado_mb,
-           cot.tiene_form500,
-           cot.correo_oc
-    FROM adq.tcotizacion cot
-         JOIN adq.tproceso_compra proc ON proc.id_proceso_compra =
-           cot.id_proceso_compra
-         JOIN adq.tsolicitud sol ON sol.id_solicitud = proc.id_solicitud
-         JOIN segu.tusuario usu1 ON usu1.id_usuario = cot.id_usuario_reg
-         JOIN detalle d ON d.id_cotizacion = cot.id_cotizacion
-         JOIN param.tmoneda mon ON mon.id_moneda = cot.id_moneda
-         JOIN param.vproveedor pro ON pro.id_proveedor = cot.id_proveedor
-         LEFT JOIN segu.tusuario usu2 ON usu2.id_usuario = cot.id_usuario_mod),
-           cantidad_adjudicada_query AS(
-      SELECT ctdet.id_cotizacion,
-             sum(ctdet.cantidad_adju) AS cantidad_adjudicada
-      FROM adq.tcotizacion_det ctdet
-           JOIN base_query base ON base.id_cotizacion = ctdet.id_cotizacion
-      GROUP BY ctdet.id_cotizacion),
-      
-       cecos_query AS(
-        SELECT ctd.id_cotizacion,
-               array_to_string(array_agg(DISTINCT cc.codigo_cc), '<br>'::TEXT)::
-                 character VARYING AS cecos
-        FROM adq.tcotizacion_det ctd
-             JOIN adq.tsolicitud_det sold ON sold.id_solicitud_det =
-               ctd.id_solicitud_det
-             JOIN param.tconcepto_ingas cig ON cig.id_concepto_ingas =
-               sold.id_concepto_ingas
-             JOIN param.vcentro_costo cc ON cc.id_centro_costo =
-               sold.id_centro_costo
-             JOIN base_query base ON base.id_cotizacion = ctd.id_cotizacion
-        GROUP BY ctd.id_cotizacion), 
-        
-        
-        nro_cuenta_query AS(
-          SELECT ctd.id_cotizacion,
-                 array_to_string(array_agg(DISTINCT cta.nro_cuenta), '<br>'::
-                   TEXT) AS nro_cuenta
-          FROM adq.tcotizacion_det ctd
-               JOIN adq.tsolicitud_det sold ON sold.id_solicitud_det =
-                 ctd.id_solicitud_det
-               LEFT JOIN conta.tcuenta cta ON cta.id_cuenta = sold.id_cuenta
-               JOIN base_query base ON base.id_cotizacion = ctd.id_cotizacion
-          GROUP BY ctd.id_cotizacion)
-            SELECT bq.id_cotizacion,
-                   bq.estado_reg,
-                   bq.estado,
-                   bq.lugar_entrega,
-                   bq.tipo_entrega,
-                   bq.fecha_coti,
-                   bq.numero_oc,
-                   bq.id_proveedor,
-                   bq.desc_proveedor,
-                   bq.fecha_entrega,
-                   bq.id_moneda,
-                   bq.moneda,
-                   bq.id_proceso_compra,
-                   bq.fecha_venc,
-                   bq.obs,
-                   bq.fecha_adju,
-                   bq.nro_contrato,
-                   bq.fecha_reg,
-                   bq.id_usuario_reg,
-                   bq.fecha_mod,
-                   bq.id_usuario_mod,
-                   bq.usr_reg,
-                   bq.usr_mod,
-                   bq.id_estado_wf,
-                   bq.id_proceso_wf,
-                   bq.desc_moneda,
-                   bq.tipo_cambio_conv,
-                   bq.email,
-                   bq.numero,
-                   bq.num_tramite,
-                   bq.id_obligacion_pago,
-                   bq.tiempo_entrega,
-                   bq.funcionario_contacto,
-                   bq.telefono_contacto,
-                   bq.correo_contacto,
-                   bq.prellenar_oferta,
-                   bq.forma_pago,
-                   bq.requiere_contrato,
-                   bq.total_adjudicado,
-                   bq.total_cotizado,
-                   bq.total_adjudicado_mb,
-                   bq.tiene_form500,
-                   bq.correo_oc,
-                   cq.cecos,
-                   caq.cantidad_adjudicada AS total,
-                   ncq.nro_cuenta
-            FROM base_query bq
-                 LEFT JOIN cantidad_adjudicada_query caq ON caq.id_cotizacion =
-                   bq.id_cotizacion
-                 LEFT JOIN cecos_query cq ON cq.id_cotizacion = bq.id_cotizacion
-                 LEFT JOIN nro_cuenta_query ncq ON ncq.id_cotizacion =
-                   bq.id_cotizacion;
-                   
-
-
-/***********************************F-DEP-RAC-ADQ-2-20/01/2020*****************************************/
-/***********************************I-DEP-EGS-ADQ-3-11/03/2020*****************************************/
-select pxp.f_insert_testructura_gui ('REPPAG', 'REPADQ');
-/***********************************F-DEP-EGS-ADQ-3-11/03/2020*****************************************/
-/***********************************I-DEP-EGS-ADQ-3-20/05/2020*****************************************/
 CREATE OR REPLACE VIEW adq.vorden_compra(
-    id_cotizacion,
-    estado_reg,
-    estado,
-    lugar_entrega,
-    tipo_entrega,
-    fecha_coti,
-    numero_oc,
-    id_proveedor,
-    desc_proveedor,
-    fecha_entrega,
-    id_moneda,
-    moneda,
-    id_proceso_compra,
-    fecha_venc,
-    obs,
-    fecha_adju,
-    nro_contrato,
-    fecha_reg,
-    id_usuario_reg,
-    fecha_mod,
-    id_usuario_mod,
-    usr_reg,
-    usr_mod,
-    id_estado_wf,
-    id_proceso_wf,
-    desc_moneda,
-    tipo_cambio_conv,
-    email,
-    numero,
-    num_tramite,
-    id_obligacion_pago,
-    tiempo_entrega,
-    funcionario_contacto,
-    telefono_contacto,
-    correo_contacto,
-    prellenar_oferta,
-    forma_pago,
-    requiere_contrato,
-    total_adjudicado,
-    total_cotizado,
-    total_adjudicado_mb,
-    tiene_form500,
-    correo_oc,
-    cecos,
-    total,
-    nro_cuenta,
-    id_categoria_compra,
-    codigo_proceso,
-    desc_categoria_compra)
+                                         id_cotizacion,
+                                         estado_reg,
+                                         estado,
+                                         lugar_entrega,
+                                         tipo_entrega,
+                                         fecha_coti,
+                                         numero_oc,
+                                         id_proveedor,
+                                         desc_proveedor,
+                                         fecha_entrega,
+                                         id_moneda,
+                                         moneda,
+                                         id_proceso_compra,
+                                         fecha_venc,
+                                         obs,
+                                         fecha_adju,
+                                         nro_contrato,
+                                         fecha_reg,
+                                         id_usuario_reg,
+                                         fecha_mod,
+                                         id_usuario_mod,
+                                         usr_reg,
+                                         usr_mod,
+                                         id_estado_wf,
+                                         id_proceso_wf,
+                                         desc_moneda,
+                                         tipo_cambio_conv,
+                                         email,
+                                         numero,
+                                         num_tramite,
+                                         id_obligacion_pago,
+                                         tiempo_entrega,
+                                         funcionario_contacto,
+                                         telefono_contacto,
+                                         correo_contacto,
+                                         prellenar_oferta,
+                                         forma_pago,
+                                         requiere_contrato,
+                                         total_adjudicado,
+                                         total_cotizado,
+                                         total_adjudicado_mb,
+                                         tiene_form500,
+                                         correo_oc,
+                                         cecos,
+                                         total,
+                                         nro_cuenta,
+                                         id_categoria_compra,
+                                         codigo_proceso,
+                                         desc_categoria_compra,
+                                         tipo_sol)
 AS
 WITH detalle AS(
-  SELECT cd.id_cotizacion,
-         sum(cd.cantidad_adju * cd.precio_unitario) AS total_adjudicado,
-         sum(cd.cantidad_coti * cd.precio_unitario) AS total_cotizado,
-         sum(cd.cantidad_adju * cd.precio_unitario_mb) AS total_adjudicado_mb
-  FROM adq.tcotizacion_det cd
-  WHERE cd.estado_reg::text = 'activo'::text
-  GROUP BY cd.id_cotizacion), base_query AS(
+    SELECT cd.id_cotizacion,
+           sum(cd.cantidad_adju * cd.precio_unitario) AS total_adjudicado,
+           sum(cd.cantidad_coti * cd.precio_unitario) AS total_cotizado,
+           sum(cd.cantidad_adju * cd.precio_unitario_mb) AS total_adjudicado_mb
+    FROM adq.tcotizacion_det cd
+    WHERE cd.estado_reg::text = 'activo'::text
+    GROUP BY cd.id_cotizacion), base_query AS(
     SELECT cot.id_cotizacion,
            cot.estado_reg,
            cot.estado,
@@ -5004,89 +2069,97 @@ WITH detalle AS(
            cot.correo_oc,
            sol.id_categoria_compra,
            proc.codigo_proceso,
-           ctp.nombre AS desc_categoria_compra
+           ctp.nombre AS desc_categoria_compra,
+           sol.tipo AS tipo_sol
     FROM adq.tcotizacion cot
-         JOIN adq.tproceso_compra proc ON proc.id_proceso_compra = cot.id_proceso_compra
-         JOIN adq.tsolicitud sol ON sol.id_solicitud = proc.id_solicitud
-         JOIN segu.tusuario usu1 ON usu1.id_usuario = cot.id_usuario_reg
-         JOIN detalle d ON d.id_cotizacion = cot.id_cotizacion
-         JOIN param.tmoneda mon ON mon.id_moneda = cot.id_moneda
-         JOIN param.vproveedor pro ON pro.id_proveedor = cot.id_proveedor
-         LEFT JOIN segu.tusuario usu2 ON usu2.id_usuario = cot.id_usuario_mod
-         LEFT JOIN adq.tcategoria_compra ctp ON ctp.id_categoria_compra = sol.id_categoria_compra), cantidad_adjudicada_query AS(
-      SELECT ctdet.id_cotizacion,
-             sum(ctdet.cantidad_adju) AS cantidad_adjudicada
-      FROM adq.tcotizacion_det ctdet
-           JOIN base_query base ON base.id_cotizacion = ctdet.id_cotizacion
-      GROUP BY ctdet.id_cotizacion), cecos_query AS(
-        SELECT ctd.id_cotizacion,
-               array_to_string(array_agg(DISTINCT upper(cc.codigo_cc)), '<br>'::text)::character varying AS cecos
-        FROM adq.tcotizacion_det ctd
+             JOIN adq.tproceso_compra proc ON proc.id_proceso_compra = cot.id_proceso_compra
+             JOIN adq.tsolicitud sol ON sol.id_solicitud = proc.id_solicitud
+             JOIN segu.tusuario usu1 ON usu1.id_usuario = cot.id_usuario_reg
+             JOIN detalle d ON d.id_cotizacion = cot.id_cotizacion
+             JOIN param.tmoneda mon ON mon.id_moneda = cot.id_moneda
+             JOIN param.vproveedor pro ON pro.id_proveedor = cot.id_proveedor
+             LEFT JOIN segu.tusuario usu2 ON usu2.id_usuario = cot.id_usuario_mod
+             LEFT JOIN adq.tcategoria_compra ctp ON ctp.id_categoria_compra = sol.id_categoria_compra), cantidad_adjudicada_query AS(
+    SELECT ctdet.id_cotizacion,
+           sum(ctdet.cantidad_adju) AS cantidad_adjudicada
+    FROM adq.tcotizacion_det ctdet
+             JOIN base_query base ON base.id_cotizacion = ctdet.id_cotizacion
+    GROUP BY ctdet.id_cotizacion), cecos_query AS(
+    SELECT ctd.id_cotizacion,
+           array_to_string(array_agg(DISTINCT upper(cc.codigo_cc)), '<br>'::text)::character varying AS cecos
+    FROM adq.tcotizacion_det ctd
              JOIN adq.tsolicitud_det sold ON sold.id_solicitud_det = ctd.id_solicitud_det
              JOIN param.tconcepto_ingas cig ON cig.id_concepto_ingas = sold.id_concepto_ingas
              JOIN param.vcentro_costo cc ON cc.id_centro_costo = sold.id_centro_costo
              JOIN base_query base ON base.id_cotizacion = ctd.id_cotizacion
-        GROUP BY ctd.id_cotizacion), nro_cuenta_query AS(
-          SELECT ctd.id_cotizacion,
-                 array_to_string(array_agg(DISTINCT cta.nro_cuenta), '<br>'::text) AS nro_cuenta
-          FROM adq.tcotizacion_det ctd
-               JOIN adq.tsolicitud_det sold ON sold.id_solicitud_det = ctd.id_solicitud_det
-               LEFT JOIN conta.tcuenta cta ON cta.id_cuenta = sold.id_cuenta
-               JOIN base_query base ON base.id_cotizacion = ctd.id_cotizacion
-          GROUP BY ctd.id_cotizacion)
-            SELECT bq.id_cotizacion,
-                   bq.estado_reg,
-                   bq.estado,
-                   bq.lugar_entrega,
-                   bq.tipo_entrega,
-                   bq.fecha_coti,
-                   bq.numero_oc,
-                   bq.id_proveedor,
-                   bq.desc_proveedor,
-                   bq.fecha_entrega,
-                   bq.id_moneda,
-                   bq.moneda,
-                   bq.id_proceso_compra,
-                   bq.fecha_venc,
-                   bq.obs,
-                   bq.fecha_adju,
-                   bq.nro_contrato,
-                   bq.fecha_reg,
-                   bq.id_usuario_reg,
-                   bq.fecha_mod,
-                   bq.id_usuario_mod,
-                   bq.usr_reg,
-                   bq.usr_mod,
-                   bq.id_estado_wf,
-                   bq.id_proceso_wf,
-                   bq.desc_moneda,
-                   bq.tipo_cambio_conv,
-                   bq.email,
-                   bq.numero,
-                   bq.num_tramite,
-                   bq.id_obligacion_pago,
-                   bq.tiempo_entrega,
-                   bq.funcionario_contacto,
-                   bq.telefono_contacto,
-                   bq.correo_contacto,
-                   bq.prellenar_oferta,
-                   bq.forma_pago,
-                   bq.requiere_contrato,
-                   bq.total_adjudicado,
-                   bq.total_cotizado,
-                   bq.total_adjudicado_mb,
-                   bq.tiene_form500,
-                   bq.correo_oc,
-                   cq.cecos,
-                   caq.cantidad_adjudicada AS total,
-                   ncq.nro_cuenta,
-                   bq.id_categoria_compra,
-                   bq.codigo_proceso,
-                   bq.desc_categoria_compra
-            FROM base_query bq
-                 LEFT JOIN cantidad_adjudicada_query caq ON caq.id_cotizacion = bq.id_cotizacion
-                 LEFT JOIN cecos_query cq ON cq.id_cotizacion = bq.id_cotizacion
-                 LEFT JOIN nro_cuenta_query ncq ON ncq.id_cotizacion = bq.id_cotizacion;
+    GROUP BY ctd.id_cotizacion), nro_cuenta_query AS(
+    SELECT ctd.id_cotizacion,
+           array_to_string(array_agg(DISTINCT cta.nro_cuenta), '<br>'::text) AS nro_cuenta
+    FROM adq.tcotizacion_det ctd
+             JOIN adq.tsolicitud_det sold ON sold.id_solicitud_det = ctd.id_solicitud_det
+             LEFT JOIN conta.tcuenta cta ON cta.id_cuenta = sold.id_cuenta
+             JOIN base_query base ON base.id_cotizacion = ctd.id_cotizacion
+    GROUP BY ctd.id_cotizacion)
+SELECT bq.id_cotizacion,
+       bq.estado_reg,
+       bq.estado,
+       bq.lugar_entrega,
+       bq.tipo_entrega,
+       bq.fecha_coti,
+       bq.numero_oc,
+       bq.id_proveedor,
+       bq.desc_proveedor,
+       bq.fecha_entrega,
+       bq.id_moneda,
+       bq.moneda,
+       bq.id_proceso_compra,
+       bq.fecha_venc,
+       bq.obs,
+       bq.fecha_adju,
+       bq.nro_contrato,
+       bq.fecha_reg,
+       bq.id_usuario_reg,
+       bq.fecha_mod,
+       bq.id_usuario_mod,
+       bq.usr_reg,
+       bq.usr_mod,
+       bq.id_estado_wf,
+       bq.id_proceso_wf,
+       bq.desc_moneda,
+       bq.tipo_cambio_conv,
+       bq.email,
+       bq.numero,
+       bq.num_tramite,
+       bq.id_obligacion_pago,
+       bq.tiempo_entrega,
+       bq.funcionario_contacto,
+       bq.telefono_contacto,
+       bq.correo_contacto,
+       bq.prellenar_oferta,
+       bq.forma_pago,
+       bq.requiere_contrato,
+       bq.total_adjudicado,
+       bq.total_cotizado,
+       bq.total_adjudicado_mb,
+       bq.tiene_form500,
+       bq.correo_oc,
+       cq.cecos,
+       caq.cantidad_adjudicada AS total,
+       ncq.nro_cuenta,
+       bq.id_categoria_compra,
+       bq.codigo_proceso,
+       bq.desc_categoria_compra,
+       bq.tipo_sol
+FROM base_query bq
+         LEFT JOIN cantidad_adjudicada_query caq ON caq.id_cotizacion = bq.id_cotizacion
+         LEFT JOIN cecos_query cq ON cq.id_cotizacion = bq.id_cotizacion
+         LEFT JOIN nro_cuenta_query ncq ON ncq.id_cotizacion = bq.id_cotizacion;
+
+/***********************************F-DEP-RAC-ADQ-2-20/01/2020*****************************************/
+/***********************************I-DEP-EGS-ADQ-3-11/03/2020*****************************************/
+select pxp.f_insert_testructura_gui ('REPPAG', 'REPADQ');
+/***********************************F-DEP-EGS-ADQ-3-11/03/2020*****************************************/
+/***********************************I-DEP-EGS-ADQ-3-20/05/2020*****************************************/
 
    -----------------SQL-----------------------------
   CREATE OR REPLACE VIEW adq.vreporte_pago(
@@ -5352,195 +2425,3 @@ select pxp.f_insert_testructura_gui ('REPEST', 'REPADQ');
 /***********************************I-DEP-YMR-ADQ-5-29/03/2021*****************************************/
 select pxp.f_insert_testructura_gui ('BOLG', 'REPADQ');
 /***********************************F-DEP-YMR-ADQ-5-29/03/2021*****************************************/
-/***********************************I-DEP-EGS-ADQ-ETR-3771-27/04/2021*****************************************/
-CREATE OR REPLACE VIEW adq.vorden_compra(
-                                         id_cotizacion,
-                                         estado_reg,
-                                         estado,
-                                         lugar_entrega,
-                                         tipo_entrega,
-                                         fecha_coti,
-                                         numero_oc,
-                                         id_proveedor,
-                                         desc_proveedor,
-                                         fecha_entrega,
-                                         id_moneda,
-                                         moneda,
-                                         id_proceso_compra,
-                                         fecha_venc,
-                                         obs,
-                                         fecha_adju,
-                                         nro_contrato,
-                                         fecha_reg,
-                                         id_usuario_reg,
-                                         fecha_mod,
-                                         id_usuario_mod,
-                                         usr_reg,
-                                         usr_mod,
-                                         id_estado_wf,
-                                         id_proceso_wf,
-                                         desc_moneda,
-                                         tipo_cambio_conv,
-                                         email,
-                                         numero,
-                                         num_tramite,
-                                         id_obligacion_pago,
-                                         tiempo_entrega,
-                                         funcionario_contacto,
-                                         telefono_contacto,
-                                         correo_contacto,
-                                         prellenar_oferta,
-                                         forma_pago,
-                                         requiere_contrato,
-                                         total_adjudicado,
-                                         total_cotizado,
-                                         total_adjudicado_mb,
-                                         tiene_form500,
-                                         correo_oc,
-                                         cecos,
-                                         total,
-                                         nro_cuenta,
-                                         id_categoria_compra,
-                                         codigo_proceso,
-                                         desc_categoria_compra,
-                                         tipo_sol)
-AS
-WITH detalle AS(
-    SELECT cd.id_cotizacion,
-           sum(cd.cantidad_adju * cd.precio_unitario) AS total_adjudicado,
-           sum(cd.cantidad_coti * cd.precio_unitario) AS total_cotizado,
-           sum(cd.cantidad_adju * cd.precio_unitario_mb) AS total_adjudicado_mb
-    FROM adq.tcotizacion_det cd
-    WHERE cd.estado_reg::text = 'activo'::text
-    GROUP BY cd.id_cotizacion), base_query AS(
-    SELECT cot.id_cotizacion,
-           cot.estado_reg,
-           cot.estado,
-           cot.lugar_entrega,
-           cot.tipo_entrega,
-           cot.fecha_coti,
-           COALESCE(cot.numero_oc, 'S/N'::character varying) AS numero_oc,
-           cot.id_proveedor,
-           pro.desc_proveedor,
-           cot.fecha_entrega,
-           cot.id_moneda,
-           mon.moneda,
-           cot.id_proceso_compra,
-           cot.fecha_venc,
-           cot.obs,
-           cot.fecha_adju,
-           cot.nro_contrato,
-           cot.fecha_reg,
-           cot.id_usuario_reg,
-           cot.fecha_mod,
-           cot.id_usuario_mod,
-           usu1.cuenta AS usr_reg,
-           usu2.cuenta AS usr_mod,
-           cot.id_estado_wf,
-           cot.id_proceso_wf,
-           mon.codigo AS desc_moneda,
-           cot.tipo_cambio_conv,
-           pro.email,
-           sol.numero,
-           sol.num_tramite,
-           cot.id_obligacion_pago,
-           cot.tiempo_entrega,
-           cot.funcionario_contacto,
-           cot.telefono_contacto,
-           cot.correo_contacto,
-           cot.prellenar_oferta,
-           cot.forma_pago,
-           cot.requiere_contrato,
-           d.total_adjudicado,
-           d.total_cotizado,
-           d.total_adjudicado_mb,
-           cot.tiene_form500,
-           cot.correo_oc,
-           sol.id_categoria_compra,
-           proc.codigo_proceso,
-           ctp.nombre AS desc_categoria_compra,
-           sol.tipo AS tipo_sol
-    FROM adq.tcotizacion cot
-             JOIN adq.tproceso_compra proc ON proc.id_proceso_compra = cot.id_proceso_compra
-             JOIN adq.tsolicitud sol ON sol.id_solicitud = proc.id_solicitud
-             JOIN segu.tusuario usu1 ON usu1.id_usuario = cot.id_usuario_reg
-             JOIN detalle d ON d.id_cotizacion = cot.id_cotizacion
-             JOIN param.tmoneda mon ON mon.id_moneda = cot.id_moneda
-             JOIN param.vproveedor pro ON pro.id_proveedor = cot.id_proveedor
-             LEFT JOIN segu.tusuario usu2 ON usu2.id_usuario = cot.id_usuario_mod
-             LEFT JOIN adq.tcategoria_compra ctp ON ctp.id_categoria_compra = sol.id_categoria_compra), cantidad_adjudicada_query AS(
-    SELECT ctdet.id_cotizacion,
-           sum(ctdet.cantidad_adju) AS cantidad_adjudicada
-    FROM adq.tcotizacion_det ctdet
-             JOIN base_query base ON base.id_cotizacion = ctdet.id_cotizacion
-    GROUP BY ctdet.id_cotizacion), cecos_query AS(
-    SELECT ctd.id_cotizacion,
-           array_to_string(array_agg(DISTINCT upper(cc.codigo_cc)), '<br>'::text)::character varying AS cecos
-    FROM adq.tcotizacion_det ctd
-             JOIN adq.tsolicitud_det sold ON sold.id_solicitud_det = ctd.id_solicitud_det
-             JOIN param.tconcepto_ingas cig ON cig.id_concepto_ingas = sold.id_concepto_ingas
-             JOIN param.vcentro_costo cc ON cc.id_centro_costo = sold.id_centro_costo
-             JOIN base_query base ON base.id_cotizacion = ctd.id_cotizacion
-    GROUP BY ctd.id_cotizacion), nro_cuenta_query AS(
-    SELECT ctd.id_cotizacion,
-           array_to_string(array_agg(DISTINCT cta.nro_cuenta), '<br>'::text) AS nro_cuenta
-    FROM adq.tcotizacion_det ctd
-             JOIN adq.tsolicitud_det sold ON sold.id_solicitud_det = ctd.id_solicitud_det
-             LEFT JOIN conta.tcuenta cta ON cta.id_cuenta = sold.id_cuenta
-             JOIN base_query base ON base.id_cotizacion = ctd.id_cotizacion
-    GROUP BY ctd.id_cotizacion)
-SELECT bq.id_cotizacion,
-       bq.estado_reg,
-       bq.estado,
-       bq.lugar_entrega,
-       bq.tipo_entrega,
-       bq.fecha_coti,
-       bq.numero_oc,
-       bq.id_proveedor,
-       bq.desc_proveedor,
-       bq.fecha_entrega,
-       bq.id_moneda,
-       bq.moneda,
-       bq.id_proceso_compra,
-       bq.fecha_venc,
-       bq.obs,
-       bq.fecha_adju,
-       bq.nro_contrato,
-       bq.fecha_reg,
-       bq.id_usuario_reg,
-       bq.fecha_mod,
-       bq.id_usuario_mod,
-       bq.usr_reg,
-       bq.usr_mod,
-       bq.id_estado_wf,
-       bq.id_proceso_wf,
-       bq.desc_moneda,
-       bq.tipo_cambio_conv,
-       bq.email,
-       bq.numero,
-       bq.num_tramite,
-       bq.id_obligacion_pago,
-       bq.tiempo_entrega,
-       bq.funcionario_contacto,
-       bq.telefono_contacto,
-       bq.correo_contacto,
-       bq.prellenar_oferta,
-       bq.forma_pago,
-       bq.requiere_contrato,
-       bq.total_adjudicado,
-       bq.total_cotizado,
-       bq.total_adjudicado_mb,
-       bq.tiene_form500,
-       bq.correo_oc,
-       cq.cecos,
-       caq.cantidad_adjudicada AS total,
-       ncq.nro_cuenta,
-       bq.id_categoria_compra,
-       bq.codigo_proceso,
-       bq.desc_categoria_compra,
-       bq.tipo_sol
-FROM base_query bq
-         LEFT JOIN cantidad_adjudicada_query caq ON caq.id_cotizacion = bq.id_cotizacion
-         LEFT JOIN cecos_query cq ON cq.id_cotizacion = bq.id_cotizacion
-         LEFT JOIN nro_cuenta_query ncq ON ncq.id_cotizacion = bq.id_cotizacion;
-/***********************************F-DEP-EGS-ADQ-ETR-3771-27/04/2021*****************************************/
